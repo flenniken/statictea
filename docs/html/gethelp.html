@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>gethelp.nim</h1>
 
-<pre class="description">
-Get the command line help message.
-</pre>
+<p>Get the command line help message.</p>
 
 Nim source code: <a href="../../src/gethelp.nim">gethelp.nim</a>
 
@@ -47,12 +51,10 @@ Nim source code: <a href="../../src/gethelp.nim">gethelp.nim</a>
 
 <h3 id="getHelp">getHelp</h3>
 
-<pre class="description">
-Get the command line help message.
-</pre>
+<p>Get the command line help message.</p>
 
 <pre class="nim-code">
-func getHelp(): string
+func getHelp(): string 
 </pre>
 
 

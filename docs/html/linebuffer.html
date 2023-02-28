@@ -22,29 +22,32 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>linebuffer.nim</h1>
 
-<pre class="description">
-Read lines from a stream without exceeding the maximum line length. The returned lines contain the line ending, either crlf or lf.
+<p>Read lines from a stream without exceeding the maximum line length. The returned lines contain the line ending, either crlf or lf.
 
-Example:
+</p><p>Example:
 
-~~~
-let lbO = newLineBuffer(stream)
+</p><pre class="desc-code">let lbO = newLineBuffer(stream)
 check lbO.isSome == true
 var lb = lbO.get()
 while line = lb.readLine():
   processLine(line)
-~~~
 </pre>
 
 Nim source code: <a href="../../src/linebuffer.nim">linebuffer.nim</a>
@@ -69,9 +72,7 @@ Nim source code: <a href="../../src/linebuffer.nim">linebuffer.nim</a>
 
 <h3 id="minMaxLineLen">minMaxLineLen</h3>
 
-<pre class="description">
-The minimum line length supported.
-</pre>
+<p>The minimum line length supported.</p>
 
 <pre class="nim-code">
 minMaxLineLen = 8
@@ -79,9 +80,7 @@ minMaxLineLen = 8
 
 <h3 id="maxMaxLineLen">maxMaxLineLen</h3>
 
-<pre class="description">
-The maximum line length supported.
-</pre>
+<p>The maximum line length supported.</p>
 
 <pre class="nim-code">
 maxMaxLineLen = 8192
@@ -89,9 +88,7 @@ maxMaxLineLen = 8192
 
 <h3 id="defaultMaxLineLen">defaultMaxLineLen</h3>
 
-<pre class="description">
-The maximum line length.
-</pre>
+<p>The maximum line length.</p>
 
 <pre class="nim-code">
 defaultMaxLineLen = 1024
@@ -99,9 +96,7 @@ defaultMaxLineLen = 1024
 
 <h3 id="defaultBufferSize">defaultBufferSize</h3>
 
-<pre class="description">
-The buffer size for reading lines.
-</pre>
+<p>The buffer size for reading lines.</p>
 
 <pre class="nim-code">
 defaultBufferSize = 16384
@@ -109,17 +104,17 @@ defaultBufferSize = 16384
 
 <h3 id="LineBuffer">LineBuffer</h3>
 
-<pre class="description">
-The LineBuffer holds information about reading lines from a buffer.
-* stream -- a stream containing lines to read processed sequentially
-* maxLineLen -- the maximum line length
-* bufferSize -- the buffer size for reading lines
-* lineNum -- he current line number in the file starting at 1
-* pos -- current byte position in the buffer
-* charsRead -- number of bytes in the buffer
-* buffer -- memory allocated for the buffer
-* filename -- the optional stream's filename
-</pre>
+<p>The LineBuffer holds information about reading lines from a buffer.
+</p><ul>
+<li>stream -- a stream containing lines to read processed sequentially
+</li><li>maxLineLen -- the maximum line length
+</li><li>bufferSize -- the buffer size for reading lines
+</li><li>lineNum -- he current line number in the file starting at 1
+</li><li>pos -- current byte position in the buffer
+</li><li>charsRead -- number of bytes in the buffer
+</li><li>buffer -- memory allocated for the buffer
+</li><li>filename -- the optional stream's filename</li></ul>
+
 
 <pre class="nim-code">
 LineBuffer = object
@@ -136,94 +131,79 @@ LineBuffer = object
 
 <h3 id="getLineNum">getLineNum</h3>
 
-<pre class="description">
-Return the current line number.
-</pre>
+<p>Return the current line number.</p>
 
 <pre class="nim-code">
-proc getLineNum(lineBuffer: LineBuffer): int
+proc getLineNum(lineBuffer: LineBuffer): int 
 </pre>
 
 <h3 id="getMaxLineLen">getMaxLineLen</h3>
 
-<pre class="description">
-Return the maximum line length.
-</pre>
+<p>Return the maximum line length.</p>
 
 <pre class="nim-code">
-proc getMaxLineLen(lineBuffer: LineBuffer): int
+proc getMaxLineLen(lineBuffer: LineBuffer): int 
 </pre>
 
 <h3 id="getFilename">getFilename</h3>
 
-<pre class="description">
-Return the filename of the stream, if there is one.
-</pre>
+<p>Return the filename of the stream, if there is one.</p>
 
 <pre class="nim-code">
-proc getFilename(lineBuffer: LineBuffer): string
+proc getFilename(lineBuffer: LineBuffer): string 
 </pre>
 
 <h3 id="getStream">getStream</h3>
 
-<pre class="description">
-Return the associated stream.
-</pre>
+<p>Return the associated stream.</p>
 
 <pre class="nim-code">
-proc getStream(lineBuffer: LineBuffer): Stream
+proc getStream(lineBuffer: LineBuffer): Stream 
 </pre>
 
 <h3 id="newLineBuffer">newLineBuffer</h3>
 
-<pre class="description">
-Return a new LineBuffer for the given stream.
-</pre>
+<p>Return a new LineBuffer for the given stream.</p>
 
 <pre class="nim-code">
 proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
                    bufferSize: int = defaultBufferSize; filename: string = ""): Option[
-    LineBuffer]
+    LineBuffer] 
 </pre>
 
 <h3 id="reset">reset</h3>
 
-<pre class="description">
-Clear the buffer and set the read position at the start of the stream.
-</pre>
+<p>Clear the buffer and set the read position at the start of the stream.</p>
 
 <pre class="nim-code">
-proc reset(lb: var LineBuffer)
+proc reset(lb: var LineBuffer) {.raises: [IOError, OSError], tags: [].}
 </pre>
 
 <h3 id="readline">readline</h3>
 
-<pre class="description">
-Return the next line from the LineBuffer. Reading starts from the
+<p>Return the next line from the LineBuffer. Reading starts from the
 current position in the stream and advances the amount read.
 
-A line end is defined by either a crlf or lf and they get
+</p><p>A line end is defined by either a crlf or lf and they get
 returned with the line bytes. A line is returned when the line
 ending is found, when the stream runs out of bytes or when the
 maximum line length is reached.
 
-You cannot tell whether the line was truncated or not without
+</p><p>You cannot tell whether the line was truncated or not without
 reading the next line. When no more data exists in the stream, an
-empty string is returned.
-</pre>
+empty string is returned.</p>
 
 <pre class="nim-code">
-proc readline(lb: var LineBuffer): string
+proc readline(lb: var LineBuffer): string {.raises: [IOError, OSError],
+    tags: [ReadIOEffect].}
 </pre>
 
 <h3 id="yieldContentLine">yieldContentLine</h3>
 
-<pre class="description">
-Yield one line at a time from the content string and keep the line endings.
-</pre>
+<p>Yield one line at a time from the content string and keep the line endings.</p>
 
 <pre class="nim-code">
-iterator yieldContentLine(content: string): string
+iterator yieldContentLine(content: string): string 
 </pre>
 
 

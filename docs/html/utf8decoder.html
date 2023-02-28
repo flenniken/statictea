@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>utf8decoder.nim</h1>
 
-<pre class="description">
-Functions for decoding and validating UTF-8.
-</pre>
+<p>Functions for decoding and validating UTF-8.</p>
 
 Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 
@@ -51,60 +55,50 @@ Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 
 <h3 id="decode">decode</h3>
 
-<pre class="description">
-Interior part of a UTF-8 decoder.
-</pre>
+<p>Interior part of a UTF-8 decoder.</p>
 
 <pre class="nim-code">
-proc decode(state: var uint32; codep: var uint32; sByte: char)
+proc decode(state: var uint32; codep: var uint32; sByte: char) 
 </pre>
 
 <h3 id="yieldUtf8Chars">yieldUtf8Chars</h3>
 
-<pre class="description">
-Iterate through the string's UTF-8 character byte sequences.
+<p>Iterate through the string's UTF-8 character byte sequences.
 For each character set ixStartSeq, ixEndSeq, and codePoint.
 Return true when the bytes sequence is valid else return false.
 
-You can get the current byte sequence with:
+</p><p>You can get the current byte sequence with:
 str[ixStartSeq .. ixEndSeq]
 
-A UTF-8 character is a one to four byte sequence.
-</pre>
+</p><p>A UTF-8 character is a one to four byte sequence.</p>
 
 <pre class="nim-code">
 iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
-                        codePoint: var uint32): bool
+                        codePoint: var uint32): bool 
 </pre>
 
 <h3 id="validateUtf8String">validateUtf8String</h3>
 
-<pre class="description">
-Return the position of the first invalid UTF-8 byte in the string else return -1.
-</pre>
+<p>Return the position of the first invalid UTF-8 byte in the string else return -1.</p>
 
 <pre class="nim-code">
-func validateUtf8String(str: string): int
+func validateUtf8String(str: string): int 
 </pre>
 
 <h3 id="sanitizeUtf8">sanitizeUtf8</h3>
 
-<pre class="description">
-Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.
-</pre>
+<p>Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.</p>
 
 <pre class="nim-code">
-func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
+func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string 
 </pre>
 
 <h3 id="utf8CharString">utf8CharString</h3>
 
-<pre class="description">
-Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.
-</pre>
+<p>Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.</p>
 
 <pre class="nim-code">
-func utf8CharString(str: string; pos: Natural): string
+func utf8CharString(str: string; pos: Natural): string 
 </pre>
 
 

@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>signatures.nim</h1>
 
-<pre class="description">
-Statictea function signatures and parameter checking.
-</pre>
+<p>Statictea function signatures and parameter checking.</p>
 
 Nim source code: <a href="../../src/signatures.nim">signatures.nim</a>
 
@@ -51,52 +55,42 @@ Nim source code: <a href="../../src/signatures.nim">signatures.nim</a>
 
 <h3 id="paramCodeString">paramCodeString</h3>
 
-<pre class="description">
-Return a string representation of a ParamCode object.
-</pre>
+<p>Return a string representation of a ParamCode object.</p>
 
 <pre class="nim-code">
-func paramCodeString(paramCode: ParamCode): string
+func paramCodeString(paramCode: ParamCode): string 
 </pre>
 
 <h3 id="kindToParamCode">kindToParamCode</h3>
 
-<pre class="description">
-Convert a value type to a parameter type.
-</pre>
+<p>Convert a value type to a parameter type.</p>
 
 <pre class="nim-code">
-func kindToParamCode(kind: ValueKind): ParamCode
+func kindToParamCode(kind: ValueKind): ParamCode 
 </pre>
 
 <h3 id="sameType">sameType</h3>
 
-<pre class="description">
-Check whether the param type is the same type or compatible with the value.
-</pre>
+<p>Check whether the param type is the same type or compatible with the value.</p>
 
 <pre class="nim-code">
-func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
+func sameType(paramCode: ParamCode; valueKind: ValueKind): bool 
 </pre>
 
 <h3 id="sameType-1">sameType</h3>
 
-<pre class="description">
-Check whether the param type is the same type or compatible with the value.
-</pre>
+<p>Check whether the param type is the same type or compatible with the value.</p>
 
 <pre class="nim-code">
-func sameType(paramType: ParamType; valueKind: ValueKind): bool
+func sameType(paramType: ParamType; valueKind: ValueKind): bool 
 </pre>
 
 <h3 id="mapParameters">mapParameters</h3>
 
-<pre class="description">
-Create a dictionary of the parameters and arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.
-</pre>
+<p>Create a dictionary of the parameters and arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.</p>
 
 <pre class="nim-code">
-func mapParameters(signature: Signature; args: seq[Value]): FunResult
+func mapParameters(signature: Signature; args: seq[Value]): FunResult 
 </pre>
 
 

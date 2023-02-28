@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>functions.nim</h1>
 
-<pre class="description">
-This module contains the StaticTea functions and supporting types. The StaticTea language functions start with "fun", for example, the "fun_cmp_ffi" function implements on of the StaticTea "cmp" functions.
-</pre>
+<p>This module contains the StaticTea functions and supporting types. The StaticTea language functions start with "fun", for example, the "fun_cmp_ffi" function implements on of the StaticTea "cmp" functions.</p>
 
 Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 
@@ -140,9 +144,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 
 <h3 id="StringOr">StringOr</h3>
 
-<pre class="description">
-StringOr holds a string or a warning.
-</pre>
+<p>StringOr holds a string or a warning.</p>
 
 <pre class="nim-code">
 StringOr = OpResultWarn[string]
@@ -150,9 +152,7 @@ StringOr = OpResultWarn[string]
 
 <h3 id="PathComponents">PathComponents</h3>
 
-<pre class="description">
-PathComponents holds the components of the file path components.
-</pre>
+<p>PathComponents holds the components of the file path components.</p>
 
 <pre class="nim-code">
 PathComponents = object
@@ -165,276 +165,224 @@ PathComponents = object
 
 <h3 id="newStringOr">newStringOr</h3>
 
-<pre class="description">
-Create a new StringOr object containing a warning.
-</pre>
+<p>Create a new StringOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
+func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr 
 </pre>
 
 <h3 id="newStringOr-1">newStringOr</h3>
 
-<pre class="description">
-Create a new StringOr object containing a warning.
-</pre>
+<p>Create a new StringOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newStringOr(warningData: WarningData): StringOr
+func newStringOr(warningData: WarningData): StringOr 
 </pre>
 
 <h3 id="newStringOr-2">newStringOr</h3>
 
-<pre class="description">
-Create a new StringOr object containing a string.
-</pre>
+<p>Create a new StringOr object containing a string.</p>
 
 <pre class="nim-code">
-func newStringOr(str: string): StringOr
+func newStringOr(str: string): StringOr 
 </pre>
 
 <h3 id="newPathComponents">newPathComponents</h3>
 
-<pre class="description">
-Create a new PathComponents object from its pieces.
-</pre>
+<p>Create a new PathComponents object from its pieces.</p>
 
 <pre class="nim-code">
-func newPathComponents(dir, filename, basename, ext: string): PathComponents
+func newPathComponents(dir, filename, basename, ext: string): PathComponents 
 </pre>
 
 <h3 id="signatureDetails">signatureDetails</h3>
 
-<pre class="description">
-Convert the signature object to a dictionary value.
-</pre>
+<p>Convert the signature object to a dictionary value.</p>
 
 <pre class="nim-code">
-func signatureDetails(signature: Signature): Value
+func signatureDetails(signature: Signature): Value 
 </pre>
 
 <h3 id="functionDetails">functionDetails</h3>
 
-<pre class="description">
-Convert the function spec to a dictionary value.
-</pre>
+<p>Convert the function spec to a dictionary value.</p>
 
 <pre class="nim-code">
-func functionDetails(fs: FunctionSpec): Value
+func functionDetails(fs: FunctionSpec): Value 
 </pre>
 
 <h3 id="cmpBaseValues">cmpBaseValues</h3>
 
-<pre class="description">
-Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
-</pre>
+<p>Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.</p>
 
 <pre class="nim-code">
-func cmpBaseValues(a, b: Value; insensitive: bool = false): int
+func cmpBaseValues(a, b: Value; insensitive: bool = false): int 
 </pre>
 
 <h3 id="parseNumber">parseNumber</h3>
 
-<pre class="description">
-Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
-</pre>
+<p>Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.</p>
 
 <pre class="nim-code">
-func parseNumber(line: string; start: Natural): ValuePosSiOr
+func parseNumber(line: string; start: Natural): ValuePosSiOr 
 </pre>
 
 <h3 id="formatString">formatString</h3>
 
-<pre class="description">
-Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
+<p>Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
 
-~~~
-let first = "Earl"
+</p><pre class="desc-code">let first = "Earl"
 let last = "Grey"
 "name: {first} {last}" => "name: Earl Grey"
-~~~
-
+</pre><p>
 To enter a left bracket use two in a row.
 
-~~~
-"{{" => "{"
-~~~
+</p><pre class="desc-code">"{{" => "{"
 </pre>
 
 <pre class="nim-code">
-proc formatString(variables: Variables; text: string): StringOr
+proc formatString(variables: Variables; text: string): StringOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="fun_cmp_iii">fun_cmp_iii</h3>
 
-<pre class="description">
-Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
-~~~
-cmp(a: int, b: int) int
-~~~
-
+</p><pre class="desc-code">cmp(a: int, b: int) int
+</pre><p>
 Examples:
 
-~~~
-cmp(7, 9) => -1
+</p><pre class="desc-code">cmp(7, 9) => -1
 cmp(8, 8) => 0
 cmp(9, 2) => 1
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_cmp_ffi">fun_cmp_ffi</h3>
 
-<pre class="description">
-Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
-~~~
-cmp(a: float, b: float) int
-~~~
-
+</p><pre class="desc-code">cmp(a: float, b: float) int
+</pre><p>
 Examples:
 
-~~~
-cmp(7.8, 9.1) => -1
+</p><pre class="desc-code">cmp(7.8, 9.1) => -1
 cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_cmp_ssobi">fun_cmp_ssobi</h3>
 
-<pre class="description">
-Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
 
-You have the option to compare case insensitive. Case sensitive
+</p><p>You have the option to compare case insensitive. Case sensitive
 is the default.
 
-~~~
-cmp(a: string, b: string, insensitive: optional bool) int
-~~~
-
+</p><pre class="desc-code">cmp(a: string, b: string, insensitive: optional bool) int
+</pre><p>
 Examples:
 
-~~~
-cmp("coffee", "tea") => -1
+</p><pre class="desc-code">cmp("coffee", "tea") => -1
 cmp("tea", "tea") => 0
 cmp("Tea", "tea") => 1
 cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_concat_sss">fun_concat_sss</h3>
 
-<pre class="description">
-Concatenate two strings. See the join function for more that two arguments.
+<p>Concatenate two strings. See the join function for more that two arguments.
 
-~~~
-concat(a: string, b: string) string
-~~~
-
+</p><pre class="desc-code">concat(a: string, b: string) string
+</pre><p>
 Examples:
 
-~~~
-concat("tea", " time") => "tea time"
+</p><pre class="desc-code">concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_len_si">fun_len_si</h3>
 
-<pre class="description">
-Number of unicode characters in a string.
+<p>Number of unicode characters in a string.
 
-~~~
-len(str: string) int
-~~~
-
+</p><pre class="desc-code">len(str: string) int
+</pre><p>
 Examples:
 
-~~~
-len("tea") => 3
+</p><pre class="desc-code">len("tea") => 3
 len("añyóng") => 6
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_len_li">fun_len_li</h3>
 
-<pre class="description">
-Number of elements in a list.
+<p>Number of elements in a list.
 
-~~~
-len(list: list) int
-~~~
-
+</p><pre class="desc-code">len(list: list) int
+</pre><p>
 Examples:
 
-~~~
-len(list()) => 0
+</p><pre class="desc-code">len(list()) => 0
 len(list(1)) => 1
 len(list(4, 5)) => 2
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_len_di">fun_len_di</h3>
 
-<pre class="description">
-Number of elements in a dictionary.
+<p>Number of elements in a dictionary.
 
-~~~
-len(dictionary: dict) int
-~~~
-
+</p><pre class="desc-code">len(dictionary: dict) int
+</pre><p>
 Examples:
 
-~~~
-len(dict()) => 0
+</p><pre class="desc-code">len(dict()) => 0
 len(dict("a", 4)) => 1
 len(dict("a", 4, "b", 3)) => 2
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_get_lioaa">fun_get_lioaa</h3>
 
-<pre class="description">
-Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
+<p>Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
 
-~~~
-get(list: list, index: int, default: optional any) any
-~~~
-
+</p><pre class="desc-code">get(list: list, index: int, default: optional any) any
+</pre><p>
 Examples:
 
-~~~
-list = list(4, "a", 10)
+</p><pre class="desc-code">list = list(4, "a", 10)
 get(list, 0) => 4
 get(list, 1) => "a"
 get(list, 2) => 10
@@ -443,76 +391,67 @@ get(list, -1) => 10
 get(list, -2) => "a"
 get(list, -3) => 4
 get(list, -4, 11) => 11
-~~~
-
+</pre><p>
 You can also use bracket notation to access list items.
 
-~~~
-a = teas[0]
-~~~
+</p><pre class="desc-code">a = teas[0]
 </pre>
 
 <pre class="nim-code">
-func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_get_dsoaa">fun_get_dsoaa</h3>
 
-<pre class="description">
-Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
+<p>Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
 
-~~~
-get(dictionary: dict, key: string, default: optional any) any
-~~~
-
+</p><pre class="desc-code">get(dictionary: dict, key: string, default: optional any) any
+</pre><p>
 Note: For dictionary lookup you can use dot notation. It's the
 same as get without the default.
 
-Examples:
+</p><p>Examples:
 
-~~~
-d = dict("tea", "Earl Grey")
+</p><pre class="desc-code">d = dict("tea", "Earl Grey")
 get(d, "tea") => "Earl Grey"
 get(d, "coffee", "Tea") => "Tea"
-~~~
-
+</pre><p>
 Using dot notation:
-~~~
+</p><pre class="desc-code">~~~
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_if0_iaoaa">fun_if0_iaoaa</h3>
 
-<pre class="description">
-If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
+<p>If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
 
-The condition types and what is considered 0:
+</p><p>The condition types and what is considered 0:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always 0
+</p><ul>
+<li>bool -- false
+</li><li>int -- 0
+</li><li>float -- 0.0
+</li><li>string -- when the length of the string is 0
+</li><li>list -- when the length of the list is 0
+</li><li>dict -- when the length of the dictionary is 0
+</li><li>func -- always 0
 
-The IF functions are special in a couple of ways, see
+</li></ul>
+<p>The IF functions are special in a couple of ways, see
 the If Functions section.
 
-~~~
-if0(condition: any, then: any, else: optional any) any
-~~~
-
+</p><pre class="desc-code">if0(condition: any, then: any, else: optional any) any
+</pre><p>
 Examples:
 
-~~~
-a = if0(0, "tea", "beer") => tea
+</p><pre class="desc-code">a = if0(0, "tea", "beer") => tea
 a = if0(1, "tea", "beer") => beer
 a = if0(4, "tea", "beer") => beer
 a = if0("", "tea", "beer") => tea
@@ -526,355 +465,297 @@ a = if0(true, "tea", "beer") => beer
 
 a = if0(true, "tea")
 a = if0(false, "tea")
-~~~
-
+</pre><p>
 You don't have to assign the result of an if0 function which is
 useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
-~~~
-if0(c, warn("got zero value"))
-~~~
+</p><pre class="desc-code">if0(c, warn("got zero value"))
 </pre>
 
 <pre class="nim-code">
-func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_if_baoaa">fun_if_baoaa</h3>
 
-<pre class="description">
-If the condition is true, return the second argument, else return the third argument.
+<p>If the condition is true, return the second argument, else return the third argument.
 
-The IF functions are special in a couple of ways, see
+</p><p>The IF functions are special in a couple of ways, see
 the If Functions section.  You usually use boolean infix
 expressions for the condition, see:
 the Boolean Expressions section.
 
-~~~
-if(condition: bool, then: any, else: optional any) any
-~~~
-
+</p><pre class="desc-code">if(condition: bool, then: any, else: optional any) any
+</pre><p>
 Examples:
 
-~~~
-a = if(true, "tea", "beer") # => tea
+</p><pre class="desc-code">a = if(true, "tea", "beer") # => tea
 b = if(false, "tea", "beer") # => beer
 c = if((v < 5), "tea", "beer")
 d = if((v < 5), "tea")
-~~~
-
+</pre><p>
 You don't have to assign the result of an if function which is
 useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
-~~~
-if(c, warn("c is true"))
+</p><pre class="desc-code">if(c, warn("c is true"))
 if(c, return("skip"))
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_add_iii">fun_add_iii</h3>
 
-<pre class="description">
-Add two integers. A warning is generated on overflow.
+<p>Add two integers. A warning is generated on overflow.
 
-~~~
-add(a: int, b: int) int
-~~~
-
+</p><pre class="desc-code">add(a: int, b: int) int
+</pre><p>
 Examples:
 
-~~~
-add(1, 2) => 3
+</p><pre class="desc-code">add(1, 2) => 3
 add(3, -2) => 1
 add(-2, -5) => -7
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_add_fff">fun_add_fff</h3>
 
-<pre class="description">
-Add two floats. A warning is generated on overflow.
+<p>Add two floats. A warning is generated on overflow.
 
-~~~
-add(a: float, b: float) float
-~~~
-
+</p><pre class="desc-code">add(a: float, b: float) float
+</pre><p>
 Examples:
 
-~~~
-add(1.5, 2.3) => 3.8
+</p><pre class="desc-code">add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult
+func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_sub_iii">fun_sub_iii</h3>
 
-<pre class="description">
-Subtract two integers. A warning is generated on overflow.
+<p>Subtract two integers. A warning is generated on overflow.
 
-~~~
-sub(a: int, b: int) int
-~~~
-
+</p><pre class="desc-code">sub(a: int, b: int) int
+</pre><p>
 Examples:
 
-~~~
-sub(3, 1) => 2
+</p><pre class="desc-code">sub(3, 1) => 2
 add(3, -2) => 5
 add(1, 5) => -4
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_sub_fff">fun_sub_fff</h3>
 
-<pre class="description">
-Subtract two floats. A warning is generated on overflow.
+<p>Subtract two floats. A warning is generated on overflow.
 
-~~~
-sub(a: float, b: float) float
-~~~
-
+</p><pre class="desc-code">sub(a: float, b: float) float
+</pre><p>
 Examples:
 
-~~~
-sub(4.5, 2.3) => 2.2
+</p><pre class="desc-code">sub(4.5, 2.3) => 2.2
 sub(1.0, 2.2) => -1.2
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_exists_dsb">fun_exists_dsb</h3>
 
-<pre class="description">
-Determine whether a key exists in a dictionary. Return true when it exists, else false.
+<p>Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
-~~~
-exists(dictionary: dict, key: string) bool
-~~~
-
+</p><pre class="desc-code">exists(dictionary: dict, key: string) bool
+</pre><p>
 Examples:
 
-~~~
-d = dict("tea", "Earl")
+</p><pre class="desc-code">d = dict("tea", "Earl")
 exists(d, "tea") => true
 exists(d, "coffee") => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_case_iloaa">fun_case_iloaa</h3>
 
-<pre class="description">
-Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+<p>Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
 
-The first element of a case pair is the condition and the
+</p><p>The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the default
+</p><p>When none of the cases match the main condition, the default
 value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be integers. The return values
 can be any type.
 
-~~~
-case(condition: int, pairs: list, default: optional any) any
-~~~
-
+</p><pre class="desc-code">case(condition: int, pairs: list, default: optional any) any
+</pre><p>
 Examples:
 
-~~~
-cases = list(0, "tea", 1, "water", 2, "beer")
+</p><pre class="desc-code">cases = list(0, "tea", 1, "water", 2, "beer")
 case(0, cases) => "tea"
 case(1, cases) => "water"
 case(2, cases) => "beer"
 case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_case_sloaa">fun_case_sloaa</h3>
 
-<pre class="description">
-Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+<p>Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
 
-The first element of a case pair is the condition and the
+</p><p>The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
 condition. The function compares the conditions left to right and
 returns the first match.
 
-When none of the cases match the main condition, the default
+</p><p>When none of the cases match the main condition, the default
 value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be strings. The return values
 can be any type.
 
-~~~
-case(condition: string, pairs: list, default: optional any) any
-~~~
-
+</p><pre class="desc-code">case(condition: string, pairs: list, default: optional any) any
+</pre><p>
 Examples:
 
-~~~
-cases = list("tea", 15, "water", 2.3, "beer", "cold")
+</p><pre class="desc-code">cases = list("tea", 15, "water", 2.3, "beer", "cold")
 case("tea", cases) => 15
 case("water", cases) => 2.3
 case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="parseVersion">parseVersion</h3>
 
-<pre class="description">
-Parse a StaticTea version number and return its three components.
-</pre>
+<p>Parse a StaticTea version number and return its three components.</p>
 
 <pre class="nim-code">
-func parseVersion(version: string): Option[(int, int, int)]
+func parseVersion(version: string): Option[(int, int, int)] 
 </pre>
 
 <h3 id="fun_cmpVersion_ssi">fun_cmpVersion_ssi</h3>
 
-<pre class="description">
-Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
-~~~
-cmpVersion(versionA: string, versionB: string) int
-~~~
-
+</p><pre class="desc-code">cmpVersion(versionA: string, versionB: string) int
+</pre><p>
 StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
 
-Examples:
+</p><p>Examples:
 
-~~~
-cmpVersion("1.2.5", "1.1.8") => 1
+</p><pre class="desc-code">cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_float_if">fun_float_if</h3>
 
-<pre class="description">
-Create a float from an int.
+<p>Create a float from an int.
 
-~~~
-float(num: int) float
-~~~
-
+</p><pre class="desc-code">float(num: int) float
+</pre><p>
 Examples:
 
-~~~
-float(2) => 2.0
+</p><pre class="desc-code">float(2) => 2.0
 float(-33) => -33.0
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_float_sf">fun_float_sf</h3>
 
-<pre class="description">
-Create a float from a number string.
+<p>Create a float from a number string.
 
-~~~
-float(numString: string) float
-~~~
-
+</p><pre class="desc-code">float(numString: string) float
+</pre><p>
 Examples:
 
-~~~
-float("2") => 2.0
+</p><pre class="desc-code">float("2") => 2.0
 float("2.4") => 2.4
 float("33") => 33.0
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_float_saa">fun_float_saa</h3>
 
-<pre class="description">
-Create a float from a number string. If the string is not a number, return the default.
+<p>Create a float from a number string. If the string is not a number, return the default.
 
-~~~
-float(numString: string, default: optional any) any
-~~~
-
+</p><pre class="desc-code">float(numString: string, default: optional any) any
+</pre><p>
 Examples:
 
-~~~
-float("2") => 2.0
+</p><pre class="desc-code">float("2") => 2.0
 float("notnum", "nan") => nan
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_int_fosi">fun_int_fosi</h3>
 
-<pre class="description">
-Create an int from a float.
+<p>Create an int from a float.
 
-~~~
-int(num: float, roundOption: optional string) int
-~~~
-
+</p><pre class="desc-code">int(num: float, roundOption: optional string) int
+</pre><p>
 Round options:
 
-* "round" - nearest integer, the default.
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+</p><ul>
+<li>"round" - nearest integer, the default.
+</li><li>"floor" - integer below (to the left on number line)
+</li><li>"ceiling" - integer above (to the right on number line)
+</li><li>"truncate" - remove decimals
 
-Examples:
+</li></ul>
+<p>Examples:
 
-~~~
-int(2.34) => 2
+</p><pre class="desc-code">int(2.34) => 2
 int(2.34, "round") => 2
 int(-2.34, "round") => -2
 int(6.5, "round") => 7
@@ -885,33 +766,31 @@ int(6.3, "ceiling") => 7
 int(-6.3, "ceiling") => -6
 int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_int_sosi">fun_int_sosi</h3>
 
-<pre class="description">
-Create an int from a number string.
+<p>Create an int from a number string.
 
-~~~
-int(numString: string, roundOption: optional string) int
-~~~
-
+</p><pre class="desc-code">int(numString: string, roundOption: optional string) int
+</pre><p>
 Round options:
 
-* "round" - nearest integer, the default
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+</p><ul>
+<li>"round" - nearest integer, the default
+</li><li>"floor" - integer below (to the left on number line)
+</li><li>"ceiling" - integer above (to the right on number line)
+</li><li>"truncate" - remove decimals
 
-Examples:
+</li></ul>
+<p>Examples:
 
-~~~
-int("2") => 2
+</p><pre class="desc-code">int("2") => 2
 int("2.34") => 2
 int("-2.34", "round") => -2
 int("6.5", "round") => 7
@@ -922,74 +801,68 @@ int("6.3", "ceiling") => 7
 int("-6.3", "ceiling") => -6
 int("6.3456", "truncate") => 6
 int("-6.3456", "truncate") => -6
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_int_ssaa">fun_int_ssaa</h3>
 
-<pre class="description">
-Create an int from a number string. If the string is not a number, return the default value.
+<p>Create an int from a number string. If the string is not a number, return the default value.
 
-~~~
-int(numString: string, roundOption: string, default: optional any) any
-~~~
-
+</p><pre class="desc-code">int(numString: string, roundOption: string, default: optional any) any
+</pre><p>
 Round options:
 
-* "round" - nearest integer, the default
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+</p><ul>
+<li>"round" - nearest integer, the default
+</li><li>"floor" - integer below (to the left on number line)
+</li><li>"ceiling" - integer above (to the right on number line)
+</li><li>"truncate" - remove decimals
 
-Examples:
+</li></ul>
+<p>Examples:
 
-~~~
-int("2", "round", "nan") => 2
+</p><pre class="desc-code">int("2", "round", "nan") => 2
 int("notnum", "round", "nan") => nan
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="if0Condition">if0Condition</h3>
 
-<pre class="description">
-Convert the value to a boolean.
-</pre>
+<p>Convert the value to a boolean.</p>
 
 <pre class="nim-code">
-func if0Condition(cond: Value): bool
+func if0Condition(cond: Value): bool 
 </pre>
 
 <h3 id="fun_bool_ab">fun_bool_ab</h3>
 
-<pre class="description">
-Create an bool from a value.
+<p>Create an bool from a value.
 
-~~~
-bool(value: Value) bool
-~~~
-
+</p><pre class="desc-code">bool(value: Value) bool
+</pre><p>
 False values by variable types:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always false
+</p><ul>
+<li>bool -- false
+</li><li>int -- 0
+</li><li>float -- 0.0
+</li><li>string -- when the length of the string is 0
+</li><li>list -- when the length of the list is 0
+</li><li>dict -- when the length of the dictionary is 0
+</li><li>func -- always false
 
-Examples:
+</li></ul>
+<p>Examples:
 
-~~~
-bool(0) => false
+</p><pre class="desc-code">bool(0) => false
 bool(0.0) => false
 bool([]) => false
 bool("") => false
@@ -1000,26 +873,22 @@ bool(3.3) => true
 bool([8]) => true
 bool("tea") => true
 bool(dict("tea", 2)) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_find_ssoaa">fun_find_ssoaa</h3>
 
-<pre class="description">
-Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
+<p>Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
 
-~~~
-find(str: string, substring: string, default: optional any) any
-~~~
-
+</p><pre class="desc-code">find(str: string, substring: string, default: optional any) any
+</pre><p>
 Examples:
 
-~~~
-       0123456789 1234567
+</p><pre class="desc-code">       0123456789 1234567
 msg = "Tea time at 3:30."
 find(msg, "Tea") = 0
 find(msg, "time") = 4
@@ -1027,97 +896,81 @@ find(msg, "me") = 6
 find(msg, "party", -1) = -1
 find(msg, "party", len(msg)) = 17
 find(msg, "party", 0) = 0
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_slice_siois">fun_slice_siois</h3>
 
-<pre class="description">
-Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
+<p>Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
 
-The start index and length are by unicode characters not bytes.
+</p><p>The start index and length are by unicode characters not bytes.
 
-~~~
-slice(str: string, start: int, length: optional int) string
-~~~
-
+</p><pre class="desc-code">slice(str: string, start: int, length: optional int) string
+</pre><p>
 Examples:
 
-~~~
-slice("Earl Grey", 1, 3) => "arl"
+</p><pre class="desc-code">slice("Earl Grey", 1, 3) => "arl"
 slice("Earl Grey", 6) => "rey"
 slice("añyóng", 0, 3) => "añy"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult
+func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_dup_sis">fun_dup_sis</h3>
 
-<pre class="description">
-Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
+<p>Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
 
-~~~
-dup(pattern: string, count: int) string
-~~~
-
+</p><pre class="desc-code">dup(pattern: string, count: int) string
+</pre><p>
 Examples:
 
-~~~
-dup("=", 3) => "==="
+</p><pre class="desc-code">dup("=", 3) => "==="
 dup("abc", 0) => ""
 dup("abc", 1) => "abc"
 dup("abc", 2) => "abcabc"
 dup("", 3) => ""
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult
+func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_dict_old">fun_dict_old</h3>
 
-<pre class="description">
-Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+<p>Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
-~~~
-dict(pairs: optional list) dict
-~~~
-
+</p><pre class="desc-code">dict(pairs: optional list) dict
+</pre><p>
 Examples:
 
-~~~
-dict() => {}
+</p><pre class="desc-code">dict() => {}
 dict(["a", 5]) => {"a": 5}
 dict(["a", 5, "b", 33, "c", 0]) =>
   {"a": 5, "b": 33, "c": 0}
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult
+func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_list_al">fun_list_al</h3>
 
-<pre class="description">
-Create a list of variables. You can also create a list with brackets.
+<p>Create a list of variables. You can also create a list with brackets.
 
-~~~
-list(...) list
-~~~
-
+</p><pre class="desc-code">list(...) list
+</pre><p>
 Examples:
 
-~~~
-a = list()
+</p><pre class="desc-code">a = list()
 a = list(1)
 a = list(1, 2, 3)
 a = list("a", 5, "b")
@@ -1125,77 +978,66 @@ a = []
 a = [1]
 a = [1, 2, 3]
 a = ["a", 5, "b"]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
+func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_listLoop_lapoab">fun_listLoop_lapoab</h3>
 
-<pre class="description">
-Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
+<p>Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
 
-You pass a list to loop over, a container to fill in, a callback
+</p><p>You pass a list to loop over, a container to fill in, a callback
 function, and an optional state variable. The function returns
 whether the callback stopped early or not.
 
-~~~
-listLoop(a: list, container: any, listCallback: func, state: optional any) bool
-~~~
-
+</p><pre class="desc-code">listLoop(a: list, container: any, listCallback: func, state: optional any) bool
+</pre><p>
 The callback gets passed the index to the item, its value, the
 container and the state variable.  The callback looks at the
 information and adds to the container when appropriate. The
 callback returns true to stop iterating.
 
-~~~
-listCallback(ix: int, item: any, container: any, state: optional any) bool
-~~~
-
+</p><pre class="desc-code">listCallback(ix: int, item: any, container: any, state: optional any) bool
+</pre><p>
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
-~~~
-o.container = []
+</p><pre class="desc-code">o.container = []
 list = [2,4,6,8]
 stopped = listLoop(list, o.container, b5)
 # o.container => [6, 8]
-~~~
-
+</pre><p>
 Below is the definition of the b5 callback function.
 
-~~~
-b5 = func(ix: int, value: int, container: list) bool
+</p><pre class="desc-code">b5 = func(ix: int, value: int, container: list) bool
   ## Collect values greater than 5.
   container &= if( (value > 5), value)
   return(false)
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_replace_siiss">fun_replace_siiss</h3>
 
-<pre class="description">
-Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
+<p>Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
 
-~~~
-replace(str: string, start: int, length: int, replacement: string) string
-~~~
+</p><pre class="desc-code">replace(str: string, start: int, length: int, replacement: string) string
+</pre><p>
+</p><ul>
+<li>str: string
+</li><li>start: substring start index
+</li><li>length: substring length
+</li><li>replacement: substring replacement
 
-* str: string
-* start: substring start index
-* length: substring length
-* replacement: substring replacement
+</li></ul>
+<p>Examples:
 
-Examples:
-
-Replace:
-~~~
+</p><p>Replace:
+</p><pre class="desc-code">~~~
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
 replace("123", 0, 1, "abcd") => abcd23
@@ -1205,20 +1047,17 @@ replace("123", 1, 1, "abcd") => 1abcd3
 replace("123", 1, 2, "abcd") => 1abcd
 
 replace("123", 2, 1, "abcd") => 12abcd
-~~~
-Insert:
-~~~
+</pre><p>Insert:
+</p><pre class="desc-code">~~~
 replace("123", 0, 0, "abcd") => abcd123
 replace("123", 1, 0, "abcd") => 1abcd23
 replace("123", 2, 0, "abcd") => 12abcd3
 replace("123", 3, 0, "abcd") => 123abcd
-~~~
-Append:
-~~~
+</pre><p>Append:
+</p><pre class="desc-code">~~~
 replace("123", 3, 0, "abcd") => 123abcd
-~~~
-Delete:
-~~~
+</pre><p>Delete:
+</p><pre class="desc-code">~~~
 replace("123", 0, 1, "") => 23
 replace("123", 0, 2, "") => 3
 replace("123", 0, 3, "") => ""
@@ -1227,76 +1066,64 @@ replace("123", 1, 1, "") => 13
 replace("123", 1, 2, "") => 1
 
 replace("123", 2, 1, "") => 12
-~~~
-Edge Cases:
-~~~
+</pre><p>Edge Cases:
+</p><pre class="desc-code">~~~
 replace("", 0, 0, "") =>
 replace("", 0, 0, "a") => a
 replace("", 0, 0, "ab") => ab
 replace("", 0, 0, "abc") => abc
 replace("", 0, 0, "abcd") => abcd
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_replaceRe_sls">fun_replaceRe_sls</h3>
 
-<pre class="description">
-Replace multiple parts of a string using regular expressions.
+<p>Replace multiple parts of a string using regular expressions.
 
-You specify one or more pairs of regex patterns and their string
+</p><p>You specify one or more pairs of regex patterns and their string
 replacements.
 
-~~~
-replaceRe(str: string, pairs: list) string
-~~~
-
+</p><pre class="desc-code">replaceRe(str: string, pairs: list) string
+</pre><p>
 Examples:
 
-~~~
-list = list("abc", "456", "def", "")
+</p><pre class="desc-code">list = list("abc", "456", "def", "")
 replaceRe("abcdefabc", list))
   => "456456"
-~~~
-
+</pre><p>
 For developing and debugging regular expressions see the
-website: https://regex101.com/
-</pre>
+website: https://regex101.com/</p>
 
 <pre class="nim-code">
-func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
+func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="parsePath">parsePath</h3>
 
-<pre class="description">
-Parse the given file path into its component pieces.
-</pre>
+<p>Parse the given file path into its component pieces.</p>
 
 <pre class="nim-code">
-func parsePath(path: string; separator = '/'): PathComponents
+func parsePath(path: string; separator = '/'): PathComponents 
 </pre>
 
 <h3 id="fun_path_sosd">fun_path_sosd</h3>
 
-<pre class="description">
-Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
+<p>Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
 
-You pass a path string and the optional path separator, forward
+</p><p>You pass a path string and the optional path separator, forward
 slash or or backslash. When no separator, the current
 system separator is used.
 
-~~~
-path(filename: string, separator: optional string) dict
-~~~
-
+</p><pre class="desc-code">path(filename: string, separator: optional string) dict
+</pre><p>
 Examples:
 
-~~~
-path("src/functions.nim") => {
+</p><pre class="desc-code">path("src/functions.nim") => {
   "filename": "functions.nim",
   "basename": "functions",
   "ext": ".nim",
@@ -1309,97 +1136,81 @@ path("src\functions.nim", "\") => {
   "ext": ".nim",
   "dir": "src\",
 }
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult
+func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_lower_ss">fun_lower_ss</h3>
 
-<pre class="description">
-Lowercase a string.
+<p>Lowercase a string.
 
-~~~
-lower(str: string) string
-~~~
-
+</p><pre class="desc-code">lower(str: string) string
+</pre><p>
 Examples:
 
-~~~
-lower("Tea") => "tea"
+</p><pre class="desc-code">lower("Tea") => "tea"
 lower("TEA") => "tea"
 lower("TEĀ") => "teā"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_keys_dl">fun_keys_dl</h3>
 
-<pre class="description">
-Create a list from the keys in a dictionary.
+<p>Create a list from the keys in a dictionary.
 
-~~~
-keys(dictionary: dict) list
-~~~
-
+</p><pre class="desc-code">keys(dictionary: dict) list
+</pre><p>
 Examples:
 
-~~~
-d = dict("a", 1, "b", 2, "c", 3)
+</p><pre class="desc-code">d = dict("a", 1, "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => [1, 2, 3]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_values_dl">fun_values_dl</h3>
 
-<pre class="description">
-Create a list out of the values in the specified dictionary.
+<p>Create a list out of the values in the specified dictionary.
 
-~~~
-values(dictionary: dict) list
-~~~
-
+</p><pre class="desc-code">values(dictionary: dict) list
+</pre><p>
 Examples:
 
-~~~
-d = dict("a", "apple", "b", 2, "c", 3)
+</p><pre class="desc-code">d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_sort_lsosl">fun_sort_lsosl</h3>
 
-<pre class="description">
-Sort a list of values of the same type.  The values are ints, floats, or strings.
+<p>Sort a list of values of the same type.  The values are ints, floats, or strings.
 
-You specify the sort order, "ascending" or "descending".
+</p><p>You specify the sort order, "ascending" or "descending".
 
-You have the option of sorting strings case "insensitive". Case
+</p><p>You have the option of sorting strings case "insensitive". Case
 "sensitive" is the default.
 
-~~~
-sort(values: list, order: string, insensitive: optional string) list
-~~~
-
+</p><pre class="desc-code">sort(values: list, order: string, insensitive: optional string) list
+</pre><p>
 Examples:
 
-~~~
-ints = list(4, 3, 5, 5, 2, 4)
+</p><pre class="desc-code">ints = list(4, 3, 5, 5, 2, 4)
 sort(list, "ascending") => [2, 3, 4, 4, 5, 5]
 sort(list, "descending") => [5, 5, 4, 4, 3, 2]
 
@@ -1411,154 +1222,136 @@ strs = list("T", "e", "a")
 sort(strs, "ascending") => ["T", "a", "e"]
 sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
 sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_sort_lssil">fun_sort_lssil</h3>
 
-<pre class="description">
-Sort a list of lists.
+<p>Sort a list of lists.
 
-You specify the sort order, "ascending" or "descending".
+</p><p>You specify the sort order, "ascending" or "descending".
 
-You specify how to sort strings either case "sensitive" or
+</p><p>You specify how to sort strings either case "sensitive" or
 "insensitive".
 
-You specify which index to compare by.  The compare index value
+</p><p>You specify which index to compare by.  The compare index value
 must exist in each list, be the same type and be an int, float,
 or string.
 
-~~~
-sort(lists: list, order: string, case: string, index: int) list
-~~~
-
+</p><pre class="desc-code">sort(lists: list, order: string, case: string, index: int) list
+</pre><p>
 Examples:
 
-~~~
-l1 = list(4, 3, 1)
+</p><pre class="desc-code">l1 = list(4, 3, 1)
 l2 = list(2, 3, 4)
 listOfLists = list(l1, l2)
 sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
 sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_sort_lsssl">fun_sort_lsssl</h3>
 
-<pre class="description">
-Sort a list of dictionaries.
+<p>Sort a list of dictionaries.
 
-You specify the sort order, "ascending" or "descending".
+</p><p>You specify the sort order, "ascending" or "descending".
 
-You specify how to sort strings either case "sensitive" or
+</p><p>You specify how to sort strings either case "sensitive" or
 "insensitive".
 
-You specify the compare key.  The key value must exist in
+</p><p>You specify the compare key.  The key value must exist in
 each dictionary, be the same type and be an int, float or
 string.
 
-~~~
-sort(dicts: list, order: string, case: string, key: string) list
-~~~
-
+</p><pre class="desc-code">sort(dicts: list, order: string, case: string, key: string) list
+</pre><p>
 Examples:
 
-~~~
-d1 = dict("name", "Earl Gray", "weight", 1.2)
+</p><pre class="desc-code">d1 = dict("name", "Earl Gray", "weight", 1.2)
 d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
 sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
 sort(dicts, "descending", "sensitive", "name") => [d2, d1]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_anchors_lsl">fun_anchors_lsl</h3>
 
-<pre class="description">
-Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+<p>Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
 
-~~~
-anchors(names: list, type: string) list
-~~~
-
+</p><pre class="desc-code">anchors(names: list, type: string) list
+</pre><p>
 type:
 
-* html -- HTML class names
-* github -- GitHub markdown anchor links
+</p><ul>
+<li>html -- HTML class names
+</li><li>github -- GitHub markdown anchor links
 
-Examples:
+</li></ul>
+<p>Examples:
 
-~~~
-list = list("Tea", "Water", "Tea")
+</p><pre class="desc-code">list = list("Tea", "Water", "Tea")
 anchores(list, "github") =>
   ["tea", "water", "tea-1"]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="fun_type_as">fun_type_as</h3>
 
-<pre class="description">
-Return the argument type, one of: int, float, string, list, dict, bool or func.
+<p>Return the argument type, one of: int, float, string, list, dict, bool or func.
 
-~~~
-type(variable: any) string
-~~~
-
+</p><pre class="desc-code">type(variable: any) string
+</pre><p>
 Examples:
 
-~~~
-type(2) => "int"
+</p><pre class="desc-code">type(2) => "int"
 type(3.14159) => "float"
 type("Tea") => "string"
 type(list(1,2)) => "list"
 type(dict("a", 1)) => "dict"
 type(true) => "bool"
 type(f.cmp[0]) => "func"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult
+func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_joinPath_loss">fun_joinPath_loss</h3>
 
-<pre class="description">
-Join the path components with a path separator.
+<p>Join the path components with a path separator.
 
-You pass a list of components to join. For the second optional
+</p><p>You pass a list of components to join. For the second optional
 parameter you specify the separator to use, either "/", "" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
-If the separator already exists between components, a new one
+</p><p>If the separator already exists between components, a new one
 is not added. If a component is "", the platform separator is
 used for it.
 
-~~~
-joinPath(components: list, separator: optional string) string
-~~~
-
+</p><pre class="desc-code">joinPath(components: list, separator: optional string) string
+</pre><p>
 Examples:
 
-~~~
-joinPath(["images", "tea"]) =>
+</p><pre class="desc-code">joinPath(["images", "tea"]) =>
   "images/tea"
 
 joinPath(["images", "tea"], "/") =>
@@ -1575,26 +1368,22 @@ joinPath(["", "tea"]) =>
 
 joinPath(["/", "tea"]) =>
   "/tea"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_join_lsois">fun_join_lsois</h3>
 
-<pre class="description">
-Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
+<p>Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
-~~~
-join(strs: list, sep: string, skipEmpty: optional bool) string
-~~~
-
+</p><pre class="desc-code">join(strs: list, sep: string, skipEmpty: optional bool) string
+</pre><p>
 Examples:
 
-~~~
-join(["a", "b"], ", ") => "a, b"
+</p><pre class="desc-code">join(["a", "b"], ", ") => "a, b"
 join(["a", "b"], "") => "ab"
 join(["a", "b", "c"], "") => "abc"
 join(["a"], ", ") => "a"
@@ -1602,99 +1391,81 @@ join([""], ", ") => ""
 join(["a", "b"], "") => "ab"
 join(["a", "", "c"], "|") => "a||c"
 join(["a", "", "c"], "|", true) => "a|c"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult
+func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_warn_ss">fun_warn_ss</h3>
 
-<pre class="description">
-Return a warning message and skip the current statement. You can call the warn function without an assignment.
+<p>Return a warning message and skip the current statement. You can call the warn function without an assignment.
 
-~~~
-warn(message: string) string
-~~~
-
+</p><pre class="desc-code">warn(message: string) string
+</pre><p>
 You can warn conditionally in a bare if statement:
 
-~~~
-if0(c, warn("message is 0"))
-~~~
-
+</p><pre class="desc-code">if0(c, warn("message is 0"))
+</pre><p>
 You can warn unconditionally using a bare warn statement:
 
-~~~
-warn("always warn")
-~~~
+</p><pre class="desc-code">warn("always warn")
 </pre>
 
 <pre class="nim-code">
-func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_log_ss">fun_log_ss</h3>
 
-<pre class="description">
-Log a message to the log file.  You can call the log function without an assignment.
+<p>Log a message to the log file.  You can call the log function without an assignment.
 
-~~~
-log(message: string) string
-~~~
-
+</p><pre class="desc-code">log(message: string) string
+</pre><p>
 You can log conditionally in a bare if statement:
 
-~~~
-if0(c, log("log this message when c is 0"))
-~~~
-
+</p><pre class="desc-code">if0(c, log("log this message when c is 0"))
+</pre><p>
 You can log unconditionally using a bare log statement:
 
-~~~
-log("always log")
-~~~
+</p><pre class="desc-code">log("always log")
 </pre>
 
 <pre class="nim-code">
-func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_return_aa">fun_return_aa</h3>
 
-<pre class="description">
-Return is a special function that returns the value passed in and has has side effects.
+<p>Return is a special function that returns the value passed in and has has side effects.
 
-In a function, the return completes the function and returns
+</p><p>In a function, the return completes the function and returns
 the value of it.
 
-~~~
-return(false)
-~~~
-
+</p><pre class="desc-code">return(false)
+</pre><p>
 You can also use it with a bare IF statement to conditionally
 return a function value.
 
-~~~
-if(c, return(5))
-~~~
-
+</p><pre class="desc-code">if(c, return(5))
+</pre><p>
 In a template command a return controls the replacement block
 looping by returning “skip” and “stop”.
 
-~~~
-if(c, return("stop"))
+</p><pre class="desc-code">if(c, return("stop"))
 if(c, return("skip"))
-~~~
+</pre><p>
+</p><ul>
+<li>“stop” – stops processing the command
+</li><li>“skip” – skips this replacement block and continues with the next iteration
 
-* “stop” – stops processing the command
-* “skip” – skips this replacement block and continues with the next iteration
+</li></ul>
+<p>The following block command repeats 4 times but skips when t.row is 2.
 
-The following block command repeats 4 times but skips when t.row is 2.
-
-~~~
-$$ block t.repeat = 4
+</p><pre class="desc-code">$$ block t.repeat = 4
 $$ : if((t.row == 2), return(“skip”))
 {t.row}
 $$ endblock
@@ -1704,176 +1475,148 @@ output:
 0
 1
 3
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_string_aoss">fun_string_aoss</h3>
 
-<pre class="description">
-Convert a variable to a string. You specify the variable and optionally the type of output you want.
+<p>Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
-~~~
-string(var: any, stype: optional string) string
-~~~
-
+</p><pre class="desc-code">string(var: any, stype: optional string) string
+</pre><p>
 The default stype is "rb" which is used for replacement blocks.
 
-stype:
+</p><p>stype:
 
-* json -- returns JSON
-* rb — replacement block (rb) returns JSON except strings are
+</p><ul>
+<li>json -- returns JSON
+</li><li>rb — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
-* dn -- dot name (dn) returns JSON except dictionary elements
+</li><li>dn -- dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
 
-Examples variables:
+</li></ul>
+<p>Examples variables:
 
-~~~
-str = "Earl Grey"
+</p><pre class="desc-code">str = "Earl Grey"
 pi = 3.14159
 one = 1
 a = [1, 2, 3]
 d = dict(["x", 1, "y", 2])
 fn = cmp[[0]
 found = true
-~~~
-
+</pre><p>
 json:
 
-~~~
-str => "Earl Grey"
+</p><pre class="desc-code">str => "Earl Grey"
 pi => 3.14159
 one => 1
 a => [1,2,3]
 d => {"x":1,"y":2}
 fn => "cmp"
 found => true
-~~~
-
+</pre><p>
 rb:
 
-Same as JSON except the following.
+</p><p>Same as JSON except the following.
 
-~~~
-str => Earl Grey
+</p><pre class="desc-code">str => Earl Grey
 fn => cmp
-~~~
-
+</pre><p>
 dn:
 
-Same as JSON except the following.
+</p><p>Same as JSON except the following.
 
-~~~
-d =>
+</p><pre class="desc-code">d =>
 x = 1
 y = 2
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
 </pre>
 
 <h3 id="fun_string_sds">fun_string_sds</h3>
 
-<pre class="description">
-Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
+<p>Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
 
-~~~
-string(dictName: string: d: dict) string
-~~~
-
+</p><pre class="desc-code">string(dictName: string: d: dict) string
+</pre><p>
 Example:
 
-~~~
-d = {"x",1, "y":"tea", "z":{"a":8}}
+</p><pre class="desc-code">d = {"x",1, "y":"tea", "z":{"a":8}}
 string("teas", d) =>
 
 teas.x = 1
 teas.y = "tea"
 teas.z.a = 8
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult
+func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="fun_format_ss">fun_format_ss</h3>
 
-<pre class="description">
-Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
+<p>Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
 
-~~~
-format(str: string) string
-~~~
-
+</p><pre class="desc-code">format(str: string) string
+</pre><p>
 Example:
 
-~~~
-let first = "Earl"
+</p><pre class="desc-code">let first = "Earl"
 let last = "Grey"
 str = format("name: {first} {last}")
 
 str => "name: Earl Grey"
-~~~
-
+</pre><p>
 To enter a left bracket use two in a row.
 
-~~~
-str = format("use two {{ to get one")
+</p><pre class="desc-code">str = format("use two {{ to get one")
 
 str => "use two { to get one"
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="fun_func_sp">fun_func_sp</h3>
 
-<pre class="description">
-Define a function.
+<p>Define a function.
 
-~~~
-func(signature: string) func
-~~~
-
+</p><pre class="desc-code">func(signature: string) func
+</pre><p>
 Example:
 
-~~~
-mycmp = func(numStr1: string, numStr2: string) int
+</p><pre class="desc-code">mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
   num2 = int(numStr2)
   return(cmp(num1, num2))
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
+func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_functionDetails_pd">fun_functionDetails_pd</h3>
 
-<pre class="description">
-Return the function details in a dictionary.
+<p>Return the function details in a dictionary.
 
-~~~
-functionDetails(funcVar: func) dict
-~~~
-
+</p><pre class="desc-code">functionDetails(funcVar: func) dict
+</pre><p>
 The following example defines a simple function then gets its
 function details.
 
-~~~
-mycmp = func(numStr1: string, numStr2: string) int
+</p><pre class="desc-code">mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings and return 1, 0, or -1.
   return(cmp(int(numStr1), int(numStr2)))
 
@@ -1891,464 +1634,388 @@ fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult
+func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_startsWith_ssb">fun_startsWith_ssb</h3>
 
-<pre class="description">
-Check whether a strings starts with the given prefix. Return true when it does, else false.
+<p>Check whether a strings starts with the given prefix. Return true when it does, else false.
 
-~~~
-startsWith(str: string, str: prefix) bool
-~~~
-
+</p><pre class="desc-code">startsWith(str: string, str: prefix) bool
+</pre><p>
 Examples:
 
-~~~
-a = startsWith("abcdef", "abc")
+</p><pre class="desc-code">a = startsWith("abcdef", "abc")
 b = startsWith("abcdef", "abf")
 
 a => true
 b => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_not_bb">fun_not_bb</h3>
 
-<pre class="description">
-Boolean not.
+<p>Boolean not.
 
-~~~
-not(value: bool) bool
-~~~
-
+</p><pre class="desc-code">not(value: bool) bool
+</pre><p>
 Examples:
 
-~~~
-not(true) => false
+</p><pre class="desc-code">not(true) => false
 not(false) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_and_bbb">fun_and_bbb</h3>
 
-<pre class="description">
-Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+<p>Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
-~~~
-and(a: bool, b: bool) bool
-~~~
-
+</p><pre class="desc-code">and(a: bool, b: bool) bool
+</pre><p>
 Examples:
 
-~~~
-and(true, true) => true
+</p><pre class="desc-code">and(true, true) => true
 and(false, true) => false
 and(true, false) => false
 and(false, false) => false
 and(false, warn("not hit")) => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_or_bbb">fun_or_bbb</h3>
 
-<pre class="description">
-Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
+<p>Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
 
-~~~
-or(a: bool, b: bool) bool
-~~~
-
+</p><pre class="desc-code">or(a: bool, b: bool) bool
+</pre><p>
 Examples:
 
-~~~
-or(true, true) => true
+</p><pre class="desc-code">or(true, true) => true
 or(false, true) => true
 or(true, false) => true
 or(false, false) => false
 or(true, warn("not hit")) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult 
 </pre>
 
 <h3 id="fun_eq_iib">fun_eq_iib</h3>
 
-<pre class="description">
-Return true when the two ints are equal.
+<p>Return true when the two ints are equal.
 
-~~~
-eq(a: int, b: int) bool
-~~~
-
+</p><pre class="desc-code">eq(a: int, b: int) bool
+</pre><p>
 Examples:
 
-~~~
-eq(1, 1) => true
+</p><pre class="desc-code">eq(1, 1) => true
 eq(2, 3) => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_eq_ffb">fun_eq_ffb</h3>
 
-<pre class="description">
-Return true when two floats are equal.
+<p>Return true when two floats are equal.
 
-~~~
-eq(a: float, b: float) bool
-~~~
-
+</p><pre class="desc-code">eq(a: float, b: float) bool
+</pre><p>
 Examples:
 
-~~~
-eq(1.2, 1.2) => true
+</p><pre class="desc-code">eq(1.2, 1.2) => true
 eq(1.2, 3.2) => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_eq_ssb">fun_eq_ssb</h3>
 
-<pre class="description">
-Return true when two strings are equal.  See cmp function for case insensitive compare.
+<p>Return true when two strings are equal.  See cmp function for case insensitive compare.
 
-~~~
-eq(a: string, b: string) bool
-~~~
-
+</p><pre class="desc-code">eq(a: string, b: string) bool
+</pre><p>
 Examples:
 
-~~~
-eq("tea", "tea") => true
+</p><pre class="desc-code">eq("tea", "tea") => true
 eq("1.2", "3.2") => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_ne_iib">fun_ne_iib</h3>
 
-<pre class="description">
-Return true when two ints are not equal.
+<p>Return true when two ints are not equal.
 
-~~~
-ne(a: int, b: int) bool
-~~~
-
+</p><pre class="desc-code">ne(a: int, b: int) bool
+</pre><p>
 Examples:
 
-~~~
-ne(1, 1) => false
+</p><pre class="desc-code">ne(1, 1) => false
 ne(2, 3) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_ne_ffb">fun_ne_ffb</h3>
 
-<pre class="description">
-Return true when two floats are not equal.
+<p>Return true when two floats are not equal.
 
-~~~
-ne(a: float, b: float) bool
-~~~
-
+</p><pre class="desc-code">ne(a: float, b: float) bool
+</pre><p>
 Examples:
 
-~~~
-ne(1.2, 1.2) => false
+</p><pre class="desc-code">ne(1.2, 1.2) => false
 ne(1.2, 3.2) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_ne_ssb">fun_ne_ssb</h3>
 
-<pre class="description">
-Return true when two strings are not equal.
+<p>Return true when two strings are not equal.
 
-~~~
-ne(a: string, b: string) bool
-~~~
-
+</p><pre class="desc-code">ne(a: string, b: string) bool
+</pre><p>
 Examples:
 
-~~~
-ne("tea", "tea") => false
+</p><pre class="desc-code">ne("tea", "tea") => false
 ne("earl", "grey") => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_gt_iib">fun_gt_iib</h3>
 
-<pre class="description">
-Return true when an int is greater then another int.
+<p>Return true when an int is greater then another int.
 
-~~~
-gt(a: int, b: int) bool
-~~~
-
+</p><pre class="desc-code">gt(a: int, b: int) bool
+</pre><p>
 Examples:
 
-~~~
-gt(2, 4) => false
+</p><pre class="desc-code">gt(2, 4) => false
 gt(3, 2) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_gt_ffb">fun_gt_ffb</h3>
 
-<pre class="description">
-Return true when one float is greater than another float.
+<p>Return true when one float is greater than another float.
 
-~~~
-gt(a: float, b: float) bool
-~~~
-
+</p><pre class="desc-code">gt(a: float, b: float) bool
+</pre><p>
 Examples:
 
-~~~
-gt(2.8, 4.3) => false
+</p><pre class="desc-code">gt(2.8, 4.3) => false
 gt(3.1, 2.5) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_gte_iib">fun_gte_iib</h3>
 
-<pre class="description">
-Return true when an int is greater then or equal to another int.
+<p>Return true when an int is greater then or equal to another int.
 
-~~~
-gte(a: int, b: int) bool
-~~~
-
+</p><pre class="desc-code">gte(a: int, b: int) bool
+</pre><p>
 Examples:
 
-~~~
-gte(2, 4) => false
+</p><pre class="desc-code">gte(2, 4) => false
 gte(3, 3) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_gte_ffb">fun_gte_ffb</h3>
 
-<pre class="description">
-Return true when a float is greater than or equal to another float.
+<p>Return true when a float is greater than or equal to another float.
 
-~~~
-gte(a: float, b: float) bool
-~~~
-
+</p><pre class="desc-code">gte(a: float, b: float) bool
+</pre><p>
 Examples:
 
-~~~
-gte(2.8, 4.3) => false
+</p><pre class="desc-code">gte(2.8, 4.3) => false
 gte(3.1, 3.1) => true
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_lt_iib">fun_lt_iib</h3>
 
-<pre class="description">
-Return true when an int is less than another int.
+<p>Return true when an int is less than another int.
 
-~~~
-lt(a: int, b: int) bool
-~~~
-
+</p><pre class="desc-code">lt(a: int, b: int) bool
+</pre><p>
 Examples:
 
-~~~
-gt(2, 4) => true
+</p><pre class="desc-code">gt(2, 4) => true
 gt(3, 2) => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_lt_ffb">fun_lt_ffb</h3>
 
-<pre class="description">
-Return true when a float is less then another float.
+<p>Return true when a float is less then another float.
 
-~~~
-lt(a: float, b: float) bool
-~~~
-
+</p><pre class="desc-code">lt(a: float, b: float) bool
+</pre><p>
 Examples:
 
-~~~
-lt(2.8, 4.3) => true
+</p><pre class="desc-code">lt(2.8, 4.3) => true
 lt(3.1, 2.5) => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_lte_iib">fun_lte_iib</h3>
 
-<pre class="description">
-Return true when an int is less than or equal to another int.
+<p>Return true when an int is less than or equal to another int.
 
-~~~
-lte(a: int, b: int) bool
-~~~
-
+</p><pre class="desc-code">lte(a: int, b: int) bool
+</pre><p>
 Examples:
 
-~~~
-lte(2, 4) => true
+</p><pre class="desc-code">lte(2, 4) => true
 lte(3, 3) => true
 lte(4, 3) => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_lte_ffb">fun_lte_ffb</h3>
 
-<pre class="description">
-Return true when a float is less than or equal to another float.
+<p>Return true when a float is less than or equal to another float.
 
-~~~
-lte(a: float, b: float) bool
-~~~
-
+</p><pre class="desc-code">lte(a: float, b: float) bool
+</pre><p>
 Examples:
 
-~~~
-lte(2.3, 4.4) => true
+</p><pre class="desc-code">lte(2.3, 4.4) => true
 lte(3.0, 3.0) => true
 lte(4.0, 3.0) => false
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="fun_readJson_sa">fun_readJson_sa</h3>
 
-<pre class="description">
-Convert a JSON string to a variable.
+<p>Convert a JSON string to a variable.
 
-~~~
-readJson(json: string) any
-~~~
-
+</p><pre class="desc-code">readJson(json: string) any
+</pre><p>
 Examples:
 
-~~~
-a = readJson(""tea"") => "tea"
+</p><pre class="desc-code">a = readJson(""tea"") => "tea"
 b = readJson("4.5") => 4.5
 c = readJson("[1,2,3]") => [1, 2, 3]
 d = readJson("{"a":1, "b": 2}")
   => {"a": 1, "b", 2}
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="fun_markdownLite_sl">fun_markdownLite_sl</h3>
 
-<pre class="description">
-Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+<p>Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
-list elements:
+</p><p>list elements:
 
-* p -- A paragraph element is one string, possibly containing
+</p><ul>
+<li>p -- A paragraph element is one string, possibly containing
 newlines.
 
-* code -- A code element is three strings. The first string is
+</li></ul>
+<ul>
+<li>code -- A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string (with newlines) contains the text of the block.  The third
 string is the ending line, for example “~~~”.
 
-* bullets -- A bullets element contains a string (with newlines)
+</li></ul>
+<ul>
+<li>bullets -- A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
 
-~~~
-elements = markdownLite(description)
+</li></ul>
+<pre class="desc-code">elements = markdownLite(description)
 elements => [
   ["p", ["the paragraph which may contain newlines"]]
   ["code", ["~~~", "code text with newlines", "~~~"]]
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
 ]
-~~~
 </pre>
 
 <pre class="nim-code">
-func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="functionsDict">functionsDict</h3>
 
-<pre class="description">
-Maps a built-in function name to a function pointer you can call.
-</pre>
+<p>Maps a built-in function name to a function pointer you can call.</p>
 
 <pre class="nim-code">
 functionsDict = newTable(32)
@@ -2356,13 +2023,13 @@ functionsDict = newTable(32)
 
 <h3 id="BuiltInInfo">BuiltInInfo</h3>
 
-<pre class="description">
-The built-in function information.
+<p>The built-in function information.
 
-* funcName -- the function name in the nim file, e.g.: fun_add_ii
-* docComment -- the function documentation
-* numLines -- the number of function code lines
-</pre>
+</p><ul>
+<li>funcName -- the function name in the nim file, e.g.: fun_add_ii
+</li><li>docComment -- the function documentation
+</li><li>numLines -- the number of function code lines</li></ul>
+
 
 <pre class="nim-code">
 BuiltInInfo = object
@@ -2374,49 +2041,40 @@ BuiltInInfo = object
 
 <h3 id="newBuiltInInfo">newBuiltInInfo</h3>
 
-<pre class="description">
-Return a BuiltInInfo object.
-</pre>
+<p>Return a BuiltInInfo object.</p>
 
 <pre class="nim-code">
-func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
+func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo 
 </pre>
 
 <h3 id="getBestFunction">getBestFunction</h3>
 
-<pre class="description">
-Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
-</pre>
+<p>Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.</p>
 
 <pre class="nim-code">
-proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
+proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr 
 </pre>
 
 <h3 id="splitFuncName">splitFuncName</h3>
 
-<pre class="description">
-Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
-</pre>
+<p>Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".</p>
 
 <pre class="nim-code">
-func splitFuncName(funcName: string): (string, string)
+func splitFuncName(funcName: string): (string, string) 
 </pre>
 
 <h3 id="makeFuncDictionary">makeFuncDictionary</h3>
 
-<pre class="description">
-Create the f dictionary from the built in functions.
-</pre>
+<p>Create the f dictionary from the built in functions.</p>
 
 <pre class="nim-code">
-proc makeFuncDictionary(): VarsDict
+proc makeFuncDictionary(): VarsDict {.raises: [ValueError, KeyError, Exception],
+                                      tags: [RootEffect].}
 </pre>
 
 <h3 id="funcsVarDict">funcsVarDict</h3>
 
-<pre class="description">
-The f dictionary of built-in functions.
-</pre>
+<p>The f dictionary of built-in functions.</p>
 
 <pre class="nim-code">
 funcsVarDict = makeFuncDictionary()

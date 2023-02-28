@@ -910,6 +910,7 @@ $$ : c = len("hello")
     check variables["s"].dictv.dict.len == 0
     check variables["o"].dictv.dict.len == 0
     check variables["t"].dictv.dict.len != 0
+    check variables["u"].dictv.dict.len == 0
     let tea = variables["t"].dictv.dict
     check tea["row"] == Value(kind: vkInt, intv: 0)
     check tea["version"] == Value(kind: vkString, stringv: staticteaVersion)

@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>repl.nim</h1>
 
-<pre class="description">
-Run commands at a prompt. Run evaluate print loop (REPL).
-</pre>
+<p>Run commands at a prompt. Run evaluate print loop (REPL).</p>
 
 Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 
@@ -48,22 +52,22 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 
 <h3 id="handleReplLine">handleReplLine</h3>
 
-<pre class="description">
-Handle the REPL line. Return true to end the loop.
-</pre>
+<p>Handle the REPL line. Return true to end the loop.</p>
 
 <pre class="nim-code">
-proc handleReplLine(env: var Env; variables: var Variables; line: string): bool
+proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
+    raises: [KeyError, Exception, ValueError, IOError, OSError],
+    tags: [RootEffect, WriteIOEffect, TimeEffect].}
 </pre>
 
 <h3 id="runEvaluatePrintLoop">runEvaluatePrintLoop</h3>
 
-<pre class="description">
-Run commands at a prompt.
-</pre>
+<p>Run commands at a prompt.</p>
 
 <pre class="nim-code">
-proc runEvaluatePrintLoop(env: var Env; args: Args)
+proc runEvaluatePrintLoop(env: var Env; args: Args) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
 </pre>
 
 

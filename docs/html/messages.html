@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>messages.nim</h1>
 
-<pre class="description">
-Messages IDs and associated strings and routines to get them.
-</pre>
+<p>Messages IDs and associated strings and routines to get them.</p>
 
 Nim source code: <a href="../../src/messages.nim">messages.nim</a>
 
@@ -55,9 +59,7 @@ Nim source code: <a href="../../src/messages.nim">messages.nim</a>
 
 <h3 id="MessageId">MessageId</h3>
 
-<pre class="description">
-Message numbers.
-</pre>
+<p>Message numbers.</p>
 
 <pre class="nim-code">
 MessageId = enum
@@ -130,14 +132,12 @@ MessageId = enum
   wVarStartsWithLetter, wVarContainsChars, wVarEndsWith, wVarMaximumLength,
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
-  wInvalidAnchorType
+  wInvalidAnchorType, wUserFunction
 </pre>
 
 <h3 id="Messages">Messages</h3>
 
-<pre class="description">
-The message text.
-</pre>
+<p>The message text.</p>
 
 <pre class="nim-code">
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
@@ -186,7 +186,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "None of the case conditions match and no else case.",
     "You cannot assign to an existing variable.", "", "Invalid length: $1.", "",
     "", "Expected / or \\.",
-    "The variables f k, m - r, u are reserved variable names.", "",
+    "The variables h - k, m - r are reserved variable names.", "",
     "Name is not a dictionary.", "",
     "Expected the sort order, \'ascending\' or \'descending\'.", "", "",
     "The argument must be 0 or 1.", "", "Expected sensitive or unsensitive.",
@@ -299,18 +299,17 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The index variable value is not a valid variable name.",
     "The index value is not a string.",
     "A two parameter IF function cannot be used as an argument.",
-    "Invalid anchor type, expected html or github."]
+    "Invalid anchor type, expected html or github.",
+    "You can only assign a user function variable to the u dictionary."]
 </pre>
 
 <h3 id="WarningData">WarningData</h3>
 
-<pre class="description">
-Warning data.<ul class="simple"><li>messageId -- the message id</li>
+<p>Warning data.<ul class="simple"><li>messageId -- the message id</li>
 <li>p1 -- the optional string substituted for the message's $1.</li>
 <li>pos -- the index in the statement where the warning was detected.</li>
 </ul>
-
-</pre>
+</p>
 
 <pre class="nim-code">
 WarningData = object
@@ -322,75 +321,62 @@ WarningData = object
 
 <h3 id="getWarning">getWarning</h3>
 
-<pre class="description">
-Return the warning string.
-</pre>
+<p>Return the warning string.</p>
 
 <pre class="nim-code">
-func getWarning(warning: MessageId; p1 = ""): string
+func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
+    tags: [].}
 </pre>
 
 <h3 id="getWarningLine">getWarningLine</h3>
 
-<pre class="description">
-Return a formatted warning line. For example:
+<p>Return a formatted warning line. For example:
 
-~~~
-filename(line): wId: message.
-~~~
+</p><pre class="desc-code">filename(line): wId: message.
 </pre>
 
 <pre class="nim-code">
-func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
+func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string {.
+    raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="getWarningLine-1">getWarningLine</h3>
 
-<pre class="description">
-Return a formatted warning line. For example:
+<p>Return a formatted warning line. For example:
 
-~~~
-filename(line): wId: message.
-~~~
+</p><pre class="desc-code">filename(line): wId: message.
 </pre>
 
 <pre class="nim-code">
-func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
+func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string 
 </pre>
 
 <h3 id="newWarningData">newWarningData</h3>
 
-<pre class="description">
-Create a WarningData object containing all the warning information.
-</pre>
+<p>Create a WarningData object containing all the warning information.</p>
 
 <pre class="nim-code">
-func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
+func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData 
 </pre>
 
 <h3 id="a__">`$`</h3>
 
-<pre class="description">
-Return a string representation of WarningData.
+<p>Return a string representation of WarningData.
 
-~~~
-let warning = newWarningData(wUnknownArg, "p1", 5)
+</p><pre class="desc-code">let warning = newWarningData(wUnknownArg, "p1", 5)
 check $warning == "wUnknownArg(p1):5"
-~~~
 </pre>
 
 <pre class="nim-code">
-func `$`(warningData: WarningData): string
+func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="a___">`==`</h3>
 
-<pre class="description">
-Return true when the two WarningData objects are equal.
-</pre>
+<p>Return true when the two WarningData objects are equal.</p>
 
 <pre class="nim-code">
-func `==`(w1: WarningData; w2: WarningData): bool
+func `==`(w1: WarningData; w2: WarningData): bool 
 </pre>
 
 

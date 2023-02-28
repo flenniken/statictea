@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>args.nim</h1>
 
-<pre class="description">
-Types for handling command line arguments.
-</pre>
+<p>Types for handling command line arguments.</p>
 
 Nim source code: <a href="../../src/args.nim">args.nim</a>
 
@@ -61,9 +65,7 @@ Nim source code: <a href="../../src/args.nim">args.nim</a>
 
 <h3 id="Prepost">Prepost</h3>
 
-<pre class="description">
-Prepost holds one prefix and its associated postfix.
-</pre>
+<p>Prepost holds one prefix and its associated postfix.</p>
 
 <pre class="nim-code">
 Prepost = object
@@ -74,9 +76,7 @@ Prepost = object
 
 <h3 id="PrepostTable">PrepostTable</h3>
 
-<pre class="description">
-The prefix postfix pairs stored in an ordered dictionary.
-</pre>
+<p>The prefix postfix pairs stored in an ordered dictionary.</p>
 
 <pre class="nim-code">
 PrepostTable = OrderedTable[string, string]
@@ -84,9 +84,7 @@ PrepostTable = OrderedTable[string, string]
 
 <h3 id="Args">Args</h3>
 
-<pre class="description">
-Args holds all the command line arguments.
-</pre>
+<p>Args holds all the command line arguments.</p>
 
 <pre class="nim-code">
 Args = object
@@ -106,9 +104,7 @@ Args = object
 
 <h3 id="ArgsOr">ArgsOr</h3>
 
-<pre class="description">
-The args or a warning.
-</pre>
+<p>The args or a warning.</p>
 
 <pre class="nim-code">
 ArgsOr = OpResultWarn[Args]
@@ -116,98 +112,82 @@ ArgsOr = OpResultWarn[Args]
 
 <h3 id="makeUserPrepostTable">makeUserPrepostTable</h3>
 
-<pre class="description">
-Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
-</pre>
+<p>Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.</p>
 
 <pre class="nim-code">
-proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
+proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable 
 </pre>
 
 <h3 id="newArgsOr">newArgsOr</h3>
 
-<pre class="description">
-Return a new ArgsOr object containing a warning.
-</pre>
+<p>Return a new ArgsOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newArgsOr(warningData: WarningData): ArgsOr
+func newArgsOr(warningData: WarningData): ArgsOr 
 </pre>
 
 <h3 id="newArgsOr-1">newArgsOr</h3>
 
-<pre class="description">
-Return a new ArgsOr object containing a warning.
-</pre>
+<p>Return a new ArgsOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
+func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr 
 </pre>
 
 <h3 id="newArgsOr-2">newArgsOr</h3>
 
-<pre class="description">
-Return a new ArgsOr object containing args.
-</pre>
+<p>Return a new ArgsOr object containing args.</p>
 
 <pre class="nim-code">
-func newArgsOr(args: Args): ArgsOr
+func newArgsOr(args: Args): ArgsOr 
 </pre>
 
 <h3 id="newPrepost">newPrepost</h3>
 
-<pre class="description">
-Create a new prepost object from the prefix and postfix.
-</pre>
+<p>Create a new prepost object from the prefix and postfix.</p>
 
 <pre class="nim-code">
-func newPrepost(prefix: string; postfix: string): Prepost
+func newPrepost(prefix: string; postfix: string): Prepost 
 </pre>
 
 <h3 id="a__">`$`</h3>
 
-<pre class="description">
-Return the Prepost string representation.
-</pre>
+<p>Return the Prepost string representation.</p>
 
 <pre class="nim-code">
-func `$`(p: Prepost): string
+func `$`(p: Prepost): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="a__-1">`$`</h3>
 
-<pre class="description">
-Return the Args string representation.
-</pre>
+<p>Return the Args string representation.</p>
 
 <pre class="nim-code">
-func `$`(args: Args): string
+func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="a__-2">`$`</h3>
 
-<pre class="description">
-Return the seq[Prepost] string representation.
-</pre>
+<p>Return the seq[Prepost] string representation.</p>
 
 <pre class="nim-code">
-func `$`(prepostList: seq[Prepost]): string
+func `$`(prepostList: seq[Prepost]): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="predefinedPrepost">predefinedPrepost</h3>
 
-<pre class="description">
-The predefined prefixes and postfixes.
+<p>The predefined prefixes and postfixes.
 
-* $$ -- Default when no comment like Markdown
-* &lt;!--$ and --&gt; -- HTML
-* #$ -- Bash, python, etc.
-* ;$ -- Config files, Lisp
-* //$ -- C++
-* /*$ and */ -- C, C++
-* &amp;lt;!--$ and --&amp;gt; -- HTML inside a textarea element
-* # $ -- Org Mode
-</pre>
+</p><ul>
+<li>$$ -- Default when no comment like Markdown
+</li><li>&lt;!--$ and --&gt; -- HTML
+</li><li>#$ -- Bash, python, etc.
+</li><li>;$ -- Config files, Lisp
+</li><li>//$ -- C++
+</li><li>/*$ and */ -- C, C++
+</li><li>&amp;lt;!--$ and --&amp;gt; -- HTML inside a textarea element
+</li><li># $ -- Org Mode</li></ul>
+
 
 <pre class="nim-code">
 predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
@@ -221,22 +201,18 @@ predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
 
 <h3 id="makeDefaultPrepostTable">makeDefaultPrepostTable</h3>
 
-<pre class="description">
-Return the default ordered table that maps prefixes to postfixes.
-</pre>
+<p>Return the default ordered table that maps prefixes to postfixes.</p>
 
 <pre class="nim-code">
-proc makeDefaultPrepostTable(): PrepostTable
+proc makeDefaultPrepostTable(): PrepostTable 
 </pre>
 
 <h3 id="getPrepostTable">getPrepostTable</h3>
 
-<pre class="description">
-Get the the prepost settings from the user or use the default ones.
-</pre>
+<p>Get the the prepost settings from the user or use the default ones.</p>
 
 <pre class="nim-code">
-proc getPrepostTable(args: Args): PrepostTable
+proc getPrepostTable(args: Args): PrepostTable 
 </pre>
 
 

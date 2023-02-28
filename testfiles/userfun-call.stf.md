@@ -57,8 +57,16 @@ o.get5 = func() int
   ## Return 5.
   return(5)
 
+u.get6 = func() int
+  ## Return 6.
+  return(6)
+
 o.nested = func(o: dict) int
   ## Return get5 value.
+  length = len("tea")
+  # You have access to u functions without passing them in.
+  v = u.get6()
+
   return(l.o.get5())
 
 o.internalVars = func(intNum: int, floatNum: float, str: string) dict

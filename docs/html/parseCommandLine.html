@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>parseCommandLine.nim</h1>
 
-<pre class="description">
-Parse the StaticTea terminal command line and return the arguments.
-</pre>
+<p>Parse the StaticTea terminal command line and return the arguments.</p>
 
 Nim source code: <a href="../../src/parseCommandLine.nim">parseCommandLine.nim</a>
 
@@ -47,12 +51,11 @@ Nim source code: <a href="../../src/parseCommandLine.nim">parseCommandLine.nim</
 
 <h3 id="parseCommandLine">parseCommandLine</h3>
 
-<pre class="description">
-Parse the terminal command line.
-</pre>
+<p>Parse the terminal command line.</p>
 
 <pre class="nim-code">
-proc parseCommandLine(argv: seq[string]): ArgsOr
+proc parseCommandLine(argv: seq[string]): ArgsOr {.raises: [KeyError, OSError],
+    tags: [ReadDirEffect].}
 </pre>
 
 

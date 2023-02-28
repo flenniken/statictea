@@ -22,20 +22,24 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>updateTemplate.nim</h1>
 
-<pre class="description">
-Update a template.
-</pre>
+<p>Update a template.</p>
 
 Nim source code: <a href="../../src/updateTemplate.nim">updateTemplate.nim</a>
 
@@ -49,33 +53,34 @@ Nim source code: <a href="../../src/updateTemplate.nim">updateTemplate.nim</a>
 
 <h3 id="collectReplaceCommand">collectReplaceCommand</h3>
 
-<pre class="description">
-Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.
-</pre>
+<p>Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.</p>
 
 <pre class="nim-code">
 proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
-                           prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
+                           prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines {.
+    raises: [IOError, OSError, ValueError, KeyError],
+    tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="updateTemplate">updateTemplate</h3>
 
-<pre class="description">
-Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
-</pre>
+<p>Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.</p>
 
 <pre class="nim-code">
-proc updateTemplate(env: var Env; args: Args)
+proc updateTemplate(env: var Env; args: Args) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
 </pre>
 
 <h3 id="updateTemplateTop">updateTemplateTop</h3>
 
-<pre class="description">
-Update the template.
-</pre>
+<p>Update the template.</p>
 
 <pre class="nim-code">
-proc updateTemplateTop(env: var Env; args: Args)
+proc updateTemplateTop(env: var Env; args: Args) {.raises: [ValueError, IOError,
+    OSError, Exception, KeyError, Exception, IOError, ValueError, OSError], tags: [
+    ReadEnvEffect, ReadIOEffect, ReadDirEffect, WriteIOEffect, TimeEffect,
+    RootEffect, WriteDirEffect].}
 </pre>
 
 

@@ -93,7 +93,7 @@ Invalid REPL command syntax, unexpected text.
 
   test "show variables":
     let numFunctionKeys = funcsVarDict.len
-    let eOut = "f={$1} g={} l={} o={} s={} t={3}\n" % $numFunctionKeys
+    let eOut = "f={$1} g={} l={} o={} s={} t={3} u={}\n" % $numFunctionKeys
     check testHandleReplLine("v", false, eOut)
 
   test "run statement":

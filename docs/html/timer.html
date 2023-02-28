@@ -22,28 +22,32 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>timer.nim</h1>
 
-<pre class="description">
-Time how long it takes something to run.
+<p>Time how long it takes something to run.
 
- Usage:
+</p><p> Usage:
 
- ~~~
+</p><p> ~~~
  timer = newTimer()
  # run something
  echo timer.seconds()
- ~~~
-</pre>
+ ~~~</p>
 
 Nim source code: <a href="../../src/timer.nim">timer.nim</a>
 
@@ -57,9 +61,7 @@ Nim source code: <a href="../../src/timer.nim">timer.nim</a>
 
 <h3 id="Timer">Timer</h3>
 
-<pre class="description">
-Holds the start time in seconds.
-</pre>
+<p>Holds the start time in seconds.</p>
 
 <pre class="nim-code">
 Timer = object
@@ -69,22 +71,19 @@ Timer = object
 
 <h3 id="newTimer">newTimer</h3>
 
-<pre class="description">
-Create a new timer and set the start time.
-</pre>
+<p>Create a new timer and set the start time.</p>
 
 <pre class="nim-code">
-proc newTimer(): Timer
+proc newTimer(): Timer {.raises: [], tags: [TimeEffect].}
 </pre>
 
 <h3 id="seconds">seconds</h3>
 
-<pre class="description">
-Return the elapsed seconds rounded to the specified number of digits.
-</pre>
+<p>Return the elapsed seconds rounded to the specified number of digits.</p>
 
 <pre class="nim-code">
-proc seconds(timer: Timer; digits: Natural = 3): float
+proc seconds(timer: Timer; digits: Natural = 3): float {.raises: [],
+    tags: [TimeEffect].}
 </pre>
 
 

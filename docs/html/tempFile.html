@@ -22,22 +22,27 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>tempFile.nim</h1>
 
-<pre class="description">
-Create a temporary file.
+<p>Create a temporary file.
 
-Example:
-~~~
+</p><p>Example:
+</p><pre class="desc-code">~~~
 var tempFileO = openTempFile()
 require tempFileO.isSome
 var tempFile = tempFileO.get()
@@ -55,7 +60,6 @@ discard tryRemoveFile(tempFile.filename)
 
 check line1 == "this is a test"
 check line2 == "line 2"
-~~~
 </pre>
 
 Nim source code: <a href="../../src/tempFile.nim">tempFile.nim</a>
@@ -73,9 +77,7 @@ Nim source code: <a href="../../src/tempFile.nim">tempFile.nim</a>
 
 <h3 id="TempFile">TempFile</h3>
 
-<pre class="description">
-Temporary filename and associated file object.
-</pre>
+<p>Temporary filename and associated file object.</p>
 
 <pre class="nim-code">
 TempFile = object
@@ -86,9 +88,7 @@ TempFile = object
 
 <h3 id="TempFileStream">TempFileStream</h3>
 
-<pre class="description">
-Temporary filename and associated stream object.
-</pre>
+<p>Temporary filename and associated stream object.</p>
 
 <pre class="nim-code">
 TempFileStream = object
@@ -99,42 +99,37 @@ TempFileStream = object
 
 <h3 id="openTempFile">openTempFile</h3>
 
-<pre class="description">
-Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.
-</pre>
+<p>Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.</p>
 
 <pre class="nim-code">
-proc openTempFile(): Option[TempFile]
+proc openTempFile(): Option[TempFile] {.raises: [ValueError],
+                                        tags: [ReadEnvEffect, ReadIOEffect].}
 </pre>
 
 <h3 id="closeDeleteFile">closeDeleteFile</h3>
 
-<pre class="description">
-Close and delete the temp file.
-</pre>
+<p>Close and delete the temp file.</p>
 
 <pre class="nim-code">
-proc closeDeleteFile(tempFile: TempFile)
+proc closeDeleteFile(tempFile: TempFile) {.raises: [], tags: [WriteDirEffect].}
 </pre>
 
 <h3 id="openTempFileStream">openTempFileStream</h3>
 
-<pre class="description">
-Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.
-</pre>
+<p>Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.</p>
 
 <pre class="nim-code">
-proc openTempFileStream(): Option[TempFileStream]
+proc openTempFileStream(): Option[TempFileStream] {.
+    raises: [ValueError, IOError], tags: [ReadEnvEffect, ReadIOEffect].}
 </pre>
 
 <h3 id="closeDeleteStream">closeDeleteStream</h3>
 
-<pre class="description">
-Close the stream and delete the associated temp file.
-</pre>
+<p>Close the stream and delete the associated temp file.</p>
 
 <pre class="nim-code">
-proc closeDeleteStream(tempFileStream: TempFileStream)
+proc closeDeleteStream(tempFileStream: TempFileStream) {.
+    raises: [Exception, IOError, OSError], tags: [WriteIOEffect, WriteDirEffect].}
 </pre>
 
 

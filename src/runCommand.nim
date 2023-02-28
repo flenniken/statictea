@@ -2095,7 +2095,8 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
   assert funcVar.kind == vkFunc
   assert funcVar.funcv.builtIn == false
 
-  var userVariables = startVariables(funcs = funcsVarDict)
+  let userFuncs = variables["u"].dictv.dict
+  var userVariables = startVariables(funcs = funcsVarDict, userFuncs = userFuncs)
 
   # Populate the l dictionary with the parameters and arguments.
   let funResult = mapParameters(funcVar.funcv.signature, arguments)

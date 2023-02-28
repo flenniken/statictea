@@ -22,24 +22,28 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>opresult.nim</h1>
 
-<pre class="description">
-OpResult holds either a value or a message.  It's similar to
+<p>OpResult holds either a value or a message.  It's similar to
 the Option type but instead of returning nothing, you return a
 message that tells why you cannot return the value.
 
-You use this to make particular OpResult objects. See [OpResultId](opresultid.md).
-</pre>
+</p><p>You use this to make particular OpResult objects. See [OpResultId](opresultid.md).</p>
 
 Nim source code: <a href="../../src/opresult.nim">opresult.nim</a>
 
@@ -61,9 +65,7 @@ Nim source code: <a href="../../src/opresult.nim">opresult.nim</a>
 
 <h3 id="OpResultKind">OpResultKind</h3>
 
-<pre class="description">
-The kind of OpResult object, either a message or a value.
-</pre>
+<p>The kind of OpResult object, either a message or a value.</p>
 
 <pre class="nim-code">
 OpResultKind = enum
@@ -72,9 +74,7 @@ OpResultKind = enum
 
 <h3 id="OpResult">OpResult</h3>
 
-<pre class="description">
-Contains either a value or a message. Defaults to an empty message.
-</pre>
+<p>Contains either a value or a message. Defaults to an empty message.</p>
 
 <pre class="nim-code">
 OpResult[T; T2] = object
@@ -85,14 +85,12 @@ OpResult[T; T2] = object
   of orMessage:
       message*: T2
 
-
+  
 </pre>
 
 <h3 id="isMessage">isMessage</h3>
 
-<pre class="description">
-Return true when the OpResult object contains a message.
-</pre>
+<p>Return true when the OpResult object contains a message.</p>
 
 <pre class="nim-code">
 func isMessage(opResult: OpResult): bool
@@ -100,9 +98,7 @@ func isMessage(opResult: OpResult): bool
 
 <h3 id="isValue">isValue</h3>
 
-<pre class="description">
-Return true when the OpResult object contains a value.
-</pre>
+<p>Return true when the OpResult object contains a value.</p>
 
 <pre class="nim-code">
 func isValue(opResult: OpResult): bool
@@ -110,9 +106,7 @@ func isValue(opResult: OpResult): bool
 
 <h3 id="a__">`$`</h3>
 
-<pre class="description">
-Return a string representation of an OpResult object.
-</pre>
+<p>Return a string representation of an OpResult object.</p>
 
 <pre class="nim-code">
 func `$`(opResult: OpResult): string
@@ -120,13 +114,11 @@ func `$`(opResult: OpResult): string
 
 <h3 id="OpResultWarn">OpResultWarn</h3>
 
-<pre class="description">
-OpResultWarn holds either a value or warning data.  It's similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
+<p>OpResultWarn holds either a value or warning data.  It's similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
 
-Example Usage:
+</p><p>Example Usage:
 
-~~~
-import opresult
+</p><pre class="desc-code">import opresult
 
 proc get_string(): OpResultWarn[string] =
   if problem:
@@ -139,7 +131,6 @@ if strOr.isMessage:
   echo show_message(strOr.message)
 else:
   echo "value = " & $strOr.value
-~~~
 </pre>
 
 <pre class="nim-code">
@@ -148,9 +139,7 @@ OpResultWarn[T] = OpResult[T, WarningData]
 
 <h3 id="opValueW">opValueW</h3>
 
-<pre class="description">
-Create a new OpResultWarn object containing a value T.
-</pre>
+<p>Create a new OpResultWarn object containing a value T.</p>
 
 <pre class="nim-code">
 func opValueW[T](value: T): OpResultWarn[T]
@@ -158,9 +147,7 @@ func opValueW[T](value: T): OpResultWarn[T]
 
 <h3 id="opMessageW">opMessageW</h3>
 
-<pre class="description">
-Create a new OpResultWarn object containing a warning.
-</pre>
+<p>Create a new OpResultWarn object containing a warning.</p>
 
 <pre class="nim-code">
 func opMessageW[T](message: WarningData): OpResultWarn[T]
@@ -168,15 +155,13 @@ func opMessageW[T](message: WarningData): OpResultWarn[T]
 
 <h3 id="OpResultId">OpResultId</h3>
 
-<pre class="description">
-OpResultId holds either a value or a message id.  It's similar to
+<p>OpResultId holds either a value or a message id.  It's similar to
 the Option type but instead of returning nothing, you return a
 message id that tells why you cannot return the value.
 
-Example Usage:
+</p><p>Example Usage:
 
-~~~
-import opresult
+</p><pre class="desc-code">import opresult
 
 proc get_string(): OpResultId[string] =
   if problem:
@@ -189,7 +174,6 @@ if strOr.isMessage:
   echo show_message(strOr.message)
 else:
   echo "value = " & $strOr.value
-~~~
 </pre>
 
 <pre class="nim-code">
@@ -198,9 +182,7 @@ OpResultId[T] = OpResult[T, MessageId]
 
 <h3 id="opValue">opValue</h3>
 
-<pre class="description">
-Create a new OpResultId object containing a value T.
-</pre>
+<p>Create a new OpResultId object containing a value T.</p>
 
 <pre class="nim-code">
 func opValue[T](value: T): OpResultId[T]
@@ -208,9 +190,7 @@ func opValue[T](value: T): OpResultId[T]
 
 <h3 id="opMessage">opMessage</h3>
 
-<pre class="description">
-Create a new OpResultId object containing a message id.
-</pre>
+<p>Create a new OpResultId object containing a message id.</p>
 
 <pre class="nim-code">
 func opMessage[T](message: MessageId): OpResultId[T]

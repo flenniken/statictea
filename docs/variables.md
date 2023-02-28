@@ -102,7 +102,7 @@ NoPrefixDict = enum
 Create an object containing a warning.
 
 ```nim
-func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
+func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr 
 ```
 
 # newVariableDataOr
@@ -110,7 +110,7 @@ func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
 Create an object containing a warning.
 
 ```nim
-func newVariableDataOr(warningData: WarningData): VariableDataOr
+func newVariableDataOr(warningData: WarningData): VariableDataOr 
 ```
 
 # newVariableDataOr
@@ -118,7 +118,7 @@ func newVariableDataOr(warningData: WarningData): VariableDataOr
 Create an object containing a VariableData object.
 
 ```nim
-func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr
+func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr 
 ```
 
 # `$`
@@ -126,7 +126,8 @@ func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): Va
 Return a string representation of VariableData.
 
 ```nim
-func `$`(v: VariableData): string
+func `$`(v: VariableData): string {.raises: [ValueError, Exception],
+                                    tags: [RootEffect].}
 ```
 
 # startVariables
@@ -135,7 +136,7 @@ Create an empty variables object in its initial state.
 
 ```nim
 func startVariables(server: VarsDict = nil; args: VarsDict = nil;
-                    funcs: VarsDict = nil): Variables
+                    funcs: VarsDict = nil; userFuncs: VarsDict = nil): Variables 
 ```
 
 # getTeaVarIntDefault
@@ -143,7 +144,8 @@ func startVariables(server: VarsDict = nil; args: VarsDict = nil;
 Return the int value of one of the tea dictionary integer items. If the value does not exist, return its default value.
 
 ```nim
-func getTeaVarIntDefault(variables: Variables; varName: string): int64
+func getTeaVarIntDefault(variables: Variables; varName: string): int64 {.
+    raises: [KeyError], tags: [].}
 ```
 
 # getTeaVarStringDefault
@@ -151,7 +153,8 @@ func getTeaVarIntDefault(variables: Variables; varName: string): int64
 Return the string value of one of the tea dictionary string items. If the value does not exist, return its default value.
 
 ```nim
-func getTeaVarStringDefault(variables: Variables; varName: string): string
+func getTeaVarStringDefault(variables: Variables; varName: string): string {.
+    raises: [KeyError], tags: [].}
 ```
 
 # resetVariables
@@ -159,7 +162,7 @@ func getTeaVarStringDefault(variables: Variables; varName: string): string
 Clear the local variables and reset the tea variables for running a command.
 
 ```nim
-proc resetVariables(variables: var Variables)
+proc resetVariables(variables: var Variables) {.raises: [KeyError], tags: [].}
 ```
 
 # assignVariable
@@ -168,7 +171,8 @@ Assign the variable the given value if possible, else return a warning.
 
 ```nim
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
-                    operator = opEqual): Option[WarningData]
+                    operator = opEqual): Option[WarningData] {.
+    raises: [KeyError, ValueError], tags: [].}
 ```
 
 # assignVariable
@@ -177,7 +181,7 @@ Assign the variable the given value if possible, else return a warning.
 
 ```nim
 proc assignVariable(variables: var Variables; variableData: VariableData): Option[
-    WarningData]
+    WarningData] {.raises: [KeyError, ValueError], tags: [].}
 ```
 
 # getVariable
@@ -186,7 +190,8 @@ Look up the variable and return its value when found, else return a warning. Whe
 
 ```nim
 proc getVariable(variables: Variables; dotNameStr: string;
-                 noPrefixDict: NoPrefixDict): ValueOr
+                 noPrefixDict: NoPrefixDict): ValueOr {.raises: [KeyError],
+    tags: [].}
 ```
 
 

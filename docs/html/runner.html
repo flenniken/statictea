@@ -22,31 +22,35 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>runner.nim</h1>
 
-<pre class="description">
-A standalone command to run Single Test File (stf) files.
+<p>A standalone command to run Single Test File (stf) files.
 
-You use runner for testing command line applications. A stf file
+</p><p>You use runner for testing command line applications. A stf file
 contains the test which the runner executes to determine whether the
 test passed.
 
-A stf file contains instructions for creating files, running files and
+</p><p>A stf file contains instructions for creating files, running files and
 comparing files and it is designed to look good in a markdown reader.
 
-See the runner help message (get_help) for more information about stf
+</p><p>See the runner help message (get_help) for more information about stf
 files, or run the nimble task "runhelp" to show the help text with
-glow.
-</pre>
+glow.</p>
 
 Nim source code: <a href="../../src/runner.nim">runner.nim</a>
 
@@ -89,9 +93,7 @@ Nim source code: <a href="../../src/runner.nim">runner.nim</a>
 
 <h3 id="runnerId">runnerId</h3>
 
-<pre class="description">
-The first line of the stf file.
-</pre>
+<p>The first line of the stf file.</p>
 
 <pre class="nim-code">
 runnerId = "stf file, version 0.1.0"
@@ -99,9 +101,7 @@ runnerId = "stf file, version 0.1.0"
 
 <h3 id="RunArgs">RunArgs</h3>
 
-<pre class="description">
-RunArgs holds the command line arguments.
-</pre>
+<p>RunArgs holds the command line arguments.</p>
 
 <pre class="nim-code">
 RunArgs = object
@@ -115,9 +115,7 @@ RunArgs = object
 
 <h3 id="Rc">Rc</h3>
 
-<pre class="description">
-Rc holds a return code where 0 is success.
-</pre>
+<p>Rc holds a return code where 0 is success.</p>
 
 <pre class="nim-code">
 Rc = int
@@ -125,9 +123,7 @@ Rc = int
 
 <h3 id="RunFileLine">RunFileLine</h3>
 
-<pre class="description">
-RunFileLine holds the file line options.
-</pre>
+<p>RunFileLine holds the file line options.</p>
 
 <pre class="nim-code">
 RunFileLine = object
@@ -140,9 +136,7 @@ RunFileLine = object
 
 <h3 id="ExpectedLine">ExpectedLine</h3>
 
-<pre class="description">
-ExpectedLine holds the expected line options.
-</pre>
+<p>ExpectedLine holds the expected line options.</p>
 
 <pre class="nim-code">
 ExpectedLine = object
@@ -153,9 +147,7 @@ ExpectedLine = object
 
 <h3 id="LineKind">LineKind</h3>
 
-<pre class="description">
-The kind of line in a stf file.
-</pre>
+<p>The kind of line in a stf file.</p>
 
 <pre class="nim-code">
 LineKind = enum
@@ -164,9 +156,7 @@ LineKind = enum
 
 <h3 id="AnyLine">AnyLine</h3>
 
-<pre class="description">
-Contains the information about one line in a stf file.
-</pre>
+<p>Contains the information about one line in a stf file.</p>
 
 <pre class="nim-code">
 AnyLine = object
@@ -186,14 +176,12 @@ AnyLine = object
   of lkCommentLine:
       commentLine*: string
 
-
+  
 </pre>
 
 <h3 id="DirAndFiles">DirAndFiles</h3>
 
-<pre class="description">
-DirAndFiles holds the file and compare lines of the stf file.
-</pre>
+<p>DirAndFiles holds the file and compare lines of the stf file.</p>
 
 <pre class="nim-code">
 DirAndFiles = object
@@ -204,245 +192,211 @@ DirAndFiles = object
 
 <h3 id="newAnyLineRunFileLine">newAnyLineRunFileLine</h3>
 
-<pre class="description">
-Create a new AnyLine object for a file line.
-</pre>
+<p>Create a new AnyLine object for a file line.</p>
 
 <pre class="nim-code">
-func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine
+func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine 
 </pre>
 
 <h3 id="newAnyLineExpectedLine">newAnyLineExpectedLine</h3>
 
-<pre class="description">
-Create a new AnyLine object for a expected line.
-</pre>
+<p>Create a new AnyLine object for a expected line.</p>
 
 <pre class="nim-code">
-func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
+func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine 
 </pre>
 
 <h3 id="newAnyLineBlockLine">newAnyLineBlockLine</h3>
 
-<pre class="description">
-Create a new AnyLine object for a block line.
-</pre>
+<p>Create a new AnyLine object for a block line.</p>
 
 <pre class="nim-code">
-func newAnyLineBlockLine(blockLine: string): AnyLine
+func newAnyLineBlockLine(blockLine: string): AnyLine 
 </pre>
 
 <h3 id="newAnyLineCommentLine">newAnyLineCommentLine</h3>
 
-<pre class="description">
-Create a new AnyLine object for a comment line.
-</pre>
+<p>Create a new AnyLine object for a comment line.</p>
 
 <pre class="nim-code">
-func newAnyLineCommentLine(commentLine: string): AnyLine
+func newAnyLineCommentLine(commentLine: string): AnyLine 
 </pre>
 
 <h3 id="newAnyLineIdLine">newAnyLineIdLine</h3>
 
-<pre class="description">
-Create a new AnyLine object for a id line.
-</pre>
+<p>Create a new AnyLine object for a id line.</p>
 
 <pre class="nim-code">
-func newAnyLineIdLine(idLine: string): AnyLine
+func newAnyLineIdLine(idLine: string): AnyLine 
 </pre>
 
 <h3 id="newRunArgs">newRunArgs</h3>
 
-<pre class="description">
-Create a new RunArgs object.
-</pre>
+<p>Create a new RunArgs object.</p>
 
 <pre class="nim-code">
 func newRunArgs(help = false; version = false; leaveTempDir = false;
-                filename = ""; directory = ""): RunArgs
+                filename = ""; directory = ""): RunArgs 
 </pre>
 
 <h3 id="newRunFileLine">newRunFileLine</h3>
 
-<pre class="description">
-Create a new RunFileLine object.
-</pre>
+<p>Create a new RunFileLine object.</p>
 
 <pre class="nim-code">
 func newRunFileLine(filename: string; noLastEnding = false; command = false;
-                    nonZeroReturn = false): RunFileLine
+                    nonZeroReturn = false): RunFileLine 
 </pre>
 
 <h3 id="newExpectedLine">newExpectedLine</h3>
 
-<pre class="description">
-Create a new ExpectedLine object.
-</pre>
+<p>Create a new ExpectedLine object.</p>
 
 <pre class="nim-code">
-func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine
+func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine 
 </pre>
 
 <h3 id="newDirAndFiles">newDirAndFiles</h3>
 
-<pre class="description">
-Create a new DirAndFiles object.
-</pre>
+<p>Create a new DirAndFiles object.</p>
 
 <pre class="nim-code">
 func newDirAndFiles(expectedLines: seq[ExpectedLine];
-                    runFileLines: seq[RunFileLine]): DirAndFiles
+                    runFileLines: seq[RunFileLine]): DirAndFiles 
 </pre>
 
 <h3 id="a__">`$`</h3>
 
-<pre class="description">
-Return a string representation of a ExpectedLine object.
-</pre>
+<p>Return a string representation of a ExpectedLine object.</p>
 
 <pre class="nim-code">
-func `$`(r: ExpectedLine): string
+func `$`(r: ExpectedLine): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="a__-1">`$`</h3>
 
-<pre class="description">
-Return a string representation of a RunFileLine object.
-</pre>
+<p>Return a string representation of a RunFileLine object.</p>
 
 <pre class="nim-code">
-func `$`(r: RunFileLine): string
+func `$`(r: RunFileLine): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="writeErr">writeErr</h3>
 
-<pre class="description">
-Write a message to stderr.
-</pre>
+<p>Write a message to stderr.</p>
 
 <pre class="nim-code">
-proc writeErr(message: string)
+proc writeErr(message: string) {.raises: [IOError], tags: [WriteIOEffect].}
 </pre>
 
 <h3 id="createFolder">createFolder</h3>
 
-<pre class="description">
-Create a folder with the given name. When the folder cannot be created return a message telling why, else return "".
-</pre>
+<p>Create a folder with the given name. When the folder cannot be created return a message telling why, else return "".</p>
 
 <pre class="nim-code">
-proc createFolder(folder: string): string
+proc createFolder(folder: string): string {.raises: [],
+    tags: [WriteDirEffect, ReadDirEffect].}
 </pre>
 
 <h3 id="deleteFolder">deleteFolder</h3>
 
-<pre class="description">
-Delete a folder with the given name. When the folder cannot be deleted return a message telling why, else return "".
-</pre>
+<p>Delete a folder with the given name. When the folder cannot be deleted return a message telling why, else return "".</p>
 
 <pre class="nim-code">
-proc deleteFolder(folder: string): string
+proc deleteFolder(folder: string): string {.raises: [],
+    tags: [WriteDirEffect, ReadDirEffect].}
 </pre>
 
 <h3 id="parseRunCommandLine">parseRunCommandLine</h3>
 
-<pre class="description">
-Parse the command line arguments.
-</pre>
+<p>Parse the command line arguments.</p>
 
 <pre class="nim-code">
-proc parseRunCommandLine(argv: seq[string]): OpResultStr[RunArgs]
+proc parseRunCommandLine(argv: seq[string]): OpResultStr[RunArgs] {.
+    raises: [ValueError], tags: [ReadIOEffect].}
 </pre>
 
 <h3 id="isRunFileLine">isRunFileLine</h3>
 
-<pre class="description">
-Return true when the line is a file line.
-</pre>
+<p>Return true when the line is a file line.</p>
 
 <pre class="nim-code">
-proc isRunFileLine(line: string): bool
+proc isRunFileLine(line: string): bool {.raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="isExpectedLine">isExpectedLine</h3>
 
-<pre class="description">
-Return true when the line is an expected line.
-</pre>
+<p>Return true when the line is an expected line.</p>
 
 <pre class="nim-code">
-proc isExpectedLine(line: string): bool
+proc isExpectedLine(line: string): bool {.raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="parseRunFileLine">parseRunFileLine</h3>
 
-<pre class="description">
-Parse a file command line.
-</pre>
+<p>Parse a file command line.</p>
 
 <pre class="nim-code">
-proc parseRunFileLine(line: string): OpResultStr[RunFileLine]
+proc parseRunFileLine(line: string): OpResultStr[RunFileLine] {.
+    raises: [KeyError, ValueError], tags: [].}
 </pre>
 
 <h3 id="parseExpectedLine">parseExpectedLine</h3>
 
-<pre class="description">
-Parse an expected line.
-</pre>
+<p>Parse an expected line.</p>
 
 <pre class="nim-code">
-proc parseExpectedLine(line: string): OpResultStr[ExpectedLine]
+proc parseExpectedLine(line: string): OpResultStr[ExpectedLine] {.
+    raises: [KeyError, ValueError], tags: [].}
 </pre>
 
 <h3 id="openNewFile">openNewFile</h3>
 
-<pre class="description">
-Create a new file in the given folder and return an open File object.
-</pre>
+<p>Create a new file in the given folder and return an open File object.</p>
 
 <pre class="nim-code">
-proc openNewFile(folder: string; filename: string): OpResultStr[File]
+proc openNewFile(folder: string; filename: string): OpResultStr[File] {.
+    raises: [ValueError], tags: [ReadDirEffect].}
 </pre>
 
 <h3 id="getAnyLine">getAnyLine</h3>
 
-<pre class="description">
-Return information about the stf line.
-</pre>
+<p>Return information about the stf line.</p>
 
 <pre class="nim-code">
-proc getAnyLine(line: string): OpResultStr[AnyLine]
+proc getAnyLine(line: string): OpResultStr[AnyLine] {.
+    raises: [KeyError, ValueError], tags: [].}
 </pre>
 
 <h3 id="makeDirAndFiles">makeDirAndFiles</h3>
 
-<pre class="description">
-Read the stf file and create its temp folder and files. Return the file lines and expected lines.
-</pre>
+<p>Read the stf file and create its temp folder and files. Return the file lines and expected lines.</p>
 
 <pre class="nim-code">
-proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles]
+proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles] {.
+    raises: [ValueError, Exception, IOError, OSError, KeyError],
+    tags: [ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect].}
 </pre>
 
 <h3 id="runCommands">runCommands</h3>
 
-<pre class="description">
-Run the command files and return 0 when they all returned their expected return code.
-</pre>
+<p>Run the command files and return 0 when they all returned their expected return code.</p>
 
 <pre class="nim-code">
-proc runCommands(folder: string; runFileLines: seq[RunFileLine]): int
+proc runCommands(folder: string; runFileLines: seq[RunFileLine]): int {.
+    raises: [OSError, ValueError], tags: [ReadDirEffect, WriteDirEffect,
+    ExecIOEffect, ReadIOEffect, RootEffect].}
 </pre>
 
 <h3 id="runStfFilename">runStfFilename</h3>
 
-<pre class="description">
-Run the stf file and leave the temp dir. Return 0 when all the tests passed.
-</pre>
+<p>Run the stf file and leave the temp dir. Return 0 when all the tests passed.</p>
 
 <pre class="nim-code">
-proc runStfFilename(filename: string): int
+proc runStfFilename(filename: string): int {.
+    raises: [ValueError, Exception, IOError, OSError, KeyError], tags: [
+    ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect, ExecIOEffect,
+    RootEffect].}
 </pre>
 
 

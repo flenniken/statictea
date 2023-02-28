@@ -22,27 +22,31 @@ body {
     white-space: pre-wrap;
 }
 
-.nim-code {
+pre {
     border-left: 6px solid green;
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
 <body>
 <h1>variables.nim</h1>
 
-<pre class="description">
-Procedures for working with statictea variables.
+<p>Procedures for working with statictea variables.
 
-There is one dictionary to hold the logically separate dictionaries,
+</p><p>There is one dictionary to hold the logically separate dictionaries,
 g, h, s, t etc which makes passing them around easier.
 
-The language allows local variables to be specified without the l
+</p><p>The language allows local variables to be specified without the l
 prefix and it allows functions to be specified without the f prefix.
-
-</pre>
+</p>
 
 Nim source code: <a href="../../src/variables.nim">variables.nim</a>
 
@@ -70,14 +74,14 @@ and value which is the result of running a statement.</li>
 
 <h3 id="outputValues">outputValues</h3>
 
-<pre class="description">
-Where the replacement block's output goes.
-* result -- output goes to the result file
-* stdout -- output goes to the standard output stream
-* stdout -- output goes to the standard error stream
-* log -- output goes to the log file
-* skip -- output goes to the bit bucket
-</pre>
+<p>Where the replacement block's output goes.
+</p><ul>
+<li>result -- output goes to the result file
+</li><li>stdout -- output goes to the standard output stream
+</li><li>stdout -- output goes to the standard error stream
+</li><li>log -- output goes to the log file
+</li><li>skip -- output goes to the bit bucket</li></ul>
+
 
 <pre class="nim-code">
 outputValues = ["result", "stdout", "stderr", "log", "skip"]
@@ -85,15 +89,15 @@ outputValues = ["result", "stdout", "stderr", "log", "skip"]
 
 <h3 id="Operator">Operator</h3>
 
-<pre class="description">
-The statement operator types.
+<p>The statement operator types.
 
-* opIgnore -- ignore the statement, e.g. comment or blank statement.
-* opAppendDict (=) -- append the value to the dictionary
-* opAppendList ($=) -- append the value to the list
-* opReturn -- stop or skip the current replacement iteration
-* opLog -- log a message
-</pre>
+</p><ul>
+<li>opIgnore -- ignore the statement, e.g. comment or blank statement.
+</li><li>opAppendDict (=) -- append the value to the dictionary
+</li><li>opAppendList ($=) -- append the value to the list
+</li><li>opReturn -- stop or skip the current replacement iteration
+</li><li>opLog -- log a message</li></ul>
+
 
 <pre class="nim-code">
 Operator = enum
@@ -103,15 +107,15 @@ Operator = enum
 
 <h3 id="VariableData">VariableData</h3>
 
-<pre class="description">
-The VariableData object holds the variable name, operator,
+<p>The VariableData object holds the variable name, operator,
 and value which is the result of running a statement.
 
-* dotNameStr -- the variable dot name tells which dictionary contains
+</p><ul>
+<li>dotNameStr -- the variable dot name tells which dictionary contains
 the variable, i.e.: l.d.a
-* operator -- the statement's operator; what to do with the variable and value.
-* value -- the variable's value
-</pre>
+</li><li>operator -- the statement's operator; what to do with the variable and value.
+</li><li>value -- the variable's value</li></ul>
+
 
 <pre class="nim-code">
 VariableData = object
@@ -123,9 +127,7 @@ VariableData = object
 
 <h3 id="VariableDataOr">VariableDataOr</h3>
 
-<pre class="description">
-A VariableData object or a warning.
-</pre>
+<p>A VariableData object or a warning.</p>
 
 <pre class="nim-code">
 VariableDataOr = OpResultWarn[VariableData]
@@ -133,12 +135,12 @@ VariableDataOr = OpResultWarn[VariableData]
 
 <h3 id="NoPrefixDict">NoPrefixDict</h3>
 
-<pre class="description">
-The variable letter prefix to use when it's missing.
+<p>The variable letter prefix to use when it's missing.
 
-* npLocal -- use the local (l) dictionary
-* npBuiltIn -- use the built in function (f) dictionary
-</pre>
+</p><ul>
+<li>npLocal -- use the local (l) dictionary
+</li><li>npBuiltIn -- use the built in function (f) dictionary</li></ul>
+
 
 <pre class="nim-code">
 NoPrefixDict = enum
@@ -147,116 +149,99 @@ NoPrefixDict = enum
 
 <h3 id="newVariableDataOr">newVariableDataOr</h3>
 
-<pre class="description">
-Create an object containing a warning.
-</pre>
+<p>Create an object containing a warning.</p>
 
 <pre class="nim-code">
-func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
+func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr 
 </pre>
 
 <h3 id="newVariableDataOr-1">newVariableDataOr</h3>
 
-<pre class="description">
-Create an object containing a warning.
-</pre>
+<p>Create an object containing a warning.</p>
 
 <pre class="nim-code">
-func newVariableDataOr(warningData: WarningData): VariableDataOr
+func newVariableDataOr(warningData: WarningData): VariableDataOr 
 </pre>
 
 <h3 id="newVariableDataOr-2">newVariableDataOr</h3>
 
-<pre class="description">
-Create an object containing a VariableData object.
-</pre>
+<p>Create an object containing a VariableData object.</p>
 
 <pre class="nim-code">
-func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr
+func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr 
 </pre>
 
 <h3 id="a__">`$`</h3>
 
-<pre class="description">
-Return a string representation of VariableData.
-</pre>
+<p>Return a string representation of VariableData.</p>
 
 <pre class="nim-code">
-func `$`(v: VariableData): string
+func `$`(v: VariableData): string {.raises: [ValueError, Exception],
+                                    tags: [RootEffect].}
 </pre>
 
 <h3 id="startVariables">startVariables</h3>
 
-<pre class="description">
-Create an empty variables object in its initial state.
-</pre>
+<p>Create an empty variables object in its initial state.</p>
 
 <pre class="nim-code">
 func startVariables(server: VarsDict = nil; args: VarsDict = nil;
-                    funcs: VarsDict = nil): Variables
+                    funcs: VarsDict = nil; userFuncs: VarsDict = nil): Variables 
 </pre>
 
 <h3 id="getTeaVarIntDefault">getTeaVarIntDefault</h3>
 
-<pre class="description">
-Return the int value of one of the tea dictionary integer items. If the value does not exist, return its default value.
-</pre>
+<p>Return the int value of one of the tea dictionary integer items. If the value does not exist, return its default value.</p>
 
 <pre class="nim-code">
-func getTeaVarIntDefault(variables: Variables; varName: string): int64
+func getTeaVarIntDefault(variables: Variables; varName: string): int64 {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="getTeaVarStringDefault">getTeaVarStringDefault</h3>
 
-<pre class="description">
-Return the string value of one of the tea dictionary string items. If the value does not exist, return its default value.
-</pre>
+<p>Return the string value of one of the tea dictionary string items. If the value does not exist, return its default value.</p>
 
 <pre class="nim-code">
-func getTeaVarStringDefault(variables: Variables; varName: string): string
+func getTeaVarStringDefault(variables: Variables; varName: string): string {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="resetVariables">resetVariables</h3>
 
-<pre class="description">
-Clear the local variables and reset the tea variables for running a command.
-</pre>
+<p>Clear the local variables and reset the tea variables for running a command.</p>
 
 <pre class="nim-code">
-proc resetVariables(variables: var Variables)
+proc resetVariables(variables: var Variables) {.raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="assignVariable">assignVariable</h3>
 
-<pre class="description">
-Assign the variable the given value if possible, else return a warning.
-</pre>
+<p>Assign the variable the given value if possible, else return a warning.</p>
 
 <pre class="nim-code">
 proc assignVariable(variables: var Variables; dotNameStr: string; value: Value;
-                    operator = opEqual): Option[WarningData]
+                    operator = opEqual): Option[WarningData] {.
+    raises: [KeyError, ValueError], tags: [].}
 </pre>
 
 <h3 id="assignVariable-1">assignVariable</h3>
 
-<pre class="description">
-Assign the variable the given value if possible, else return a warning.
-</pre>
+<p>Assign the variable the given value if possible, else return a warning.</p>
 
 <pre class="nim-code">
 proc assignVariable(variables: var Variables; variableData: VariableData): Option[
-    WarningData]
+    WarningData] {.raises: [KeyError, ValueError], tags: [].}
 </pre>
 
 <h3 id="getVariable">getVariable</h3>
 
-<pre class="description">
-Look up the variable and return its value when found, else return a warning. When no prefix is specified, look in the noPrefixDict dictionary.
-</pre>
+<p>Look up the variable and return its value when found, else return a warning. When no prefix is specified, look in the noPrefixDict dictionary.</p>
 
 <pre class="nim-code">
 proc getVariable(variables: Variables; dotNameStr: string;
-                 noPrefixDict: NoPrefixDict): ValueOr
+                 noPrefixDict: NoPrefixDict): ValueOr {.raises: [KeyError],
+    tags: [].}
 </pre>
 
 

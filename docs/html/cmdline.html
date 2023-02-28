@@ -27,6 +27,12 @@ pre {
     padding: 16px;
     background-color: #f6f8fa;
     overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
 }
 </style>
 </head>
@@ -37,7 +43,7 @@ pre {
 
 </p><p>Example:
 
-</p><pre>import cmdline
+</p><pre class="desc-code">import cmdline
 
 # Define the supported options.
 var options = newSeq[CmlOption]()
@@ -85,12 +91,10 @@ dictionary.</li>
 
 <h3 id="CmlArgs">CmlArgs</h3>
 
-<pre class="description">
-CmlArgs holds the parsed command line arguments in an ordered
+<p>CmlArgs holds the parsed command line arguments in an ordered
 dictionary. The keys are the supported options found on the
 command line and each value is a list of associated arguments.
-An option without arguments will have an empty list.
-</pre>
+An option without arguments will have an empty list.</p>
 
 <pre class="nim-code">
 CmlArgs = OrderedTable[string, seq[string]]
@@ -98,9 +102,7 @@ CmlArgs = OrderedTable[string, seq[string]]
 
 <h3 id="CmlMessageId">CmlMessageId</h3>
 
-<pre class="description">
-Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.
-</pre>
+<p>Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.</p>
 
 <pre class="nim-code">
 CmlMessageId = enum
@@ -113,9 +115,7 @@ CmlMessageId = enum
 
 <h3 id="ArgsOrMessageKind">ArgsOrMessageKind</h3>
 
-<pre class="description">
-The kind of an ArgsOrMessage object, either args or a message.
-</pre>
+<p>The kind of an ArgsOrMessage object, either args or a message.</p>
 
 <pre class="nim-code">
 ArgsOrMessageKind = enum
@@ -124,9 +124,7 @@ ArgsOrMessageKind = enum
 
 <h3 id="ArgsOrMessage">ArgsOrMessage</h3>
 
-<pre class="description">
-Contains the command line args or a message.
-</pre>
+<p>Contains the command line args or a message.</p>
 
 <pre class="nim-code">
 ArgsOrMessage = object
@@ -138,25 +136,25 @@ ArgsOrMessage = object
       messageId*: CmlMessageId
       problemArg*: string
 
-
+  
 </pre>
 
 <h3 id="CmlOptionType">CmlOptionType</h3>
 
-<pre class="description">
-The option type.
+<p>The option type.
 
-* cmlArgument0or1 -- option with an argument, 0 or 1 times.
-* cmlNoArgument -- option without an argument, 0 or 1 times.
-* cmlOptionalArgument -- option with an optional argument, 0
+</p><ul>
+<li>cmlArgument0or1 -- option with an argument, 0 or 1 times.
+</li><li>cmlNoArgument -- option without an argument, 0 or 1 times.
+</li><li>cmlOptionalArgument -- option with an optional argument, 0
     or 1 times.
-* cmlBareArgument -- an argument without an option, 1 time.
-* cmlArgumentOnce -- option with an argument, 1 time.
-* cmlArgumentMany -- option with an argument, unlimited
+</li><li>cmlBareArgument -- an argument without an option, 1 time.
+</li><li>cmlArgumentOnce -- option with an argument, 1 time.
+</li><li>cmlArgumentMany -- option with an argument, unlimited
     number of times.
-* cmlStopArgument -- option without an argument, 0 or 1
-    times. Stop and return this option by itself.
-</pre>
+</li><li>cmlStopArgument -- option without an argument, 0 or 1
+    times. Stop and return this option by itself.</li></ul>
+
 
 <pre class="nim-code">
 CmlOptionType = enum
@@ -166,9 +164,7 @@ CmlOptionType = enum
 
 <h3 id="CmlOption">CmlOption</h3>
 
-<pre class="description">
-An CmlOption holds its type, long name and short name.
-</pre>
+<p>An CmlOption holds its type, long name and short name.</p>
 
 <pre class="nim-code">
 CmlOption = object
@@ -180,89 +176,72 @@ CmlOption = object
 
 <h3 id="newCmlOption">newCmlOption</h3>
 
-<pre class="description">
-Create a new CmlOption object. For no short option use a dash.
-</pre>
+<p>Create a new CmlOption object. For no short option use a dash.</p>
 
 <pre class="nim-code">
-func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
+func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption 
 </pre>
 
 <h3 id="newArgsOrMessage">newArgsOrMessage</h3>
 
-<pre class="description">
-Create a new ArgsOrMessage object containing arguments.
-</pre>
+<p>Create a new ArgsOrMessage object containing arguments.</p>
 
 <pre class="nim-code">
-func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
+func newArgsOrMessage(args: CmlArgs): ArgsOrMessage 
 </pre>
 
 <h3 id="newArgsOrMessage-1">newArgsOrMessage</h3>
 
-<pre class="description">
-Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
-</pre>
+<p>Create a new ArgsOrMessage object containing a message id and optionally the problem argument.</p>
 
 <pre class="nim-code">
-func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
+func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage 
 </pre>
 
 <h3 id="a__">`$`</h3>
 
-<pre class="description">
-Return a string representation of an CmlOption object.
-</pre>
+<p>Return a string representation of an CmlOption object.</p>
 
 <pre class="nim-code">
-func `$`(a: CmlOption): string
+func `$`(a: CmlOption): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="a__-1">`$`</h3>
 
-<pre class="description">
-Return a string representation of a ArgsOrMessage object.
-</pre>
+<p>Return a string representation of a ArgsOrMessage object.</p>
 
 <pre class="nim-code">
-func `$`(a: ArgsOrMessage): string
+func `$`(a: ArgsOrMessage): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="commandLineEcho">commandLineEcho</h3>
 
-<pre class="description">
-Show the command line arguments.
-</pre>
+<p>Show the command line arguments.</p>
 
 <pre class="nim-code">
-proc commandLineEcho()
+proc commandLineEcho() {.raises: [ValueError], tags: [ReadIOEffect].}
 </pre>
 
 <h3 id="collectArgs">collectArgs</h3>
 
-<pre class="description">
-Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.
-</pre>
+<p>Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.</p>
 
 <pre class="nim-code">
-proc collectArgs(): seq[string]
+proc collectArgs(): seq[string] {.raises: [], tags: [ReadIOEffect].}
 </pre>
 
 <h3 id="cmdLine">cmdLine</h3>
 
-<pre class="description">
-Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".
-</pre>
+<p>Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".</p>
 
 <pre class="nim-code">
-func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage
+func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="cmlMessages">cmlMessages</h3>
 
-<pre class="description">
-Messages used by this module.
-</pre>
+<p>Messages used by this module.</p>
 
 <pre class="nim-code">
 cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
@@ -280,22 +259,19 @@ cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
 
 <h3 id="getMessage">getMessage</h3>
 
-<pre class="description">
-Return a message from a message id and problem argument.
-</pre>
+<p>Return a message from a message id and problem argument.</p>
 
 <pre class="nim-code">
-func getMessage(message: CmlMessageId; problemArg: string = ""): string
+func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
+    raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="a__-2">`$`</h3>
 
-<pre class="description">
-Return a string representation of an Args object.
-</pre>
+<p>Return a string representation of an Args object.</p>
 
 <pre class="nim-code">
-func `$`(a: Args): string
+func `$`(a: Args): string {.raises: [ValueError], tags: [].}
 </pre>
 
 

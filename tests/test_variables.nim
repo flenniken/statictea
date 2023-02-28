@@ -104,7 +104,8 @@ o = {}
 s = {}
 t.args = {}
 t.row = 0
-t.version = "$1"""" % staticteaVersion
+t.version = "$1"
+u = {}""" % staticteaVersion
     check dotNameRep(variables, top=true) == expected
 
   test "getVariable":
@@ -118,6 +119,7 @@ t.version = "$1"""" % staticteaVersion
     check testGetVariableOk(variables, "o", "{}")
     check testGetVariableOk(variables, "l", "{}")
     check testGetVariableOk(variables, "g", "{}")
+    check testGetVariableOk(variables, "u", "{}")
 
     let eTea = """{"args":{},"row":0,"version":"$1"}""" % staticteaVersion
     check testGetVariableOk(variables, "t", eTea)
@@ -129,6 +131,15 @@ t.version = "$1"""" % staticteaVersion
     variables["l"].dictv.dict["five"] = newValue(5)
     check testGetVariableOk(variables, "l.five", "5")
     check testGetVariableOk(variables, "five", "5")
+
+  test "getVariable u.a":
+    var variables = startVariables()
+    func abc(variables: Variables, parameters: seq[Value]): FunResult =
+      result = newFunResult(newValue("hi"))
+    let fn = newValue(newDummyFunctionSpec(builtIn = false,
+      functionName = "abc", signatureCode = "iis", functionPtr = abc))
+    variables["u"].dictv.dict["a"] = fn
+    check testGetVariableOk(variables, "u.a", """"abc"""")
 
   test "getVariable nested":
     var variables = startVariables()
@@ -269,9 +280,13 @@ t.version = "$1"""" % staticteaVersion
     let json5 = """{$1,"content":"asdf"}""" % tkeys
     check testAssignVarFlex("t.content", opEqual, newValue("asdf"), json5, dictName="t")
 
-    # check testAssignVarFlex("t.content", opEqual, newValue("asdf"), newValue("asdf"))
-    # check testAssignVarFlex("t.output", opEqual, newValue("stderr"), newValue("stderr"))
-    # check testAssignVarFlex("t.output", opEqual, newValue("stdout"), newValue("stdout"))
+    # Assign a user function variable to the u dictionary.
+    let json6 = """{"a":"abc"}"""
+    func abc(variables: Variables, parameters: seq[Value]): FunResult =
+      result = newFunResult(newValue("hi"))
+    let fn = newValue(newDummyFunctionSpec(builtIn = false,
+      functionName = "abc", signatureCode = "iis", functionPtr = abc))
+    check testAssignVarFlex("u.a", opEqual, fn, json6, dictName="u")
 
   test "assignVariable warning":
     check testAssignVarWarn("t.repeat", opEqual, newValue("hello"),
@@ -297,13 +312,18 @@ t.version = "$1"""" % staticteaVersion
     check testAssignVarWarn("l", opEqual, newValue(1), wImmutableVars)
     check testAssignVarWarn("t", opEqual, newValue(1), wImmutableVars)
     check testAssignVarWarn("m", opEqual, newValue(1), wReservedNameSpaces)
+    check testAssignVarWarn("u", opEqual, newValue(1), wImmutableVars)
 
   test "assignVariable wReadOnlyFunctions":
     check testAssignVarWarn("f", opEqual, newValue(1), wReadOnlyFunctions)
     check testAssignVarWarn("f.a", opEqual, newValue(1), wReadOnlyFunctions)
 
+  test "u.a = 1":
+    check testAssignVarWarn("u.a", opEqual, newValue(1), wUserFunction)
+    check testAssignVarWarn("u.a", opAppendList, newValue(1), wUserFunction)
+
   test "assignVariable wReservedNameSpaces":
-    for letterVar in ["i", "j", "k", "n", "p", "q", "r", "u"]:
+    for letterVar in ["i", "j", "k", "n", "p", "q", "r"]:
       check testAssignVarWarn(letterVar, opEqual, newValue(1), wReservedNameSpaces)
 
   test "non wReservedNameSpaces in command":

@@ -28,6 +28,7 @@ suite "startingvars.nim":
     check "l" in variables
     check "o" in variables
     check "s" in variables
+    check "u" in variables
 
     let eLogLines: seq[string] = @[]
     let eErrLines: seq[string] = @[]

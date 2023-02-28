@@ -85,7 +85,7 @@ func `$`*(v: VariableData): string =
   v.dotNameStr, $v.operator, $v.value]
 
 func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
-    funcs: VarsDict = nil): Variables =
+    funcs: VarsDict = nil, userFuncs: VarsDict = nil): Variables =
   ## Create an empty variables object in its initial state.
 
   # Add the standard dictionaries in alphabetical order.
@@ -116,6 +116,12 @@ func startVariables*(server: VarsDict = nil, args: VarsDict = nil,
   tea["row"] = newValue(0)
   tea["version"] = newValue(staticteaVersion)
   result["t"] = newValue(tea, mutable = Mutable.append)
+
+  # User functions.
+  if userFuncs == nil:
+    result["u"] = newValue(newVarsDict(), mutable = Mutable.append)
+  else:
+    result["u"] = newValue(userFuncs)
 
 func getTeaVarIntDefault*(variables: Variables, varName: string): int64 =
   ## Return the int value of one of the tea dictionary integer
@@ -168,6 +174,7 @@ proc resetVariables*(variables: var Variables) =
       if teaVar in tea:
         tea.del(teaVar)
 
+  # Clear local variables.
   variables["l"] = newValue(newVarsDict(), mutable = Mutable.append)
 
 proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
@@ -177,7 +184,7 @@ proc getParentDictToAddTo(variables: Variables, dotNameList: openArray[string]):
   ## "a.b.c.d" and the c dictionary is the result.
 
   assert(dotNameList.len > 1, "No namespace for '$1'." % dotNameList.join("."))
-  assert dotNameList[0] in ["f", "g", "h", "l", "s", "o"]
+  assert dotNameList[0] in ["f", "g", "h", "l", "s", "o", "u"]
 
   var parentDict: Value
   var dictNames: seq[string]
@@ -279,7 +286,8 @@ proc assignVariable*(
   # -- You can specify local variables without the l prefix.
   # -- You cannot assign true and false.
   # -- You can assign new values to the code dictonary when in code files.
-  # -- You cannot assign or append to a immutable dict or list.
+  # -- You cannot assign or append to an immutable dict or list.
+  # -- You can assign a user function to the u dictionary but nothing else.
 
   assert dotNameStr.len > 0
   var dotNameList = split(dotNameStr, '.')
@@ -307,7 +315,12 @@ proc assignVariable*(
   of "f":
     # You cannot assign to the functions dictionary.
     return some(newWarningData(wReadOnlyFunctions))
-  of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
+  of "u":
+    # Assign user functions to the u dictionary.
+    if dotNameList.len != 1 and (value.kind != vkFunc or value.funcv.builtin):
+      # You can only assign a user function variable to the u dictionary.
+      return some(newWarningData(wUserFunction))
+  of "h", "i", "j", "k", "m", "n", "p", "q", "r":
     # The variables f, h - k, m - r, u are reserved variable names.
     return some(newWarningData(wReservedNameSpaces))
   else:
@@ -320,7 +333,7 @@ proc assignVariable*(
     # Add the default l prefix to the variable name.
     dotNameList.insert("l", 0)
 
-  if dotNameList.len == 1 and dotNameList[0] in ["l", "g", "o"]:
+  if dotNameList.len == 1 and dotNameList[0] in ["l", "g", "o", "u"]:
     # You cannot assign to an existing variable.
     return some(newWarningData(wImmutableVars))
 
@@ -414,10 +427,10 @@ proc getVariable*(variables: Variables, dotNameStr: string,
   var names = split(dotNameStr, '.')
   let nameSpace = names[0]
   case nameSpace
-  of "g", "l", "s", "t", "o", "f":
+  of "g", "l", "s", "t", "o", "f", "u":
     result = lookUpVar(variables, names)
-  of "h", "i", "j", "k", "m", "n", "p", "q", "r", "u":
-    # The variables f, h - k, m - r, u are reserved variable names.
+  of "h", "i", "j", "k", "m", "n", "p", "q", "r":
+    # The variables h - k, m - r are reserved variable names.
     result = newValueOr(wReservedNameSpaces)
   else:
     # Non-prefix variable, look it up in its default dictionary.
@@ -431,11 +444,12 @@ proc getVariable*(variables: Variables, dotNameStr: string,
     var varNames = @[prefix] & names
     result = lookUpVar(variables, varNames)
     if result.isMessage:
-      # The variable isn't in the x dictionary.
       var messageId: MessageId
       case noPrefixDict
       of npLocal:
+        # The variable '$1' isn't in the l dictionary.
         messageId = wNotInL
       of npBuiltIn:
+        # The variable '$1' isn't in the f dictionary.
         messageId = wNotInF
       result = newValueOr(messageId, dotNameStr)
