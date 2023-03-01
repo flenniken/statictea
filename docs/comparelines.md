@@ -42,7 +42,7 @@ func opMessageStr[T](message: string): OpResultStr[T]
 Split lines and keep the line endings. Works with n and rn type endings. keyword: splitLines
 
 ```nim
-func splitNewLines(content: string): seq[string]
+func splitNewLines(content: string): seq[string] 
 ```
 
 # linesSideBySide
@@ -50,7 +50,8 @@ func splitNewLines(content: string): seq[string]
 Show the two sets of lines side by side (above and below).
 
 ```nim
-proc linesSideBySide(gotContent: string; expectedContent: string): string
+proc linesSideBySide(gotContent: string; expectedContent: string): string {.
+    raises: [ValueError], tags: [].}
 ```
 
 # testLinesSideBySide
@@ -58,7 +59,8 @@ proc linesSideBySide(gotContent: string; expectedContent: string): string
 If the two strings are equal, return true, else show the differences and return false.
 
 ```nim
-proc testLinesSideBySide(got: string; expected: string): bool
+proc testLinesSideBySide(got: string; expected: string): bool {.
+    raises: [ValueError], tags: [].}
 ```
 
 # compareFiles
@@ -67,7 +69,7 @@ Compare two files and return the differences. When they are equal return "".
 
 ```nim
 proc compareFiles(gotFilename: string; expectedFilename: string): OpResultStr[
-    string]
+    string] {.raises: [ValueError], tags: [ReadIOEffect].}
 ```
 
 

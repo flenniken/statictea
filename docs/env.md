@@ -106,7 +106,8 @@ Env = object
 Close the environment streams.
 
 ```nim
-proc close(env: var Env)
+proc close(env: var Env) {.raises: [Exception, IOError, OSError],
+                           tags: [WriteIOEffect].}
 ```
 
 # outputWarning
@@ -114,7 +115,8 @@ proc close(env: var Env)
 Write a message to the error stream and increment the warning count.
 
 ```nim
-proc outputWarning(env: var Env; lineNum: Natural; message: string)
+proc outputWarning(env: var Env; lineNum: Natural; message: string) {.
+    raises: [IOError, OSError, ValueError], tags: [WriteIOEffect].}
 ```
 
 # warn
@@ -123,7 +125,8 @@ Write a formatted warning message to the error stream.
 
 ```nim
 proc warn(env: var Env; filename: string; lineNum: Natural; warning: MessageId;
-          p1: string = "")
+          p1: string = "") {.raises: [ValueError, IOError, OSError],
+                             tags: [WriteIOEffect].}
 ```
 
 # warn
@@ -132,7 +135,8 @@ Write a formatted warning message to the error stream.
 
 ```nim
 proc warn(env: var Env; filename: string; lineNum: Natural;
-          warningData: WarningData)
+          warningData: WarningData) {.raises: [ValueError, IOError, OSError],
+                                      tags: [WriteIOEffect].}
 ```
 
 # warnNoFile
@@ -140,7 +144,8 @@ proc warn(env: var Env; filename: string; lineNum: Natural;
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warnNoFile(env: var Env; messageId: MessageId; p1: string = "")
+proc warnNoFile(env: var Env; messageId: MessageId; p1: string = "") {.
+    raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
 ```
 
 # warnNoFile
@@ -148,7 +153,8 @@ proc warnNoFile(env: var Env; messageId: MessageId; p1: string = "")
 Write a formatted warning message to the error stream.
 
 ```nim
-proc warnNoFile(env: var Env; warningData: WarningData)
+proc warnNoFile(env: var Env; warningData: WarningData) {.
+    raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
 ```
 
 # formatLogDateTime
@@ -156,7 +162,7 @@ proc warnNoFile(env: var Env; warningData: WarningData)
 Return a formatted time stamp for the log.
 
 ```nim
-func formatLogDateTime(dt: DateTime): string
+func formatLogDateTime(dt: DateTime): string 
 ```
 
 # formatLogLine
@@ -164,7 +170,8 @@ func formatLogDateTime(dt: DateTime): string
 Return a formatted log line.
 
 ```nim
-func formatLogLine(filename: string; lineNum: int; message: string; dt = now()): string
+func formatLogLine(filename: string; lineNum: int; message: string; dt = now()): string {.
+    raises: [ValueError], tags: [].}
 ```
 
 # logLine
@@ -172,7 +179,9 @@ func formatLogLine(filename: string; lineNum: int; message: string; dt = now()):
 Append a message to the log file. If there is an error writing, close the log. Do nothing when the log is closed. A newline is not added to the line.
 
 ```nim
-proc logLine(env: var Env; filename: string; lineNum: int; message: string)
+proc logLine(env: var Env; filename: string; lineNum: int; message: string) {.
+    raises: [ValueError, ValueError, IOError, OSError],
+    tags: [TimeEffect, WriteIOEffect].}
 ```
 
 # log
@@ -188,7 +197,8 @@ template log(env: var Env; message: string)
 Write a message to the output stream.
 
 ```nim
-proc writeOut(env: var Env; message: string)
+proc writeOut(env: var Env; message: string) {.raises: [IOError, OSError],
+    tags: [WriteIOEffect].}
 ```
 
 # writeErr
@@ -196,7 +206,8 @@ proc writeOut(env: var Env; message: string)
 Write a message to the error stream.
 
 ```nim
-proc writeErr(env: var Env; message: string)
+proc writeErr(env: var Env; message: string) {.raises: [IOError, OSError],
+    tags: [WriteIOEffect].}
 ```
 
 # checkLogSize
@@ -204,7 +215,8 @@ proc writeErr(env: var Env; message: string)
 Check the log file size and write a warning message when the file is big.
 
 ```nim
-proc checkLogSize(env: var Env)
+proc checkLogSize(env: var Env) {.raises: [IOError, ValueError, OSError],
+                                  tags: [ReadIOEffect, WriteIOEffect].}
 ```
 
 # openLogFile
@@ -212,7 +224,8 @@ proc checkLogSize(env: var Env)
 Open the log file and update the environment. If the log file cannot be opened, a warning is output and the environment is unchanged.
 
 ```nim
-proc openLogFile(env: var Env; logFilename: string)
+proc openLogFile(env: var Env; logFilename: string) {.
+    raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
 ```
 
 # openEnv
@@ -220,7 +233,7 @@ proc openLogFile(env: var Env; logFilename: string)
 Open and return the environment containing standard error and standard out as streams.
 
 ```nim
-proc openEnv(logFilename: string = ""; warnSize: int64 = logWarnSize): Env
+proc openEnv(logFilename: string = ""; warnSize: int64 = logWarnSize): Env 
 ```
 
 # setupLogging
@@ -229,7 +242,8 @@ Turn on logging for the environment using the specified log file.
 
 ```nim
 proc setupLogging(env: var Env; logFilename: string = "";
-                  warnSize: int64 = logWarnSize)
+                  warnSize: int64 = logWarnSize) {.
+    raises: [ValueError, IOError, OSError], tags: [WriteIOEffect, ReadIOEffect].}
 ```
 
 # addExtraStreams
@@ -238,7 +252,8 @@ Add the template and result streams to the environment.
 
 ```nim
 proc addExtraStreams(env: var Env; templateFilename: string;
-                     resultFilename: string): Option[WarningData]
+                     resultFilename: string): Option[WarningData] {.raises: [],
+    tags: [ReadDirEffect].}
 ```
 
 # addExtraStreamsForUpdate
@@ -247,7 +262,8 @@ For the update case, add the template and result streams to the environment. Ret
 
 ```nim
 proc addExtraStreamsForUpdate(env: var Env; resultFilename: string;
-                              templateFilename: string): Option[WarningData]
+                              templateFilename: string): Option[WarningData] {.
+    raises: [ValueError], tags: [ReadEnvEffect, ReadIOEffect, ReadDirEffect].}
 ```
 
 

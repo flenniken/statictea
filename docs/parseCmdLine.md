@@ -97,7 +97,7 @@ ExtraLine = object
 Create a normal ExtraLine.
 
 ```nim
-func newNormalLine(line: string): ExtraLine
+func newNormalLine(line: string): ExtraLine 
 ```
 
 # newNoLine
@@ -105,7 +105,7 @@ func newNormalLine(line: string): ExtraLine
 Create a no line ExtraLine.
 
 ```nim
-func newNoLine(): ExtraLine
+func newNoLine(): ExtraLine 
 ```
 
 # newOutOfLines
@@ -113,7 +113,7 @@ func newNoLine(): ExtraLine
 Create an out of lines ExtraLine.
 
 ```nim
-func newOutOfLines(): ExtraLine
+func newOutOfLines(): ExtraLine 
 ```
 
 # newLinePartsOr
@@ -121,7 +121,7 @@ func newOutOfLines(): ExtraLine
 Return a new LinePartsOr object containing a warning.
 
 ```nim
-func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
+func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr 
 ```
 
 # newLinePartsOr
@@ -129,7 +129,7 @@ func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
 Return a new LinePartsOr object containing a LineParts object.
 
 ```nim
-func newLinePartsOr(lineParts: LineParts): LinePartsOr
+func newLinePartsOr(lineParts: LineParts): LinePartsOr 
 ```
 
 # getCodeLength
@@ -137,7 +137,7 @@ func newLinePartsOr(lineParts: LineParts): LinePartsOr
 Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.
 
 ```nim
-func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
+func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural 
 ```
 
 # parseCmdLine
@@ -145,7 +145,8 @@ func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 Parse the line and return its parts. Return quickly when not a command line.
 
 ```nim
-proc parseCmdLine(prepostTable: PrepostTable; line: string; lineNum: Natural): LinePartsOr
+proc parseCmdLine(prepostTable: PrepostTable; line: string; lineNum: Natural): LinePartsOr {.
+    raises: [ValueError, KeyError], tags: [].}
 ```
 
 

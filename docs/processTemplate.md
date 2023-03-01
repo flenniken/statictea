@@ -21,7 +21,9 @@ the first replacement block line.
 
 ```nim
 proc collectCommand(env: var Env; lb: var LineBuffer;
-                    prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
+                    prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines {.
+    raises: [IOError, OSError, ValueError, KeyError],
+    tags: [ReadIOEffect, WriteIOEffect].}
 ```
 
 # processTemplate
@@ -29,7 +31,10 @@ proc collectCommand(env: var Env; lb: var LineBuffer;
 Process the template.
 
 ```nim
-proc processTemplate(env: var Env; args: Args)
+proc processTemplate(env: var Env; args: Args) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
+    TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect,
+    ReadEnvEffect, WriteDirEffect].}
 ```
 
 # processTemplateTop
@@ -37,7 +42,10 @@ proc processTemplate(env: var Env; args: Args)
 Setup the environment streams then process the template.
 
 ```nim
-proc processTemplateTop(env: var Env; args: Args)
+proc processTemplateTop(env: var Env; args: Args) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
+    ReadDirEffect, WriteIOEffect, TimeEffect, ReadIOEffect, RootEffect,
+    ReadEnvEffect, WriteDirEffect].}
 ```
 
 

@@ -91,7 +91,7 @@ LineBuffer = object
 Return the current line number.
 
 ```nim
-proc getLineNum(lineBuffer: LineBuffer): int
+proc getLineNum(lineBuffer: LineBuffer): int 
 ```
 
 # getMaxLineLen
@@ -99,7 +99,7 @@ proc getLineNum(lineBuffer: LineBuffer): int
 Return the maximum line length.
 
 ```nim
-proc getMaxLineLen(lineBuffer: LineBuffer): int
+proc getMaxLineLen(lineBuffer: LineBuffer): int 
 ```
 
 # getFilename
@@ -107,7 +107,7 @@ proc getMaxLineLen(lineBuffer: LineBuffer): int
 Return the filename of the stream, if there is one.
 
 ```nim
-proc getFilename(lineBuffer: LineBuffer): string
+proc getFilename(lineBuffer: LineBuffer): string 
 ```
 
 # getStream
@@ -115,7 +115,7 @@ proc getFilename(lineBuffer: LineBuffer): string
 Return the associated stream.
 
 ```nim
-proc getStream(lineBuffer: LineBuffer): Stream
+proc getStream(lineBuffer: LineBuffer): Stream 
 ```
 
 # newLineBuffer
@@ -125,7 +125,7 @@ Return a new LineBuffer for the given stream.
 ```nim
 proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
                    bufferSize: int = defaultBufferSize; filename: string = ""): Option[
-    LineBuffer]
+    LineBuffer] 
 ```
 
 # reset
@@ -133,7 +133,7 @@ proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
 Clear the buffer and set the read position at the start of the stream.
 
 ```nim
-proc reset(lb: var LineBuffer)
+proc reset(lb: var LineBuffer) {.raises: [IOError, OSError], tags: [].}
 ```
 
 # readline
@@ -151,7 +151,8 @@ reading the next line. When no more data exists in the stream, an
 empty string is returned.
 
 ```nim
-proc readline(lb: var LineBuffer): string
+proc readline(lb: var LineBuffer): string {.raises: [IOError, OSError],
+    tags: [ReadIOEffect].}
 ```
 
 # yieldContentLine
@@ -159,7 +160,7 @@ proc readline(lb: var LineBuffer): string
 Yield one line at a time from the content string and keep the line endings.
 
 ```nim
-iterator yieldContentLine(content: string): string
+iterator yieldContentLine(content: string): string 
 ```
 
 

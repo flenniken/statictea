@@ -2,13 +2,13 @@
 
 Time how long it takes something to run.
 
- Usage:
+Usage:
 
- ~~~
- timer = newTimer()
- # run something
- echo timer.seconds()
- ~~~
+~~~
+timer = newTimer()
+# run something
+echo timer.seconds()
+~~~
 
 * [timer.nim](../src/timer.nim) &mdash; Nim source code.
 # Index
@@ -32,7 +32,7 @@ Timer = object
 Create a new timer and set the start time.
 
 ```nim
-proc newTimer(): Timer
+proc newTimer(): Timer {.raises: [], tags: [TimeEffect].}
 ```
 
 # seconds
@@ -40,7 +40,8 @@ proc newTimer(): Timer
 Return the elapsed seconds rounded to the specified number of digits.
 
 ```nim
-proc seconds(timer: Timer; digits: Natural = 3): float
+proc seconds(timer: Timer; digits: Natural = 3): float {.raises: [],
+    tags: [TimeEffect].}
 ```
 
 

@@ -95,8 +95,6 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
-* const: [functionsList](#functionslist) &mdash; Dynamically generated sorted list of built-in functions.
-* const: [functionStarts](#functionstarts) &mdash; Dynamically generated array of starting line numbers for each built-in function in the functions.
 * [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 * [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 * [makeFuncDictionary](#makefuncdictionary) &mdash; Create the f dictionary from the built in functions.
@@ -128,7 +126,7 @@ PathComponents = object
 Create a new StringOr object containing a warning.
 
 ```nim
-func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
+func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr 
 ```
 
 # newStringOr
@@ -136,7 +134,7 @@ func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 Create a new StringOr object containing a warning.
 
 ```nim
-func newStringOr(warningData: WarningData): StringOr
+func newStringOr(warningData: WarningData): StringOr 
 ```
 
 # newStringOr
@@ -144,7 +142,7 @@ func newStringOr(warningData: WarningData): StringOr
 Create a new StringOr object containing a string.
 
 ```nim
-func newStringOr(str: string): StringOr
+func newStringOr(str: string): StringOr 
 ```
 
 # newPathComponents
@@ -152,7 +150,7 @@ func newStringOr(str: string): StringOr
 Create a new PathComponents object from its pieces.
 
 ```nim
-func newPathComponents(dir, filename, basename, ext: string): PathComponents
+func newPathComponents(dir, filename, basename, ext: string): PathComponents 
 ```
 
 # signatureDetails
@@ -160,7 +158,7 @@ func newPathComponents(dir, filename, basename, ext: string): PathComponents
 Convert the signature object to a dictionary value.
 
 ```nim
-func signatureDetails(signature: Signature): Value
+func signatureDetails(signature: Signature): Value 
 ```
 
 # functionDetails
@@ -168,7 +166,7 @@ func signatureDetails(signature: Signature): Value
 Convert the function spec to a dictionary value.
 
 ```nim
-func functionDetails(fs: FunctionSpec): Value
+func functionDetails(fs: FunctionSpec): Value 
 ```
 
 # cmpBaseValues
@@ -176,7 +174,7 @@ func functionDetails(fs: FunctionSpec): Value
 Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
 
 ```nim
-func cmpBaseValues(a, b: Value; insensitive: bool = false): int
+func cmpBaseValues(a, b: Value; insensitive: bool = false): int 
 ```
 
 # parseNumber
@@ -184,7 +182,7 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
 ```nim
-func parseNumber(line: string; start: Natural): ValuePosSiOr
+func parseNumber(line: string; start: Natural): ValuePosSiOr 
 ```
 
 # formatString
@@ -204,7 +202,8 @@ To enter a left bracket use two in a row.
 ~~~
 
 ```nim
-proc formatString(variables: Variables; text: string): StringOr
+proc formatString(variables: Variables; text: string): StringOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # fun_cmp_iii
@@ -224,7 +223,8 @@ cmp(9, 2) => 1
 ~~~
 
 ```nim
-func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_cmp_ffi
@@ -244,7 +244,8 @@ cmp(9.3, 2.2) => 1
 ~~~
 
 ```nim
-func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_cmp_ssobi
@@ -269,7 +270,8 @@ cmp("Tea", "tea", false) => 0
 ~~~
 
 ```nim
-func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_concat_sss
@@ -288,7 +290,8 @@ concat("a", "b") => "ab"
 ~~~
 
 ```nim
-func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_len_si
@@ -307,7 +310,8 @@ len("añyóng") => 6
 ~~~
 
 ```nim
-func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_len_li
@@ -327,7 +331,8 @@ len(list(4, 5)) => 2
 ~~~
 
 ```nim
-func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_len_di
@@ -347,7 +352,8 @@ len(dict("a", 4, "b", 3)) => 2
 ~~~
 
 ```nim
-func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult
+func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_get_lioaa
@@ -379,7 +385,8 @@ a = teas[0]
 ~~~
 
 ```nim
-func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_get_dsoaa
@@ -408,7 +415,8 @@ d.tea => "Earl Grey"
 ~~~
 
 ```nim
-func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_if0_iaoaa
@@ -460,7 +468,7 @@ if0(c, warn("got zero value"))
 ~~~
 
 ```nim
-func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_if_baoaa
@@ -495,7 +503,7 @@ if(c, return("skip"))
 ~~~
 
 ```nim
-func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_add_iii
@@ -515,7 +523,8 @@ add(-2, -5) => -7
 ~~~
 
 ```nim
-func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_add_fff
@@ -534,7 +543,8 @@ add(3.2, -2.2) => 1.0
 ~~~
 
 ```nim
-func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult
+func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_sub_iii
@@ -554,7 +564,8 @@ add(1, 5) => -4
 ~~~
 
 ```nim
-func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_sub_fff
@@ -573,7 +584,8 @@ sub(1.0, 2.2) => -1.2
 ~~~
 
 ```nim
-func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_exists_dsb
@@ -593,7 +605,8 @@ exists(d, "coffee") => false
 ~~~
 
 ```nim
-func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_case_iloaa
@@ -626,7 +639,8 @@ case(3, cases, "wine") => "wine"
 ~~~
 
 ```nim
-func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_case_sloaa
@@ -658,7 +672,8 @@ case("bunch", cases, "other") => "other"
 ~~~
 
 ```nim
-func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # parseVersion
@@ -666,7 +681,7 @@ func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult
 Parse a StaticTea version number and return its three components.
 
 ```nim
-func parseVersion(version: string): Option[(int, int, int)]
+func parseVersion(version: string): Option[(int, int, int)] 
 ```
 
 # fun_cmpVersion_ssi
@@ -690,7 +705,8 @@ cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 
 ```nim
-func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_float_if
@@ -709,7 +725,8 @@ float(-33) => -33.0
 ~~~
 
 ```nim
-func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_float_sf
@@ -729,7 +746,8 @@ float("33") => 33.0
 ~~~
 
 ```nim
-func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_float_saa
@@ -748,7 +766,8 @@ float("notnum", "nan") => nan
 ~~~
 
 ```nim
-func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_int_fosi
@@ -783,7 +802,8 @@ int(-6.3456, "truncate") => -6
 ~~~
 
 ```nim
-func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_int_sosi
@@ -818,7 +838,8 @@ int("-6.3456", "truncate") => -6
 ~~~
 
 ```nim
-func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_int_ssaa
@@ -844,7 +865,8 @@ int("notnum", "round", "nan") => nan
 ~~~
 
 ```nim
-func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # if0Condition
@@ -852,7 +874,7 @@ func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult
 Convert the value to a boolean.
 
 ```nim
-func if0Condition(cond: Value): bool
+func if0Condition(cond: Value): bool 
 ```
 
 # fun_bool_ab
@@ -890,7 +912,8 @@ bool(dict("tea", 2)) => true
 ~~~
 
 ```nim
-func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_find_ssoaa
@@ -915,7 +938,8 @@ find(msg, "party", 0) = 0
 ~~~
 
 ```nim
-func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_slice_siois
@@ -937,7 +961,8 @@ slice("añyóng", 0, 3) => "añy"
 ~~~
 
 ```nim
-func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult
+func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_dup_sis
@@ -959,7 +984,8 @@ dup("", 3) => ""
 ~~~
 
 ```nim
-func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult
+func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_dict_old
@@ -980,7 +1006,8 @@ dict(["a", 5, "b", 33, "c", 0]) =>
 ~~~
 
 ```nim
-func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult
+func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_list_al
@@ -1005,7 +1032,7 @@ a = ["a", 5, "b"]
 ~~~
 
 ```nim
-func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
+func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_listLoop_lapoab
@@ -1049,7 +1076,7 @@ b5 = func(ix: int, value: int, container: list) bool
 ~~~
 
 ```nim
-func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_replace_siiss
@@ -1111,7 +1138,8 @@ replace("", 0, 0, "abcd") => abcd
 ~~~
 
 ```nim
-func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_replaceRe_sls
@@ -1137,7 +1165,8 @@ For developing and debugging regular expressions see the
 website: https://regex101.com/
 
 ```nim
-func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
+func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # parsePath
@@ -1145,7 +1174,7 @@ func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult
 Parse the given file path into its component pieces.
 
 ```nim
-func parsePath(path: string; separator = '/'): PathComponents
+func parsePath(path: string; separator = '/'): PathComponents 
 ```
 
 # fun_path_sosd
@@ -1179,7 +1208,8 @@ path("src\functions.nim", "\") => {
 ~~~
 
 ```nim
-func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult
+func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_lower_ss
@@ -1199,7 +1229,8 @@ lower("TEĀ") => "teā"
 ~~~
 
 ```nim
-func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_keys_dl
@@ -1219,7 +1250,8 @@ values(d) => [1, 2, 3]
 ~~~
 
 ```nim
-func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_values_dl
@@ -1239,7 +1271,8 @@ values(d) => ["apple", 2, 3]
 ~~~
 
 ```nim
-func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_sort_lsosl
@@ -1273,7 +1306,8 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
 
 ```nim
-func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_sort_lssil
@@ -1304,7 +1338,8 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~
 
 ```nim
-func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_sort_lsssl
@@ -1335,7 +1370,8 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~
 
 ```nim
-func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_anchors_lsl
@@ -1360,7 +1396,8 @@ anchores(list, "github") =>
 ~~~
 
 ```nim
-func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
 ```
 
 # fun_type_as
@@ -1384,7 +1421,8 @@ type(f.cmp[0]) => "func"
 ~~~
 
 ```nim
-func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult
+func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_joinPath_loss
@@ -1427,7 +1465,8 @@ joinPath(["/", "tea"]) =>
 ~~~
 
 ```nim
-func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_join_lsois
@@ -1452,7 +1491,8 @@ join(["a", "", "c"], "|", true) => "a|c"
 ~~~
 
 ```nim
-func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult
+func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_warn_ss
@@ -1476,7 +1516,8 @@ warn("always warn")
 ~~~
 
 ```nim
-func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_log_ss
@@ -1500,7 +1541,8 @@ log("always log")
 ~~~
 
 ```nim
-func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_return_aa
@@ -1548,7 +1590,7 @@ output:
 ~~~
 
 ```nim
-func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_string_aoss
@@ -1613,7 +1655,8 @@ y = 2
 ~~~
 
 ```nim
-func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
 ```
 
 # fun_string_sds
@@ -1636,7 +1679,8 @@ teas.z.a = 8
 ~~~
 
 ```nim
-func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult
+func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
 ```
 
 # fun_format_ss
@@ -1666,7 +1710,8 @@ str => "use two { to get one"
 ~~~
 
 ```nim
-func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult
+func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # fun_func_sp
@@ -1689,7 +1734,7 @@ mycmp = func(numStr1: string, numStr2: string) int
 ~~~
 
 ```nim
-func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
+func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_functionDetails_pd
@@ -1725,7 +1770,8 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 ~~~
 
 ```nim
-func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult
+func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_startsWith_ssb
@@ -1747,7 +1793,8 @@ b => false
 ~~~
 
 ```nim
-func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_not_bb
@@ -1766,7 +1813,8 @@ not(false) => true
 ~~~
 
 ```nim
-func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_and_bbb
@@ -1788,7 +1836,7 @@ and(false, warn("not hit")) => false
 ~~~
 
 ```nim
-func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_or_bbb
@@ -1810,7 +1858,7 @@ or(true, warn("not hit")) => true
 ~~~
 
 ```nim
-func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult 
 ```
 
 # fun_eq_iib
@@ -1829,7 +1877,8 @@ eq(2, 3) => false
 ~~~
 
 ```nim
-func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_eq_ffb
@@ -1848,7 +1897,8 @@ eq(1.2, 3.2) => false
 ~~~
 
 ```nim
-func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_eq_ssb
@@ -1867,7 +1917,8 @@ eq("1.2", "3.2") => false
 ~~~
 
 ```nim
-func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_ne_iib
@@ -1886,7 +1937,8 @@ ne(2, 3) => true
 ~~~
 
 ```nim
-func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_ne_ffb
@@ -1905,7 +1957,8 @@ ne(1.2, 3.2) => true
 ~~~
 
 ```nim
-func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_ne_ssb
@@ -1924,7 +1977,8 @@ ne("earl", "grey") => true
 ~~~
 
 ```nim
-func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_gt_iib
@@ -1943,7 +1997,8 @@ gt(3, 2) => true
 ~~~
 
 ```nim
-func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_gt_ffb
@@ -1962,7 +2017,8 @@ gt(3.1, 2.5) => true
 ~~~
 
 ```nim
-func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_gte_iib
@@ -1981,7 +2037,8 @@ gte(3, 3) => true
 ~~~
 
 ```nim
-func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_gte_ffb
@@ -2000,7 +2057,8 @@ gte(3.1, 3.1) => true
 ~~~
 
 ```nim
-func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_lt_iib
@@ -2019,7 +2077,8 @@ gt(3, 2) => false
 ~~~
 
 ```nim
-func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_lt_ffb
@@ -2038,7 +2097,8 @@ lt(3.1, 2.5) => false
 ~~~
 
 ```nim
-func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_lte_iib
@@ -2058,7 +2118,8 @@ lte(4, 3) => false
 ~~~
 
 ```nim
-func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_lte_ffb
@@ -2078,7 +2139,8 @@ lte(4.0, 3.0) => false
 ~~~
 
 ```nim
-func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult
+func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # fun_readJson_sa
@@ -2100,7 +2162,8 @@ d = readJson("{"a":1, "b": 2}")
 ~~~
 
 ```nim
-func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult
+func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
 ```
 
 # fun_markdownLite_sl
@@ -2131,7 +2194,8 @@ elements => [
 ~~~
 
 ```nim
-func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
+func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
 ```
 
 # functionsDict
@@ -2163,263 +2227,7 @@ BuiltInInfo = object
 Return a BuiltInInfo object.
 
 ```nim
-func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
-```
-
-# functionsList
-
-Dynamically generated sorted list of built-in functions. Each line contains the nim function name, its doc comment, and the number of lines.  See templates/dynamicFuncList.nim
-
-```nim
-functionsList = [(funcName: "fun_add_fff", docComment: """Add two floats. A warning is generated on overflow.
-
-~~~
-add(a: float, b: float) float
-~~~
-
-Examples:
-
-~~~
-add(1.5, 2.3) => 3.8
-add(3.2, -2.2) => 1.0
-~~~
-""",
-                  numLines: 23), (funcName: "fun_add_iii", docComment: """Add two integers. A warning is generated on overflow.
-
-~~~
-add(a: int, b: int) int
-~~~
-
-Examples:
-
-~~~
-add(1, 2) => 3
-add(3, -2) => 1
-add(-2, -5) => -7
-~~~
-""",
-                                  numLines: 24), (funcName: "fun_anchors_lsl", docComment: """Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
-
-~~~
-anchors(names: list, type: string) list
-~~~
-
-type:
-
-* html -- HTML class names
-* github -- GitHub markdown anchor links
-
-Examples:
-
-~~~
-list = list("Tea", "Water", "Tea")
-anchores(list, "github") =>
-  ["tea", "water", "tea-1"]
-~~~
-""",
-    numLines: 38), (funcName: "fun_and_bbb", docComment: """Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
-
-~~~
-and(a: bool, b: bool) bool
-~~~
-
-Examples:
-
-~~~
-and(true, true) => true
-and(false, true) => false
-and(true, false) => false
-and(false, false) => false
-and(false, warn("not hit")) => false
-~~~
-""",
-                    numLines: 23), (funcName: "fun_bool_ab", docComment: """Create an bool from a value.
-
-~~~
-bool(value: Value) bool
-~~~
-
-False values by variable types:
-
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always false
-
-Examples:
-
-~~~
-bool(0) => false
-bool(0.0) => false
-bool([]) => false
-bool("") => false
-bool(dict()) => false
-
-bool(5) => true
-bool(3.3) => true
-bool([8]) => true
-bool("tea") => true
-bool(dict("tea", 2)) => true
-~~~
-""",
-                                    numLines: 37), (funcName: "fun_case_iloaa", docComment: """Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
-
-The first element of a case pair is the condition and the
-second is the return value when that condition matches the main
-condition. The function compares the conditions left to right and
-returns the first match.
-
-When none of the cases match the main condition, the default
-value is returned if it is specified, otherwise a warning is
-generated.  The conditions must be integers. The return values
-can be any type.
-
-~~~
-case(condition: int, pairs: list, default: optional any) any
-~~~
-
-Examples:
-
-~~~
-cases = list(0, "tea", 1, "water", 2, "beer")
-case(0, cases) => "tea"
-case(1, cases) => "water"
-case(2, cases) => "beer"
-case(2, cases, "wine") => "beer"
-case(3, cases, "wine") => "wine"
-~~~
-""",
-    numLines: 33), (funcName: "fun_case_sloaa", docComment: """Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
-
-The first element of a case pair is the condition and the
-second is the return value when that condition matches the main
-condition. The function compares the conditions left to right and
-returns the first match.
-
-When none of the cases match the main condition, the default
-value is returned if it is specified, otherwise a warning is
-generated.  The conditions must be strings. The return values
-can be any type.
-
-~~~
-case(condition: string, pairs: list, default: optional any) any
-~~~
-
-Examples:
-
-~~~
-cases = list("tea", 15, "water", 2.3, "beer", "cold")
-case("tea", cases) => 15
-case("water", cases) => 2.3
-case("beer", cases) => "cold"
-case("bunch", cases, "other") => "other"
-~~~
-""",
-                    numLines: 32), (funcName: "fun_cmp_ffi", docComment: """Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
-
-~~~
-cmp(a: float, b: float) int
-~~~
-
-Examples:
-
-~~~
-cmp(7.8, 9.1) => -1
-cmp(8.4, 8.4) => 0
-cmp(9.3, 2.2) => 1
-~~~
-""",
-                                    numLines: 21), (funcName: "fun_cmp_iii", docComment: """Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
-
-~~~
-cmp(a: int, b: int) int
-~~~
-
-Examples:
-
-~~~
-cmp(7, 9) => -1
-cmp(8, 8) => 0
-cmp(9, 2) => 1
-~~~
-""",
-    numLines: 21), (funcName: "fun_cmp_ssobi", docComment: """Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
-
-You have the option to compare case insensitive. Case sensitive
-is the default.
-
-~~~
-cmp(a: string, b: string, insensitive: optional bool) int
-~~~
-
-Examples:
-
-~~~
-cmp("coffee", "tea") => -1
-cmp("tea", "tea") => 0
-cmp("Tea", "tea") => 1
-cmp("Tea", "tea", true) => 1
-cmp("Tea", "tea", false) => 0
-~~~
-""",
-                    numLines: 33), (funcName: "fun_cmpVersion_ssi", docComment: """Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
-
-~~~
-cmpVersion(versionA: string, versionB: string) int
-~~~
-
-StaticTea uses [[https://semver.org/][Semantic Versioning]]
-with the added restriction that each version component has one
-to three digits (no letters).
-
-Examples:
-
-~~~
-cmpVersion("1.2.5", "1.1.8") => 1
-cmpVersion("1.2.5", "1.3.0") => -1
-cmpVersion("1.2.5", "1.2.5") => 0
-~~~
-""",
-                                    numLines: 44), (funcName: "fun_concat_sss", docComment: """Concatenate two strings. See the join function for more that two arguments.
-
-~~~
-concat(a: string, b: string) string
-~~~
-
-Examples:
-
-~~~
-concat("tea", " time") => "tea time"
-concat("a", "b") => "ab"
-~~~
-""",
-    numLines: 19), (funcName: "fun_dict_old", docComment: """Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
-
-~~~
-dict(pairs: optional list) dict
-~~~
-
-Examples:
-
-~~~
-dict() =>
-```
-
-# functionStarts
-
-Dynamically generated array of starting line numbers for each built-in function in the functions.nim file.
-
-```nim
-functionStarts = [688, 664, 1844, 2368, 1109, 782, 815, 352, 331, 373, 859, 406,
-                  1258, 1219, 2433, 2414, 2452, 760, 1146, 903, 946, 920, 2237,
-                  2271, 2292, 529, 481, 2548, 2529, 2586, 2567, 567, 625, 973,
-                  1008, 1050, 1976, 1935, 1606, 462, 443, 425, 1295, 1316, 2046,
-                  1587, 2624, 2605, 2663, 2643, 2706, 2491, 2472, 2510, 2350,
-                  2391, 1532, 2683, 1363, 1473, 2070, 1184, 1753, 1786, 1815,
-                  2327, 2127, 2213, 735, 711, 1882, 1630, 2021]
+func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo 
 ```
 
 # getBestFunction
@@ -2427,7 +2235,7 @@ functionStarts = [688, 664, 1844, 2368, 1109, 782, 815, 352, 331, 373, 859, 406,
 Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 
 ```nim
-proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
+proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr 
 ```
 
 # splitFuncName
@@ -2435,7 +2243,7 @@ proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 
 ```nim
-func splitFuncName(funcName: string): (string, string)
+func splitFuncName(funcName: string): (string, string) 
 ```
 
 # makeFuncDictionary
@@ -2443,7 +2251,8 @@ func splitFuncName(funcName: string): (string, string)
 Create the f dictionary from the built in functions.
 
 ```nim
-proc makeFuncDictionary(): VarsDict
+proc makeFuncDictionary(): VarsDict {.raises: [ValueError, KeyError, Exception],
+                                      tags: [RootEffect].}
 ```
 
 # funcsVarDict

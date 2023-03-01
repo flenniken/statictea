@@ -53,7 +53,7 @@ commands: array[6, string] = ["nextline", "block", "replace", "#", ":",
 Parse the prepost item on the terminal command line.  A prefix is followed by an optional postfix, prefix[,postfix].  Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.
 
 ```nim
-proc parsePrepost(str: string): Option[tuple[prefix: string, postfix: string]]
+proc parsePrepost(str: string): Option[tuple[prefix: string, postfix: string]] 
 ```
 
 # matchPrefix
@@ -62,7 +62,7 @@ Match lines that start with one of the prefixes in the given table plus optional
 
 ```nim
 proc matchPrefix(line: string; prefixes: seq[string]; start: Natural = 0): Option[
-    Matches]
+    Matches] {.raises: [ValueError, KeyError], tags: [].}
 ```
 
 # matchCommand
@@ -70,7 +70,8 @@ proc matchPrefix(line: string; prefixes: seq[string]; start: Natural = 0): Optio
 Match statictea commands.
 
 ```nim
-proc matchCommand(line: string; start: Natural = 0): Option[Matches]
+proc matchCommand(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [ValueError, KeyError], tags: [].}
 ```
 
 # matchLastPart
@@ -79,7 +80,7 @@ Match the last part of a command line.  It matches the optional continuation plu
 
 ```nim
 proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[
-    Matches]
+    Matches] {.raises: [ValueError, KeyError], tags: [].}
 ```
 
 # getLastPart
@@ -87,7 +88,8 @@ proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[
 Return the optional plus sign and line endings from the line.
 
 ```nim
-proc getLastPart(line: string; postfix: string): Option[Matches]
+proc getLastPart(line: string; postfix: string): Option[Matches] {.
+    raises: [ValueError, KeyError], tags: [].}
 ```
 
 # matchTabSpace
@@ -95,7 +97,8 @@ proc getLastPart(line: string; postfix: string): Option[Matches]
 Match one or more spaces or tabs starting at the given position.
 
 ```nim
-proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]
+proc matchTabSpace(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # emptyOrSpaces
@@ -103,7 +106,8 @@ proc matchTabSpace(line: string; start: Natural = 0): Option[Matches]
 Return true when the text is empty or all whitespace from start to the end.
 
 ```nim
-proc emptyOrSpaces(text: string; start: Natural = 0): bool
+proc emptyOrSpaces(text: string; start: Natural = 0): bool {.raises: [KeyError],
+    tags: [].}
 ```
 
 # matchEqualSign
@@ -111,7 +115,8 @@ proc emptyOrSpaces(text: string; start: Natural = 0): bool
 Match an equal sign or "&=" and the optional trailing whitespace. Return the operator in the group, "=" or "&=".
 
 ```nim
-proc matchEqualSign(line: string; start: Natural = 0): Option[Matches]
+proc matchEqualSign(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchCommaParentheses
@@ -119,7 +124,8 @@ proc matchEqualSign(line: string; start: Natural = 0): Option[Matches]
 Match a comma or right parentheses and the optional trailing whitespace.
 
 ```nim
-proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches]
+proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchNumber
@@ -127,7 +133,8 @@ proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches]
 Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer.
 
 ```nim
-proc matchNumber(line: string; start: Natural = 0): Option[Matches]
+proc matchNumber(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchNumberNotCached
@@ -135,7 +142,7 @@ proc matchNumber(line: string; start: Natural = 0): Option[Matches]
 Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer. "Not cached" allows it to be called by a function because it has no side effects.
 
 ```nim
-func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
+func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches] 
 ```
 
 # matchUpToLeftBracket
@@ -151,7 +158,8 @@ text on the line {variable} more text {variable2} asdf
 ~~~
 
 ```nim
-proc matchUpToLeftBracket(line: string; start: Natural = 0): Option[Matches]
+proc matchUpToLeftBracket(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchFileLine
@@ -159,7 +167,8 @@ proc matchUpToLeftBracket(line: string; start: Natural = 0): Option[Matches]
 Match a file and line number like: filename(234).
 
 ```nim
-proc matchFileLine(line: string; start: Natural = 0): Option[Matches]
+proc matchFileLine(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchVersion
@@ -167,7 +176,8 @@ proc matchFileLine(line: string; start: Natural = 0): Option[Matches]
 Match a StaticTea version number.
 
 ```nim
-proc matchVersion(line: string; start: Natural = 0): Option[Matches]
+proc matchVersion(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchVersionNotCached
@@ -176,7 +186,7 @@ Match a StaticTea version number. "Not cached" allows it to be called by a funct
 
 ```nim
 func matchVersionNotCached(line: string; start: Natural = 0;
-                           numGroups: Natural = 0): Option[Matches]
+                           numGroups: Natural = 0): Option[Matches] 
 ```
 
 # matchDotNames
@@ -201,7 +211,8 @@ let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
 ~~~
 
 ```nim
-proc matchDotNames(line: string; start: Natural = 0): Option[Matches]
+proc matchDotNames(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [ValueError, KeyError], tags: [].}
 ```
 
 # GroupSymbol
@@ -220,7 +231,7 @@ Match a comma or the symbol and the optional trailing whitespace.
 
 ```nim
 proc matchCommaOrSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
-    Matches]
+    Matches] {.raises: [KeyError], tags: [].}
 ```
 
 # matchSymbol
@@ -229,7 +240,7 @@ Match the symbol and the optional trailing whitespace.
 
 ```nim
 proc matchSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
-    Matches]
+    Matches] {.raises: [KeyError], tags: [].}
 ```
 
 # matchNotOrParen
@@ -237,7 +248,8 @@ proc matchSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
 Match "not " or "(" and the trailing whitespace.
 
 ```nim
-proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches]
+proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchBoolExprOperator
@@ -245,7 +257,8 @@ proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches]
 Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.  The bool operators require a trailing space but it isn't part of the operator name returned but still in the length.
 
 ```nim
-proc matchBoolExprOperator(line: string; start: Natural): Option[Matches]
+proc matchBoolExprOperator(line: string; start: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchCompareOperator
@@ -253,7 +266,8 @@ proc matchBoolExprOperator(line: string; start: Natural): Option[Matches]
 Match the compare operators and the trailing whitespace.
 
 ```nim
-proc matchCompareOperator(line: string; start: Natural): Option[Matches]
+proc matchCompareOperator(line: string; start: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchReplCmd
@@ -261,7 +275,8 @@ proc matchCompareOperator(line: string; start: Natural): Option[Matches]
 Match the REPL commands and the trailing optional whitespace.
 
 ```nim
-proc matchReplCmd(line: string; start: Natural): Option[Matches]
+proc matchReplCmd(line: string; start: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchParameterType
@@ -269,7 +284,8 @@ proc matchReplCmd(line: string; start: Natural): Option[Matches]
 Match a parameter type and the trailing whitespace.
 
 ```nim
-proc matchParameterType(line: string; start: Natural): Option[Matches]
+proc matchParameterType(line: string; start: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchDocComment
@@ -277,7 +293,8 @@ proc matchParameterType(line: string; start: Natural): Option[Matches]
 Match a doc comment.
 
 ```nim
-proc matchDocComment(line: string; start: Natural): Option[Matches]
+proc matchDocComment(line: string; start: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # matchReturnStatement
@@ -285,7 +302,8 @@ proc matchDocComment(line: string; start: Natural): Option[Matches]
 Match a return statement. a = return(...
 
 ```nim
-proc matchReturnStatement(line: string; start: Natural): Option[Matches]
+proc matchReturnStatement(line: string; start: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 

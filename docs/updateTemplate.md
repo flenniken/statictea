@@ -15,7 +15,9 @@ Collect the replace commands.  Read template lines and write out non-command lin
 
 ```nim
 proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
-                           prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines
+                           prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines {.
+    raises: [IOError, OSError, ValueError, KeyError],
+    tags: [ReadIOEffect, WriteIOEffect].}
 ```
 
 # updateTemplate
@@ -23,7 +25,9 @@ proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
 Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
 
 ```nim
-proc updateTemplate(env: var Env; args: Args)
+proc updateTemplate(env: var Env; args: Args) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
 ```
 
 # updateTemplateTop
@@ -31,7 +35,10 @@ proc updateTemplate(env: var Env; args: Args)
 Update the template.
 
 ```nim
-proc updateTemplateTop(env: var Env; args: Args)
+proc updateTemplateTop(env: var Env; args: Args) {.raises: [ValueError, IOError,
+    OSError, Exception, KeyError, Exception, IOError, ValueError, OSError], tags: [
+    ReadEnvEffect, ReadIOEffect, ReadDirEffect, WriteIOEffect, TimeEffect,
+    RootEffect, WriteDirEffect].}
 ```
 
 

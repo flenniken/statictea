@@ -90,7 +90,7 @@ MessageId = enum
   wVarStartsWithLetter, wVarContainsChars, wVarEndsWith, wVarMaximumLength,
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
-  wInvalidAnchorType
+  wInvalidAnchorType, wUserFunction
 ```
 
 # Messages
@@ -144,7 +144,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "None of the case conditions match and no else case.",
     "You cannot assign to an existing variable.", "", "Invalid length: $1.", "",
     "", "Expected / or \\.",
-    "The variables f k, m - r, u are reserved variable names.", "",
+    "The variables h - k, m - r are reserved variable names.", "",
     "Name is not a dictionary.", "",
     "Expected the sort order, \'ascending\' or \'descending\'.", "", "",
     "The argument must be 0 or 1.", "", "Expected sensitive or unsensitive.",
@@ -257,7 +257,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The index variable value is not a valid variable name.",
     "The index value is not a string.",
     "A two parameter IF function cannot be used as an argument.",
-    "Invalid anchor type, expected html or github."]
+    "Invalid anchor type, expected html or github.",
+    "You can only assign a user function variable to the u dictionary."]
 ```
 
 # WarningData
@@ -281,7 +282,8 @@ WarningData = object
 Return the warning string.
 
 ```nim
-func getWarning(warning: MessageId; p1 = ""): string
+func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
+    tags: [].}
 ```
 
 # getWarningLine
@@ -293,7 +295,8 @@ filename(line): wId: message.
 ~~~
 
 ```nim
-func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string
+func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string {.
+    raises: [ValueError], tags: [].}
 ```
 
 # getWarningLine
@@ -305,7 +308,7 @@ filename(line): wId: message.
 ~~~
 
 ```nim
-func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
+func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string 
 ```
 
 # newWarningData
@@ -313,7 +316,7 @@ func getWarningLine(filename: string; lineNum: int; warningData: WarningData): s
 Create a WarningData object containing all the warning information.
 
 ```nim
-func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
+func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData 
 ```
 
 # `$`
@@ -326,7 +329,7 @@ check $warning == "wUnknownArg(p1):5"
 ~~~
 
 ```nim
-func `$`(warningData: WarningData): string
+func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}
 ```
 
 # `==`
@@ -334,7 +337,7 @@ func `$`(warningData: WarningData): string
 Return true when the two WarningData objects are equal.
 
 ```nim
-func `==`(w1: WarningData; w2: WarningData): bool
+func `==`(w1: WarningData; w2: WarningData): bool 
 ```
 
 

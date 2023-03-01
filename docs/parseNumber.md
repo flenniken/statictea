@@ -14,7 +14,7 @@ Parse the string and return the 64 bit float number and the position after the n
 
 ```nim
 proc parseFloat(str: string; start: Natural = 0): Option[
-    tuple[number: float64, pos: Natural]]
+    tuple[number: float64, pos: Natural]] 
 ```
 
 # parseInteger
@@ -27,7 +27,7 @@ skipped.
 
 ```nim
 proc parseInteger(s: string; start: Natural = 0): Option[
-    tuple[number: int64, pos: Natural]]
+    tuple[number: int64, pos: Natural]] 
 ```
 
 

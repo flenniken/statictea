@@ -44,7 +44,7 @@ Element = object
 Create an Element object.
 
 ```nim
-proc newElement(tag: ElementTag; content: seq[string]): Element
+proc newElement(tag: ElementTag; content: seq[string]): Element 
 ```
 
 # parseMarkdown
@@ -67,7 +67,7 @@ bullet point and it may contain newlines.  The leading “* “ is
 not part of the string.
 
 ```nim
-func parseMarkdown(desc: string): seq[Element]
+func parseMarkdown(desc: string): seq[Element] 
 ```
 
 # `$`
@@ -75,7 +75,7 @@ func parseMarkdown(desc: string): seq[Element]
 Return a string representation of an Element.
 
 ```nim
-func `$`(element: Element): string
+func `$`(element: Element): string {.raises: [ValueError], tags: [].}
 ```
 
 # `$`
@@ -83,7 +83,7 @@ func `$`(element: Element): string
 Return a string representation of a list of Elements.
 
 ```nim
-func `$`(elements: seq[Element]): string
+func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
 ```
 
 # FragmentType
@@ -123,7 +123,7 @@ Fragment = object
 
 
 ```nim
-func newFragment(fragmentType: FragmentType; start: Natural; length: Natural): Fragment
+func newFragment(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
 ```
 
 # `$`
@@ -131,7 +131,7 @@ func newFragment(fragmentType: FragmentType; start: Natural; length: Natural): F
 Return a string representation of a Fragment.
 
 ```nim
-func `$`(f: Fragment): string
+func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
 ```
 
 # `$`
@@ -139,7 +139,7 @@ func `$`(f: Fragment): string
 Return a string representation of a sequence of fragments.
 
 ```nim
-func `$`(fragments: seq[Fragment]): string
+func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
 ```
 
 # matchFragment
@@ -147,7 +147,8 @@ func `$`(fragments: seq[Fragment]): string
 Match a highlight fragment starting at the given position.
 
 ```nim
-proc matchFragment(line: string; start: Natural): Option[Fragment]
+proc matchFragment(line: string; start: Natural): Option[Fragment] {.
+    raises: [ValueError, KeyError], tags: [].}
 ```
 
 # highlightStaticTea
@@ -155,7 +156,8 @@ proc matchFragment(line: string; start: Natural): Option[Fragment]
 Identify all the fragments in the StaticTea code line to highlight. The fragments are ordered from left to right.
 
 ```nim
-proc highlightStaticTea(codeLine: string): seq[Fragment]
+proc highlightStaticTea(codeLine: string): seq[Fragment] {.
+    raises: [ValueError, KeyError], tags: [].}
 ```
 
 

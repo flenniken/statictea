@@ -73,7 +73,7 @@ ReplaceLine = object
 Return a new ReplaceLine object.
 
 ```nim
-func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
+func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine 
 ```
 
 # `$`
@@ -81,7 +81,7 @@ func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
 Return a string representation of a ReplaceLine object.
 
 ```nim
-func `$`(replaceLine: ReplaceLine): string
+func `$`(replaceLine: ReplaceLine): string 
 ```
 
 # stringSegment
@@ -89,7 +89,8 @@ func `$`(replaceLine: ReplaceLine): string
 Return a string segment made from the fragment. AtEnd is true when the fragment ends the line.
 
 ```nim
-proc stringSegment(fragment: string; atEnd: bool): string
+proc stringSegment(fragment: string; atEnd: bool): string {.
+    raises: [ValueError], tags: [].}
 ```
 
 # varSegment
@@ -97,7 +98,8 @@ proc stringSegment(fragment: string; atEnd: bool): string
 Return a variable segment made from the dot name. AtEnd is true when the bracketed variable ends the line.
 
 ```nim
-proc varSegment(dotName: string; atEnd: bool): string
+proc varSegment(dotName: string; atEnd: bool): string {.raises: [ValueError],
+    tags: [].}
 ```
 
 # lineToSegments
@@ -105,7 +107,7 @@ proc varSegment(dotName: string; atEnd: bool): string
 Convert a line to a list of segments. No warnings.
 
 ```nim
-proc lineToSegments(line: string): seq[string]
+proc lineToSegments(line: string): seq[string] {.raises: [ValueError], tags: [].}
 ```
 
 # varSegmentDotName
@@ -113,7 +115,7 @@ proc lineToSegments(line: string): seq[string]
 Given a variable segment, return its dot name.
 
 ```nim
-func varSegmentDotName(segment: string): string
+func varSegmentDotName(segment: string): string 
 ```
 
 # writeTempSegments
@@ -122,7 +124,9 @@ Write the replacement block's stored segments to the result stream with the vari
 
 ```nim
 proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
-                       lineNum: Natural; variables: Variables)
+                       lineNum: Natural; variables: Variables) {.
+    raises: [IOError, OSError, KeyError, Exception, ValueError],
+    tags: [ReadIOEffect, RootEffect, WriteIOEffect, TimeEffect].}
 ```
 
 # allocTempSegments
@@ -130,7 +134,9 @@ proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
 Create a TempSegments object. This reserves memory for a line buffer and creates a backing temp file. Call the closeDeleteTempSegments procedure when done to free the memory and to close and delete the file.
 
 ```nim
-proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments]
+proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments] {.
+    raises: [ValueError, IOError, OSError, Exception],
+    tags: [ReadEnvEffect, ReadIOEffect, WriteIOEffect, WriteDirEffect].}
 ```
 
 # closeDeleteTempSegments
@@ -138,7 +144,8 @@ proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments]
 Close the TempSegments and delete its backing temporary file.
 
 ```nim
-proc closeDeleteTempSegments(tempSegments: TempSegments)
+proc closeDeleteTempSegments(tempSegments: TempSegments) {.
+    raises: [Exception, IOError, OSError], tags: [WriteIOEffect, WriteDirEffect].}
 ```
 
 # storeLineSegments
@@ -146,7 +153,8 @@ proc closeDeleteTempSegments(tempSegments: TempSegments)
 Divide the line into segments and write them to the TempSegments' temp file.
 
 ```nim
-proc storeLineSegments(env: var Env; tempSegments: TempSegments; line: string)
+proc storeLineSegments(env: var Env; tempSegments: TempSegments; line: string) {.
+    raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
 ```
 
 # yieldReplacementLine
@@ -156,7 +164,9 @@ Yield all the replacement block lines and one line after.
 ```nim
 iterator yieldReplacementLine(env: var Env; firstReplaceLine: string;
                               lb: var LineBuffer; prepostTable: PrepostTable;
-                              command: string; maxLines: Natural): ReplaceLine
+                              command: string; maxLines: Natural): ReplaceLine {.
+    raises: [ValueError, KeyError, IOError, OSError],
+    tags: [WriteIOEffect, ReadIOEffect].}
 ```
 
 

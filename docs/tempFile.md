@@ -60,7 +60,8 @@ TempFileStream = object
 Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.
 
 ```nim
-proc openTempFile(): Option[TempFile]
+proc openTempFile(): Option[TempFile] {.raises: [ValueError],
+                                        tags: [ReadEnvEffect, ReadIOEffect].}
 ```
 
 # closeDeleteFile
@@ -68,7 +69,7 @@ proc openTempFile(): Option[TempFile]
 Close and delete the temp file.
 
 ```nim
-proc closeDeleteFile(tempFile: TempFile)
+proc closeDeleteFile(tempFile: TempFile) {.raises: [], tags: [WriteDirEffect].}
 ```
 
 # openTempFileStream
@@ -76,7 +77,8 @@ proc closeDeleteFile(tempFile: TempFile)
 Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.
 
 ```nim
-proc openTempFileStream(): Option[TempFileStream]
+proc openTempFileStream(): Option[TempFileStream] {.
+    raises: [ValueError, IOError], tags: [ReadEnvEffect, ReadIOEffect].}
 ```
 
 # closeDeleteStream
@@ -84,7 +86,8 @@ proc openTempFileStream(): Option[TempFileStream]
 Close the stream and delete the associated temp file.
 
 ```nim
-proc closeDeleteStream(tempFileStream: TempFileStream)
+proc closeDeleteStream(tempFileStream: TempFileStream) {.
+    raises: [Exception, IOError, OSError], tags: [WriteIOEffect, WriteDirEffect].}
 ```
 
 

@@ -680,7 +680,7 @@ rt = f.cmp(a, b)
 
 All variables are stored in one of the reserved one letter top
 level dictionaries f - u. Seven are currently used: f, g, l, o,
-s, t.
+s, t, u.
 
 The server json variables are stored in the s dictionary. You
 reference them with "s.", for example:
@@ -708,7 +708,7 @@ Reserved single letter variables:
 - p, q, r -- Reserved
 - s -- [[#server-json-variables][Server Json Variables]]
 - t -- [[#tea-variables][Tea Variables]]
-- u -- Reserved
+- u -- [[#user-function-vars][User Function Vars]]
 
 [[#contents][茶]]
 
@@ -798,6 +798,29 @@ The json null values get converted to the 0.
 To give full control of the presentation to the template
 designers, the server json shouldn't contain any presentation
 data.
+
+[[#contents][茶]]
+
+** User Function Vars
+:PROPERTIES:
+:CUSTOM_ID: user-function-vars
+:END:
+
+You use the u dictionary to store your function variables for
+easy access inside other functions.
+
+Similar to the f dictionary the u dictionary variables are
+visible inside user defined functions so you don’t need to pass
+them in.  You specify the u prefix when defining and calling the
+function.
+
+Only user function variables are allowed in the u dictionary. 
+
+#+BEGIN_SRC
+u.myCmp = func(…) int
+…
+a = u.myCmp(“3”, “4”)
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -1835,7 +1858,7 @@ takes two string parameters called numStr1 and numStr2 and it
 returns an integer.
 
 #+BEGIN_SRC
-mycmp = func(numStr1: string, numStr2: string) int
+u.mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings
   ## and return 1, 0, or -1.
   num1 = int(numStr1)
@@ -1844,10 +1867,11 @@ mycmp = func(numStr1: string, numStr2: string) int
 #+END_SRC
 
 The first line names the function and defines its signature and
-assigns it to a variable.
+assigns it to a variable. The function variable is stored in the
+u dictionary so it is visible inside other functions.
 
 #+BEGIN_SRC
-mycmp = func(numStr1: string, numStr2: string) int
+u.mycmp = func(numStr1: string, numStr2: string) int
 #+END_SRC
 
 The doc comment comes next and tells what the function does:
@@ -1872,7 +1896,7 @@ aren’t any brackets, and no line terminators.
 Here is how you call the example function:
 
 #+BEGIN_SRC
-a = l.mycmp(“1”, "2")
+a = u.mycmp(“1”, "2")
 #+END_SRC
 
 *Function Signature:*
@@ -1882,7 +1906,7 @@ and types and the return type. For the example above the
 signature string is:
 
 #+BEGIN_SRC
-mycmp(numStr1: string, numStr2: string) int
+u.mycmp(numStr1: string, numStr2: string) int
 #+END_SRC
 
 You can specify an optional last parameter and a parameter can

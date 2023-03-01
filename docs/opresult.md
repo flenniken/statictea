@@ -43,7 +43,7 @@ OpResult[T; T2] = object
   of orMessage:
       message*: T2
 
-
+  
 ```
 
 # isMessage

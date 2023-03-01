@@ -73,7 +73,7 @@ ArgsOr = OpResultWarn[Args]
 Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
 
 ```nim
-proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
+proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable 
 ```
 
 # newArgsOr
@@ -81,7 +81,7 @@ proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 Return a new ArgsOr object containing a warning.
 
 ```nim
-func newArgsOr(warningData: WarningData): ArgsOr
+func newArgsOr(warningData: WarningData): ArgsOr 
 ```
 
 # newArgsOr
@@ -89,7 +89,7 @@ func newArgsOr(warningData: WarningData): ArgsOr
 Return a new ArgsOr object containing a warning.
 
 ```nim
-func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
+func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr 
 ```
 
 # newArgsOr
@@ -97,7 +97,7 @@ func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
 Return a new ArgsOr object containing args.
 
 ```nim
-func newArgsOr(args: Args): ArgsOr
+func newArgsOr(args: Args): ArgsOr 
 ```
 
 # newPrepost
@@ -105,7 +105,7 @@ func newArgsOr(args: Args): ArgsOr
 Create a new prepost object from the prefix and postfix.
 
 ```nim
-func newPrepost(prefix: string; postfix: string): Prepost
+func newPrepost(prefix: string; postfix: string): Prepost 
 ```
 
 # `$`
@@ -113,7 +113,7 @@ func newPrepost(prefix: string; postfix: string): Prepost
 Return the Prepost string representation.
 
 ```nim
-func `$`(p: Prepost): string
+func `$`(p: Prepost): string {.raises: [ValueError], tags: [].}
 ```
 
 # `$`
@@ -121,7 +121,7 @@ func `$`(p: Prepost): string
 Return the Args string representation.
 
 ```nim
-func `$`(args: Args): string
+func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 ```
 
 # `$`
@@ -129,7 +129,7 @@ func `$`(args: Args): string
 Return the seq[Prepost] string representation.
 
 ```nim
-func `$`(prepostList: seq[Prepost]): string
+func `$`(prepostList: seq[Prepost]): string {.raises: [ValueError], tags: [].}
 ```
 
 # predefinedPrepost
@@ -160,7 +160,7 @@ predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
 Return the default ordered table that maps prefixes to postfixes.
 
 ```nim
-proc makeDefaultPrepostTable(): PrepostTable
+proc makeDefaultPrepostTable(): PrepostTable 
 ```
 
 # getPrepostTable
@@ -168,7 +168,7 @@ proc makeDefaultPrepostTable(): PrepostTable
 Get the the prepost settings from the user or use the default ones.
 
 ```nim
-proc getPrepostTable(args: Args): PrepostTable
+proc getPrepostTable(args: Args): PrepostTable 
 ```
 
 

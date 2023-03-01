@@ -16,7 +16,7 @@ Functions for decoding and validating UTF-8.
 Interior part of a UTF-8 decoder.
 
 ```nim
-proc decode(state: var uint32; codep: var uint32; sByte: char)
+proc decode(state: var uint32; codep: var uint32; sByte: char) 
 ```
 
 # yieldUtf8Chars
@@ -32,7 +32,7 @@ A UTF-8 character is a one to four byte sequence.
 
 ```nim
 iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
-                        codePoint: var uint32): bool
+                        codePoint: var uint32): bool 
 ```
 
 # validateUtf8String
@@ -40,7 +40,7 @@ iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
 Return the position of the first invalid UTF-8 byte in the string else return -1.
 
 ```nim
-func validateUtf8String(str: string): int
+func validateUtf8String(str: string): int 
 ```
 
 # sanitizeUtf8
@@ -48,7 +48,7 @@ func validateUtf8String(str: string): int
 Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.
 
 ```nim
-func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
+func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string 
 ```
 
 # utf8CharString
@@ -56,7 +56,7 @@ func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.
 
 ```nim
-func utf8CharString(str: string; pos: Natural): string
+func utf8CharString(str: string; pos: Natural): string 
 ```
 
 

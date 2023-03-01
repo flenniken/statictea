@@ -104,7 +104,7 @@ Replacement = object
 Create a new Matches object with no groups.
 
 ```nim
-func newMatches(length: Natural; start: Natural): Matches
+func newMatches(length: Natural; start: Natural): Matches 
 ```
 
 # newMatches
@@ -112,7 +112,7 @@ func newMatches(length: Natural; start: Natural): Matches
 Create a new Matches object with one group.
 
 ```nim
-func newMatches(length: Natural; start: Natural; group: string): Matches
+func newMatches(length: Natural; start: Natural; group: string): Matches 
 ```
 
 # newMatches
@@ -120,7 +120,7 @@ func newMatches(length: Natural; start: Natural; group: string): Matches
 Create a new Matches object with two groups.
 
 ```nim
-func newMatches(length: Natural; start: Natural; group1: string; group2: string): Matches
+func newMatches(length: Natural; start: Natural; group1: string; group2: string): Matches 
 ```
 
 # newMatches
@@ -129,7 +129,7 @@ Create a new Matches object with three groups.
 
 ```nim
 func newMatches(length: Natural; start: Natural; group1: string; group2: string;
-                group3: string): Matches
+                group3: string): Matches 
 ```
 
 # newMatches
@@ -137,7 +137,7 @@ func newMatches(length: Natural; start: Natural; group1: string; group2: string;
 Create a Matches object with the given number of groups.
 
 ```nim
-proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches
+proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches 
 ```
 
 # newMatches
@@ -145,7 +145,7 @@ proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches
 Create a Matches object with the given number of groups.
 
 ```nim
-proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches
+proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches 
 ```
 
 # newReplacement
@@ -153,7 +153,7 @@ proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches
 Create a new Replacement object.
 
 ```nim
-func newReplacement(pattern: string; sub: string): Replacement
+func newReplacement(pattern: string; sub: string): Replacement 
 ```
 
 # getGroup
@@ -161,7 +161,7 @@ func newReplacement(pattern: string; sub: string): Replacement
 Get the group in matches.
 
 ```nim
-func getGroup(matches: Matches): string
+func getGroup(matches: Matches): string 
 ```
 
 # getGroupLen
@@ -169,7 +169,7 @@ func getGroup(matches: Matches): string
 Get the group in matches.
 
 ```nim
-func getGroupLen(matches: Matches): (string, Natural)
+func getGroupLen(matches: Matches): (string, Natural) 
 ```
 
 # getGroup
@@ -177,7 +177,7 @@ func getGroupLen(matches: Matches): (string, Natural)
 Get the group in matches.
 
 ```nim
-func getGroup(matchesO: Option[Matches]): string
+func getGroup(matchesO: Option[Matches]): string 
 ```
 
 # getGroupLen
@@ -185,7 +185,7 @@ func getGroup(matchesO: Option[Matches]): string
 Get the group in matches and the match length.
 
 ```nim
-func getGroupLen(matchesO: Option[Matches]): (string, Natural)
+func getGroupLen(matchesO: Option[Matches]): (string, Natural) 
 ```
 
 # get2Groups
@@ -193,7 +193,7 @@ func getGroupLen(matchesO: Option[Matches]): (string, Natural)
 Get two groups in matches.
 
 ```nim
-func get2Groups(matches: Matches): (string, string)
+func get2Groups(matches: Matches): (string, string) 
 ```
 
 # get2GroupsLen
@@ -201,7 +201,7 @@ func get2Groups(matches: Matches): (string, string)
 Get two groups and length in matches.
 
 ```nim
-func get2GroupsLen(matches: Matches): (string, string, Natural)
+func get2GroupsLen(matches: Matches): (string, string, Natural) 
 ```
 
 # get2Groups
@@ -209,7 +209,7 @@ func get2GroupsLen(matches: Matches): (string, string, Natural)
 Get two groups in matches.
 
 ```nim
-func get2Groups(matchesO: Option[Matches]): (string, string)
+func get2Groups(matchesO: Option[Matches]): (string, string) 
 ```
 
 # get2GroupsLen
@@ -217,7 +217,7 @@ func get2Groups(matchesO: Option[Matches]): (string, string)
 Get two groups and length in matchesO.
 
 ```nim
-func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural)
+func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural) 
 ```
 
 # get3Groups
@@ -225,7 +225,7 @@ func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural)
 Get three groups in matches.
 
 ```nim
-func get3Groups(matches: Matches): (string, string, string)
+func get3Groups(matches: Matches): (string, string, string) 
 ```
 
 # get3Groups
@@ -233,7 +233,7 @@ func get3Groups(matches: Matches): (string, string, string)
 Get three groups in matches.
 
 ```nim
-func get3Groups(matchesO: Option[Matches]): (string, string, string)
+func get3Groups(matchesO: Option[Matches]): (string, string, string) 
 ```
 
 # get3GroupsLen
@@ -241,7 +241,7 @@ func get3Groups(matchesO: Option[Matches]): (string, string, string)
 Return the three groups and the length of the match.
 
 ```nim
-func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
+func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural) 
 ```
 
 # getGroups
@@ -249,7 +249,7 @@ func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
 Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.
 
 ```nim
-func getGroups(matches: Matches; numGroups: Natural): seq[string]
+func getGroups(matches: Matches; numGroups: Natural): seq[string] 
 ```
 
 # getGroups
@@ -257,7 +257,7 @@ func getGroups(matches: Matches; numGroups: Natural): seq[string]
 Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.
 
 ```nim
-func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string]
+func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string] 
 ```
 
 # matchPattern
@@ -270,7 +270,7 @@ Note: the pattern uses the anchored option.
 
 ```nim
 func matchPattern(str: string; pattern: string; start: Natural;
-                  numGroups: Natural): Option[Matches]
+                  numGroups: Natural): Option[Matches] 
 ```
 
 # matchPatternCached
@@ -282,7 +282,8 @@ the pattern.
 
 ```nim
 proc matchPatternCached(str: string; pattern: string; start: Natural;
-                        numGroups: Natural): Option[Matches]
+                        numGroups: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ```
 
 # replaceMany
@@ -290,7 +291,8 @@ proc matchPatternCached(str: string; pattern: string; start: Natural;
 Replace the patterns in the string with their replacements.
 
 ```nim
-proc replaceMany(str: string; replacements: seq[Replacement]): Option[string]
+proc replaceMany(str: string; replacements: seq[Replacement]): Option[string] {.
+    raises: [ValueError], tags: [].}
 ```
 
 

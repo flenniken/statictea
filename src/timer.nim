@@ -1,12 +1,12 @@
 ## Time how long it takes something to run.
 ## @:
-## @: Usage:
+## @:Usage:
 ## @:
-## @: ~~~
-## @: timer = newTimer()
-## @: # run something
-## @: echo timer.seconds()
-## @: ~~~~
+## @:~~~
+## @:timer = newTimer()
+## @:# run something
+## @:echo timer.seconds()
+## @:~~~~
 
 import std/times
 import std/math

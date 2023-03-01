@@ -13,7 +13,9 @@ Run commands at a prompt. Run evaluate print loop (REPL).
 Handle the REPL line. Return true to end the loop.
 
 ```nim
-proc handleReplLine(env: var Env; variables: var Variables; line: string): bool
+proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
+    raises: [KeyError, Exception, ValueError, IOError, OSError],
+    tags: [RootEffect, WriteIOEffect, TimeEffect].}
 ```
 
 # runEvaluatePrintLoop
@@ -21,7 +23,9 @@ proc handleReplLine(env: var Env; variables: var Variables; line: string): bool
 Run commands at a prompt.
 
 ```nim
-proc runEvaluatePrintLoop(env: var Env; args: Args)
+proc runEvaluatePrintLoop(env: var Env; args: Args) {.
+    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
 ```
 
 

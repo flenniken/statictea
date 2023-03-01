@@ -1,4 +1,4 @@
-# Nim code file for use by nimModule.md.
+# Tea code file for use by templates nimModule.md and nimModule.html.
 
 # Define replacement patterns to remove formatting from the descriptions.
 patterns = list( +
@@ -14,78 +14,74 @@ patterns = list( +
   "&lt;", "<", +
   "&amp;", "&")
 
-handle-bullet = func(ix: int, bullet: string, lines: list) bool
+u.handle-bullet = func(ix: int, bullet: string, lines: list) bool
   ## Make the bullet text into an html bullet and add it to lines.
   lines &= join(["<li>", bullet, "</li>"], "")
   return(false)
 
-html-paragraph = func(item: list) string
-  ## Return html given a "p" element item list.
+u.html-paragraph = func(item: list) string
+  ## Return html given a "p" element md list.
   return(join(["<p>", item[0], "</p>"], ""))
 
-html-code = func(item: list) string
-  ## Return html given a "code" element item list.
+u.html-code = func(item: list) string
+  ## Return html given a "code" md element list.
   return(join(["<pre class=\"desc-code\">", item[1], "</pre>"], ""))
 
-html-bullets = func(item: list, funcs: dict) string
-  ## Return html given a "bullets" element item list.
+u.html-bullets = func(item: list) string
+  ## Return html given a "bullets" md element list.
   lines = []
   lines &= "<ul>\n"
-  dummy = listLoop(item, lines, funcs.handle-bullet)
+  dummy = listLoop(item, lines, u.handle-bullet)
   lines &= "</ul>\n"
   return(join(lines, ""))
 
-handle-element = func(ix: int, element: list, lines: list, funcs: dict) bool
-  ## Make the element into html and add it to the lines.
-  fn = case(element[0], [ +
-    "p", funcs.html-paragraph, +
-    "code", funcs.html-code, +
-    "bullets", funcs.html-bullets +
+u.handle-element = func(ix: int, element: list, lines: list) bool
+  ## Make the description md element into html and add it to lines.
+  l.fn = case(element[0], [ +
+    "p", u.html-paragraph, +
+    "code", u.html-code, +
+    "bullets", u.html-bullets +
   ])
-  html = if((element[0] == "bullets"), l.fn(element[1], funcs), l.fn(element[1]))
-  lines &= html
+  lines &= l.fn(element[1])
   return(false)
 
-get-html-description = func(mdDescription: string, funcs: dict) string
+u.get-html-description = func(mdDescription: string) string
   ## Parse the description markdown text and return html paragraphs,
   ## bullet lists and code blocks.
   elements = markdownLite(mdDescription)
   lines = []
-  dummy = listLoop(elements, lines, funcs.handle-element, funcs)
+  dummy = listLoop(elements, lines, u.handle-element)
   return(join(lines, ""))
 
-funcs = dict()
-funcs.html-paragraph = html-paragraph
-funcs.html-code = html-code
-funcs.html-bullets = html-bullets
-funcs.handle-element = handle-element
-funcs.handle-bullet = handle-bullet
-funcs.get-html-description = get-html-description
-
-get-name = func(ix: int, entry: dict, newList: list) bool
+u.get-name = func(ix: int, entry: dict, newList: list) bool
   ## Add the entry name to the list.
   newList &= entry.name
   return(false)
 
-# Create the github anchors for all the heading names.
-names = []
-stopped2 = listLoop(s.entries, names, l.get-name)
-
-# Use the anchor type depending on the result type (extension).
+# Determine the template type from the template's extension.
 path = path(t.args.resultFilename)
 templateType = if((path.ext == ".md"), "github", "html")
+
+# Create the anchors for all the heading names.
+names = []
+dummy2 = listLoop(s.entries, names, u.get-name)
 anchors = anchors(names, templateType)
 
 # Use the filename's basename for the module name.
 orig-path = path(s.orig)
 o.moduleName = orig-path.filename
 
+# Remove the special patterns from the description resulting in
+# markdown.
 mdDescription = replaceRe(s.moduleDescription, patterns)
+
+# For the html template convert the markdown to html, else use the
+# markdown as is.
 o.moduleDescription = if((templateType == "html"), +
-  l.get-html-description(mdDescription, funcs), +
+  u.get-html-description(mdDescription), +
   mdDescription)
 
-get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
+u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Reformat the entry and add it to the new list.
   newEntry = dict()
   newEntry.name = entry.name
@@ -105,25 +101,22 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
 
   # Convert the markdown description to html for the html template.
   newEntry.description = if((state.templateType == "html"), +
-    l.state.funcs.get-html-description(mdDescription, state.funcs), +
+    u.get-html-description(mdDescription), +
     mdDescription)
 
   # Simplify the code by removing some text.
   junk = "{.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[].}"
   code = replaceRe(entry.code, list(junk, ""))
+
   newEntry.signature = code
-
   newEntry.anchor = state.anchors[ix]
-
   newList &= newEntry
-
   return(false)
 
-# Reformat the entries list and store it in o.entries.
+# Reformat the server entries list and store it in o.entries.
 state = dict()
 state.patterns = patterns
 state.anchors = anchors
-state.funcs = funcs
 state.templateType = templateType
 o.entries = []
-stopped = listLoop(s.entries, o.entries, l.get-entry, state)
+dummy3 = listLoop(s.entries, o.entries, u.get-entry, state)
