@@ -530,8 +530,7 @@ func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 <h3 id="skipArgument">skipArgument</h3>
 
 <p>Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
-</p><pre class="desc-code">~~~
-a = fn( 1 )
+</p><pre class="desc-code">a = fn( 1 )
         ^ ^
           ^^
 a = fn( 1 , 2 )
@@ -591,8 +590,7 @@ proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
 <h3 id="getArguments">getArguments</h3>
 
 <p>Get the function arguments and the position of each. If an argument has a side effect, the return value and pos and side effect is returned, else a 0 value and seNone is returned.
-</p><pre class="desc-code">~~~
-newList = listLoop(list, callback, state)  # comment
+</p><pre class="desc-code">newList = listLoop(list, callback, state)  # comment
                    ^                       ^
 newList = listLoop(return(3), callback, state)  # comment
                           ^ ^

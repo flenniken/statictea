@@ -228,6 +228,23 @@ c = 7
 """
     check testParseMarkdown(content, expected)
 
+  test "parseMarkdown code 3":
+    let content = """
+Example:
+~~~
+a = 5
+~~~
+"""
+    let expected = """
+---p---
+:Example:
+---code---
+:~~~
+:a = 5
+:~~~
+"""
+    check testParseMarkdown(content, expected)
+
   test "parseMarkdown code type":
     let content = """
 ~~~nim
@@ -240,6 +257,44 @@ b = 6
 :~~~nim
 :a = 5
 b = 6
+:~~~
+"""
+    check testParseMarkdown(content, expected)
+
+  test "parseMarkdown p bullet":
+    let content = """
+Example:
+* a
+* b
+* c
+"""
+    let expected = """
+---p---
+:Example:
+---bullets---
+:a
+:b
+:c
+"""
+    check testParseMarkdown(content, expected)
+
+  test "parseMarkdown bullet code":
+    let content = """
+* a
+* b
+* c
+~~~
+my code
+~~~
+"""
+    let expected = """
+---bullets---
+:a
+:b
+:c
+---code---
+:~~~
+:my code
 :~~~
 """
     check testParseMarkdown(content, expected)

@@ -418,8 +418,7 @@ get(d, "tea") => "Earl Grey"
 get(d, "coffee", "Tea") => "Tea"
 </pre><p>
 Using dot notation:
-</p><pre class="desc-code">~~~
-d = dict("tea", "Earl Grey")
+</p><pre class="desc-code">d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 </pre>
 
@@ -1037,8 +1036,7 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 <p>Examples:
 
 </p><p>Replace:
-</p><pre class="desc-code">~~~
-replace("Earl Grey", 5, 4, "of Sandwich")
+</p><pre class="desc-code">replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
 replace("123", 0, 1, "abcd") => abcd23
 replace("123", 0, 2, "abcd") => abcd3
@@ -1048,17 +1046,14 @@ replace("123", 1, 2, "abcd") => 1abcd
 
 replace("123", 2, 1, "abcd") => 12abcd
 </pre><p>Insert:
-</p><pre class="desc-code">~~~
-replace("123", 0, 0, "abcd") => abcd123
+</p><pre class="desc-code">replace("123", 0, 0, "abcd") => abcd123
 replace("123", 1, 0, "abcd") => 1abcd23
 replace("123", 2, 0, "abcd") => 12abcd3
 replace("123", 3, 0, "abcd") => 123abcd
 </pre><p>Append:
-</p><pre class="desc-code">~~~
-replace("123", 3, 0, "abcd") => 123abcd
+</p><pre class="desc-code">replace("123", 3, 0, "abcd") => 123abcd
 </pre><p>Delete:
-</p><pre class="desc-code">~~~
-replace("123", 0, 1, "") => 23
+</p><pre class="desc-code">replace("123", 0, 1, "") => 23
 replace("123", 0, 2, "") => 3
 replace("123", 0, 3, "") => ""
 
@@ -1067,8 +1062,7 @@ replace("123", 1, 2, "") => 1
 
 replace("123", 2, 1, "") => 12
 </pre><p>Edge Cases:
-</p><pre class="desc-code">~~~
-replace("", 0, 0, "") =>
+</p><pre class="desc-code">replace("", 0, 0, "") =>
 replace("", 0, 0, "a") => a
 replace("", 0, 0, "ab") => ab
 replace("", 0, 0, "abc") => abc
@@ -1506,7 +1500,7 @@ pi = 3.14159
 one = 1
 a = [1, 2, 3]
 d = dict(["x", 1, "y", 2])
-fn = cmp[[0]
+fn = cmp[0]
 found = true
 </pre><p>
 json:

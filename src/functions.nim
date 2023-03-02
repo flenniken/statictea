@@ -2150,7 +2150,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:one = 1
   ## @:a = [1, 2, 3]
   ## @:d = dict(["x", 1, "y", 2])
-  ## @:fn = cmp[[0]
+  ## @:fn = cmp[0]
   ## @:found = true
   ## @:~~~~
   ## @:

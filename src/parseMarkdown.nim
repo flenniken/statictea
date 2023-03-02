@@ -77,7 +77,6 @@ func parseMarkdown*(desc: string): seq[Element] =
         # code started
         content.add(line)
         newLineString = ""
-        newLineString.add(line)
         tag = code
       elif line.startsWith("* "):
         result.add(newElement(tag, @[newLineString]))
