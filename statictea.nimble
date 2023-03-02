@@ -428,13 +428,13 @@ ratio=.5;
     let count = sourceNamesDict[name]
     if count == 0:
       # tree leaves
-      extra = "shape=doubleoctagon, fillcolor=palegreen, style=filled"
+      extra = """target="_parent", shape=doubleoctagon, fillcolor=palegreen, style=filled"""
     elif count == 1:
-      extra = "fillcolor=palegoldenrod, style=filled"
+      extra = """target="_parent", fillcolor=palegoldenrod, style=filled"""
       # extra = "color=red"
     else:
       # tree trunk
-      extra = "fillcolor=palegoldenrod, style=filled"
+      extra = """target="_parent", fillcolor=palegoldenrod, style=filled"""
     var attrs: string
     if name == "statictea":
       attrs = fmt"""{name} [fontsize=48, shape=diamond, {extra}, {url}, {tooltip}];""" & "\n"

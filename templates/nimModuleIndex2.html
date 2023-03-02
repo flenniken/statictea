@@ -13,7 +13,7 @@ body {
     margin-left: 1em;
 }
 
-#staticteadep {
+.staticteadep {
     width: 100%;
 }
 </style>
@@ -31,8 +31,14 @@ This is the index to the StaticTea source code documentation.
   other modules. The size is proportional to the module file
   size. Green modules don't include other modules.
 </p>
+<p>
+  Click a module:
+</p>
 
-<img id="staticteadep" src=../staticteadep.svg alt="Module Dependencies Graph">
+<!--$ # Use an object element so the svg links work. -->
+<object type="image/svg+xml" data="../staticteadep.svg" class="staticteadep">
+  <img class="staticteadep" src=../staticteadep.svg alt="Module Dependencies Graph" />
+</object>
 
 <h3>Index</h3>
 
