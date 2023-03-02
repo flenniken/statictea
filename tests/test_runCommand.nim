@@ -2947,6 +2947,27 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
+  test "bare listLoop":
+    let content = """
+copy = func(ix: int, value: int, newList: list) bool
+  ## Copy list.
+  newList &= value
+  return(false)
+
+newList = []
+ls = [1, 1, 2, 3, 5, 8]
+listLoop(ls, newList, l.copy)
+"""
+    let eVarRep = """
+l.copy = "copy"
+l.newList = [1,1,2,3,5,8]
+l.ls = [1,1,2,3,5,8]
+o = {}
+"""
+    let eErrLines: seq[string] = splitNewLines """
+"""
+    check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
   test "listLoop b5":
     let content = """
 b5 = func(ix: int, value: int, newList: list) bool

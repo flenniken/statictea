@@ -34,7 +34,7 @@ b5 = func(ix: int, value: int, container: list) bool
 
 o.container = []
 list = [2,4,6,8]
-stopped = listLoop(list, o.container, b5)
+listLoop(list, o.container, b5)
 ~~~
 
 ### File result.expected

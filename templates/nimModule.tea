@@ -31,7 +31,7 @@ u.html-bullets = func(item: list) string
   ## Return html given a "bullets" md element list.
   lines = []
   lines &= "<ul>\n"
-  dummy = listLoop(item, lines, u.handle-bullet)
+  listLoop(item, lines, u.handle-bullet)
   lines &= "</ul>\n"
   return(join(lines, ""))
 
@@ -50,7 +50,7 @@ u.get-html-description = func(mdDescription: string) string
   ## bullet lists and code blocks.
   elements = markdownLite(mdDescription)
   lines = []
-  dummy = listLoop(elements, lines, u.handle-element)
+  listLoop(elements, lines, u.handle-element)
   return(join(lines, ""))
 
 u.get-name = func(ix: int, entry: dict, newList: list) bool
@@ -64,7 +64,7 @@ templateType = if((path.ext == ".md"), "github", "html")
 
 # Create the anchors for all the heading names.
 names = []
-dummy2 = listLoop(s.entries, names, u.get-name)
+listLoop(s.entries, names, u.get-name)
 anchors = anchors(names, templateType)
 
 # Use the filename's basename for the module name.
@@ -119,4 +119,4 @@ state.patterns = patterns
 state.anchors = anchors
 state.templateType = templateType
 o.entries = []
-dummy3 = listLoop(s.entries, o.entries, u.get-entry, state)
+listLoop(s.entries, o.entries, u.get-entry, state)

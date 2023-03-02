@@ -1721,7 +1721,7 @@ proc listLoop*(
     statement: Statement,
     start: Natural,
     variables: Variables,
-    listCase=false): ValuePosSiOr =
+  ): ValuePosSiOr =
   ## Make a new list from an existing list. The callback function is
   ## called for each item in the list and determines what goes in the
   ## new list.  See funList_lpoal in functions.nim for more
@@ -1891,8 +1891,8 @@ proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variable
 
 proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: VariableName): ValuePosSiOr =
-  ## Handle bare function: if, if0, return, warn and log. A bare
-  ## function does not assign a variable.
+  ## Handle bare function: if, if0, return, warn, log and listLoop. A
+  ## bare function does not assign a variable.
   ## @:
   ## @:~~~
   ## @:if( true, warn("tea time")) # test
@@ -1918,7 +1918,9 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     result = bareIfAndIf0(env, specialFunction, statement, runningPos, variables)
   of spReturn:
     result = bareReturn(env, statement, runningPos, variables)
-  of spNotSpecial, spAnd, spOr, spFunc, spListLoop:
+  of spListLoop:
+    result = listLoop(env, specialFunction, statement, runningPos, variables)
+  of spNotSpecial, spAnd, spOr, spFunc:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValuePosSiOr(wMissingLeftAndOpr, "", start)
   of spWarn, spLog:
@@ -2023,8 +2025,8 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
 
   case leftName.kind
   of vnkFunction:
-    # Handle bare function: if, if0, return, warn and log. A bare
-    # function does not assign a variable.
+    # Handle bare function: if, if0, return, warn, log and listLoop. A
+    # bare function does not assign a variable.
     vlOr = runBareFunction(env, statement, runningPos, variables, leftName)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)

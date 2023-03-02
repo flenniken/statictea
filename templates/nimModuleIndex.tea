@@ -18,7 +18,7 @@ make-entry = func(ix: int, module: dict, entries: list) bool
   return(false)
 
 entries = []
-stopped = listLoop(s.modules, entries, make-entry)
+listLoop(s.modules, entries, make-entry)
 
 # Sort the list of entries by name.
 o.entries = sort(entries, "ascending", "sensitive", "name")

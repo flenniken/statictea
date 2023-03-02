@@ -99,7 +99,7 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#getBracketedVarValue">getBracketedVarValue</a> &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.</li>
 <li> <a href="#listLoop">listLoop</a> &mdash; Make a new list from an existing list.</li>
 <li> <a href="#getValuePosSi">getValuePosSi</a> &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.</li>
-<li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, if0, return, warn and log.</li>
+<li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, if0, return, warn, log and listLoop.</li>
 <li> <a href="#getBracketDotName">getBracketDotName</a> &mdash; Convert var[key] to a dot name.</li>
 <li> <a href="#runStatement">runStatement</a> &mdash; Run one statement and return the variable dot name string, operator and value.</li>
 <li> <a href="#skipSpaces">skipSpaces</a> &mdash; </li>
@@ -682,9 +682,8 @@ parentheses.
 
 <pre class="nim-code">
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
-              statement: Statement; start: Natural; variables: Variables;
-              listCase = false): ValuePosSiOr {.raises: [KeyError, Exception],
-    tags: [RootEffect].}
+              statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="getValuePosSi">getValuePosSi</h3>
@@ -707,7 +706,7 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 
 <h3 id="runBareFunction">runBareFunction</h3>
 
-<p>Handle bare function: if, if0, return, warn and log. A bare function does not assign a variable.
+<p>Handle bare function: if, if0, return, warn, log and listLoop. A bare function does not assign a variable.
 
 </p><pre class="desc-code">if( true, warn("tea time")) # test
 ^                           ^

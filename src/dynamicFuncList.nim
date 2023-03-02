@@ -915,9 +915,10 @@ a = ["a", 5, "b"]
   dc_fun_listLoop_lapoab = """
 Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
 
-You pass a list to loop over, a container to fill in, a callback
-function, and an optional state variable. The function returns
-whether the callback stopped early or not.
+You pass a list to loop over, a container to fill in, a
+callback function, and an optional state variable. The function
+returns whether the callback stopped early or not and you can
+ignore it using a bare form..
 
 ~~~
 listLoop(a: list, container: any, listCallback: func, state: optional any) bool
@@ -938,7 +939,7 @@ The following example makes a new list [6, 8] from the list
 ~~~
 o.container = []
 list = [2,4,6,8]
-stopped = listLoop(list, o.container, b5)
+listLoop(list, o.container, b5)
 # o.container => [6, 8]
 ~~~
 
@@ -1659,7 +1660,7 @@ warn("always warn")
     info("fun_len_li", dc_fun_len_li, 19),
     info("fun_len_si", dc_fun_len_si, 18),
     info("fun_list_al", dc_fun_list_al, 21),
-    info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 47),
+    info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 48),
     info("fun_log_ss", dc_fun_log_ss, 24),
     info("fun_lower_ss", dc_fun_lower_ss, 19),
     info("fun_lt_ffb", dc_fun_lt_ffb, 19),
@@ -1700,8 +1701,8 @@ warn("always warn")
   functionStarts = [
     688,
     664,
-    1844,
-    2368,
+    1845,
+    2369,
     1109,
     782,
     815,
@@ -1712,65 +1713,65 @@ warn("always warn")
     406,
     1258,
     1219,
-    2433,
-    2414,
-    2452,
+    2434,
+    2415,
+    2453,
     760,
     1146,
     903,
     946,
     920,
-    2237,
-    2271,
-    2292,
+    2238,
+    2272,
+    2293,
     529,
     481,
-    2548,
-    2529,
-    2586,
-    2567,
+    2549,
+    2530,
+    2587,
+    2568,
     567,
     625,
     973,
     1008,
     1050,
-    1976,
-    1935,
-    1606,
+    1977,
+    1936,
+    1607,
     462,
     443,
     425,
     1295,
     1316,
-    2046,
-    1587,
-    2624,
-    2605,
-    2663,
-    2643,
-    2706,
-    2491,
-    2472,
-    2510,
-    2350,
-    2391,
-    1532,
-    2683,
-    1363,
-    1473,
-    2070,
+    2047,
+    1588,
+    2625,
+    2606,
+    2664,
+    2644,
+    2707,
+    2492,
+    2473,
+    2511,
+    2351,
+    2392,
+    1533,
+    2684,
+    1364,
+    1474,
+    2071,
     1184,
-    1753,
-    1786,
-    1815,
-    2327,
-    2127,
-    2213,
+    1754,
+    1787,
+    1816,
+    2328,
+    2128,
+    2214,
     735,
     711,
-    1882,
-    1630,
-    2021,
+    1883,
+    1631,
+    2022,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

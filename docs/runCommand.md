@@ -58,7 +58,7 @@ Run a command and fill in the variables dictionaries.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
 * [listLoop](#listloop) &mdash; Make a new list from an existing list.
 * [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
-* [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn and log.
+* [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn, log and listLoop.
 * [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [skipSpaces](#skipspaces) &mdash; 
@@ -642,9 +642,8 @@ stopped = listLoop(list, new, callback, state)
 
 ```nim
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
-              statement: Statement; start: Natural; variables: Variables;
-              listCase = false): ValuePosSiOr {.raises: [KeyError, Exception],
-    tags: [RootEffect].}
+              statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ```
 
 # getValuePosSi
@@ -668,7 +667,7 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 
 # runBareFunction
 
-Handle bare function: if, if0, return, warn and log. A bare function does not assign a variable.
+Handle bare function: if, if0, return, warn, log and listLoop. A bare function does not assign a variable.
 
 ~~~
 if( true, warn("tea time")) # test

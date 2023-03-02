@@ -1040,9 +1040,10 @@ a = ["a", 5, "b"]
 
 Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
 
-You pass a list to loop over, a container to fill in, a callback
-function, and an optional state variable. The function returns
-whether the callback stopped early or not.
+You pass a list to loop over, a container to fill in, a
+callback function, and an optional state variable. The function
+returns whether the callback stopped early or not and you can
+ignore it using a bare form..
 
 ~~~
 listLoop(a: list, container: any, listCallback: func, state: optional any) bool
@@ -1063,7 +1064,7 @@ The following example makes a new list [6, 8] from the list
 ~~~
 o.container = []
 list = [2,4,6,8]
-stopped = listLoop(list, o.container, b5)
+listLoop(list, o.container, b5)
 # o.container => [6, 8]
 ~~~
 
