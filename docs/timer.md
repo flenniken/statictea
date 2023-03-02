@@ -24,7 +24,6 @@ Holds the start time in seconds.
 ```nim
 Timer = object
   start: float
-
 ```
 
 # newTimer

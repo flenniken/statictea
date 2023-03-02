@@ -200,7 +200,6 @@ Mutable {.pure.} = enum
 DictType = object
   dict*: VarsDict
   mutable*: Mutable
-
 </pre>
 
 <h3 id="ListType">ListType</h3>
@@ -216,7 +215,6 @@ DictType = object
 ListType = object
   list*: seq[Value]
   mutable*: Mutable
-
 </pre>
 
 <h3 id="Variables">Variables</h3>
@@ -286,7 +284,6 @@ Statement = object
   text*: string
   lineNum*: Natural
   ending*: string
-
 </pre>
 
 <h3 id="FunctionPtr">FunctionPtr</h3>
@@ -338,7 +335,6 @@ ParamType = enum
 Param = object
   name*: string
   paramType*: ParamType
-
 </pre>
 
 <h3 id="Signature">Signature</h3>
@@ -357,7 +353,6 @@ Signature = object
   name*: string
   params*: seq[Param]
   returnType*: ParamType
-
 </pre>
 
 <h3 id="SignatureOr">SignatureOr</h3>
@@ -393,7 +388,6 @@ FunctionSpec = object
   numLines*: Natural
   statements*: seq[Statement]
   functionPtr*: FunctionPtr
-
 </pre>
 
 <h3 id="FunResultKind">FunResultKind</h3>
@@ -425,8 +419,6 @@ FunResult = object
   of frWarning:
       parameter*: int
       warningData*: WarningData
-
-  
 </pre>
 
 <h3 id="SideEffect">SideEffect</h3>
@@ -464,7 +456,6 @@ ValuePosSi = object
   value*: Value
   pos*: Natural
   sideEffect*: SideEffect
-
 </pre>
 
 <h3 id="ValuePosSiOr">ValuePosSiOr</h3>

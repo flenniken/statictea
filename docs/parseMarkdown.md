@@ -36,7 +36,6 @@ ElementTag = enum
 Element = object
   tag*: ElementTag
   content*: seq[string]
-
 ```
 
 # newElement
@@ -115,7 +114,6 @@ Fragment = object
   fragmentType*: FragmentType
   start*: Natural
   length*: Natural
-
 ```
 
 # newFragment

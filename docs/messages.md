@@ -274,7 +274,6 @@ WarningData = object
   messageId*: MessageId
   p1*: string
   pos*: Natural
-
 ```
 
 # getWarning

@@ -41,7 +41,6 @@ Temporary filename and associated file object.
 TempFile = object
   filename*: string
   file*: File
-
 ```
 
 # TempFileStream
@@ -52,7 +51,6 @@ Temporary filename and associated stream object.
 TempFileStream = object
   filename*: string
   stream*: Stream
-
 ```
 
 # openTempFile

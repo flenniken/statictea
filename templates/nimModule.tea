@@ -106,7 +106,7 @@ u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
 
   # Simplify the code by removing some text.
   junk = "{.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[].}"
-  code = replaceRe(entry.code, list(junk, ""))
+  code = replaceRe(entry.code, list(junk, "", "\n*\\s*$", ""))
 
   newEntry.signature = code
   newEntry.anchor = state.anchors[ix]

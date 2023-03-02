@@ -46,7 +46,6 @@ LineParts = object
   postfix*: string
   ending*: string
   lineNum*: Natural
-
 ```
 
 # LinePartsOr
@@ -65,7 +64,6 @@ The collected command lines and their parts.
 CmdLines = object
   lines*: seq[string]
   lineParts*: seq[LineParts]
-
 ```
 
 # ExtraLineKind
@@ -89,7 +87,6 @@ The extra line and its type. The line is empty except for the elkNormalLine type
 ExtraLine = object
   kind*: ExtraLineKind
   line*: string
-
 ```
 
 # newNormalLine

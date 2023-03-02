@@ -95,8 +95,6 @@ ArgsOrMessage = object
   of cmlMessageKind:
       messageId*: CmlMessageId
       problemArg*: string
-
-  
 ```
 
 # CmlOptionType
@@ -129,7 +127,6 @@ CmlOption = object
   optionType: CmlOptionType
   long: string
   short: char
-
 ```
 
 # newCmlOption

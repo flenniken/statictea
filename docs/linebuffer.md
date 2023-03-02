@@ -83,7 +83,6 @@ LineBuffer = object
   charsRead: int
   buffer: string
   filename: string
-
 ```
 
 # getLineNum

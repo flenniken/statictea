@@ -110,7 +110,6 @@ RunArgs = object
   leaveTempDir*: bool
   filename*: string
   directory*: string
-
 </pre>
 
 <h3 id="Rc">Rc</h3>
@@ -131,7 +130,6 @@ RunFileLine = object
   noLastEnding*: bool
   command*: bool
   nonZeroReturn*: bool
-
 </pre>
 
 <h3 id="ExpectedLine">ExpectedLine</h3>
@@ -142,7 +140,6 @@ RunFileLine = object
 ExpectedLine = object
   gotFilename*: string
   expectedFilename*: string
-
 </pre>
 
 <h3 id="LineKind">LineKind</h3>
@@ -175,8 +172,6 @@ AnyLine = object
 
   of lkCommentLine:
       commentLine*: string
-
-  
 </pre>
 
 <h3 id="DirAndFiles">DirAndFiles</h3>
@@ -187,7 +182,6 @@ AnyLine = object
 DirAndFiles = object
   expectedLines*: seq[ExpectedLine]
   runFileLines*: seq[RunFileLine]
-
 </pre>
 
 <h3 id="newAnyLineRunFileLine">newAnyLineRunFileLine</h3>

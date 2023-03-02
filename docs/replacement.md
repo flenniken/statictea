@@ -65,7 +65,6 @@ Line information returned by yieldReplacementLine.
 ReplaceLine = object
   kind*: ReplaceLineKind
   line*: string
-
 ```
 
 # newReplaceLine

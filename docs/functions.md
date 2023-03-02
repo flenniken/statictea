@@ -118,7 +118,6 @@ PathComponents = object
   filename: string
   basename: string
   ext: string
-
 ```
 
 # newStringOr
@@ -2220,7 +2219,6 @@ BuiltInInfo = object
   funcName*: string
   docComment*: string
   numLines*: Natural
-
 ```
 
 # newBuiltInInfo

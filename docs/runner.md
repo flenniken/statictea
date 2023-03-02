@@ -68,7 +68,6 @@ RunArgs = object
   leaveTempDir*: bool
   filename*: string
   directory*: string
-
 ```
 
 # Rc
@@ -89,7 +88,6 @@ RunFileLine = object
   noLastEnding*: bool
   command*: bool
   nonZeroReturn*: bool
-
 ```
 
 # ExpectedLine
@@ -100,7 +98,6 @@ ExpectedLine holds the expected line options.
 ExpectedLine = object
   gotFilename*: string
   expectedFilename*: string
-
 ```
 
 # LineKind
@@ -133,8 +130,6 @@ AnyLine = object
 
   of lkCommentLine:
       commentLine*: string
-
-  
 ```
 
 # DirAndFiles
@@ -145,7 +140,6 @@ DirAndFiles holds the file and compare lines of the stf file.
 DirAndFiles = object
   expectedLines*: seq[ExpectedLine]
   runFileLines*: seq[RunFileLine]
-
 ```
 
 # newAnyLineRunFileLine

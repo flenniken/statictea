@@ -86,7 +86,6 @@ LineParts = object
   postfix*: string
   ending*: string
   lineNum*: Natural
-
 </pre>
 
 <h3 id="LinePartsOr">LinePartsOr</h3>
@@ -105,7 +104,6 @@ LinePartsOr = OpResultWarn[LineParts]
 CmdLines = object
   lines*: seq[string]
   lineParts*: seq[LineParts]
-
 </pre>
 
 <h3 id="ExtraLineKind">ExtraLineKind</h3>
@@ -131,7 +129,6 @@ ExtraLineKind = enum
 ExtraLine = object
   kind*: ExtraLineKind
   line*: string
-
 </pre>
 
 <h3 id="newNormalLine">newNormalLine</h3>

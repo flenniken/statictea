@@ -74,7 +74,6 @@ VariableData = object
   dotNameStr*: string
   operator*: Operator
   value*: Value
-
 ```
 
 # VariableDataOr

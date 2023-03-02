@@ -98,7 +98,6 @@ Env = object
   resultFilename*: string
   resultStream*: Stream
   warningsWritten*: Natural
-
 ```
 
 # close

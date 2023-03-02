@@ -29,7 +29,6 @@ Prepost holds one prefix and its associated postfix.
 Prepost = object
   prefix*: string
   postfix*: string
-
 ```
 
 # PrepostTable
@@ -57,7 +56,6 @@ Args = object
   templateFilename*: string
   resultFilename*: string
   logFilename*: string
-
 ```
 
 # ArgsOr

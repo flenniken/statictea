@@ -279,7 +279,6 @@ VariableName = object
   dotName*: string
   kind*: VariableNameKind
   pos*: Natural
-
 ```
 
 # VariableNameOr

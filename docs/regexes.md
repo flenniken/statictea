@@ -85,7 +85,6 @@ Matches = object
   length*: Natural
   start*: Natural
   numGroups*: Natural
-
 ```
 
 # Replacement
@@ -96,7 +95,6 @@ Holds the regular expression pattern and its replacement for the replaceMany fun
 Replacement = object
   pattern*: string
   sub*: string
-
 ```
 
 # newMatches

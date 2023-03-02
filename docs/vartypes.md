@@ -154,7 +154,6 @@ The statictea dictionary type.
 DictType = object
   dict*: VarsDict
   mutable*: Mutable
-
 ```
 
 # ListType
@@ -168,7 +167,6 @@ The statictea list type.
 ListType = object
   list*: seq[Value]
   mutable*: Mutable
-
 ```
 
 # Variables
@@ -234,7 +232,6 @@ Statement = object
   text*: string
   lineNum*: Natural
   ending*: string
-
 ```
 
 # FunctionPtr
@@ -282,7 +279,6 @@ Holds attributes for one parameter.
 Param = object
   name*: string
   paramType*: ParamType
-
 ```
 
 # Signature
@@ -299,7 +295,6 @@ Signature = object
   name*: string
   params*: seq[Param]
   returnType*: ParamType
-
 ```
 
 # SignatureOr
@@ -333,7 +328,6 @@ FunctionSpec = object
   numLines*: Natural
   statements*: seq[Statement]
   functionPtr*: FunctionPtr
-
 ```
 
 # FunResultKind
@@ -363,8 +357,6 @@ FunResult = object
   of frWarning:
       parameter*: int
       warningData*: WarningData
-
-  
 ```
 
 # SideEffect
@@ -401,7 +393,6 @@ ValuePosSi = object
   value*: Value
   pos*: Natural
   sideEffect*: SideEffect
-
 ```
 
 # ValuePosSiOr
