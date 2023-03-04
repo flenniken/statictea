@@ -580,6 +580,17 @@ func dotNameRep*(dict: VarsDict, leftSide: string = "", top = false): string =
     else:
       result.add("$1 = $2" % [left, $v])
 
+func verticalLines*(value: Value): string =
+  ## Return a vertical lines string representation of a list.
+  # Loop through the list and flatten it to json lines.
+
+  if value.kind != vkList or value.listv.list.len == 0:
+    return valueToString(value)
+
+  ## Loop through the list items.
+  for ix, value in value.listv.list:
+    result.add("$1: $2\n" % [$ix, valueToString(value)])
+
 func newValueOr*(warning: MessageId, p1 = "", pos = 0): ValueOr =
   ## Create a new ValueOr containing a warning.
   let warningData = newWarningData(warning, p1, pos)

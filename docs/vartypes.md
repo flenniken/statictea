@@ -67,6 +67,7 @@ StaticTea variable types.
 * [`$`](#-3) &mdash; Return a string representation of a Value.
 * [`$`](#-4) &mdash; Return a string representation of a VarsDict.
 * [dotNameRep](#dotnamerep) &mdash; Return a dot name string representation of a dictionary.
+* [verticalLines](#verticallines) &mdash; Return a vertical lines string representation of a list.
 * [newValueOr](#newvalueor) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-2) &mdash; Create a new ValueOr containing a value.
@@ -714,6 +715,15 @@ Return a dot name string representation of a dictionary. The top variables tells
 ```nim
 func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string {.
     raises: [ValueError, Exception], tags: [RootEffect].}
+```
+
+# verticalLines
+
+Return a vertical lines string representation of a list.
+
+```nim
+func verticalLines(value: Value): string {.raises: [Exception, ValueError],
+    tags: [RootEffect].}
 ```
 
 # newValueOr

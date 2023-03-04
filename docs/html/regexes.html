@@ -80,6 +80,7 @@ Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
 <h1>Index</h1>
 
 <ul>
+<li>type:  <a href="#CompilePattern">CompilePattern</a> &mdash; </li>
 <li>type:  <a href="#Matches">Matches</a> &mdash; Holds the result of a match.</li>
 <li>type:  <a href="#Replacement">Replacement</a> &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.</li>
 <li> <a href="#newMatches">newMatches</a> &mdash; Create a new Matches object with no groups.</li>
@@ -102,11 +103,21 @@ Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
 <li> <a href="#get3GroupsLen">get3GroupsLen</a> &mdash; Return the three groups and the length of the match.</li>
 <li> <a href="#getGroups">getGroups</a> &mdash; Return the number of groups specified.</li>
 <li> <a href="#getGroups-1">getGroups</a> &mdash; Return the number of groups specified.</li>
+<li> <a href="#matchRegex">matchRegex</a> &mdash; Match a regular expression pattern in a string.</li>
+<li> <a href="#compilePattern">compilePattern</a> &mdash; Compile the pattern and return a regex object.</li>
 <li> <a href="#matchPattern">matchPattern</a> &mdash; Match a regular expression pattern in a string.</li>
 <li> <a href="#matchPatternCached">matchPatternCached</a> &mdash; Match a pattern in a string and cache the compiled regular
 expression pattern for next time.</li>
 <li> <a href="#replaceMany">replaceMany</a> &mdash; Replace the patterns in the string with their replacements.</li>
 </ul>
+
+<h3 id="CompilePattern">CompilePattern</h3>
+
+
+
+<pre class="nim-code">
+CompilePattern = Regex
+</pre>
 
 <h3 id="Matches">Matches</h3>
 
@@ -295,6 +306,23 @@ func getGroups(matches: Matches; numGroups: Natural): seq[string]
 
 <pre class="nim-code">
 func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string] 
+</pre>
+
+<h3 id="matchRegex">matchRegex</h3>
+
+<p>Match a regular expression pattern in a string. Start is the index in the string to start the search. NumGroups is the number of groups in the pattern.</p>
+
+<pre class="nim-code">
+func matchRegex(str: string; regex: CompilePattern; start: Natural;
+                numGroups: Natural): Option[Matches] 
+</pre>
+
+<h3 id="compilePattern">compilePattern</h3>
+
+<p>Compile the pattern and return a regex object.</p>
+
+<pre class="nim-code">
+func compilePattern(pattern: string): Option[CompilePattern] 
 </pre>
 
 <h3 id="matchPattern">matchPattern</h3>

@@ -9,6 +9,7 @@ import variables
 import opresult
 import sharedtestcode
 import readJson
+import compareLines
 
 func newFunResult(valueOr: ValueOr, parameter=0): FunResult =
   ## Return a new FunResult object based on the ValueOr and the parameter index.
@@ -180,6 +181,24 @@ proc testMarkdownLite(text: string, eJson: string): bool =
   var arguments = @[newValue(text)]
   let funResult = callFunction("markdownLite", arguments)
   result = gotExpected($funResult, eJson)
+
+proc testHighlight(text: string, expected: string): bool =
+  var arguments = @[newValue(text)]
+  let funResult = callFunction("highlight", arguments)
+  if funResult.kind == frWarning:
+    echo "got a warning"
+    return false
+  let got = verticalLines(funResult.value)
+  if got == expected:
+    return true
+  if expected == "":
+    echo "text:"
+    echo text
+    echo "got:"
+    echo got
+    return false
+  echo linesSideBySide(got, expected)
+  return false
 
 suite "functions.nim":
 
@@ -2061,3 +2080,38 @@ end
     var eValueOr = readJsonString(expected)
     assert eValueOr.isValue
     check testMarkdownLite(text, $eValueOr.value)
+
+  test "highlight":
+    let text = """
+a = 5
+"""
+    let expected = """
+0: ["var","a"]
+1: ["other"," = "]
+2: ["num","5"]
+3: ["other","\n"]
+"""
+    check testHighlight(text, expected)
+
+  test "highlight":
+    let text = """
+a = 5 # comment here
+len = len("tea")
+# testing
+"""
+    let expected = """
+0: ["var","a"]
+1: ["other"," = "]
+2: ["num","5"]
+3: ["other"," "]
+4: ["comment","# comment here"]
+5: ["other","\n"]
+6: ["var","len"]
+7: ["other"," = "]
+8: ["func","len("]
+9: ["string","\"tea\""]
+10: ["other",")\n"]
+11: ["comment","# testing"]
+12: ["other","\n"]
+"""
+    check testHighlight(text, expected)

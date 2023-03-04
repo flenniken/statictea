@@ -16,6 +16,36 @@ type
     tag*: ElementTag
     content*: seq[string]
 
+  FragmentType* = enum
+    ## Hightlight fragments.
+    ## @:
+    ## @:* ftOther -- not one of the other types
+    ## @:* ftType -- int, float, string, list, dict, bool, any, true, false
+    ## @:* ftFunc -- a variable name followed by a left parenthesis
+    ## @:* ftVarName -- a variable name
+    ## @:* ftNumber -- a literal number
+    ## @:* ftString -- a literal string
+    ## @:* ftDocComment -- a ## to the end of the line
+    ## @:* ftComment -- a # to the end of the line
+    ftOther = "other",
+    ftType = "type",
+    ftFunc = "func",
+    ftVarName = "var",
+    ftNumber = "num",
+    ftString = "string",
+    ftDocComment = "doc",
+    ftComment = "comment",
+
+  Fragment* = object
+    ## A fragment of a string.
+    ## @:* kind -- the type of fragment
+    ## @:* start -- the index in the string where the fragment starts
+    ## @:* fEnd -- the end of the fragment + 1.
+    fragmentType*: FragmentType
+    # [start, end) half-open interval
+    start*: Natural
+    fEnd*: Natural
+
 proc newElement*(tag: ElementTag, content: seq[string]): Element =
   ## Create an Element object.
   result = Element(tag: tag, content: content)
@@ -152,49 +182,24 @@ func `$`*(elements: seq[Element]): string =
   for element in elements:
     result.add($element)
 
-type
-  FragmentType* = enum
-    ## Hightlight fragments.
-    ## @:
-    ## @:* ftType -- int, float, string, list, dict, bool, any, true, false
-    ## @:* ftFunc -- a variable name followed by a left parenthesis
-    ## @:* ftVarName -- a variable name
-    ## @:* ftNumber -- a literal number
-    ## @:* ftString -- a literal string
-    ## @:* ftDocComment -- a ## to the end of the line
-    ## @:* ftComment -- a # to the end of the line
-    ftType
-    ftFunc
-    ftVarName
-    ftNumber
-    ftString
-    ftDocComment
-    ftComment
+func newFragment*(fragmentType: FragmentType, start: Natural, fEnd: Natural): Fragment =
+  result = Fragment(fragmentType: fragmentType, start: start, fEnd: fEnd)
 
-  Fragment* = object
-    ## A fragment of a string.
-    ## @:* kind -- the type of fragment
-    ## @:* start -- the index in the string where the fragment starts
-    ## @:* length -- the number of ascii characters in the fragment
-    fragmentType*: FragmentType
-    start*: Natural
-    length*: Natural
-
-func newFragment*(fragmentType: FragmentType, start: Natural, length: Natural): Fragment =
-  result = Fragment(fragmentType: fragmentType, start: start, length: length)
+func newFragmentLen*(fragmentType: FragmentType, start: Natural, length: Natural): Fragment =
+  result = Fragment(fragmentType: fragmentType, start: start, fEnd: start+length)
 
 func `$`*(f: Fragment): string =
   ## Return a string representation of a Fragment.
-  result.add("$1, start: $2, length: $3" % [$f.fragmentType, $f.start, $f.length])
+  result.add("$1, start: $2, end: $3" % [$f.fragmentType, $f.start, $f.fEnd])
 
 func `$`*(fragments: seq[Fragment]): string =
   ## Return a string representation of a sequence of fragments.
   if fragments.len == 0:
     return "no fragments"
   for f in fragments:
-    result.add("$1, start: $2, length: $3\n" % [$f.fragmentType, $f.start, $f.length])
+    result.add("$1, start: $2, fEnd: $3\n" % [$f.fragmentType, $f.start, $f.fEnd])
 
-proc matchFragment*(line: string, start: Natural): Option[Fragment] =
+func matchFragment*(line: string, start: Natural): Option[Fragment] =
   ## Match a highlight fragment starting at the given position.
 
   let numGroups = 7
@@ -206,26 +211,50 @@ proc matchFragment*(line: string, start: Natural): Option[Fragment] =
   let docCommentP = r"(##.*)"
   let commentP = r"(#.*)"
   let pattern = "$1|$2|$3|$4|$5|$6|$7" % [typeP, funcP, varNameP, numP, stringP, docCommentP, commentP]
-  let matchesO = matchPatternCached(line, pattern, start, numGroups)
+
+  func GroupToFragmentType(ix: int): FragmentType =
+    assert ord(low(FragmentType)) == 0
+    assert ord(high(FragmentType)) == 7
+    result = FragmentType(ix+1)
+
+  # Compile the pattern.
+  let compiledPatternO = compilePattern(pattern)
+  if not compiledPatternO.isSome:
+    return
+  let compiledPattern = compiledPatternO.get()
+
+  let matchesO = matchRegex(line, compiledPattern, start, numGroups)
   if not matchesO.isSome:
     return
   let groups = getGroups(matchesO.get(), numGroups)
   for ix, group in groups:
     if group != "":
-      let fragmentType = FragmentType(ix)
-      return some(newFragment(fragmentType, start, matchesO.get().length))
+      let fragmentType = GroupToFragmentType(ix)
+      return some(newFragment(fragmentType, start, start+matchesO.get().length))
 
-proc highlightStaticTea*(codeLine: string): seq[Fragment] =
+func highlightStaticTea*(codeText: string): seq[Fragment] =
   ## Identify all the fragments in the StaticTea code line to
   ## highlight. The fragments are ordered from left to right.
+
+  var fragList = newSeq[Fragment]()
   var ix = 0
   while true:
-    if ix >= codeLine.len:
+    if ix >= codeText.len:
       break
-    let fragmentO = matchFragment(codeLine, ix)
+    let fragmentO = matchFragment(codeText, ix)
     if fragmentO.isSome:
       let fragment = fragmentO.get()
-      result.add(fragment)
-      ix = ix + fragment.length
+      fragList.add(fragment)
+      ix = fragment.fEnd
     else:
       inc(ix)
+
+  var start = 0
+  for fragment in fragList:
+    let fs = fragment.start
+    if start != fs:
+      result.add(newFragment(ftOther, start, fs))
+    result.add(fragment)
+    start = fragment.fEnd
+  if start != codeText.len:
+    result.add(newFragment(ftOther, start, codeText.len))

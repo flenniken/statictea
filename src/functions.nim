@@ -2142,6 +2142,8 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:not quoted and special characters are not escaped.
   ## @:* dn -- dot name (dn) returns JSON except dictionary elements
   ## @:are printed one per line as "key = value". See string(dotName, string).
+  ## @:* vl -- vertical list (vl) returns JSON except list elements
+  ## @:are printed one per line as "ix: value".
   ## @:
   ## @:Examples variables:
   ## @:
@@ -2149,7 +2151,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:str = "Earl Grey"
   ## @:pi = 3.14159
   ## @:one = 1
-  ## @:a = [1, 2, 3]
+  ## @:a = ["red", "green", "blue"]
   ## @:d = dict(["x", 1, "y", 2])
   ## @:fn = cmp[0]
   ## @:found = true
@@ -2161,7 +2163,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:str => "Earl Grey"
   ## @:pi => 3.14159
   ## @:one => 1
-  ## @:a => [1,2,3]
+  ## @:a => ["red","green","blue"]
   ## @:d => {"x":1,"y":2}
   ## @:fn => "cmp"
   ## @:found => true
@@ -2185,6 +2187,17 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:x = 1
   ## @:y = 2
   ## @:~~~~
+  ## @:
+  ## @:vl:
+  ## @:
+  ## @:Same as JSON except the following.
+  ## @:
+  ## @:~~~
+  ## @:a =>
+  ## @:0: "red"
+  ## @:1: "green"
+  ## @:2: "blue"
+  ## @:~~~~
 
   tMapParameters("string", "aoss")
   let value = map["a"]
@@ -2203,6 +2216,11 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   of "dn":
     if value.kind == vkDict:
       str = dotNameRep(value.dictv.dict)
+    else:
+      str = valueToString(value)
+  of "vl":
+    if value.kind == vkList:
+      str = verticalLines(value)
     else:
       str = valueToString(value)
   else:
@@ -2709,6 +2727,10 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
   ## bullets and code blocks. This subset is used to document all
   ## StaticTea functions. Return a list of lists.
   ## @:
+  ## @:~~~
+  ## @:markdownList(mdText: string) list
+  ## @:~~~~
+  ## @:
   ## @:list elements:
   ## @:
   ## @:* p -- A paragraph element is one string, possibly containing
@@ -2741,6 +2763,51 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
     sublist.listv.list.add(newValue(element.content))
     elementList.listv.list.add(sublist)
   result = newFunResult(elementList)
+
+# todo: match multiline strings for highlighting.
+
+func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Divide a string of StaticTea code into fragments useful for
+  ## syntax highlighting.  Return a list of tagged fragments.
+  ## @:
+  ## @:~~~
+  ## @:highlight(code: string) list
+  ## @:~~~~
+  ## @:
+  ## @:Tags:
+  ## @:
+  ## @:* other -- not one of the other types
+  ## @:* func -- a function call, var followed by a left parenthesis
+  ## @:* var -- a variable name
+  ## @:* type -- int, float, string, list, dict, bool, any, true, false
+  ## @:* num -- a literal number
+  ## @:* string -- a literal string
+  ## @:* doc -- a doc comment
+  ## @:* comment -- a comment
+  ## @:
+  ## @:Example:
+  ## @:
+  ## @:~~~
+  ## @:frags = highlight("a = 5")
+  ## @:frags => [
+  ## @:  ["var", "a"],
+  ## @:  ["other", " = "],
+  ## @:  ["num", "5"],
+  ## @:]
+  ## @:~~~~
+  tMapParameters("highlight", "sl")
+  let codeText = map["a"].stringv
+  var fragments = highlightStaticTea(codeText)
+
+  var fragList = newEmptyListValue()
+  for fragment in fragments:
+    var sublist = newEmptyListValue()
+    sublist.listv.list.add(newValue($fragment.fragmentType))
+    let start = fragment.start
+    let fEnd = fragment.fEnd
+    sublist.listv.list.add(newValue(codeText[start .. (fEnd - 1)]))
+    fragList.listv.list.add(sublist)
+  result = newFunResult(fragList)
 
 var functionsDict* = newTable[string, FunctionPtr]()
   ## Maps a built-in function name to a function pointer you can call.
@@ -2775,6 +2842,7 @@ functionsDict["fun_gt_ffb"] = fun_gt_ffb
 functionsDict["fun_gt_iib"] = fun_gt_iib
 functionsDict["fun_gte_ffb"] = fun_gte_ffb
 functionsDict["fun_gte_iib"] = fun_gte_iib
+functionsDict["fun_highlight_sl"] = fun_highlight_sl
 functionsDict["fun_if_baoaa"] = fun_if_baoaa
 functionsDict["fun_if0_iaoaa"] = fun_if0_iaoaa
 functionsDict["fun_int_fosi"] = fun_int_fosi
@@ -2916,8 +2984,12 @@ proc makeFuncDictionary*(): VarsDict =
 
   var funcList = newEmptyListValue()
   var lastName = ""
-  assert functionsDict.len == functionsList.len
-  assert functionsDict.len == functionStarts.len
+
+  # Generate an error when the function lists don't match up.
+  assert(functionsDict.len == functionsList.len,
+    "\n\n\x1b[1;31mManually update dynamicFuncList.nim. The functionsList list is out of date.\x1b[0m")
+  assert(functionsDict.len == functionStarts.len,
+    "\n\n\x1b[1;31mManually update dynamicFuncList.nim. The functionStarts list is out of date.\x1b[0m")
 
   for ix, bii in functionsList:
     let (name, signatureCode) = splitFuncName(bii.funcName)

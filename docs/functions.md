@@ -92,6 +92,7 @@ This module contains the StaticTea functions and supporting types. The StaticTea
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
 * [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
+* [fun_highlight_sl](#fun_highlight_sl) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
 * [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
@@ -1610,6 +1611,8 @@ stype:
 not quoted and special characters are not escaped.
 * dn -- dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
+* vl -- vertical list (vl) returns JSON except list elements
+are printed one per line as "ix: value".
 
 Examples variables:
 
@@ -1617,7 +1620,7 @@ Examples variables:
 str = "Earl Grey"
 pi = 3.14159
 one = 1
-a = [1, 2, 3]
+a = ["red", "green", "blue"]
 d = dict(["x", 1, "y", 2])
 fn = cmp[0]
 found = true
@@ -1629,7 +1632,7 @@ json:
 str => "Earl Grey"
 pi => 3.14159
 one => 1
-a => [1,2,3]
+a => ["red","green","blue"]
 d => {"x":1,"y":2}
 fn => "cmp"
 found => true
@@ -1652,6 +1655,17 @@ Same as JSON except the following.
 d =>
 x = 1
 y = 2
+~~~
+
+vl:
+
+Same as JSON except the following.
+
+~~~
+a =>
+0: "red"
+1: "green"
+2: "blue"
 ~~~
 
 ```nim
@@ -2170,6 +2184,10 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
+~~~
+markdownList(mdText: string) list
+~~~
+
 list elements:
 
 * p -- A paragraph element is one string, possibly containing
@@ -2196,6 +2214,41 @@ elements => [
 ```nim
 func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
+```
+
+# fun_highlight_sl
+
+Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+
+~~~
+highlight(code: string) list
+~~~
+
+Tags:
+
+* other -- not one of the other types
+* func -- a function call, var followed by a left parenthesis
+* var -- a variable name
+* type -- int, float, string, list, dict, bool, any, true, false
+* num -- a literal number
+* string -- a literal string
+* doc -- a doc comment
+* comment -- a comment
+
+Example:
+
+~~~
+frags = highlight("a = 5")
+frags => [
+  ["var", "a"],
+  ["other", " = "],
+  ["num", "5"],
+]
+~~~
+
+```nim
+func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, ValueError], tags: [].}
 ```
 
 # functionsDict

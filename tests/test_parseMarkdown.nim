@@ -21,10 +21,11 @@ proc markdownHtml(elements: seq[Element]): string =
       result.add("""<pre class="nim-code">""" & "\n")
       let codeString = element.content[1]
       let fragments = highlightStaticTea(codeString)
-      var begin = 0
       for fragment in fragments:
         var color: string
         case fragment.fragmentType
+        of ftOther:
+          color = ""
         of ftType:
           color = "red"
         of ftFunc:
@@ -40,17 +41,13 @@ proc markdownHtml(elements: seq[Element]): string =
         of ftComment:
           color = "FireBrick"
 
-        result.add(codeString[begin .. fragment.start-1])
-
-        result.add(fmt"""<span style="color: {color};">""")
-        let finish = fragment.start + fragment.length
-        result.add(codeString[fragment.start .. finish-1])
-        result.add("</span>")
-
-        begin = finish
-
-      result.add(codeString[begin .. ^1])
+        if color != "":
+          result.add(fmt"""<span style="color: {color};">""")
+        result.add(codeString[fragment.start .. fragment.fEnd-1])
+        if color != "":
+          result.add("</span>")
       result.add("</pre>\n")
+
     of bullets:
       result.add("<ul>\n")
       for nl_string in element.content:
@@ -95,7 +92,7 @@ proc testParseMarkdown(content: string, expected: string): bool =
   return false
 
 proc testMatchFragment(aLine: string, start: Natural, eFragmentO: Option[Fragment]): bool =
-  ## Test matchFragment. a ! in the line is replaced with a quote (").
+  ## Test matchFragment. a ! in the line is replaced with a quote.
   let line = replace(aLine, '!', '"')
   let fragmentO = matchFragment(line, start)
   result = gotExpected($fragmentO, $eFragmentO)
@@ -105,10 +102,10 @@ proc testMatchFragment(aLine: string, start: Natural, eFragmentO: Option[Fragmen
     echo line
     if fragmentO.isSome:
       let f = fragmentO.get()
-      echo startColumn(line, f.start + f.length, "└─got end")
+      echo startColumn(line, f.fEnd, "└─got end")
     if eFragmentO.isSome:
       let f = eFragmentO.get()
-      echo startColumn(line, f.start + f.length, "└─expected end")
+      echo startColumn(line, f.fEnd, "└─expected end")
 
 proc testHighlightStaticTea(line: string, eFragments: seq[Fragment]): bool =
   let fragments = highlightStaticTea(line)
@@ -464,94 +461,107 @@ Examples:
 
   test "matchFragment type":
     check testMatchFragment("", 0, none(Fragment))
-    check testMatchFragment("true", 0, some(newFragment(ftType, 0, 4)))
-    check testMatchFragment(" true", 1, some(newFragment(ftType, 1, 4)))
-    check testMatchFragment(" true ", 1, some(newFragment(ftType, 1, 4)))
-    check testMatchFragment("abctrue ", 3, some(newFragment(ftType, 3, 4)))
-    check testMatchFragment("false", 0, some(newFragment(ftType, 0, 5)))
-    check testMatchFragment("int", 0, some(newFragment(ftType, 0, 3)))
-    check testMatchFragment("float", 0, some(newFragment(ftType, 0, 5)))
-    check testMatchFragment("string", 0, some(newFragment(ftType, 0, 6)))
-    check testMatchFragment("dict", 0, some(newFragment(ftType, 0, 4)))
-    check testMatchFragment("list", 0, some(newFragment(ftType, 0, 4)))
-    check testMatchFragment("any", 0, some(newFragment(ftType, 0, 3)))
+    check testMatchFragment("true", 0, some(newFragmentLen(ftType, 0, 4)))
+    check testMatchFragment(" true", 1, some(newFragmentLen(ftType, 1, 4)))
+    check testMatchFragment(" true ", 1, some(newFragmentLen(ftType, 1, 4)))
+    check testMatchFragment("abctrue ", 3, some(newFragmentLen(ftType, 3, 4)))
+    check testMatchFragment("false", 0, some(newFragmentLen(ftType, 0, 5)))
+    check testMatchFragment("int", 0, some(newFragmentLen(ftType, 0, 3)))
+    check testMatchFragment("float", 0, some(newFragmentLen(ftType, 0, 5)))
+    check testMatchFragment("string", 0, some(newFragmentLen(ftType, 0, 6)))
+    check testMatchFragment("dict", 0, some(newFragmentLen(ftType, 0, 4)))
+    check testMatchFragment("list", 0, some(newFragmentLen(ftType, 0, 4)))
+    check testMatchFragment("any", 0, some(newFragmentLen(ftType, 0, 3)))
 
   test "matchFragment function":
-    check testMatchFragment("a(", 0, some(newFragment(ftFunc, 0, 2)))
-    check testMatchFragment("abc(", 0, some(newFragment(ftFunc, 0, 4)))
-    check testMatchFragment(" abc(", 1, some(newFragment(ftFunc, 1, 4)))
-    check testMatchFragment("s.aAZz-4_3(", 0, some(newFragment(ftFunc, 0, 11)))
+    check testMatchFragment("a(", 0, some(newFragmentLen(ftFunc, 0, 2)))
+    check testMatchFragment("abc(", 0, some(newFragmentLen(ftFunc, 0, 4)))
+    check testMatchFragment(" abc(", 1, some(newFragmentLen(ftFunc, 1, 4)))
+    check testMatchFragment("s.aAZz-4_3(", 0, some(newFragmentLen(ftFunc, 0, 11)))
 
   test "matchFragment var name":
     check testMatchFragment("", 0, none(Fragment))
-    check testMatchFragment("a", 0, some(newFragment(ftVarName, 0, 1)))
-    check testMatchFragment("s.d", 0, some(newFragment(ftVarName, 0, 3)))
-    check testMatchFragment(r"a\bc(", 0, some(newFragment(ftVarName, 0, 1)))
-    check testMatchFragment("trueabc", 0, some(newFragment(ftVarName, 0, 7)))
-    check testMatchFragment(" tru", 1, some(newFragment(ftVarName, 1, 3)))
-    check testMatchFragment(" True", 1, some(newFragment(ftVarName, 1, 4)))
-    check testMatchFragment("f.cmp", 0, some(newFragment(ftVarName, 0, 5)))
+    check testMatchFragment("a", 0, some(newFragmentLen(ftVarName, 0, 1)))
+    check testMatchFragment("s.d", 0, some(newFragmentLen(ftVarName, 0, 3)))
+    check testMatchFragment(r"a\bc(", 0, some(newFragmentLen(ftVarName, 0, 1)))
+    check testMatchFragment("trueabc", 0, some(newFragmentLen(ftVarName, 0, 7)))
+    check testMatchFragment(" tru", 1, some(newFragmentLen(ftVarName, 1, 3)))
+    check testMatchFragment(" True", 1, some(newFragmentLen(ftVarName, 1, 4)))
+    check testMatchFragment("f.cmp", 0, some(newFragmentLen(ftVarName, 0, 5)))
 
   test "matchFragment number":
-    check testMatchFragment(r"1", 0, some(newFragment(ftNumber, 0, 1)))
-    check testMatchFragment(r"-1", 0, some(newFragment(ftNumber, 0, 2)))
-    check testMatchFragment(r"1.2", 0, some(newFragment(ftNumber, 0, 3)))
-    check testMatchFragment(r"123.24", 0, some(newFragment(ftNumber, 0, 6)))
+    check testMatchFragment(r"1", 0, some(newFragmentLen(ftNumber, 0, 1)))
+    check testMatchFragment(r"-1", 0, some(newFragmentLen(ftNumber, 0, 2)))
+    check testMatchFragment(r"1.2", 0, some(newFragmentLen(ftNumber, 0, 3)))
+    check testMatchFragment(r"123.24", 0, some(newFragmentLen(ftNumber, 0, 6)))
 
   test "matchFragment string":
-    check testMatchFragment("!!", 0, some(newFragment(ftString, 0, 2)))
-    check testMatchFragment("!a!", 0, some(newFragment(ftString, 0, 3)))
-    check testMatchFragment("!123!", 0, some(newFragment(ftString, 0, 5)))
-    check testMatchFragment(" !123!", 1, some(newFragment(ftString, 1, 5)))
-    check testMatchFragment(r"!1\n23!", 0, some(newFragment(ftString, 0, 7)))
-    check testMatchFragment(r"!1\\23!", 0, some(newFragment(ftString, 0, 7)))
-    check testMatchFragment(r"!1\!23!", 0, some(newFragment(ftString, 0, 7)))
-    check testMatchFragment(r"!1\b23!", 0, some(newFragment(ftString, 0, 7)))
+    check testMatchFragment("!!", 0, some(newFragmentLen(ftString, 0, 2)))
+    check testMatchFragment("!a!", 0, some(newFragmentLen(ftString, 0, 3)))
+    check testMatchFragment("!123!", 0, some(newFragmentLen(ftString, 0, 5)))
+    check testMatchFragment(" !123!", 1, some(newFragmentLen(ftString, 1, 5)))
+    check testMatchFragment(r"!1\n23!", 0, some(newFragmentLen(ftString, 0, 7)))
+    check testMatchFragment(r"!1\\23!", 0, some(newFragmentLen(ftString, 0, 7)))
+    check testMatchFragment(r"!1\!23!", 0, some(newFragmentLen(ftString, 0, 7)))
+    check testMatchFragment(r"!1\b23!", 0, some(newFragmentLen(ftString, 0, 7)))
     check testMatchFragment("!", 0, none(Fragment))
     check testMatchFragment("!  ", 0, none(Fragment))
 
   test "matchFragment doc comment":
-    check testMatchFragment("##", 0, some(newFragment(ftDocComment, 0, 2)))
-    check testMatchFragment("## asdf", 0, some(newFragment(ftDocComment, 0, 7)))
+    check testMatchFragment("##", 0, some(newFragmentLen(ftDocComment, 0, 2)))
+    check testMatchFragment("## asdf", 0, some(newFragmentLen(ftDocComment, 0, 7)))
 
   test "matchFragment comment":
-    check testMatchFragment("#", 0, some(newFragment(ftComment, 0, 1)))
-    check testMatchFragment("# asdf", 0, some(newFragment(ftComment, 0, 6)))
+    check testMatchFragment("#", 0, some(newFragmentLen(ftComment, 0, 1)))
+    check testMatchFragment("# asdf", 0, some(newFragmentLen(ftComment, 0, 6)))
 
   test "matchFragment highlightStaticTea":
-    check testHighlightStaticTea("true", @[newFragment(ftType, 0, 4)])
+    check testHighlightStaticTea("true", @[newFragmentLen(ftType, 0, 4)])
     check testHighlightStaticTea("true false", @[
-      newFragment(ftType, 0, 4),
-      newFragment(ftType, 5, 5),
+      newFragmentLen(ftType, 0, 4),
+      newFragmentLen(ftOther, 4, 1),
+      newFragmentLen(ftType, 5, 5),
     ])
     check testHighlightStaticTea("a = true", @[
-      newFragment(ftVarName, 0, 1),
-      newFragment(ftType, 4, 4),
+      newFragmentLen(ftVarName, 0, 1),
+      newFragmentLen(ftOther, 1, 3),
+      newFragmentLen(ftType, 4, 4),
     ])
     check testHighlightStaticTea("""a = len("abc")""", @[
-      newFragment(ftVarName, 0, 1),
-      newFragment(ftFunc, 4, 4),
-      newFragment(ftString, 8, 5),
+      newFragmentLen(ftVarName, 0, 1),
+      newFragmentLen(ftOther, 1, 3),
+      newFragmentLen(ftFunc, 4, 4),
+      newFragmentLen(ftString, 8, 5),
+      newFragmentLen(ftOther, 13, 1),
     ])
     check testHighlightStaticTea("""a = 35""", @[
-      newFragment(ftVarName, 0, 1),
-      newFragment(ftNumber, 4, 2),
+      newFragmentLen(ftVarName, 0, 1),
+      newFragmentLen(ftOther, 1, 3),
+      newFragmentLen(ftNumber, 4, 2),
     ])
     check testHighlightStaticTea("""a = process(35, 44, true)""", @[
-      newFragment(ftVarName, 0, 1),
-      newFragment(ftFunc, 4, 8),
-      newFragment(ftNumber, 12, 2),
-      newFragment(ftNumber, 16, 2),
-      newFragment(ftType, 20, 4),
+      newFragmentLen(ftVarName, 0, 1),
+      newFragmentLen(ftOther, 1, 3),
+      newFragmentLen(ftFunc, 4, 8),
+      newFragmentLen(ftNumber, 12, 2),
+      newFragmentLen(ftOther, 14, 2),
+      newFragmentLen(ftNumber, 16, 2),
+      newFragmentLen(ftOther, 18, 2),
+      newFragmentLen(ftType, 20, 4),
+      newFragmentLen(ftOther, 24, 1),
     ])
     check testHighlightStaticTea("""  #a = process(35, 44, true)""", @[
-      newFragment(ftComment, 2, 26),
+      newFragmentLen(ftOther, 0, 2),
+      newFragmentLen(ftComment, 2, 26),
     ])
     check testHighlightStaticTea("""  ## this is a doc comment""", @[
-      newFragment(ftDocComment, 2, 24),
+      newFragmentLen(ftOther, 0, 2),
+      newFragmentLen(ftDocComment, 2, 24),
     ])
     check testHighlightStaticTea("""a = 5 # comment""", @[
-      newFragment(ftVarName, 0, 1),
-      newFragment(ftNumber, 4, 1),
-      newFragment(ftComment, 6, 9),
+      newFragmentLen(ftVarName, 0, 1),
+      newFragmentLen(ftOther, 1, 3),
+      newFragmentLen(ftNumber, 4, 1),
+      newFragmentLen(ftOther, 5, 1),
+      newFragmentLen(ftComment, 6, 9),
     ])

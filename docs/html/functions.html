@@ -133,6 +133,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_lte_ffb">fun_lte_ffb</a> &mdash; Return true when a float is less than or equal to another float.</li>
 <li> <a href="#fun_readJson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
 <li> <a href="#fun_markdownLite_sl">fun_markdownLite_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.</li>
+<li> <a href="#fun_highlight_sl">fun_highlight_sl</a> &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.</li>
 <li> <a href="#functionsDict">functionsDict</a> &mdash; Maps a built-in function name to a function pointer you can call.</li>
 <li>type:  <a href="#BuiltInInfo">BuiltInInfo</a> &mdash; The built-in function information.</li>
 <li> <a href="#newBuiltInInfo">newBuiltInInfo</a> &mdash; Return a BuiltInInfo object.</li>
@@ -1491,6 +1492,8 @@ The default stype is "rb" which is used for replacement blocks.
 not quoted and special characters are not escaped.
 </li><li>dn -- dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
+</li><li>vl -- vertical list (vl) returns JSON except list elements
+are printed one per line as "ix: value".
 
 </li></ul>
 <p>Examples variables:
@@ -1498,7 +1501,7 @@ are printed one per line as "key = value". See string(dotName, string).
 </p><pre class="desc-code">str = "Earl Grey"
 pi = 3.14159
 one = 1
-a = [1, 2, 3]
+a = ["red", "green", "blue"]
 d = dict(["x", 1, "y", 2])
 fn = cmp[0]
 found = true
@@ -1508,7 +1511,7 @@ json:
 </p><pre class="desc-code">str => "Earl Grey"
 pi => 3.14159
 one => 1
-a => [1,2,3]
+a => ["red","green","blue"]
 d => {"x":1,"y":2}
 fn => "cmp"
 found => true
@@ -1527,6 +1530,15 @@ dn:
 </p><pre class="desc-code">d =>
 x = 1
 y = 2
+</pre><p>
+vl:
+
+</p><p>Same as JSON except the following.
+
+</p><pre class="desc-code">a =>
+0: "red"
+1: "green"
+2: "blue"
 </pre>
 
 <pre class="nim-code">
@@ -1974,7 +1986,9 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
-</p><p>list elements:
+</p><pre class="desc-code">markdownList(mdText: string) list
+</pre><p>
+list elements:
 
 </p><ul>
 <li>p -- A paragraph element is one string, possibly containing
@@ -2005,6 +2019,40 @@ elements => [
 <pre class="nim-code">
 func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
+</pre>
+
+<h3 id="fun_highlight_sl">fun_highlight_sl</h3>
+
+<p>Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+
+</p><pre class="desc-code">highlight(code: string) list
+</pre><p>
+Tags:
+
+</p><ul>
+<li>other -- not one of the other types
+</li><li>func -- a function call, var followed by a left parenthesis
+</li><li>var -- a variable name
+</li><li>type -- int, float, string, list, dict, bool, any, true, false
+</li><li>num -- a literal number
+</li><li>string -- a literal string
+</li><li>doc -- a doc comment
+</li><li>comment -- a comment
+
+</li></ul>
+<p>Example:
+
+</p><pre class="desc-code">frags = highlight("a = 5")
+frags => [
+  ["var", "a"],
+  ["other", " = "],
+  ["num", "5"],
+]
+</pre>
+
+<pre class="nim-code">
+func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError, ValueError], tags: [].}
 </pre>
 
 <h3 id="functionsDict">functionsDict</h3>

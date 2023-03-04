@@ -109,6 +109,7 @@ gt(a: float, b: float) bool
 gt(a: int, b: int) bool
 gte(a: float, b: float) bool
 gte(a: int, b: int) bool
+highlight(a: string) list
 if0(a: int, b: any, c: any) any
 if(a: bool, b: any, c: any) any
 int(a: float, b: string) int

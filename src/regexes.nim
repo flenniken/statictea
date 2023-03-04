@@ -79,8 +79,13 @@ const
     ## The maximum number of groups supported in the matchPattern
     ## procedure.
 
-var compliledPatterns = initTable[string, Regex]()
-  ## A cache of compiled regex patterns, mapping a pattern to Regex.
+type
+  CompilePattern* = Regex
+
+# todo: move cache to matches.nim
+
+var compliledPatterns = initTable[string, CompilePattern]()
+  ## A cache of compiled regex patterns, mapping a pattern to CompilePattern.
 
 type
   Matches* = object
@@ -231,7 +236,7 @@ func getGroups*(matchesO: Option[Matches], numGroups: Natural): seq[string] =
   assert(matchesO.isSome, "Not a match")
   result = matchesO.get().getGroups(numGroups)
   
-func matchRegex(str: string, regex: Regex, start: Natural,
+func matchRegex*(str: string, regex: CompilePattern, start: Natural,
     numGroups: Natural): Option[Matches] =
   ## Match a regular expression pattern in a string. Start is the
   ## index in the string to start the search. NumGroups is the number
@@ -254,13 +259,13 @@ func matchRegex(str: string, regex: Regex, start: Natural,
 
     result = some(matches)
 
-func compilePattern(pattern: string): Option[Regex] =
+func compilePattern*(pattern: string): Option[CompilePattern] =
   ## Compile the pattern and return a regex object.
   try:
     let regex = re(pattern)
     result = some(regex)
   except:
-    result = none(Regex)
+    result = none(CompilePattern)
 
 func matchPattern*(str: string, pattern: string,
     start: Natural, numGroups: Natural): Option[Matches] =
@@ -297,7 +302,7 @@ proc matchPatternCached*(str: string, pattern: string,
 proc replaceMany*(str: string, replacements: seq[Replacement]): Option[string] =
   ## Replace the patterns in the string with their replacements.
 
-  var subs: seq[tuple[pattern: Regex, repl: string]]
+  var subs: seq[tuple[pattern: CompilePattern, repl: string]]
   for r in replacements:
     let regexO = compilePattern(r.pattern)
     if not regexO.isSome:

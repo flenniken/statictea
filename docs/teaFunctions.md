@@ -41,6 +41,7 @@ variable or pass to another function.
 * [gt](#gt-1) &mdash; Return true when an int is greater then another int.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
 * [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
+* [highlight](#highlight) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
 * [if0](#if0) &mdash; If the condition is 0, return the second argument, else return the third argument.
 * [if](#if) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [int](#int) &mdash; Create an int from a float.
@@ -717,6 +718,37 @@ gte(3, 3) => true
 ~~~
 
 
+# highlight
+
+Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+
+~~~
+highlight(code: string) list
+~~~
+
+Tags:
+
+* other -- not one of the other types
+* func -- a function call, var followed by a left parenthesis
+* var -- a variable name
+* type -- int, float, string, list, dict, bool, any, true, false
+* num -- a literal number
+* string -- a literal string
+* doc -- a doc comment
+* comment -- a comment
+
+Example:
+
+~~~
+frags = highlight("a = 5")
+frags => [
+  ["var", "a"],
+  ["other", " = "],
+  ["num", "5"],
+]
+~~~
+
+
 # if0
 
 If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
@@ -1186,6 +1218,10 @@ lte(4, 3) => false
 
 Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
+~~~
+markdownList(mdText: string) list
+~~~
+
 list elements:
 
 * p -- A paragraph element is one string, possibly containing
@@ -1612,6 +1648,8 @@ stype:
 not quoted and special characters are not escaped.
 * dn -- dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
+* vl -- vertical list (vl) returns JSON except list elements
+are printed one per line as "ix: value".
 
 Examples variables:
 
@@ -1619,7 +1657,7 @@ Examples variables:
 str = "Earl Grey"
 pi = 3.14159
 one = 1
-a = [1, 2, 3]
+a = ["red", "green", "blue"]
 d = dict(["x", 1, "y", 2])
 fn = cmp[0]
 found = true
@@ -1631,7 +1669,7 @@ json:
 str => "Earl Grey"
 pi => 3.14159
 one => 1
-a => [1,2,3]
+a => ["red","green","blue"]
 d => {"x":1,"y":2}
 fn => "cmp"
 found => true
@@ -1654,6 +1692,17 @@ Same as JSON except the following.
 d =>
 x = 1
 y = 2
+~~~
+
+vl:
+
+Same as JSON except the following.
+
+~~~
+a =>
+0: "red"
+1: "green"
+2: "blue"
 ~~~
 
 

@@ -33,6 +33,10 @@ proc testNewSignatureO(signatureCode: string, expected: string,
   else:
     result = gotExpected($signatureO.get(), expected, "newSignatureO")
 
+proc testVerticalLines(value: Value, expected: string): bool =
+  let str = verticalLines(value)
+  result = gotExpected(str, expected)
+
 suite "vartypes":
 
   test "newValue string":
@@ -443,3 +447,36 @@ y = 2"""
     check strToParamType("list") == ptList
     check strToParamType("func") == ptFunc
     check strToParamType("any") == ptAny
+
+  test "verticalLines":
+    var listValue = newEmptyListValue()
+    let expected = "[]"
+    check testVerticalLines(listValue, expected)
+
+  test "verticalLines":
+    var listValue = newValue(["one", "two"])
+    let expected = """
+0: "one"
+1: "two"
+"""
+    check testVerticalLines(listValue, expected)
+
+  test "verticalLines 1":
+    var listValue = newValue([1])
+    let expected = """
+0: 1
+"""
+    check testVerticalLines(listValue, expected)
+
+  test "verticalLines lists":
+    var listValue = newEmptyListValue()
+    var subList0 = newValue([1,2,3])
+    var subList1 = newValue(["a","b","c"])
+    listValue.listv.list.add(subList0)
+    listValue.listv.list.add(subList1)
+
+    let expected = """
+0: [1,2,3]
+1: ["a","b","c"]
+"""
+    check testVerticalLines(listValue, expected)

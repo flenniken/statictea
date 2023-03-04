@@ -133,7 +133,7 @@ The variable 'missing' does not exist.
 
   test "ph f ":
     let eOut = """
-The f dictionary contains 73 functions and 50 names.
+The f dictionary contains 74 functions and 51 names.
 """
     check testHandleReplLine("ph f", eOut = eOut)
 

@@ -605,6 +605,36 @@ gte(3, 3) => true
 ~~~
 """
 
+  dc_fun_highlight_sl = """
+Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+
+~~~
+highlight(code: string) list
+~~~
+
+Tags:
+
+* other -- not one of the other types
+* func -- a function call, var followed by a left parenthesis
+* var -- a variable name
+* type -- int, float, string, list, dict, bool, any, true, false
+* num -- a literal number
+* string -- a literal string
+* doc -- a doc comment
+* comment -- a comment
+
+Example:
+
+~~~
+frags = highlight("a = 5")
+frags => [
+  ["var", "a"],
+  ["other", " = "],
+  ["num", "5"],
+]
+~~~
+"""
+
   dc_fun_if0_iaoaa = """
 If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
 
@@ -1054,6 +1084,10 @@ lte(4, 3) => false
   dc_fun_markdownLite_sl = """
 Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
+~~~
+markdownList(mdText: string) list
+~~~
+
 list elements:
 
 * p -- A paragraph element is one string, possibly containing
@@ -1464,6 +1498,8 @@ stype:
 not quoted and special characters are not escaped.
 * dn -- dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
+* vl -- vertical list (vl) returns JSON except list elements
+are printed one per line as "ix: value".
 
 Examples variables:
 
@@ -1471,7 +1507,7 @@ Examples variables:
 str = "Earl Grey"
 pi = 3.14159
 one = 1
-a = [1, 2, 3]
+a = ["red", "green", "blue"]
 d = dict(["x", 1, "y", 2])
 fn = cmp[0]
 found = true
@@ -1483,7 +1519,7 @@ json:
 str => "Earl Grey"
 pi => 3.14159
 one => 1
-a => [1,2,3]
+a => ["red","green","blue"]
 d => {"x":1,"y":2}
 fn => "cmp"
 found => true
@@ -1506,6 +1542,17 @@ Same as JSON except the following.
 d =>
 x = 1
 y = 2
+~~~
+
+vl:
+
+Same as JSON except the following.
+
+~~~
+a =>
+0: "red"
+1: "green"
+2: "blue"
 ~~~
 """
 
@@ -1648,6 +1695,7 @@ warn("always warn")
     info("fun_gt_iib", dc_fun_gt_iib, 19),
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
     info("fun_gte_iib", dc_fun_gte_iib, 19),
+    info("fun_highlight_sl", dc_fun_highlight_sl, 43),
     info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 58),
     info("fun_if_baoaa", dc_fun_if_baoaa, 39),
     info("fun_int_fosi", dc_fun_int_fosi, 35),
@@ -1667,7 +1715,7 @@ warn("always warn")
     info("fun_lt_iib", dc_fun_lt_iib, 19),
     info("fun_lte_ffb", dc_fun_lte_ffb, 20),
     info("fun_lte_iib", dc_fun_lte_iib, 20),
-    info("fun_markdownLite_sl", dc_fun_markdownLite_sl, 38),
+    info("fun_markdownLite_sl", dc_fun_markdownLite_sl, 44),
     info("fun_ne_ffb", dc_fun_ne_ffb, 19),
     info("fun_ne_iib", dc_fun_ne_iib, 19),
     info("fun_ne_ssb", dc_fun_ne_ssb, 19),
@@ -1683,7 +1731,7 @@ warn("always warn")
     info("fun_sort_lssil", dc_fun_sort_lssil, 29),
     info("fun_sort_lsssl", dc_fun_sort_lsssl, 29),
     info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 23),
-    info("fun_string_aoss", dc_fun_string_aoss, 86),
+    info("fun_string_aoss", dc_fun_string_aoss, 104),
     info("fun_string_sds", dc_fun_string_sds, 24),
     info("fun_sub_fff", dc_fun_sub_fff, 25),
     info("fun_sub_iii", dc_fun_sub_iii, 24),
@@ -1702,7 +1750,7 @@ warn("always warn")
     688,
     664,
     1845,
-    2369,
+    2387,
     1109,
     782,
     815,
@@ -1713,23 +1761,24 @@ warn("always warn")
     406,
     1258,
     1219,
-    2434,
-    2415,
-    2453,
+    2452,
+    2433,
+    2471,
     760,
     1146,
     903,
     946,
     920,
-    2238,
-    2272,
-    2293,
+    2256,
+    2290,
+    2311,
     529,
     481,
-    2549,
-    2530,
-    2587,
-    2568,
+    2567,
+    2548,
+    2605,
+    2586,
+    2769,
     567,
     625,
     973,
@@ -1745,18 +1794,18 @@ warn("always warn")
     1316,
     2047,
     1588,
-    2625,
-    2606,
-    2664,
-    2644,
-    2707,
-    2492,
-    2473,
-    2511,
-    2351,
-    2392,
+    2643,
+    2624,
+    2682,
+    2662,
+    2725,
+    2510,
+    2491,
+    2529,
+    2369,
+    2410,
     1533,
-    2684,
+    2702,
     1364,
     1474,
     2071,
@@ -1764,9 +1813,9 @@ warn("always warn")
     1754,
     1787,
     1816,
-    2328,
+    2346,
     2128,
-    2214,
+    2232,
     735,
     711,
     1883,

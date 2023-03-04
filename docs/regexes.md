@@ -44,6 +44,7 @@ check resultStringO.get() == "456456"
 * [regexes.nim](../src/regexes.nim) &mdash; Nim source code.
 # Index
 
+* type: [CompilePattern](#compilepattern) &mdash; 
 * type: [Matches](#matches) &mdash; Holds the result of a match.
 * type: [Replacement](#replacement) &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.
 * [newMatches](#newmatches) &mdash; Create a new Matches object with no groups.
@@ -66,10 +67,20 @@ check resultStringO.get() == "456456"
 * [get3GroupsLen](#get3groupslen) &mdash; Return the three groups and the length of the match.
 * [getGroups](#getgroups) &mdash; Return the number of groups specified.
 * [getGroups](#getgroups-1) &mdash; Return the number of groups specified.
+* [matchRegex](#matchregex) &mdash; Match a regular expression pattern in a string.
+* [compilePattern](#compilepattern-1) &mdash; Compile the pattern and return a regex object.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
 * [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular
 expression pattern for next time.
 * [replaceMany](#replacemany) &mdash; Replace the patterns in the string with their replacements.
+
+# CompilePattern
+
+
+
+```nim
+CompilePattern = Regex
+```
 
 # Matches
 
@@ -256,6 +267,23 @@ Return the number of groups specified. If one of the groups doesn't exist, "" is
 
 ```nim
 func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string] 
+```
+
+# matchRegex
+
+Match a regular expression pattern in a string. Start is the index in the string to start the search. NumGroups is the number of groups in the pattern.
+
+```nim
+func matchRegex(str: string; regex: CompilePattern; start: Natural;
+                numGroups: Natural): Option[Matches] 
+```
+
+# compilePattern
+
+Compile the pattern and return a regex object.
+
+```nim
+func compilePattern(pattern: string): Option[CompilePattern] 
 ```
 
 # matchPattern

@@ -48,13 +48,14 @@ Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 <ul>
 <li>type:  <a href="#ElementTag">ElementTag</a> &mdash; </li>
 <li>type:  <a href="#Element">Element</a> &mdash; </li>
+<li>type:  <a href="#FragmentType">FragmentType</a> &mdash; Hightlight fragments.</li>
+<li>type:  <a href="#Fragment">Fragment</a> &mdash; A fragment of a string.</li>
 <li> <a href="#newElement">newElement</a> &mdash; Create an Element object.</li>
 <li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the simple description markdown and return a list of elements.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Element.</li>
 <li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a list of Elements.</li>
-<li>type:  <a href="#FragmentType">FragmentType</a> &mdash; Hightlight fragments.</li>
-<li>type:  <a href="#Fragment">Fragment</a> &mdash; A fragment of a string.</li>
 <li> <a href="#newFragment">newFragment</a> &mdash; </li>
+<li> <a href="#newFragmentLen">newFragmentLen</a> &mdash; </li>
 <li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a Fragment.</li>
 <li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a sequence of fragments.</li>
 <li> <a href="#matchFragment">matchFragment</a> &mdash; Match a highlight fragment starting at the given position.</li>
@@ -78,6 +79,44 @@ ElementTag = enum
 Element = object
   tag*: ElementTag
   content*: seq[string]
+</pre>
+
+<h3 id="FragmentType">FragmentType</h3>
+
+<p>Hightlight fragments.
+
+</p><ul>
+<li>ftOther -- not one of the other types
+</li><li>ftType -- int, float, string, list, dict, bool, any, true, false
+</li><li>ftFunc -- a variable name followed by a left parenthesis
+</li><li>ftVarName -- a variable name
+</li><li>ftNumber -- a literal number
+</li><li>ftString -- a literal string
+</li><li>ftDocComment -- a ## to the end of the line
+</li><li>ftComment -- a # to the end of the line</li></ul>
+
+
+<pre class="nim-code">
+FragmentType = enum
+  ftOther = "other", ftType = "type", ftFunc = "func", ftVarName = "var",
+  ftNumber = "num", ftString = "string", ftDocComment = "doc",
+  ftComment = "comment"
+</pre>
+
+<h3 id="Fragment">Fragment</h3>
+
+<p>A fragment of a string.
+</p><ul>
+<li>kind -- the type of fragment
+</li><li>start -- the index in the string where the fragment starts
+</li><li>fEnd -- the end of the fragment + 1.</li></ul>
+
+
+<pre class="nim-code">
+Fragment = object
+  fragmentType*: FragmentType
+  start*: Natural
+  fEnd*: Natural
 </pre>
 
 <h3 id="newElement">newElement</h3>
@@ -133,47 +172,20 @@ func `$`(element: Element): string {.raises: [ValueError], tags: [].}
 func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
 </pre>
 
-<h3 id="FragmentType">FragmentType</h3>
-
-<p>Hightlight fragments.
-
-</p><ul>
-<li>ftType -- int, float, string, list, dict, bool, any, true, false
-</li><li>ftFunc -- a variable name followed by a left parenthesis
-</li><li>ftVarName -- a variable name
-</li><li>ftNumber -- a literal number
-</li><li>ftString -- a literal string
-</li><li>ftDocComment -- a ## to the end of the line
-</li><li>ftComment -- a # to the end of the line</li></ul>
-
-
-<pre class="nim-code">
-FragmentType = enum
-  ftType, ftFunc, ftVarName, ftNumber, ftString, ftDocComment, ftComment
-</pre>
-
-<h3 id="Fragment">Fragment</h3>
-
-<p>A fragment of a string.
-</p><ul>
-<li>kind -- the type of fragment
-</li><li>start -- the index in the string where the fragment starts
-</li><li>length -- the number of ascii characters in the fragment</li></ul>
-
-
-<pre class="nim-code">
-Fragment = object
-  fragmentType*: FragmentType
-  start*: Natural
-  length*: Natural
-</pre>
-
 <h3 id="newFragment">newFragment</h3>
 
 
 
 <pre class="nim-code">
-func newFragment(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
+func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
+</pre>
+
+<h3 id="newFragmentLen">newFragmentLen</h3>
+
+
+
+<pre class="nim-code">
+func newFragmentLen(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
 </pre>
 
 <h3 id="a__-2">`$`</h3>
@@ -197,8 +209,8 @@ func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
 <p>Match a highlight fragment starting at the given position.</p>
 
 <pre class="nim-code">
-proc matchFragment(line: string; start: Natural): Option[Fragment] {.
-    raises: [ValueError, KeyError], tags: [].}
+func matchFragment(line: string; start: Natural): Option[Fragment] {.
+    raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="highlightStaticTea">highlightStaticTea</h3>
@@ -206,8 +218,8 @@ proc matchFragment(line: string; start: Natural): Option[Fragment] {.
 <p>Identify all the fragments in the StaticTea code line to highlight. The fragments are ordered from left to right.</p>
 
 <pre class="nim-code">
-proc highlightStaticTea(codeLine: string): seq[Fragment] {.
-    raises: [ValueError, KeyError], tags: [].}
+func highlightStaticTea(codeText: string): seq[Fragment] {.raises: [ValueError],
+    tags: [].}
 </pre>
 
 

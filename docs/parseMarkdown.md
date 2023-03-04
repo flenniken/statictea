@@ -7,13 +7,14 @@ Parse the simple markdown used in the function descriptions.
 
 * type: [ElementTag](#elementtag) &mdash; 
 * type: [Element](#element) &mdash; 
+* type: [FragmentType](#fragmenttype) &mdash; Hightlight fragments.
+* type: [Fragment](#fragment) &mdash; A fragment of a string.
 * [newElement](#newelement) &mdash; Create an Element object.
 * [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of elements.
 * [`$`](#) &mdash; Return a string representation of an Element.
 * [`$`](#-1) &mdash; Return a string representation of a list of Elements.
-* type: [FragmentType](#fragmenttype) &mdash; Hightlight fragments.
-* type: [Fragment](#fragment) &mdash; A fragment of a string.
 * [newFragment](#newfragment) &mdash; 
+* [newFragmentLen](#newfragmentlen) &mdash; 
 * [`$`](#-2) &mdash; Return a string representation of a Fragment.
 * [`$`](#-3) &mdash; Return a string representation of a sequence of fragments.
 * [matchFragment](#matchfragment) &mdash; Match a highlight fragment starting at the given position.
@@ -36,6 +37,40 @@ ElementTag = enum
 Element = object
   tag*: ElementTag
   content*: seq[string]
+```
+
+# FragmentType
+
+Hightlight fragments.
+
+* ftOther -- not one of the other types
+* ftType -- int, float, string, list, dict, bool, any, true, false
+* ftFunc -- a variable name followed by a left parenthesis
+* ftVarName -- a variable name
+* ftNumber -- a literal number
+* ftString -- a literal string
+* ftDocComment -- a ## to the end of the line
+* ftComment -- a # to the end of the line
+
+```nim
+FragmentType = enum
+  ftOther = "other", ftType = "type", ftFunc = "func", ftVarName = "var",
+  ftNumber = "num", ftString = "string", ftDocComment = "doc",
+  ftComment = "comment"
+```
+
+# Fragment
+
+A fragment of a string.
+* kind -- the type of fragment
+* start -- the index in the string where the fragment starts
+* fEnd -- the end of the fragment + 1.
+
+```nim
+Fragment = object
+  fragmentType*: FragmentType
+  start*: Natural
+  fEnd*: Natural
 ```
 
 # newElement
@@ -85,43 +120,20 @@ Return a string representation of a list of Elements.
 func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
 ```
 
-# FragmentType
-
-Hightlight fragments.
-
-* ftType -- int, float, string, list, dict, bool, any, true, false
-* ftFunc -- a variable name followed by a left parenthesis
-* ftVarName -- a variable name
-* ftNumber -- a literal number
-* ftString -- a literal string
-* ftDocComment -- a ## to the end of the line
-* ftComment -- a # to the end of the line
-
-```nim
-FragmentType = enum
-  ftType, ftFunc, ftVarName, ftNumber, ftString, ftDocComment, ftComment
-```
-
-# Fragment
-
-A fragment of a string.
-* kind -- the type of fragment
-* start -- the index in the string where the fragment starts
-* length -- the number of ascii characters in the fragment
-
-```nim
-Fragment = object
-  fragmentType*: FragmentType
-  start*: Natural
-  length*: Natural
-```
-
 # newFragment
 
 
 
 ```nim
-func newFragment(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
+func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
+```
+
+# newFragmentLen
+
+
+
+```nim
+func newFragmentLen(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
 ```
 
 # `$`
@@ -145,8 +157,8 @@ func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
 Match a highlight fragment starting at the given position.
 
 ```nim
-proc matchFragment(line: string; start: Natural): Option[Fragment] {.
-    raises: [ValueError, KeyError], tags: [].}
+func matchFragment(line: string; start: Natural): Option[Fragment] {.
+    raises: [ValueError], tags: [].}
 ```
 
 # highlightStaticTea
@@ -154,8 +166,8 @@ proc matchFragment(line: string; start: Natural): Option[Fragment] {.
 Identify all the fragments in the StaticTea code line to highlight. The fragments are ordered from left to right.
 
 ```nim
-proc highlightStaticTea(codeLine: string): seq[Fragment] {.
-    raises: [ValueError, KeyError], tags: [].}
+func highlightStaticTea(codeText: string): seq[Fragment] {.raises: [ValueError],
+    tags: [].}
 ```
 
 

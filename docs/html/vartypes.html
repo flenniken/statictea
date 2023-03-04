@@ -108,6 +108,7 @@ Nim source code: <a href="../../src/vartypes.nim">vartypes.nim</a>
 <li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a Value.</li>
 <li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a VarsDict.</li>
 <li> <a href="#dotNameRep">dotNameRep</a> &mdash; Return a dot name string representation of a dictionary.</li>
+<li> <a href="#verticalLines">verticalLines</a> &mdash; Return a vertical lines string representation of a list.</li>
 <li> <a href="#newValueOr">newValueOr</a> &mdash; Create a new ValueOr containing a warning.</li>
 <li> <a href="#newValueOr-1">newValueOr</a> &mdash; Create a new ValueOr containing a warning.</li>
 <li> <a href="#newValueOr-2">newValueOr</a> &mdash; Create a new ValueOr containing a value.</li>
@@ -775,6 +776,15 @@ proc `$`(varsDict: VarsDict): string {.raises: [Exception], tags: [RootEffect].}
 <pre class="nim-code">
 func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string {.
     raises: [ValueError, Exception], tags: [RootEffect].}
+</pre>
+
+<h3 id="verticalLines">verticalLines</h3>
+
+<p>Return a vertical lines string representation of a list.</p>
+
+<pre class="nim-code">
+func verticalLines(value: Value): string {.raises: [Exception, ValueError],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="newValueOr">newValueOr</h3>
