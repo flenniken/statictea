@@ -3468,7 +3468,7 @@ other: *!␊@$␊
 a = 5
 """
     let expected = """
-varName: a
+dotName: a
 other: ␠=␠
 number: 5
 other: ␊
@@ -3477,10 +3477,10 @@ other: ␊
 
   test "highlightCode func, string, comment":
     let code = """
-tea = len("Earl Gray") # comment
+d.tea = len("Earl Gray") # comment
 """
     let expected = """
-varName: tea
+dotName: d.tea
 other: ␠=␠
 funcCall: len
 other: (
@@ -3495,7 +3495,7 @@ comment: #␠comment␊
 tea = int(4.3)
 """
     let expected = """
-varName: tea
+dotName: tea
 other: ␠=␠
 funcCall: int
 other: (
@@ -3511,12 +3511,12 @@ tea = "tea"
 asdf = concat("a", "b")
 """
     let expected = """
-varName: tea
+dotName: tea
 other: ␠=␠
 string: "tea"
 other: ␊
 comment: #␠hello␊
-varName: asdf
+dotName: asdf
 other: ␠=␠
 funcCall: concat
 other: (
@@ -3532,7 +3532,7 @@ other: )␊
 a =  add(   456  , 321   )
 """
     let expected = """
-varName: a
+dotName: a
 other: ␠=␠␠
 funcCall: add
 other: (␠␠␠
@@ -3552,7 +3552,7 @@ abc
 $1
 """ % tripleQuotes
     let expected = """
-varName: multi
+dotName: multi
 other: ␠=␠
 multiline: $1␊123␊abc␊"hello"␠asdf␊$1␊
 """ % tripleQuotes
@@ -3565,15 +3565,55 @@ a = func(num: int) int
   return(0)
 """ % tripleQuotes
     let expected = """
-varName: a
+dotName: a
 other: ␠=␠
 funcCall: func
 other: (
-varName: num
+paramName: num
 other: :␠
 paramType: int
 other: )␠
 paramType: int
+other: ␊␠␠
+doc: ##␠test␠function␊
+other: ␠␠
+funcCall: return
+other: (
+number: 0
+other: )␊
+""" % tripleQuotes
+    check testHighlightCode(code, expected)
+
+  test "highlightCode sig types":
+    let code = """
+a = func(num: int, str: string, d: dict, ls: optional list) any
+  ## test function
+  return(0)
+""" % tripleQuotes
+    let expected = """
+dotName: a
+other: ␠=␠
+funcCall: func
+other: (
+paramName: num
+other: :␠
+paramType: int
+other: ,␠
+paramName: str
+other: :␠
+paramType: string
+other: ,␠
+paramName: d
+other: :␠
+paramType: dict
+other: ,␠
+paramName: ls
+other: :␠
+paramType: optional
+other: ␠
+paramType: list
+other: )␠
+paramType: any
 other: ␊␠␠
 doc: ##␠test␠function␊
 other: ␠␠

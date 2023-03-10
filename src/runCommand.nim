@@ -2051,7 +2051,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     else:
       runningPos = leftName.pos
 
-    # Handle normal "varName operator right" statements.
+    # Handle normal "dotName operator right" statements.
 
     # Get the equal sign or &= and the following whitespace.
     let operatorO = matchEqualSign(statement.text, runningPos)
@@ -2539,7 +2539,8 @@ type
     ## @:* hlOther -- not one of the other types
     ## @:* hlParamType -- int, float, string, list, dict, bool, func, any and optional
     ## @:* hlFuncCall -- a variable name followed by a left parenthesis
-    ## @:* hlVarName -- a variable name
+    ## @:* hlDotName -- a dot name
+    ## @:* hlParamName -- a parameter name
     ## @:* hlNumber -- a literal number
     ## @:* hlStringType -- a literal string
     ## @:* hlDocComment -- a ## to the end of the line
@@ -2547,7 +2548,8 @@ type
     hlOther = "other",
     hlParamType = "paramType",
     hlFuncCall = "funcCall",
-    hlVarName = "varName",
+    hlDotName = "dotName",
+    hlParamName = "paramName",
     hlNumber = "number",
     hlStringType = "string",
     hlDocComment = "doc",
@@ -2615,16 +2617,22 @@ func highlightCode*(codeText: string): seq[Fragment2] =
   ## code. Unlighted areas are in "other" fragments. It doesn't
   ## validate but it works for valid code.
 
+  # debugEcho "---"
+  # debugEcho codeText
+  # debugEcho "---"
   type
     State = enum
       ## Parsing states.
-      other, varName, number, multiLine, beforeParam,
-      beforeType, param, paramType, beforeReturnType, returnType
+      other, dotName, number, multiLine, beforeParam,
+      beforeType, param, paramType, optionalType,
+      beforeReturnType, returnType
 
   template addFrag(fragmentType2: FragmentType2) =
     if currentPos > start:
       let frag = newFragment2(fragmentType2, start, currentPos)
+      # debugEcho "--- $1, '$2'" % [$fragmentType2, codeText[start .. currentPos-1]]
       result.add(frag)
+    start = currentPos
 
   var state = other
   var start = 0
@@ -2635,30 +2643,23 @@ func highlightCode*(codeText: string): seq[Fragment2] =
     if currentPos > codeText.len - 1:
       break
     let ch = codeText[currentPos]
-
+    # debugEcho "state = $1, ch = $2" % [$state, $ch]
     case state
     of other:
-      # The first character determines what type of fragment it is.
       case ch
-      of '0' .. '9', '-':
+      of '0'..'9', '-':
         # We have a number.
         addFrag(hlOther)
-        start = currentPos
         state = number
 
-      of 'a'..'z', 'A' .. 'Z':
-        # We have a variable name or function call or a function
-        # definition.
+      of 'a'..'z', 'A'..'Z':
+        # We have a dot name, function call or a function definition.
         addFrag(hlOther)
-        start = currentPos
-        state = varName
+        state = dotName
 
       of '#':
         # We have a comment or doc comment.
-
-        # Add the other fragment, if any.
         addFrag(hlOther)
-        start = currentPos
 
         # Find the end of the current line (plus 1).
         let lineEnd = lineEnd(codeText, currentPos)
@@ -2674,17 +2675,13 @@ func highlightCode*(codeText: string): seq[Fragment2] =
         # Add the doc comment or comment fragment.
         currentPos = lineEnd
         addFrag(tag)
-        start = currentPos
         state = other
         # Continue so currentPos equals start and isn't incremented at the end.
         continue
 
       of '"':
-        # Add the other fragment, if any.
-        addFrag(hlOther)
-        start = currentPos
-
         # We have a string type or multiline string.
+        addFrag(hlOther)
 
         let mLen = atMultiline(codeText, currentPos)
         if mLen != 0:
@@ -2700,7 +2697,6 @@ func highlightCode*(codeText: string): seq[Fragment2] =
           # Add the string fragment.
           currentPos = valuePosSiOr.value.pos
           addFrag(hlStringType)
-          start = currentPos
           state = other
       else:
         # Stay in the other state.
@@ -2712,10 +2708,9 @@ func highlightCode*(codeText: string): seq[Fragment2] =
         discard
       else:
         addFrag(hlNumber)
-        start = currentPos
         state = other
         
-    of varName:
+    of dotName:
       case ch
       of 'a'..'z', 'A'..'Z', '.', '_', '-':
         discard
@@ -2727,11 +2722,9 @@ func highlightCode*(codeText: string): seq[Fragment2] =
         else:
           state = other
         addFrag(hlFuncCall)
-        start = currentPos
       else:
-        # Variable name.
-        addFrag(hlVarName)
-        start = currentPos
+        # Dot name.
+        addFrag(hlDotName)
         state = other
 
     of multiLine:
@@ -2739,14 +2732,14 @@ func highlightCode*(codeText: string): seq[Fragment2] =
       if mLen != 0:
         currentPos += mLen
         addFrag(hlMultiline)
-        start = currentPos
         state = other
 
     of beforeParam:
       case ch
+      of ')':
+        state = beforeReturnType
       of 'a'..'z', 'A'..'Z':
         addFrag(hlOther)
-        start = currentPos
         state = param
       else:
         discard
@@ -2756,44 +2749,55 @@ func highlightCode*(codeText: string): seq[Fragment2] =
       of 'a'..'z', 'A'..'Z', '_', '-':
         discard
       else:
-        addFrag(hlVarName)
-        start = currentPos
+        addFrag(hlParamName)
         state = beforeType
 
     of beforeType:
       case ch
-      of 'a'..'z', 'A'..'Z':
+      of 'o':
         addFrag(hlOther)
-        start = currentPos
+        state = optionalType
+      of 'a'..'n', 'p'..'z':
+        addFrag(hlOther)
         state = paramType
       else:
         discard
 
     of paramType:
       case ch
-      of 'a'..'z', 'A'..'Z':
+      of ')':
+        addFrag(hlParamType)
+        state = beforeReturnType
+      # int, float, bool, string, dict, list, any
+      of 'a'..'z':
         discard
       else:
         addFrag(hlParamType)
-        start = currentPos
-        state = beforeReturnType
+        state = beforeParam
+
+    of optionalType:
+      case ch
+      # optional a-t
+      of 'a'..'t':
+        discard
+      else:
+        addFrag(hlParamType)
+        state = beforeType
 
     of beforeReturnType:
       case ch
-      of 'a'..'z', 'A'..'Z':
+      of 'a'..'z':
         addFrag(hlOther)
-        start = currentPos
         state = returnType
       else:
         discard
 
     of returnType:
       case ch
-      of 'a'..'z', 'A'..'Z':
+      of 'a'..'z':
         discard
       else:
         addFrag(hlParamType)
-        start = currentPos
         state = other
 
     inc(currentPos)
