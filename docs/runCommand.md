@@ -831,7 +831,8 @@ Hightlight fragments.
 * hlOther -- not one of the other types
 * hlParamType -- int, float, string, list, dict, bool, func, any and optional
 * hlFuncCall -- a variable name followed by a left parenthesis
-* hlVarName -- a variable name
+* hlDotName -- a dot name
+* hlParamName -- a parameter name
 * hlNumber -- a literal number
 * hlStringType -- a literal string
 * hlDocComment -- a ## to the end of the line
@@ -840,8 +841,9 @@ Hightlight fragments.
 ```nim
 FragmentType2 = enum
   hlOther = "other", hlParamType = "paramType", hlFuncCall = "funcCall",
-  hlVarName = "varName", hlNumber = "number", hlStringType = "string",
-  hlDocComment = "doc", hlComment = "comment", hlMultiline = "multiline"
+  hlDotName = "dotName", hlParamName = "paramName", hlNumber = "number",
+  hlStringType = "string", hlDocComment = "doc", hlComment = "comment",
+  hlMultiline = "multiline"
 ```
 
 # Fragment2

@@ -2600,7 +2600,7 @@ func atMultiline*(codeText: string, start: Natural): int =
     return 0
   if codeText[start+3] == '\r' and codeText[start+4] == '\n':
     return 5
-  return 0    
+  return 0
 
 func lineEnd*(str: string, start: Natural): int =
   ## Find the end of the line. It returns either one after the first
@@ -2625,7 +2625,7 @@ func highlightCode*(codeText: string): seq[Fragment2] =
       ## Parsing states.
       other, dotName, number, multiLine, beforeParam,
       beforeType, param, paramType, optionalType,
-      beforeReturnType, returnType
+      beforeReturnType, returnType, strLiteral, slash
 
   template addFrag(fragmentType2: FragmentType2) =
     if currentPos > start:
@@ -2688,20 +2688,25 @@ func highlightCode*(codeText: string): seq[Fragment2] =
           currentPos += mLen
           state = multiline
         else:
-          let valuePosSiOr = getString(codeText, start)
-          if valuePosSiOr.isMessage:
-            # Not really a string, skip ahead and treat is as Other.
-            currentPos = valuePosSiOr.message.pos
-            continue
-
-          # Add the string fragment.
-          currentPos = valuePosSiOr.value.pos
-          addFrag(hlStringType)
-          state = other
+          state = strLiteral
       else:
         # Stay in the other state.
         discard
-        
+
+    of strLiteral:
+      case ch
+      of '"':
+        inc(currentPos)
+        addFrag(hlStringType)
+        state = other
+      of '\\':
+        state = slash
+      else:
+        discard
+
+    of slash:
+      state = strLiteral
+
     of number:
       case ch
       of '0'..'9', '.':
@@ -2709,7 +2714,7 @@ func highlightCode*(codeText: string): seq[Fragment2] =
       else:
         addFrag(hlNumber)
         state = other
-        
+
     of dotName:
       case ch
       of 'a'..'z', 'A'..'Z', '.', '_', '-':
@@ -2743,7 +2748,7 @@ func highlightCode*(codeText: string): seq[Fragment2] =
         state = param
       else:
         discard
-      
+
     of param:
       case ch
       of 'a'..'z', 'A'..'Z', '_', '-':
@@ -2804,4 +2809,3 @@ func highlightCode*(codeText: string): seq[Fragment2] =
 
   if start < codeText.len:
     addFrag(hlOther)
-  

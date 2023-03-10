@@ -918,7 +918,8 @@ proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string])
 <li>hlOther -- not one of the other types
 </li><li>hlParamType -- int, float, string, list, dict, bool, func, any and optional
 </li><li>hlFuncCall -- a variable name followed by a left parenthesis
-</li><li>hlVarName -- a variable name
+</li><li>hlDotName -- a dot name
+</li><li>hlParamName -- a parameter name
 </li><li>hlNumber -- a literal number
 </li><li>hlStringType -- a literal string
 </li><li>hlDocComment -- a ## to the end of the line
@@ -928,8 +929,9 @@ proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string])
 <pre class="nim-code">
 FragmentType2 = enum
   hlOther = "other", hlParamType = "paramType", hlFuncCall = "funcCall",
-  hlVarName = "varName", hlNumber = "number", hlStringType = "string",
-  hlDocComment = "doc", hlComment = "comment", hlMultiline = "multiline"
+  hlDotName = "dotName", hlParamName = "paramName", hlNumber = "number",
+  hlStringType = "string", hlDocComment = "doc", hlComment = "comment",
+  hlMultiline = "multiline"
 </pre>
 
 <h3 id="Fragment2">Fragment2</h3>

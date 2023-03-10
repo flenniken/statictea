@@ -3623,3 +3623,12 @@ number: 0
 other: )␊
 """ % tripleQuotes
     check testHighlightCode(code, expected)
+
+  test "highlightCode drink me":
+    let code = "drink = $1\nme\n$1" % "\""
+    let expected = """
+dotName: drink
+other: ␠=␠
+string: "␊me␊"
+"""
+    check testHighlightCode(code, expected)
