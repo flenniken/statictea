@@ -83,13 +83,13 @@ func unescapePopularChar(popular: char): char
 
 Parse the quoted json string literal. The startPos points one
 past the leading double quote.  Return the parsed string value
-and the ending position after the trailing whitespace. On
+and the ending position after the trailing quote. On
 failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
 ~~~
 a = "test string"  # test
-     ^             ^
+     ^           ^
 ~~~
 
 ```nim

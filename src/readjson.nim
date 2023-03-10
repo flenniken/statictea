@@ -164,13 +164,13 @@ func unescapePopularChar*(popular: char): char =
 func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
   ## Parse the quoted json string literal. The startPos points one
   ## @:past the leading double quote.  Return the parsed string value
-  ## @:and the ending position after the trailing whitespace. On
+  ## @:and the ending position after the trailing quote. On
   ## @:failure, the ending position points at the invalid character and
   ## @:the message id tells what went wrong.
   ## @:
   ## @:~~~
   ## @:a = "test string"  # test
-  ## @:     ^             ^
+  ## @:     ^           ^
   ## @:~~~~
 
   if startPos >= text.len:
@@ -179,7 +179,7 @@ func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
   type
     State = enum
       ## Parsing states.
-      middle, slash, whitespace
+      middle, slash
 
   func getChar(text: string, pos: Natural): char =
     ## Get the char at the given position. If pos is past the end of
@@ -209,8 +209,8 @@ func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
         state = slash
         inc(pos)
       of '"':
-        state = whitespace
         inc(pos)
+        break
       of char(1)..char(0x1f):
         # Controls characters must be escaped.
         return newValuePosSiOr(wControlNotEscaped, "", pos)
@@ -239,11 +239,5 @@ func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
         newStr.add(ch)
         inc(pos)
       state = middle
-    of whitespace:
-      case getChar(text, pos):
-      of ' ', '\t', '\n', '\r':
-        inc(pos)
-      else:
-        break
 
   result = newValuePosSiOr(newValue(newStr), pos)

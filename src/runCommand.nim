@@ -572,7 +572,7 @@ func removeLineEnd*(s: string): string =
 
 iterator yieldStatements*(cmdLines: CmdLines): Statement =
   ## Iterate through the command's statements. A statement can be
-  ## blank or all whitespace.
+  ## blank or all whitespace. A statement doesn't end with a newline.
 
   type
     State {.pure.} = enum
@@ -732,7 +732,12 @@ func getMultilineStr*(text: string, start: Natural): ValuePosSiOr =
   let newStr = text[start + 1 .. text.len - 5]
   result = newValuePosSiOr(newStr, text.len)
 
-func getString*(statement: Statement, start: Natural): ValuePosSiOr =
+proc matchTabSpace2*(line: string, start: Natural = 0): Option[Matches] =
+  ## Match one or more spaces or tabs starting at the given position.
+  let pattern = r"[ \t]+"
+  result = matchPattern(line, pattern, start, 0)
+
+func getString*(str: string, start: Natural): ValuePosSiOr =
   ## Return a literal string value and position after it. The start
   ## parameter is the index of the first quote in the statement and
   ## the return position is after the optional trailing white space
@@ -743,17 +748,21 @@ func getString*(statement: Statement, start: Natural): ValuePosSiOr =
   ## @:      ^       ^
   ## @:~~~~
 
-  let str = statement.text
-
   # Parse the json string and remove escaping.
   result = parseJsonStr(str, start+1)
   if result.isMessage:
     return result
+  var runningPos = result.value.pos
+
+  # Skip whitespace, if any.
+  let spaceMatchO = matchTabSpace2(str, runningPos)
+  if isSome(spaceMatchO):
+    runningPos += spaceMatchO.get().length
+    result.value.pos = runningPos
 
   # A triple quoted string looks like an empty string with a quote
   # following it to the parseJsonStr function.
-  let pos = result.value.pos
-  if pos < str.len and pos == start+2 and str[start+2] == '"':
+  if runningPos < str.len and runningPos == start+2 and str[start+2] == '"':
     result = getMultilineStr(str, start+3)
 
 func getNumber*(statement: Statement, start: Natural): ValuePosSiOr =
@@ -1778,7 +1787,7 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
     # Expected a string, number, variable, list or condition.
     return newValuePosSiOr(wInvalidRightHandSide, "", start)
   of rtString:
-    result = getString(statement, start)
+    result = getString(statement.text, start)
   of rtNumber:
     result = getNumber(statement, start)
   of rtList:
@@ -1948,7 +1957,7 @@ proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
   let indexVarNameOr = getVariableName(statement.text, runningPos)
   if indexVarNameOr.isMessage:
     # Not a variable name, Look for a string literal.
-    let valuePosSiOr = getString(statement, runningPos)
+    let valuePosSiOr = getString(statement.text, runningPos)
     if valuePosSiOr.isMessage:
       # The index value must be a variable name or literal string.
       return newValuePosSiOr(wInvalidIndexValue, "", runningPos)
@@ -2522,3 +2531,273 @@ proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]
   for filename in codeList:
     runCodeFile(env, variables, filename)
     resetVariables(variables)
+
+type
+  FragmentType2* = enum
+    ## Hightlight fragments.
+    ## @:
+    ## @:* hlOther -- not one of the other types
+    ## @:* hlParamType -- int, float, string, list, dict, bool, func, any and optional
+    ## @:* hlFuncCall -- a variable name followed by a left parenthesis
+    ## @:* hlVarName -- a variable name
+    ## @:* hlNumber -- a literal number
+    ## @:* hlStringType -- a literal string
+    ## @:* hlDocComment -- a ## to the end of the line
+    ## @:* hlComment -- a # to the end of the line
+    hlOther = "other",
+    hlParamType = "paramType",
+    hlFuncCall = "funcCall",
+    hlVarName = "varName",
+    hlNumber = "number",
+    hlStringType = "string",
+    hlDocComment = "doc",
+    hlComment = "comment",
+    hlMultiline = "multiline"
+
+  Fragment2* = object
+    ## A fragment of a string.
+    ## @:* kind -- the type of fragment
+    ## @:* start -- the index in the string where the fragment starts
+    ## @:* fEnd -- the end of the fragment + 1.
+    fragmentType*: FragmentType2
+    # [start, end) half-open interval
+    start*: Natural
+    fEnd*: Natural
+
+func newFragment2*(fragmentType: FragmentType2, start: Natural, fEnd: Natural): Fragment2 =
+  result = Fragment2(fragmentType: fragmentType, start: start, fEnd: fEnd)
+
+func newFragmentLen2*(fragmentType: FragmentType2, start: Natural, length: Natural): Fragment2 =
+  result = Fragment2(fragmentType: fragmentType, start: start, fEnd: start+length)
+
+func `$`*(f: Fragment2): string =
+  ## Return a string representation of a Fragment.
+  result.add("$1, start: $2, end: $3" % [$f.fragmentType, $f.start, $f.fEnd])
+
+func `$`*(fragments: seq[Fragment2]): string =
+  ## Return a string representation of a sequence of fragments.
+  if fragments.len == 0:
+    return "no fragments"
+  for f in fragments:
+    result.add("$1, start: $2, fEnd: $3\n" % [$f.fragmentType, $f.start, $f.fEnd])
+
+func atMultiline*(codeText: string, start: Natural): int =
+  ## Determine whether the start index points a the start of a
+  ## multiline string. Return 0 when it doesn't. Return the position
+  ## after the triple quotes, either 4 or 5 depending on the line
+  ## endings.
+  # Look for """\n or """\r\n at start.
+  if codeText.len < 4:
+    return 0
+  if not (codeText[start] == '"' and codeText[start+1] == '"' and
+          codeText[start+2] == '"'):
+    return 0
+  if codeText[start+3] == '\n':
+    return 4
+  if codeText.len < 5:
+    return 0
+  if codeText[start+3] == '\r' and codeText[start+4] == '\n':
+    return 5
+  return 0    
+
+func lineEnd*(str: string, start: Natural): int =
+  ## Find the end of the line. It returns either one after the first
+  ## newline or after the end of the string.
+  let pos  = find(str[start .. ^1], '\n')
+  if pos == -1:
+    result = str.len
+  else:
+    result = start + pos + 1
+
+func highlightCode*(codeText: string): seq[Fragment2] =
+  ## Identify all the fragments in the StaticTea code to
+  ## highlight. Return a list of fragments that cover all the
+  ## code. Unlighted areas are in "other" fragments. It doesn't
+  ## validate but it works for valid code.
+
+  type
+    State = enum
+      ## Parsing states.
+      other, varName, number, multiLine, beforeParam,
+      beforeType, param, paramType, beforeReturnType, returnType
+
+  template addFrag(fragmentType2: FragmentType2) =
+    if currentPos > start:
+      let frag = newFragment2(fragmentType2, start, currentPos)
+      result.add(frag)
+
+  var state = other
+  var start = 0
+  var currentPos = 0
+
+  # Loop through the text one byte at a time.
+  while true:
+    if currentPos > codeText.len - 1:
+      break
+    let ch = codeText[currentPos]
+
+    case state
+    of other:
+      # The first character determines what type of fragment it is.
+      case ch
+      of '0' .. '9', '-':
+        # We have a number.
+        addFrag(hlOther)
+        start = currentPos
+        state = number
+
+      of 'a'..'z', 'A' .. 'Z':
+        # We have a variable name or function call or a function
+        # definition.
+        addFrag(hlOther)
+        start = currentPos
+        state = varName
+
+      of '#':
+        # We have a comment or doc comment.
+
+        # Add the other fragment, if any.
+        addFrag(hlOther)
+        start = currentPos
+
+        # Find the end of the current line (plus 1).
+        let lineEnd = lineEnd(codeText, currentPos)
+
+        # Determine whether it is a doc comment or comment.
+        var tag: FragmentType2
+        let plus1 = currentPos + 1
+        if plus1 < codeText.len and codeText[plus1] == '#':
+          tag = hlDocComment
+        else:
+          tag = hlComment
+
+        # Add the doc comment or comment fragment.
+        currentPos = lineEnd
+        addFrag(tag)
+        start = currentPos
+        state = other
+        # Continue so currentPos equals start and isn't incremented at the end.
+        continue
+
+      of '"':
+        # Add the other fragment, if any.
+        addFrag(hlOther)
+        start = currentPos
+
+        # We have a string type or multiline string.
+
+        let mLen = atMultiline(codeText, currentPos)
+        if mLen != 0:
+          currentPos += mLen
+          state = multiline
+        else:
+          let valuePosSiOr = getString(codeText, start)
+          if valuePosSiOr.isMessage:
+            # Not really a string, skip ahead and treat is as Other.
+            currentPos = valuePosSiOr.message.pos
+            continue
+
+          # Add the string fragment.
+          currentPos = valuePosSiOr.value.pos
+          addFrag(hlStringType)
+          start = currentPos
+          state = other
+      else:
+        # Stay in the other state.
+        discard
+        
+    of number:
+      case ch
+      of '0'..'9', '.':
+        discard
+      else:
+        addFrag(hlNumber)
+        start = currentPos
+        state = other
+        
+    of varName:
+      case ch
+      of 'a'..'z', 'A'..'Z', '.', '_', '-':
+        discard
+      of '(':
+        # Function call.
+        let name = codeText[start .. currentPos - 1]
+        if name == "func":
+          state = beforeParam
+        else:
+          state = other
+        addFrag(hlFuncCall)
+        start = currentPos
+      else:
+        # Variable name.
+        addFrag(hlVarName)
+        start = currentPos
+        state = other
+
+    of multiLine:
+      let mLen = atMultiline(codeText, currentPos)
+      if mLen != 0:
+        currentPos += mLen
+        addFrag(hlMultiline)
+        start = currentPos
+        state = other
+
+    of beforeParam:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        addFrag(hlOther)
+        start = currentPos
+        state = param
+      else:
+        discard
+      
+    of param:
+      case ch
+      of 'a'..'z', 'A'..'Z', '_', '-':
+        discard
+      else:
+        addFrag(hlVarName)
+        start = currentPos
+        state = beforeType
+
+    of beforeType:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        addFrag(hlOther)
+        start = currentPos
+        state = paramType
+      else:
+        discard
+
+    of paramType:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        discard
+      else:
+        addFrag(hlParamType)
+        start = currentPos
+        state = beforeReturnType
+
+    of beforeReturnType:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        addFrag(hlOther)
+        start = currentPos
+        state = returnType
+      else:
+        discard
+
+    of returnType:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        discard
+      else:
+        addFrag(hlParamType)
+        start = currentPos
+        state = other
+
+    inc(currentPos)
+
+  if start < codeText.len:
+    addFrag(hlOther)
+  

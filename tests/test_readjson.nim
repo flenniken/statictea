@@ -410,36 +410,36 @@ she sat down in a large arm-chair at one end of the table.
     check testParseJsonStr(""""""", 0, "", 1)
     check testParseJsonStr(""" """", 1, "", 2)
     check testParseJsonStr(""" """"", 2, "", 3)
-    check testParseJsonStr(""" "" """, 2, "", 4)
-    check testParseJsonStr(""" ""  """, 2, "", 5)
+    check testParseJsonStr(""" "" """, 2, "", 3)
+    check testParseJsonStr(""" ""  """, 2, "", 3)
 
-    check testParseJsonStr(""" "t" """, 2, "t", 5)
+    check testParseJsonStr(""" "t" """, 2, "t", 4)
     check testParseJsonStr(""" "t")""", 2, "t", 4)
     check testParseJsonStr(""" "t",9)""", 2, "t", 4)
-    check testParseJsonStr(""" "tea" """, 2, "tea", 7)
-    check testParseJsonStr(""" "tea" other""", 2, "tea", 7)
+    check testParseJsonStr(""" "tea" """, 2, "tea", 6)
+    check testParseJsonStr(""" "tea" other""", 2, "tea", 6)
 
   test "parseJsonStr popular escape":
-    check testParseJsonStr(""" "\b" """, 2, "\b", 6)
-    check testParseJsonStr(""" "\f" """, 2, "\f", 6)
-    check testParseJsonStr(""" "\n" """, 2, "\n", 6)
-    check testParseJsonStr(""" "\r" """, 2, "\r", 6)
-    check testParseJsonStr(""" "\t" """, 2, "\t", 6)
+    check testParseJsonStr(""" "\b" """, 2, "\b", 5)
+    check testParseJsonStr(""" "\f" """, 2, "\f", 5)
+    check testParseJsonStr(""" "\n" """, 2, "\n", 5)
+    check testParseJsonStr(""" "\r" """, 2, "\r", 5)
+    check testParseJsonStr(""" "\t" """, 2, "\t", 5)
 
   test "parseJsonStr unicode escape":
-    check testParseJsonStr(""" "\u0038" """, 2, "8", 10)
-    check testParseJsonStr(""" "\u03A6" """, 2, "Φ", 10)
-    check testParseJsonStr(""" "\u1E00" """, 2, "Ḁ", 10)
-    check testParseJsonStr(""" "\u8336" """, 2, "茶", 10)
-    check testParseJsonStr(""" "\uD834\uDD1E" """, 2, "\u{1D11E}", 16)
+    check testParseJsonStr(""" "\u0038" """, 2, "8", 9)
+    check testParseJsonStr(""" "\u03A6" """, 2, "Φ", 9)
+    check testParseJsonStr(""" "\u1E00" """, 2, "Ḁ", 9)
+    check testParseJsonStr(""" "\u8336" """, 2, "茶", 9)
+    check testParseJsonStr(""" "\uD834\uDD1E" """, 2, "\u{1D11E}", 15)
 
   test "parseJsonStr varying":
-    check testParseJsonStr(""" "\u0038 39 40 \t 50" """, 2, "8 39 40 \t 50", 22)
+    check testParseJsonStr(""" "\u0038 39 40 \t 50" """, 2, "8 39 40 \t 50", 21)
     check testParseJsonStr(""" "\t\n\r\"\\ \b\f\/ \u0039 \uD83D\uDE03" """, 2,
-                           "\t\n\r\"\\ \b\f/ 9 😃", 41)
+                           "\t\n\r\"\\ \b\f/ 9 😃", 40)
 
-    check testParseJsonStr(""" "a"	""", 2, "a", 5)
-    check testParseJsonStr(""" "a"	 """, 2, "a", 6)
+    check testParseJsonStr(""" "a"	""", 2, "a", 4)
+    check testParseJsonStr(""" "a"	 """, 2, "a", 4)
 
   test "parseJsonStr utf8":
     var str = bytesToString([0x31u8, 0x32, 0x33, 0x34, uint8('"')])

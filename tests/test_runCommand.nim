@@ -2,6 +2,7 @@ import std/os
 import std/unittest
 import std/options
 import std/strutils
+import std/strformat
 import std/tables
 import std/streams
 import runCommand
@@ -289,7 +290,7 @@ proc testStartColumn(text: string, start: Natural, eStr = "", message = "^"): bo
 proc testGetString(statement: Statement, start: Natural,
     eValuePosSiOr: ValuePosSiOr): bool =
 
-  let valueAndPosOr = getString(statement, start)
+  let valueAndPosOr = getString(statement.text, start)
   result = gotExpected($valueAndPosOr, $eValuePosSiOr)
   if not result:
     let numBytesStrO = sameNumBytesStr(statement.text)
@@ -306,7 +307,7 @@ proc testGetStringInvalid(buffer: seq[uint8]): bool =
   let str = bytesToString(buffer)
   let statement = newStatement("""a = "stringwithbadutf8:$1:end"""" % str)
   let start = 4
-  let valueAndPosOr = getString(statement, start)
+  let valueAndPosOr = getString(statement.text, start)
   let eValuePosSiOr = newValuePosSiOr(wInvalidUtf8ByteSeq, "23", 23)
   result = gotExpected($valueAndPosOr, $eValuePosSiOr)
   if not result:
@@ -625,6 +626,27 @@ proc testRunCodeFile(
     echo eVarRep
     result = false
 
+proc testHighlightCode(code: string, expected: string): bool =
+  ## Test highlightCode.
+  let fragments = highlightCode(code)
+  var got: string
+  for f in fragments:
+    let codeFrag = visibleControl(code[f.start .. f.fEnd - 1], spacesToo=true)
+    got.add(fmt("{f.fragmentType}: {codeFrag}") & "\n")
+  
+  if got == expected:
+    return true
+  echo "---code:"
+  for line in splitNewLines(code):
+    echo visibleControl(line)
+  if expected == "":
+    echo "---got:"
+    echo got
+    echo "---"
+  else:
+    echo linesSideBySide(got, expected)
+  return false
+
 proc testRemoveLineEnd(line: string, expected: string): bool =
   let got = removeLineEnd(line)
   result = gotExpected(got, expected)
@@ -848,9 +870,6 @@ $$ : c = len("hello")
     check testGetString(newStatement("""a = "hello"  """), 4,
       newValuePosSiOr("hello", 13))
 
-    check testGetString(newStatement("a = \"hello\"\n"), 4,
-      newValuePosSiOr("hello", 12))
-
     check testGetString(newStatement("a = \"hello\"   #\n"), 4,
       newValuePosSiOr("hello", 14))
 
@@ -1001,11 +1020,6 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "runStatement string":
     let statement = newStatement(text="""str = "testing" """, lineNum=1)
-    let eVariableDataOr = newVariableDataOr("str", opEqual, newValue("testing"))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "runStatement string newline":
-    let statement = newStatement(text="str = \"testing\"\n", lineNum=1)
     let eVariableDataOr = newVariableDataOr("str", opEqual, newValue("testing"))
     check testRunStatement(statement, eVariableDataOr)
 
@@ -3394,3 +3408,178 @@ o = {}
     let eErrLines: seq[string] = splitNewLines """
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
+
+  test "atMultiline":
+      check atMultiline("$1\n" % tripleQuotes, 0) == 4
+      check atMultiline(" $1\n" % tripleQuotes, 1) == 4
+      check atMultiline(" $1\n  " % tripleQuotes, 1) == 4
+      check atMultiline("$1\r\n" % tripleQuotes, 0) == 5
+      check atMultiline(" $1\r\n" % tripleQuotes, 1) == 5
+      check atMultiline(" $1\r\n  " % tripleQuotes, 1) == 5
+
+  test "atMultiline false":
+      check atMultiline("", 0) == 0
+      check atMultiline("a", 0) == 0
+      check atMultiline("\"", 0) == 0
+      check atMultiline("\"\n", 0) == 0
+      check atMultiline("\"\"\n", 0) == 0
+      check atMultiline("\"\"\"", 0) == 0
+      check atMultiline("\"\"\r\n", 0) == 0
+      check atMultiline("\"\"\"\r", 0) == 0
+
+  test "lineEnd":
+    check lineEnd("", 0) == 0
+    check lineEnd("a", 0) == 1
+    check lineEnd("ab", 0) == 2
+    check lineEnd("ab\n", 0) == 3
+    check lineEnd("ab\r\n", 0) == 4
+                  #01 234 5678
+    check lineEnd("ab\nde\nfg", 0) == 3
+    check lineEnd("ab\nde\nfg", 1) == 3
+    check lineEnd("ab\nde\nfg", 2) == 3
+    check lineEnd("ab\nde\nfg", 3) == 6
+    check lineEnd("ab\nde\nfg", 4) == 6
+    check lineEnd("ab\nde\nfg", 5) == 6
+    check lineEnd("ab\nde\nfg", 6) == 8
+    check lineEnd("ab\nde\nfg", 7) == 8
+
+  test "highlightCode empty":
+    check testHighlightCode("", "")
+
+  test "highlightCode one other":
+    let code = "**!@"
+    let expected = """
+other: **!@
+"""
+    check testHighlightCode(code, expected)
+
+  test "highlightCode symbols":
+    let code = """
+*!
+@$
+"""
+    let expected = """
+other: *!␊@$␊
+"""
+    check testHighlightCode(code, expected)
+
+  test "highlightCode a = 5":
+    let code = """
+a = 5
+"""
+    let expected = """
+varName: a
+other: ␠=␠
+number: 5
+other: ␊
+"""
+    check testHighlightCode(code, expected)
+
+  test "highlightCode func, string, comment":
+    let code = """
+tea = len("Earl Gray") # comment
+"""
+    let expected = """
+varName: tea
+other: ␠=␠
+funcCall: len
+other: (
+string: "Earl␠Gray"
+other: )␠
+comment: #␠comment␊
+"""
+    check testHighlightCode(code, expected)
+
+  test "highlightCode int func":
+    let code = """
+tea = int(4.3)
+"""
+    let expected = """
+varName: tea
+other: ␠=␠
+funcCall: int
+other: (
+number: 4.3
+other: )␊
+"""
+    check testHighlightCode(code, expected)
+
+  test "highlightCode var, string":
+    let code = """
+tea = "tea"
+# hello
+asdf = concat("a", "b")
+"""
+    let expected = """
+varName: tea
+other: ␠=␠
+string: "tea"
+other: ␊
+comment: #␠hello␊
+varName: asdf
+other: ␠=␠
+funcCall: concat
+other: (
+string: "a"
+other: ,␠
+string: "b"
+other: )␊
+"""
+    check testHighlightCode(code, expected)
+
+  test "highlightCode spaces":
+    let code = """
+a =  add(   456  , 321   )
+"""
+    let expected = """
+varName: a
+other: ␠=␠␠
+funcCall: add
+other: (␠␠␠
+number: 456
+other: ␠␠,␠
+number: 321
+other: ␠␠␠)␊
+"""
+    check testHighlightCode(code, expected)
+
+  test "highlightCode multiline":
+    let code = """
+multi = $1
+123
+abc
+"hello" asdf
+$1
+""" % tripleQuotes
+    let expected = """
+varName: multi
+other: ␠=␠
+multiline: $1␊123␊abc␊"hello"␠asdf␊$1␊
+""" % tripleQuotes
+    check testHighlightCode(code, expected)
+
+  test "highlightCode signature":
+    let code = """
+a = func(num: int) int
+  ## test function
+  return(0)
+""" % tripleQuotes
+    let expected = """
+varName: a
+other: ␠=␠
+funcCall: func
+other: (
+varName: num
+other: :␠
+paramType: int
+other: )␠
+paramType: int
+other: ␊␠␠
+doc: ##␠test␠function␊
+other: ␠␠
+funcCall: return
+other: (
+number: 0
+other: )␊
+""" % tripleQuotes
+    check testHighlightCode(code, expected)

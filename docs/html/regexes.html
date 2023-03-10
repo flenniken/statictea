@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -45,35 +67,41 @@ pre {
 
 </p><p>Match a string with "abc" in it:
 
-</p><pre class="desc-code">let line = "123abc456"
-let pattern = ".*abc"
-let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
+</p><pre class="desc-code">
+<span class="tag-var">let</span> <span class="tag-var">line</span> = <span class="tag-string">"123abc456"</span>
+<span class="tag-var">let</span> <span class="tag-var">pattern</span> = <span class="tag-string">".*abc"</span>
+<span class="tag-var">let</span> <span class="tag-var">matchesO</span> = <span class="tag-func">matchPattern(</span><span class="tag-var">line</span>, <span class="tag-var">pattern</span>, <span class="tag-var">start</span>=<span class="tag-num">0</span>, <span class="tag-var">numGroups</span>=<span class="tag-num">0</span>)
 
-check matchesO.isSome == true
-check matchesO.get().length == 6
-</pre><p>
+<span class="tag-var">check</span> <span class="tag-var">matchesO.isSome</span> == <span class="tag-true-false">true</span>
+<span class="tag-var">check</span> <span class="tag-func">matchesO.get(</span>)<span class="tag-num">.</span><span class="tag-var">length</span> == <span class="tag-num">6</span>
+</pre>
+<p>
 Match a file and line number like: filename(234):
 
-</p><pre class="desc-code">let line = "template.html(87)"
-let pattern = r"^(.*)(([0-9]+))$"
+</p><pre class="desc-code">
+<span class="tag-var">let</span> <span class="tag-var">line</span> = <span class="tag-string">"template.html(87)"</span>
+<span class="tag-var">let</span> <span class="tag-var">pattern</span> = <span class="tag-var">r</span>"^(.*)(([<span class="tag-num">0</span><span class="tag-num">-9</span>]+))$<span class="tag-string">"
 let matchesO = matchPatternCached(line, pattern, 0, 2)
 
 check matchesO.isSome == true
 let (filename, lineNum) = matchesO.get2Groups()
-check filename == "template.html"
-check lineNum == "87"
-</pre><p>
+check filename == "</span><span class="tag-var">template.html</span>"
+<span class="tag-var">check</span> <span class="tag-var">lineNum</span> == <span class="tag-string">"87"</span>
+</pre>
+<p>
 Replace the patterns in the string with their replacements:
 
-</p><pre class="desc-code">var replacements: seq[Replacement]
-replacements.add(newReplacement("abc", "456"))
-replacements.add(newReplacement("def", ""))
+</p><pre class="desc-code">
+<span class="tag-var">var</span> <span class="tag-var">replacements</span>: <span class="tag-var">seq</span>[<span class="tag-var">Replacement</span>]
+<span class="tag-func">replacements.add(</span><span class="tag-func">newReplacement(</span><span class="tag-string">"abc"</span>, <span class="tag-string">"456"</span>))
+<span class="tag-func">replacements.add(</span><span class="tag-func">newReplacement(</span><span class="tag-string">"def"</span>, <span class="tag-string">""</span>))
 
-let resultStringO = replaceMany("abcdefabc", replacements)
+<span class="tag-var">let</span> <span class="tag-var">resultStringO</span> = <span class="tag-func">replaceMany(</span><span class="tag-string">"abcdefabc"</span>, <span class="tag-var">replacements</span>)
 
-check resultStringO.isSome
-check resultStringO.get() == "456456"
+<span class="tag-var">check</span> <span class="tag-var">resultStringO.isSome</span>
+<span class="tag-var">check</span> <span class="tag-func">resultStringO.get(</span>) == <span class="tag-string">"456456"</span>
 </pre>
+
 
 Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
 

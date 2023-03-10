@@ -55,8 +55,8 @@ Hightlight fragments.
 ```nim
 FragmentType = enum
   ftOther = "other", ftType = "type", ftFunc = "func", ftVarName = "var",
-  ftNumber = "num", ftString = "string", ftDocComment = "doc",
-  ftComment = "comment"
+  ftNumber = "num", ftString = "string", ftTrueFalse = "true-false",
+  ftDocComment = "doc", ftComment = "comment"
 ```
 
 # Fragment

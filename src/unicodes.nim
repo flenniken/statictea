@@ -320,7 +320,7 @@ func slice*(str: string, start: int, length: int): FunResult =
     parameter = 2
   return newFunResultWarn(messageId, parameter)
 
-func visibleControl*(str: string): string =
+func visibleControl*(str: string, spacesToo=false): string =
   ## Return a new string with the tab and line endings and other
   ## control characters visible.
 
@@ -329,7 +329,12 @@ func visibleControl*(str: string): string =
     var num = uint(rune)
     # Show a special glyph for tab, carrage return and line feed and
     # other control characters.
-    if num <= 0x1f:
+    var top: uint
+    if spacesToo:
+      top = 0x20
+    else:
+      top = 0x1f
+    if num <= top:
       num = 0x00002400 + num
     visibleRunes.add(Rune(num))
   result = $visibleRunes

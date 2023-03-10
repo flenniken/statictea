@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+color: blue;
+}
+.tag-var {
+color: green;
+}
+.tag-type {
+color: red;
+}
+.tag-num {
+color: IndianRed;
+}
+.tag-string {
+color: SeaGreen;
+}
+.tag-doc {
+color: OrangeRed;
+}
+.tag-comment {
+color: FireBrick;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -64,14 +86,16 @@ Nim source code: <a href="../../src/parseCmdLine.nim">parseCmdLine.nim</a>
 
 <p>LineParts holds parsed components of a line.
 
-</p><pre class="desc-code">prefix command  [code]   [comment] [continuation]
-|      |        |        |         |[postfix]
-|      |        |        |         ||  [ending]
+</p><pre class="desc-code">
+<span class="tag-var">prefix</span> <span class="tag-var">command</span>  [<span class="tag-var">code</span>]   [<span class="tag-var">comment</span>] [<span class="tag-var">continuation</span>]
+|      |        |        |         |[<span class="tag-var">postfix</span>]
+|      |        |        |         ||  [<span class="tag-var">ending</span>]
 |      |        |        |         ||  |
-<!--$  nextline var = 5  # comment +-->n
+<!--$  <span class="tag-var">nextline</span> <span class="tag-var">var</span> = <span class="tag-num">5</span>  <span class="tag-comment"># comment +-->n</span>
      |
-     optional spaces
-</pre><p>
+     <span class="tag-var">optional</span> <span class="tag-var">spaces</span>
+</pre>
+<p>
 Whitespace must follow a command except on the last line of the file.
 codeStart is 0 when codeLen is 0.</p>
 

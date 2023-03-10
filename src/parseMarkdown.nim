@@ -33,6 +33,7 @@ type
     ftVarName = "var",
     ftNumber = "num",
     ftString = "string",
+    ftTrueFalse = "true-false",
     ftDocComment = "doc",
     ftComment = "comment",
 
@@ -202,34 +203,46 @@ func `$`*(fragments: seq[Fragment]): string =
 func matchFragment*(line: string, start: Natural): Option[Fragment] =
   ## Match a highlight fragment starting at the given position.
 
-  let numGroups = 7
-  let typeP = r"(true|false|int|string|float|dict|list|any|bool)\b"
-  let funcP = r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\("
-  let varNameP = r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\b"
-  let numP = r"(\-*[.0-9]*)\b"
-  let stringP = r"($1(?:\\.|[^\$1])*$1)" % "\""
-  let docCommentP = r"(##.*)"
-  let commentP = r"(#.*)"
-  let pattern = "$1|$2|$3|$4|$5|$6|$7" % [typeP, funcP, varNameP, numP, stringP, docCommentP, commentP]
 
-  func GroupToFragmentType(ix: int): FragmentType =
-    assert ord(low(FragmentType)) == 0
-    assert ord(high(FragmentType)) == 7
-    result = FragmentType(ix+1)
+  # todo: move the big pattern making and compiling out of the loop.
+  let patterns = [
+    (ftTrueFalse, r"\b(true|false)\b"),
+    (ftFunc, r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\("),
+    (ftType, r"optional\s*(int|string|float|dict|list|any|bool|func)\b"),
+    (ftType, r"[:\)]\s*(int|string|float|dict|list|any|bool|func)\b"),
+    (ftVarName, r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\b"),
+    (ftNumber, r"(\-*[.0-9]*)\b"),
+    (ftString, r"($1(?:\\.|[^\$1])*$1)" % "\""),
+    (ftDocComment, r"(##.*)"),
+    (ftComment, r"(#.*)"),
+  ]
 
-  # Compile the pattern.
-  let compiledPatternO = compilePattern(pattern)
+  # Generate an error when the number of patterns does not equal the
+  # number of types minus "other".
+  assert(patterns.len != ord(high(FragmentType))-1,
+    "\n\n\x1b[1;31mThe number of patterns does not equal the number of fragment types - 1.\x1b[0m")
+    
+  # Join the patterns together.
+  var bigPattern: string
+  for (_, pattern) in patterns:
+    if bigPattern.len > 0:
+      bigPattern.add("|")
+    bigPattern.add(pattern)
+    
+  # Compile the big pattern.
+  let compiledPatternO = compilePattern(bigPattern)
   if not compiledPatternO.isSome:
     return
   let compiledPattern = compiledPatternO.get()
 
-  let matchesO = matchRegex(line, compiledPattern, start, numGroups)
+  # Look for one of the patterns at the start position.
+  let matchesO = matchRegex(line, compiledPattern, start, patterns.len)
   if not matchesO.isSome:
     return
-  let groups = getGroups(matchesO.get(), numGroups)
+  let groups = getGroups(matchesO.get(), patterns.len)
   for ix, group in groups:
     if group != "":
-      let fragmentType = GroupToFragmentType(ix)
+      let (fragmentType, _) = patterns[ix]
       return some(newFragment(fragmentType, start, start+matchesO.get().length))
 
 func highlightStaticTea*(codeText: string): seq[Fragment] =

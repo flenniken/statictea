@@ -23,9 +23,24 @@ u.html-paragraph = func(item: list) string
   ## Return html given a "p" element md list.
   return(join(["<p>", item[0], "</p>"], ""))
 
+u.handle-fragment = func(ix: int, fragment: list, frags: list) bool
+  ## Make the html highlight the fragment and add it to frags.
+  tag = fragment[0]
+  str = fragment[1]
+  frags &= if((tag == "other"), str, +
+    format("<span class=\"tag-{tag}\">{str}</span>"))
+  return(false)
+
 u.html-code = func(item: list) string
   ## Return html given a "code" md element list.
-  return(join(["<pre class=\"desc-code\">", item[1], "</pre>"], ""))
+  lines = []
+  lines &= "<pre class=\"desc-code\">\n"
+  # todo: look at the ~~~ line and only highlight statictea code.
+  # todo: shorten the class names tvar, tstr, tdoc, etc.
+  # Syntax highlight the code.
+  listLoop(highlight(item[1]), lines, u.handle-fragment)
+  lines &= "</pre>\n"
+  return(join(lines, ""))
 
 u.html-bullets = func(item: list) string
   ## Return html given a "bullets" md element list.

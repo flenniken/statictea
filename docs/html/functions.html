@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -231,14 +253,18 @@ func parseNumber(line: string; start: Natural): ValuePosSiOr
 
 <p>Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
 
-</p><pre class="desc-code">let first = "Earl"
-let last = "Grey"
-"name: {first} {last}" => "name: Earl Grey"
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">let</span> <span class="tag-var">first</span> = <span class="tag-string">"Earl"</span>
+<span class="tag-var">let</span> <span class="tag-var">last</span> = <span class="tag-string">"Grey"</span>
+<span class="tag-string">"name: {first} {last}"</span> => <span class="tag-string">"name: Earl Grey"</span>
+</pre>
+<p>
 To enter a left bracket use two in a row.
 
-</p><pre class="desc-code">"{{" => "{"
+</p><pre class="desc-code">
+<span class="tag-string">"{{"</span> => <span class="tag-string">"{"</span>
 </pre>
+
 
 <pre class="nim-code">
 proc formatString(variables: Variables; text: string): StringOr {.
@@ -249,14 +275,18 @@ proc formatString(variables: Variables; text: string): StringOr {.
 
 <p>Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
-</p><pre class="desc-code">cmp(a: int, b: int) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">cmp(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">cmp(7, 9) => -1
-cmp(8, 8) => 0
-cmp(9, 2) => 1
+</p><pre class="desc-code">
+<span class="tag-func">cmp(</span><span class="tag-num">7</span>, <span class="tag-num">9</span>) => <span class="tag-num">-1</span>
+<span class="tag-func">cmp(</span><span class="tag-num">8</span>, <span class="tag-num">8</span>) => <span class="tag-num">0</span>
+<span class="tag-func">cmp(</span><span class="tag-num">9</span>, <span class="tag-num">2</span>) => <span class="tag-num">1</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -267,14 +297,18 @@ func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
-</p><pre class="desc-code">cmp(a: float, b: float) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">cmp(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">cmp(7.8, 9.1) => -1
-cmp(8.4, 8.4) => 0
-cmp(9.3, 2.2) => 1
+</p><pre class="desc-code">
+<span class="tag-func">cmp(</span><span class="tag-num">7.8</span>, <span class="tag-num">9.1</span>) => <span class="tag-num">-1</span>
+<span class="tag-func">cmp(</span><span class="tag-num">8.4</span>, <span class="tag-num">8.4</span>) => <span class="tag-num">0</span>
+<span class="tag-func">cmp(</span><span class="tag-num">9.3</span>, <span class="tag-num">2.2</span>) => <span class="tag-num">1</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -288,16 +322,20 @@ func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
 </p><p>You have the option to compare case insensitive. Case sensitive
 is the default.
 
-</p><pre class="desc-code">cmp(a: string, b: string, insensitive: optional bool) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">cmp(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span>, <span class="tag-var">insensitive</span>: <span class="tag-type">optional bool</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">cmp("coffee", "tea") => -1
-cmp("tea", "tea") => 0
-cmp("Tea", "tea") => 1
-cmp("Tea", "tea", true) => 1
-cmp("Tea", "tea", false) => 0
+</p><pre class="desc-code">
+<span class="tag-func">cmp(</span><span class="tag-string">"coffee"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-num">-1</span>
+<span class="tag-func">cmp(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-num">0</span>
+<span class="tag-func">cmp(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-num">1</span>
+<span class="tag-func">cmp(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"tea"</span>, <span class="tag-true-false">true</span>) => <span class="tag-num">1</span>
+<span class="tag-func">cmp(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"tea"</span>, <span class="tag-true-false">false</span>) => <span class="tag-num">0</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -308,13 +346,17 @@ func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Concatenate two strings. See the join function for more that two arguments.
 
-</p><pre class="desc-code">concat(a: string, b: string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">concat(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">concat("tea", " time") => "tea time"
-concat("a", "b") => "ab"
+</p><pre class="desc-code">
+<span class="tag-func">concat(</span><span class="tag-string">"tea"</span>, <span class="tag-string">" time"</span>) => <span class="tag-string">"tea time"</span>
+<span class="tag-func">concat(</span><span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>) => <span class="tag-string">"ab"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -325,13 +367,17 @@ func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Number of unicode characters in a string.
 
-</p><pre class="desc-code">len(str: string) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">len(</span><span class="tag-var">str</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">len("tea") => 3
-len("añyóng") => 6
+</p><pre class="desc-code">
+<span class="tag-func">len(</span><span class="tag-string">"tea"</span>) => <span class="tag-num">3</span>
+<span class="tag-func">len(</span><span class="tag-string">"añyóng"</span>) => <span class="tag-num">6</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -342,14 +388,18 @@ func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Number of elements in a list.
 
-</p><pre class="desc-code">len(list: list) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">len(</span><span class="tag-var">list</span><span class="tag-type">: list</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">len(list()) => 0
-len(list(1)) => 1
-len(list(4, 5)) => 2
+</p><pre class="desc-code">
+<span class="tag-func">len(</span><span class="tag-func">list(</span>)) => <span class="tag-num">0</span>
+<span class="tag-func">len(</span><span class="tag-func">list(</span><span class="tag-num">1</span>)) => <span class="tag-num">1</span>
+<span class="tag-func">len(</span><span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-num">5</span>)) => <span class="tag-num">2</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -360,14 +410,18 @@ func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Number of elements in a dictionary.
 
-</p><pre class="desc-code">len(dictionary: dict) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">len(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">len(dict()) => 0
-len(dict("a", 4)) => 1
-len(dict("a", 4, "b", 3)) => 2
+</p><pre class="desc-code">
+<span class="tag-func">len(</span><span class="tag-func">dict(</span>)) => <span class="tag-num">0</span>
+<span class="tag-func">len(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">4</span>)) => <span class="tag-num">1</span>
+<span class="tag-func">len(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">4</span>, <span class="tag-string">"b"</span>, <span class="tag-num">3</span>)) => <span class="tag-num">2</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -378,24 +432,30 @@ func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
 
-</p><pre class="desc-code">get(list: list, index: int, default: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">get(</span><span class="tag-var">list</span><span class="tag-type">: list</span>, <span class="tag-var">index</span><span class="tag-type">: int</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">list = list(4, "a", 10)
-get(list, 0) => 4
-get(list, 1) => "a"
-get(list, 2) => 10
-get(list, 3, 99) => 99
-get(list, -1) => 10
-get(list, -2) => "a"
-get(list, -3) => 4
-get(list, -4, 11) => 11
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">list</span> = <span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-string">"a"</span>, <span class="tag-num">10</span>)
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">0</span>) => <span class="tag-num">4</span>
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">1</span>) => <span class="tag-string">"a"</span>
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">2</span>) => <span class="tag-num">10</span>
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">3</span>, <span class="tag-num">99</span>) => <span class="tag-num">99</span>
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-1</span>) => <span class="tag-num">10</span>
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-2</span>) => <span class="tag-string">"a"</span>
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-3</span>) => <span class="tag-num">4</span>
+<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-4</span>, <span class="tag-num">11</span>) => <span class="tag-num">11</span>
+</pre>
+<p>
 You can also use bracket notation to access list items.
 
-</p><pre class="desc-code">a = teas[0]
+</p><pre class="desc-code">
+<span class="tag-var">a</span> = <span class="tag-var">teas</span>[<span class="tag-num">0</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -406,21 +466,27 @@ func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
 
-</p><pre class="desc-code">get(dictionary: dict, key: string, default: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">get(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span>, <span class="tag-var">key</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Note: For dictionary lookup you can use dot notation. It's the
 same as get without the default.
 
 </p><p>Examples:
 
-</p><pre class="desc-code">d = dict("tea", "Earl Grey")
-get(d, "tea") => "Earl Grey"
-get(d, "coffee", "Tea") => "Tea"
-</pre><p>
-Using dot notation:
-</p><pre class="desc-code">d = dict("tea", "Earl Grey")
-d.tea => "Earl Grey"
+</p><pre class="desc-code">
+<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"Earl Grey"</span>)
+<span class="tag-func">get(</span><span class="tag-var">d</span>, <span class="tag-string">"tea"</span>) => <span class="tag-string">"Earl Grey"</span>
+<span class="tag-func">get(</span><span class="tag-var">d</span>, <span class="tag-string">"coffee"</span>, <span class="tag-string">"Tea"</span>) => <span class="tag-string">"Tea"</span>
 </pre>
+<p>
+Using dot notation:
+</p><pre class="desc-code">
+<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"Earl Grey"</span>)
+<span class="tag-var">d.tea</span> => <span class="tag-string">"Earl Grey"</span>
+</pre>
+
 
 <pre class="nim-code">
 func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -446,31 +512,37 @@ func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>The IF functions are special in a couple of ways, see
 the If Functions section.
 
-</p><pre class="desc-code">if0(condition: any, then: any, else: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">if0(</span><span class="tag-var">condition</span><span class="tag-type">: any</span>, <span class="tag-var">then</span><span class="tag-type">: any</span>, <span class="tag-var">else</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">a = if0(0, "tea", "beer") => tea
-a = if0(1, "tea", "beer") => beer
-a = if0(4, "tea", "beer") => beer
-a = if0("", "tea", "beer") => tea
-a = if0("abc", "tea", "beer") => beer
-a = if0([], "tea", "beer") => tea
-a = if0([1,2], "tea", "beer") => beer
-a = if0(dict(), "tea", "beer") => tea
-a = if0(dict("a",1), "tea", "beer") => beer
-a = if0(false, "tea", "beer") => tea
-a = if0(true, "tea", "beer") => beer
+</p><pre class="desc-code">
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-num">0</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-num">1</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-num">4</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-string">""</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-string">"abc"</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span>[], <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span>[<span class="tag-num">1</span>,<span class="tag-num">2</span>], <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-func">dict(</span>), <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>,<span class="tag-num">1</span>), <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">false</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">true</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
 
-a = if0(true, "tea")
-a = if0(false, "tea")
-</pre><p>
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">true</span>, <span class="tag-string">"tea"</span>)
+<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">false</span>, <span class="tag-string">"tea"</span>)
+</pre>
+<p>
 You don't have to assign the result of an if0 function which is
 useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
-</p><pre class="desc-code">if0(c, warn("got zero value"))
+</p><pre class="desc-code">
+<span class="tag-func">if0(</span><span class="tag-var">c</span>, <span class="tag-func">warn(</span><span class="tag-string">"got zero value"</span>))
 </pre>
+
 
 <pre class="nim-code">
 func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult 
@@ -485,22 +557,28 @@ the If Functions section.  You usually use boolean infix
 expressions for the condition, see:
 the Boolean Expressions section.
 
-</p><pre class="desc-code">if(condition: bool, then: any, else: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">if(</span><span class="tag-var">condition</span><span class="tag-type">: bool</span>, <span class="tag-var">then</span><span class="tag-type">: any</span>, <span class="tag-var">else</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">a = if(true, "tea", "beer") # => tea
-b = if(false, "tea", "beer") # => beer
-c = if((v < 5), "tea", "beer")
-d = if((v < 5), "tea")
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">a</span> = <span class="tag-func">if(</span><span class="tag-true-false">true</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) <span class="tag-comment"># => tea</span>
+<span class="tag-var">b</span> = <span class="tag-func">if(</span><span class="tag-true-false">false</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) <span class="tag-comment"># => beer</span>
+<span class="tag-var">c</span> = <span class="tag-func">if(</span>(<span class="tag-var">v</span> < <span class="tag-num">5</span>), <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>)
+<span class="tag-var">d</span> = <span class="tag-func">if(</span>(<span class="tag-var">v</span> < <span class="tag-num">5</span>), <span class="tag-string">"tea"</span>)
+</pre>
+<p>
 You don't have to assign the result of an if function which is
 useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
-</p><pre class="desc-code">if(c, warn("c is true"))
-if(c, return("skip"))
+</p><pre class="desc-code">
+<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">warn(</span><span class="tag-string">"c is true"</span>))
+<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-string">"skip"</span>))
 </pre>
+
 
 <pre class="nim-code">
 func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult 
@@ -510,14 +588,18 @@ func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 
 <p>Add two integers. A warning is generated on overflow.
 
-</p><pre class="desc-code">add(a: int, b: int) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">add(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">add(1, 2) => 3
-add(3, -2) => 1
-add(-2, -5) => -7
+</p><pre class="desc-code">
+<span class="tag-func">add(</span><span class="tag-num">1</span>, <span class="tag-num">2</span>) => <span class="tag-num">3</span>
+<span class="tag-func">add(</span><span class="tag-num">3</span>, <span class="tag-num">-2</span>) => <span class="tag-num">1</span>
+<span class="tag-func">add(</span><span class="tag-num">-2</span>, <span class="tag-num">-5</span>) => <span class="tag-num">-7</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -528,13 +610,17 @@ func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Add two floats. A warning is generated on overflow.
 
-</p><pre class="desc-code">add(a: float, b: float) float
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">add(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) float</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">add(1.5, 2.3) => 3.8
-add(3.2, -2.2) => 1.0
+</p><pre class="desc-code">
+<span class="tag-func">add(</span><span class="tag-num">1.5</span>, <span class="tag-num">2.3</span>) => <span class="tag-num">3.8</span>
+<span class="tag-func">add(</span><span class="tag-num">3.2</span>, <span class="tag-num">-2.2</span>) => <span class="tag-num">1.0</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -545,14 +631,18 @@ func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Subtract two integers. A warning is generated on overflow.
 
-</p><pre class="desc-code">sub(a: int, b: int) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">sub(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">sub(3, 1) => 2
-add(3, -2) => 5
-add(1, 5) => -4
+</p><pre class="desc-code">
+<span class="tag-func">sub(</span><span class="tag-num">3</span>, <span class="tag-num">1</span>) => <span class="tag-num">2</span>
+<span class="tag-func">add(</span><span class="tag-num">3</span>, <span class="tag-num">-2</span>) => <span class="tag-num">5</span>
+<span class="tag-func">add(</span><span class="tag-num">1</span>, <span class="tag-num">5</span>) => <span class="tag-num">-4</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -563,13 +653,17 @@ func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Subtract two floats. A warning is generated on overflow.
 
-</p><pre class="desc-code">sub(a: float, b: float) float
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">sub(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) float</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">sub(4.5, 2.3) => 2.2
-sub(1.0, 2.2) => -1.2
+</p><pre class="desc-code">
+<span class="tag-func">sub(</span><span class="tag-num">4.5</span>, <span class="tag-num">2.3</span>) => <span class="tag-num">2.2</span>
+<span class="tag-func">sub(</span><span class="tag-num">1.0</span>, <span class="tag-num">2.2</span>) => <span class="tag-num">-1.2</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -580,14 +674,18 @@ func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
-</p><pre class="desc-code">exists(dictionary: dict, key: string) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">exists(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span>, <span class="tag-var">key</span><span class="tag-type">: string</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">d = dict("tea", "Earl")
-exists(d, "tea") => true
-exists(d, "coffee") => false
+</p><pre class="desc-code">
+<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"Earl"</span>)
+<span class="tag-func">exists(</span><span class="tag-var">d</span>, <span class="tag-string">"tea"</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">exists(</span><span class="tag-var">d</span>, <span class="tag-string">"coffee"</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -608,17 +706,21 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be integers. The return values
 can be any type.
 
-</p><pre class="desc-code">case(condition: int, pairs: list, default: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">case(</span><span class="tag-var">condition</span><span class="tag-type">: int</span>, <span class="tag-var">pairs</span><span class="tag-type">: list</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">cases = list(0, "tea", 1, "water", 2, "beer")
-case(0, cases) => "tea"
-case(1, cases) => "water"
-case(2, cases) => "beer"
-case(2, cases, "wine") => "beer"
-case(3, cases, "wine") => "wine"
+</p><pre class="desc-code">
+<span class="tag-var">cases</span> = <span class="tag-func">list(</span><span class="tag-num">0</span>, <span class="tag-string">"tea"</span>, <span class="tag-num">1</span>, <span class="tag-string">"water"</span>, <span class="tag-num">2</span>, <span class="tag-string">"beer"</span>)
+<span class="tag-func">case(</span><span class="tag-num">0</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"tea"</span>
+<span class="tag-func">case(</span><span class="tag-num">1</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"water"</span>
+<span class="tag-func">case(</span><span class="tag-num">2</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"beer"</span>
+<span class="tag-func">case(</span><span class="tag-num">2</span>, <span class="tag-var">cases</span>, <span class="tag-string">"wine"</span>) => <span class="tag-string">"beer"</span>
+<span class="tag-func">case(</span><span class="tag-num">3</span>, <span class="tag-var">cases</span>, <span class="tag-string">"wine"</span>) => <span class="tag-string">"wine"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -639,16 +741,20 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be strings. The return values
 can be any type.
 
-</p><pre class="desc-code">case(condition: string, pairs: list, default: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">case(</span><span class="tag-var">condition</span><span class="tag-type">: string</span>, <span class="tag-var">pairs</span><span class="tag-type">: list</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">cases = list("tea", 15, "water", 2.3, "beer", "cold")
-case("tea", cases) => 15
-case("water", cases) => 2.3
-case("beer", cases) => "cold"
-case("bunch", cases, "other") => "other"
+</p><pre class="desc-code">
+<span class="tag-var">cases</span> = <span class="tag-func">list(</span><span class="tag-string">"tea"</span>, <span class="tag-num">15</span>, <span class="tag-string">"water"</span>, <span class="tag-num">2.3</span>, <span class="tag-string">"beer"</span>, <span class="tag-string">"cold"</span>)
+<span class="tag-func">case(</span><span class="tag-string">"tea"</span>, <span class="tag-var">cases</span>) => <span class="tag-num">15</span>
+<span class="tag-func">case(</span><span class="tag-string">"water"</span>, <span class="tag-var">cases</span>) => <span class="tag-num">2.3</span>
+<span class="tag-func">case(</span><span class="tag-string">"beer"</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"cold"</span>
+<span class="tag-func">case(</span><span class="tag-string">"bunch"</span>, <span class="tag-var">cases</span>, <span class="tag-string">"other"</span>) => <span class="tag-string">"other"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -667,18 +773,22 @@ func parseVersion(version: string): Option[(int, int, int)]
 
 <p>Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
-</p><pre class="desc-code">cmpVersion(versionA: string, versionB: string) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">cmpVersion(</span><span class="tag-var">versionA</span><span class="tag-type">: string</span>, <span class="tag-var">versionB</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
+</pre>
+<p>
 StaticTea uses [[https://semver.org/][Semantic Versioning]]
 with the added restriction that each version component has one
 to three digits (no letters).
 
 </p><p>Examples:
 
-</p><pre class="desc-code">cmpVersion("1.2.5", "1.1.8") => 1
-cmpVersion("1.2.5", "1.3.0") => -1
-cmpVersion("1.2.5", "1.2.5") => 0
+</p><pre class="desc-code">
+<span class="tag-func">cmpVersion(</span><span class="tag-string">"1.2.5"</span>, <span class="tag-string">"1.1.8"</span>) => <span class="tag-num">1</span>
+<span class="tag-func">cmpVersion(</span><span class="tag-string">"1.2.5"</span>, <span class="tag-string">"1.3.0"</span>) => <span class="tag-num">-1</span>
+<span class="tag-func">cmpVersion(</span><span class="tag-string">"1.2.5"</span>, <span class="tag-string">"1.2.5"</span>) => <span class="tag-num">0</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -689,13 +799,17 @@ func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult 
 
 <p>Create a float from an int.
 
-</p><pre class="desc-code">float(num: int) float
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">float(</span><span class="tag-var">num</span><span class="tag-type">: int</span><span class="tag-type">) float</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">float(2) => 2.0
-float(-33) => -33.0
+</p><pre class="desc-code">
+<span class="tag-func">float(</span><span class="tag-num">2</span>) => <span class="tag-num">2.0</span>
+<span class="tag-func">float(</span><span class="tag-num">-33</span>) => <span class="tag-num">-33.0</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -706,14 +820,18 @@ func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create a float from a number string.
 
-</p><pre class="desc-code">float(numString: string) float
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">float(</span><span class="tag-var">numString</span><span class="tag-type">: string</span><span class="tag-type">) float</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">float("2") => 2.0
-float("2.4") => 2.4
-float("33") => 33.0
+</p><pre class="desc-code">
+<span class="tag-func">float(</span><span class="tag-string">"2"</span>) => <span class="tag-num">2.0</span>
+<span class="tag-func">float(</span><span class="tag-string">"2.4"</span>) => <span class="tag-num">2.4</span>
+<span class="tag-func">float(</span><span class="tag-string">"33"</span>) => <span class="tag-num">33.0</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -724,13 +842,17 @@ func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create a float from a number string. If the string is not a number, return the default.
 
-</p><pre class="desc-code">float(numString: string, default: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">float(</span><span class="tag-var">numString</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">float("2") => 2.0
-float("notnum", "nan") => nan
+</p><pre class="desc-code">
+<span class="tag-func">float(</span><span class="tag-string">"2"</span>) => <span class="tag-num">2.0</span>
+<span class="tag-func">float(</span><span class="tag-string">"notnum"</span>, <span class="tag-string">"nan"</span>) => <span class="tag-var">nan</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -741,8 +863,10 @@ func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create an int from a float.
 
-</p><pre class="desc-code">int(num: float, roundOption: optional string) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">int(</span><span class="tag-var">num</span><span class="tag-type">: float</span>, <span class="tag-var">roundOption</span>: <span class="tag-type">optional string</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Round options:
 
 </p><ul>
@@ -754,18 +878,20 @@ Round options:
 </li></ul>
 <p>Examples:
 
-</p><pre class="desc-code">int(2.34) => 2
-int(2.34, "round") => 2
-int(-2.34, "round") => -2
-int(6.5, "round") => 7
-int(-6.5, "round") => -7
-int(4.57, "floor") => 4
-int(-4.57, "floor") => -5
-int(6.3, "ceiling") => 7
-int(-6.3, "ceiling") => -6
-int(6.3456, "truncate") => 6
-int(-6.3456, "truncate") => -6
+</p><pre class="desc-code">
+<span class="tag-func">int(</span><span class="tag-num">2.34</span>) => <span class="tag-num">2</span>
+<span class="tag-func">int(</span><span class="tag-num">2.34</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">2</span>
+<span class="tag-func">int(</span><span class="tag-num">-2.34</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-2</span>
+<span class="tag-func">int(</span><span class="tag-num">6.5</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">7</span>
+<span class="tag-func">int(</span><span class="tag-num">-6.5</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-7</span>
+<span class="tag-func">int(</span><span class="tag-num">4.57</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">4</span>
+<span class="tag-func">int(</span><span class="tag-num">-4.57</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">-5</span>
+<span class="tag-func">int(</span><span class="tag-num">6.3</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">7</span>
+<span class="tag-func">int(</span><span class="tag-num">-6.3</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">-6</span>
+<span class="tag-func">int(</span><span class="tag-num">6.3456</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">6</span>
+<span class="tag-func">int(</span><span class="tag-num">-6.3456</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">-6</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -776,8 +902,10 @@ func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create an int from a number string.
 
-</p><pre class="desc-code">int(numString: string, roundOption: optional string) int
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">int(</span><span class="tag-var">numString</span><span class="tag-type">: string</span>, <span class="tag-var">roundOption</span>: <span class="tag-type">optional string</span><span class="tag-type">) int</span>
+</pre>
+<p>
 Round options:
 
 </p><ul>
@@ -789,18 +917,20 @@ Round options:
 </li></ul>
 <p>Examples:
 
-</p><pre class="desc-code">int("2") => 2
-int("2.34") => 2
-int("-2.34", "round") => -2
-int("6.5", "round") => 7
-int("-6.5", "round") => -7
-int("4.57", "floor") => 4
-int("-4.57", "floor") => -5
-int("6.3", "ceiling") => 7
-int("-6.3", "ceiling") => -6
-int("6.3456", "truncate") => 6
-int("-6.3456", "truncate") => -6
+</p><pre class="desc-code">
+<span class="tag-func">int(</span><span class="tag-string">"2"</span>) => <span class="tag-num">2</span>
+<span class="tag-func">int(</span><span class="tag-string">"2.34"</span>) => <span class="tag-num">2</span>
+<span class="tag-func">int(</span><span class="tag-string">"-2.34"</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-2</span>
+<span class="tag-func">int(</span><span class="tag-string">"6.5"</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">7</span>
+<span class="tag-func">int(</span><span class="tag-string">"-6.5"</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-7</span>
+<span class="tag-func">int(</span><span class="tag-string">"4.57"</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">4</span>
+<span class="tag-func">int(</span><span class="tag-string">"-4.57"</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">-5</span>
+<span class="tag-func">int(</span><span class="tag-string">"6.3"</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">7</span>
+<span class="tag-func">int(</span><span class="tag-string">"-6.3"</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">-6</span>
+<span class="tag-func">int(</span><span class="tag-string">"6.3456"</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">6</span>
+<span class="tag-func">int(</span><span class="tag-string">"-6.3456"</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">-6</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -811,8 +941,10 @@ func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create an int from a number string. If the string is not a number, return the default value.
 
-</p><pre class="desc-code">int(numString: string, roundOption: string, default: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">int(</span><span class="tag-var">numString</span><span class="tag-type">: string</span>, <span class="tag-var">roundOption</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Round options:
 
 </p><ul>
@@ -824,9 +956,11 @@ Round options:
 </li></ul>
 <p>Examples:
 
-</p><pre class="desc-code">int("2", "round", "nan") => 2
-int("notnum", "round", "nan") => nan
+</p><pre class="desc-code">
+<span class="tag-func">int(</span><span class="tag-string">"2"</span>, <span class="tag-string">"round"</span>, <span class="tag-string">"nan"</span>) => <span class="tag-num">2</span>
+<span class="tag-func">int(</span><span class="tag-string">"notnum"</span>, <span class="tag-string">"round"</span>, <span class="tag-string">"nan"</span>) => <span class="tag-var">nan</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -845,8 +979,10 @@ func if0Condition(cond: Value): bool
 
 <p>Create an bool from a value.
 
-</p><pre class="desc-code">bool(value: Value) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">bool(</span><span class="tag-var">value</span>: <span class="tag-var">Value</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 False values by variable types:
 
 </p><ul>
@@ -861,18 +997,20 @@ False values by variable types:
 </li></ul>
 <p>Examples:
 
-</p><pre class="desc-code">bool(0) => false
-bool(0.0) => false
-bool([]) => false
-bool("") => false
-bool(dict()) => false
+</p><pre class="desc-code">
+<span class="tag-func">bool(</span><span class="tag-num">0</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">bool(</span><span class="tag-num">0.0</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">bool(</span>[]) => <span class="tag-true-false">false</span>
+<span class="tag-func">bool(</span><span class="tag-string">""</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">bool(</span><span class="tag-func">dict(</span>)) => <span class="tag-true-false">false</span>
 
-bool(5) => true
-bool(3.3) => true
-bool([8]) => true
-bool("tea") => true
-bool(dict("tea", 2)) => true
+<span class="tag-func">bool(</span><span class="tag-num">5</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">bool(</span><span class="tag-num">3.3</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">bool(</span>[<span class="tag-num">8</span>]) => <span class="tag-true-false">true</span>
+<span class="tag-func">bool(</span><span class="tag-string">"tea"</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">bool(</span><span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-num">2</span>)) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -883,19 +1021,23 @@ func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
 
-</p><pre class="desc-code">find(str: string, substring: string, default: optional any) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">find(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">substring</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">       0123456789 1234567
-msg = "Tea time at 3:30."
-find(msg, "Tea") = 0
-find(msg, "time") = 4
-find(msg, "me") = 6
-find(msg, "party", -1) = -1
-find(msg, "party", len(msg)) = 17
-find(msg, "party", 0) = 0
+</p><pre class="desc-code">
+       <span class="tag-num">0123456789</span> <span class="tag-num">1234567</span>
+<span class="tag-var">msg</span> = <span class="tag-string">"Tea time at 3:30."</span>
+<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"Tea"</span>) = <span class="tag-num">0</span>
+<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"time"</span>) = <span class="tag-num">4</span>
+<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"me"</span>) = <span class="tag-num">6</span>
+<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"party"</span>, <span class="tag-num">-1</span>) = <span class="tag-num">-1</span>
+<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"party"</span>, <span class="tag-func">len(</span><span class="tag-var">msg</span>)) = <span class="tag-num">17</span>
+<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"party"</span>, <span class="tag-num">0</span>) = <span class="tag-num">0</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -908,14 +1050,18 @@ func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 </p><p>The start index and length are by unicode characters not bytes.
 
-</p><pre class="desc-code">slice(str: string, start: int, length: optional int) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">slice(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">start</span><span class="tag-type">: int</span>, <span class="tag-var">length</span>: <span class="tag-type">optional int</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">slice("Earl Grey", 1, 3) => "arl"
-slice("Earl Grey", 6) => "rey"
-slice("añyóng", 0, 3) => "añy"
+</p><pre class="desc-code">
+<span class="tag-func">slice(</span><span class="tag-string">"Earl Grey"</span>, <span class="tag-num">1</span>, <span class="tag-num">3</span>) => <span class="tag-string">"arl"</span>
+<span class="tag-func">slice(</span><span class="tag-string">"Earl Grey"</span>, <span class="tag-num">6</span>) => <span class="tag-string">"rey"</span>
+<span class="tag-func">slice(</span><span class="tag-string">"añyóng"</span>, <span class="tag-num">0</span>, <span class="tag-num">3</span>) => <span class="tag-string">"añy"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -926,16 +1072,20 @@ func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
 
-</p><pre class="desc-code">dup(pattern: string, count: int) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">dup(</span><span class="tag-var">pattern</span><span class="tag-type">: string</span>, <span class="tag-var">count</span><span class="tag-type">: int</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">dup("=", 3) => "==="
-dup("abc", 0) => ""
-dup("abc", 1) => "abc"
-dup("abc", 2) => "abcabc"
-dup("", 3) => ""
+</p><pre class="desc-code">
+<span class="tag-func">dup(</span><span class="tag-string">"="</span>, <span class="tag-num">3</span>) => <span class="tag-string">"==="</span>
+<span class="tag-func">dup(</span><span class="tag-string">"abc"</span>, <span class="tag-num">0</span>) => <span class="tag-string">""</span>
+<span class="tag-func">dup(</span><span class="tag-string">"abc"</span>, <span class="tag-num">1</span>) => <span class="tag-string">"abc"</span>
+<span class="tag-func">dup(</span><span class="tag-string">"abc"</span>, <span class="tag-num">2</span>) => <span class="tag-string">"abcabc"</span>
+<span class="tag-func">dup(</span><span class="tag-string">""</span>, <span class="tag-num">3</span>) => <span class="tag-string">""</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -946,15 +1096,19 @@ func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
-</p><pre class="desc-code">dict(pairs: optional list) dict
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">dict(</span><span class="tag-var">pairs</span>: <span class="tag-type">optional list</span><span class="tag-type">) dict</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">dict() => {}
-dict(["a", 5]) => {"a": 5}
-dict(["a", 5, "b", 33, "c", 0]) =>
-  {"a": 5, "b": 33, "c": 0}
+</p><pre class="desc-code">
+<span class="tag-func">dict(</span>) => {}
+<span class="tag-func">dict(</span>[<span class="tag-string">"a"</span>, <span class="tag-num">5</span>]) => {<span class="tag-string">"a"</span>: <span class="tag-num">5</span>}
+<span class="tag-func">dict(</span>[<span class="tag-string">"a"</span>, <span class="tag-num">5</span>, <span class="tag-string">"b"</span>, <span class="tag-num">33</span>, <span class="tag-string">"c"</span>, <span class="tag-num">0</span>]) =>
+  {<span class="tag-string">"a"</span>: <span class="tag-num">5</span>, <span class="tag-string">"b"</span>: <span class="tag-num">33</span>, <span class="tag-string">"c"</span>: <span class="tag-num">0</span>}
 </pre>
+
 
 <pre class="nim-code">
 func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -965,19 +1119,23 @@ func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create a list of variables. You can also create a list with brackets.
 
-</p><pre class="desc-code">list(...) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">list(</span>...<span class="tag-type">) list</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">a = list()
-a = list(1)
-a = list(1, 2, 3)
-a = list("a", 5, "b")
-a = []
-a = [1]
-a = [1, 2, 3]
-a = ["a", 5, "b"]
+</p><pre class="desc-code">
+<span class="tag-var">a</span> = <span class="tag-func">list(</span>)
+<span class="tag-var">a</span> = <span class="tag-func">list(</span><span class="tag-num">1</span>)
+<span class="tag-var">a</span> = <span class="tag-func">list(</span><span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>)
+<span class="tag-var">a</span> = <span class="tag-func">list(</span><span class="tag-string">"a"</span>, <span class="tag-num">5</span>, <span class="tag-string">"b"</span>)
+<span class="tag-var">a</span> = []
+<span class="tag-var">a</span> = [<span class="tag-num">1</span>]
+<span class="tag-var">a</span> = [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
+<span class="tag-var">a</span> = [<span class="tag-string">"a"</span>, <span class="tag-num">5</span>, <span class="tag-string">"b"</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult 
@@ -992,30 +1150,38 @@ callback function, and an optional state variable. The function
 returns whether the callback stopped early or not and you can
 ignore it using a bare form..
 
-</p><pre class="desc-code">listLoop(a: list, container: any, listCallback: func, state: optional any) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">listLoop(</span><span class="tag-var">a</span><span class="tag-type">: list</span>, <span class="tag-var">container</span><span class="tag-type">: any</span>, <span class="tag-var">listCallback</span><span class="tag-type">: func</span>, <span class="tag-var">state</span>: <span class="tag-type">optional any</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 The callback gets passed the index to the item, its value, the
 container and the state variable.  The callback looks at the
 information and adds to the container when appropriate. The
 callback returns true to stop iterating.
 
-</p><pre class="desc-code">listCallback(ix: int, item: any, container: any, state: optional any) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">listCallback(</span><span class="tag-var">ix</span><span class="tag-type">: int</span>, <span class="tag-var">item</span><span class="tag-type">: any</span>, <span class="tag-var">container</span><span class="tag-type">: any</span>, <span class="tag-var">state</span>: <span class="tag-type">optional any</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
-</p><pre class="desc-code">o.container = []
-list = [2,4,6,8]
-listLoop(list, o.container, b5)
-# o.container => [6, 8]
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">o.container</span> = []
+<span class="tag-var">list</span> = [<span class="tag-num">2</span>,<span class="tag-num">4</span>,<span class="tag-num">6</span>,<span class="tag-num">8</span>]
+<span class="tag-func">listLoop(</span><span class="tag-var">list</span>, <span class="tag-var">o.container</span>, <span class="tag-var">b5</span>)
+<span class="tag-comment"># o.container => [6, 8]</span>
+</pre>
+<p>
 Below is the definition of the b5 callback function.
 
-</p><pre class="desc-code">b5 = func(ix: int, value: int, container: list) bool
-  ## Collect values greater than 5.
-  container &= if( (value > 5), value)
-  return(false)
+</p><pre class="desc-code">
+<span class="tag-var">b5</span> = <span class="tag-func">func(</span><span class="tag-var">ix</span><span class="tag-type">: int</span>, <span class="tag-var">value</span><span class="tag-type">: int</span>, <span class="tag-var">container</span><span class="tag-type">: list</span><span class="tag-type">) bool</span>
+  <span class="tag-doc">## Collect values greater than 5.</span>
+  <span class="tag-var">container</span> &= <span class="tag-func">if(</span> (<span class="tag-var">value</span> > <span class="tag-num">5</span>), <span class="tag-var">value</span>)
+  <span class="tag-func">return(</span><span class="tag-true-false">false</span>)
 </pre>
+
 
 <pre class="nim-code">
 func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult 
@@ -1025,8 +1191,10 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 
 <p>Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
 
-</p><pre class="desc-code">replace(str: string, start: int, length: int, replacement: string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">replace(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">start</span><span class="tag-type">: int</span>, <span class="tag-var">length</span><span class="tag-type">: int</span>, <span class="tag-var">replacement</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 </p><ul>
 <li>str: string
 </li><li>start: substring start index
@@ -1037,38 +1205,48 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 <p>Examples:
 
 </p><p>Replace:
-</p><pre class="desc-code">replace("Earl Grey", 5, 4, "of Sandwich")
-  => "Earl of Sandwich"
-replace("123", 0, 1, "abcd") => abcd23
-replace("123", 0, 2, "abcd") => abcd3
+</p><pre class="desc-code">
+<span class="tag-func">replace(</span><span class="tag-string">"Earl Grey"</span>, <span class="tag-num">5</span>, <span class="tag-num">4</span>, <span class="tag-string">"of Sandwich"</span>)
+  => <span class="tag-string">"Earl of Sandwich"</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">1</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd23</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">2</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd3</span>
 
-replace("123", 1, 1, "abcd") => 1abcd3
-replace("123", 1, 2, "abcd") => 1abcd
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">1</span>, <span class="tag-string">"abcd"</span>) => 1<span class="tag-var">abcd3</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-string">"abcd"</span>) => 1<span class="tag-var">abcd</span>
 
-replace("123", 2, 1, "abcd") => 12abcd
-</pre><p>Insert:
-</p><pre class="desc-code">replace("123", 0, 0, "abcd") => abcd123
-replace("123", 1, 0, "abcd") => 1abcd23
-replace("123", 2, 0, "abcd") => 12abcd3
-replace("123", 3, 0, "abcd") => 123abcd
-</pre><p>Append:
-</p><pre class="desc-code">replace("123", 3, 0, "abcd") => 123abcd
-</pre><p>Delete:
-</p><pre class="desc-code">replace("123", 0, 1, "") => 23
-replace("123", 0, 2, "") => 3
-replace("123", 0, 3, "") => ""
-
-replace("123", 1, 1, "") => 13
-replace("123", 1, 2, "") => 1
-
-replace("123", 2, 1, "") => 12
-</pre><p>Edge Cases:
-</p><pre class="desc-code">replace("", 0, 0, "") =>
-replace("", 0, 0, "a") => a
-replace("", 0, 0, "ab") => ab
-replace("", 0, 0, "abc") => abc
-replace("", 0, 0, "abcd") => abcd
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">1</span>, <span class="tag-string">"abcd"</span>) => 12<span class="tag-var">abcd</span>
 </pre>
+<p>Insert:
+</p><pre class="desc-code">
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd123</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 1<span class="tag-var">abcd23</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 12<span class="tag-var">abcd3</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">3</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 123<span class="tag-var">abcd</span>
+</pre>
+<p>Append:
+</p><pre class="desc-code">
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">3</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 123<span class="tag-var">abcd</span>
+</pre>
+<p>Delete:
+</p><pre class="desc-code">
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">1</span>, <span class="tag-string">""</span>) => <span class="tag-num">23</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">2</span>, <span class="tag-string">""</span>) => <span class="tag-num">3</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">3</span>, <span class="tag-string">""</span>) => <span class="tag-string">""</span>
+
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">1</span>, <span class="tag-string">""</span>) => <span class="tag-num">13</span>
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-string">""</span>) => <span class="tag-num">1</span>
+
+<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">1</span>, <span class="tag-string">""</span>) => <span class="tag-num">12</span>
+</pre>
+<p>Edge Cases:
+</p><pre class="desc-code">
+<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">""</span>) =>
+<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"a"</span>) => <span class="tag-var">a</span>
+<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"ab"</span>) => <span class="tag-var">ab</span>
+<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"abc"</span>) => <span class="tag-var">abc</span>
+<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd</span>
+</pre>
+
 
 <pre class="nim-code">
 func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1082,14 +1260,18 @@ func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult {
 </p><p>You specify one or more pairs of regex patterns and their string
 replacements.
 
-</p><pre class="desc-code">replaceRe(str: string, pairs: list) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">replaceRe(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">pairs</span><span class="tag-type">: list</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">list = list("abc", "456", "def", "")
-replaceRe("abcdefabc", list))
-  => "456456"
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">list</span> = <span class="tag-func">list(</span><span class="tag-string">"abc"</span>, <span class="tag-string">"456"</span>, <span class="tag-string">"def"</span>, <span class="tag-string">""</span>)
+<span class="tag-func">replaceRe(</span><span class="tag-string">"abcdefabc"</span>, <span class="tag-var">list</span>))
+  => <span class="tag-string">"456456"</span>
+</pre>
+<p>
 For developing and debugging regular expressions see the
 website: https://regex101.com/</p>
 
@@ -1114,24 +1296,28 @@ func parsePath(path: string; separator = '/'): PathComponents
 slash or or backslash. When no separator, the current
 system separator is used.
 
-</p><pre class="desc-code">path(filename: string, separator: optional string) dict
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">path(</span><span class="tag-var">filename</span><span class="tag-type">: string</span>, <span class="tag-var">separator</span>: <span class="tag-type">optional string</span><span class="tag-type">) dict</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">path("src/functions.nim") => {
-  "filename": "functions.nim",
-  "basename": "functions",
-  "ext": ".nim",
-  "dir": "src/",
+</p><pre class="desc-code">
+<span class="tag-func">path(</span><span class="tag-string">"src/functions.nim"</span>) => {
+  <span class="tag-string">"filename"</span>: <span class="tag-string">"functions.nim"</span>,
+  <span class="tag-string">"basename"</span>: <span class="tag-string">"functions"</span>,
+  <span class="tag-string">"ext"</span>: <span class="tag-string">".nim"</span>,
+  <span class="tag-string">"dir"</span>: <span class="tag-string">"src/"</span>,
 }
 
-path("src\functions.nim", "\") => {
-  "filename": "functions.nim",
-  "basename": "functions",
-  "ext": ".nim",
-  "dir": "src\",
+<span class="tag-func">path(</span><span class="tag-string">"src\functions.nim"</span>, <span class="tag-string">"\") => {
+  "</span><span class="tag-var">filename</span>": <span class="tag-string">"functions.nim"</span>,
+  <span class="tag-string">"basename"</span>: <span class="tag-string">"functions"</span>,
+  <span class="tag-string">"ext"</span>: <span class="tag-string">".nim"</span>,
+  <span class="tag-string">"dir"</span>: <span class="tag-string">"src\"</span>,
 }
 </pre>
+
 
 <pre class="nim-code">
 func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1142,14 +1328,18 @@ func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Lowercase a string.
 
-</p><pre class="desc-code">lower(str: string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">lower(</span><span class="tag-var">str</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">lower("Tea") => "tea"
-lower("TEA") => "tea"
-lower("TEĀ") => "teā"
+</p><pre class="desc-code">
+<span class="tag-func">lower(</span><span class="tag-string">"Tea"</span>) => <span class="tag-string">"tea"</span>
+<span class="tag-func">lower(</span><span class="tag-string">"TEA"</span>) => <span class="tag-string">"tea"</span>
+<span class="tag-func">lower(</span><span class="tag-string">"TEĀ"</span>) => <span class="tag-string">"teā"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1160,14 +1350,18 @@ func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create a list from the keys in a dictionary.
 
-</p><pre class="desc-code">keys(dictionary: dict) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">keys(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span><span class="tag-type">) list</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">d = dict("a", 1, "b", 2, "c", 3)
-keys(d) => ["a", "b", "c"]
-values(d) => [1, 2, 3]
+</p><pre class="desc-code">
+<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">1</span>, <span class="tag-string">"b"</span>, <span class="tag-num">2</span>, <span class="tag-string">"c"</span>, <span class="tag-num">3</span>)
+<span class="tag-func">keys(</span><span class="tag-var">d</span>) => [<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>, <span class="tag-string">"c"</span>]
+<span class="tag-func">values(</span><span class="tag-var">d</span>) => [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1178,14 +1372,18 @@ func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create a list out of the values in the specified dictionary.
 
-</p><pre class="desc-code">values(dictionary: dict) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">values(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span><span class="tag-type">) list</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">d = dict("a", "apple", "b", 2, "c", 3)
-keys(d) => ["a", "b", "c"]
-values(d) => ["apple", 2, 3]
+</p><pre class="desc-code">
+<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-string">"apple"</span>, <span class="tag-string">"b"</span>, <span class="tag-num">2</span>, <span class="tag-string">"c"</span>, <span class="tag-num">3</span>)
+<span class="tag-func">keys(</span><span class="tag-var">d</span>) => [<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>, <span class="tag-string">"c"</span>]
+<span class="tag-func">values(</span><span class="tag-var">d</span>) => [<span class="tag-string">"apple"</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1201,23 +1399,27 @@ func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 </p><p>You have the option of sorting strings case "insensitive". Case
 "sensitive" is the default.
 
-</p><pre class="desc-code">sort(values: list, order: string, insensitive: optional string) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">sort(</span><span class="tag-var">values</span><span class="tag-type">: list</span>, <span class="tag-var">order</span><span class="tag-type">: string</span>, <span class="tag-var">insensitive</span>: <span class="tag-type">optional string</span><span class="tag-type">) list</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">ints = list(4, 3, 5, 5, 2, 4)
-sort(list, "ascending") => [2, 3, 4, 4, 5, 5]
-sort(list, "descending") => [5, 5, 4, 4, 3, 2]
+</p><pre class="desc-code">
+<span class="tag-var">ints</span> = <span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">5</span>, <span class="tag-num">5</span>, <span class="tag-num">2</span>, <span class="tag-num">4</span>)
+<span class="tag-func">sort(</span><span class="tag-var">list</span>, <span class="tag-string">"ascending"</span>) => [<span class="tag-num">2</span>, <span class="tag-num">3</span>, <span class="tag-num">4</span>, <span class="tag-num">4</span>, <span class="tag-num">5</span>, <span class="tag-num">5</span>]
+<span class="tag-func">sort(</span><span class="tag-var">list</span>, <span class="tag-string">"descending"</span>) => [<span class="tag-num">5</span>, <span class="tag-num">5</span>, <span class="tag-num">4</span>, <span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">2</span>]
 
-floats = list(4.4, 3.1, 5.9)
-sort(floats, "ascending") => [3.1, 4.4, 5.9]
-sort(floats, "descending") => [5.9, 4.4, 3.1]
+<span class="tag-var">floats</span> = <span class="tag-func">list(</span><span class="tag-num">4.4</span>, <span class="tag-num">3.1</span>, <span class="tag-num">5.9</span>)
+<span class="tag-func">sort(</span><span class="tag-var">floats</span>, <span class="tag-string">"ascending"</span>) => [<span class="tag-num">3.1</span>, <span class="tag-num">4.4</span>, <span class="tag-num">5.9</span>]
+<span class="tag-func">sort(</span><span class="tag-var">floats</span>, <span class="tag-string">"descending"</span>) => [<span class="tag-num">5.9</span>, <span class="tag-num">4.4</span>, <span class="tag-num">3.1</span>]
 
-strs = list("T", "e", "a")
-sort(strs, "ascending") => ["T", "a", "e"]
-sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
-sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
+<span class="tag-var">strs</span> = <span class="tag-func">list(</span><span class="tag-string">"T"</span>, <span class="tag-string">"e"</span>, <span class="tag-string">"a"</span>)
+<span class="tag-func">sort(</span><span class="tag-var">strs</span>, <span class="tag-string">"ascending"</span>) => [<span class="tag-string">"T"</span>, <span class="tag-string">"a"</span>, <span class="tag-string">"e"</span>]
+<span class="tag-func">sort(</span><span class="tag-var">strs</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>) => [<span class="tag-string">"T"</span>, <span class="tag-string">"a"</span>, <span class="tag-string">"e"</span>]
+<span class="tag-func">sort(</span><span class="tag-var">strs</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"insensitive"</span>) => [<span class="tag-string">"a"</span>, <span class="tag-string">"e"</span>, <span class="tag-string">"T"</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1237,16 +1439,20 @@ func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
 must exist in each list, be the same type and be an int, float,
 or string.
 
-</p><pre class="desc-code">sort(lists: list, order: string, case: string, index: int) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">sort(</span><span class="tag-var">lists</span><span class="tag-type">: list</span>, <span class="tag-var">order</span><span class="tag-type">: string</span>, <span class="tag-var">case</span><span class="tag-type">: string</span>, <span class="tag-var">index</span><span class="tag-type">: int</span><span class="tag-type">) list</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">l1 = list(4, 3, 1)
-l2 = list(2, 3, 4)
-listOfLists = list(l1, l2)
-sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
-sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
+</p><pre class="desc-code">
+<span class="tag-var">l1</span> = <span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">1</span>)
+<span class="tag-var">l2</span> = <span class="tag-func">list(</span><span class="tag-num">2</span>, <span class="tag-num">3</span>, <span class="tag-num">4</span>)
+<span class="tag-var">listOfLists</span> = <span class="tag-func">list(</span><span class="tag-var">l1</span>, <span class="tag-var">l2</span>)
+<span class="tag-func">sort(</span><span class="tag-var">listOfLists</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-num">0</span>) => [<span class="tag-var">l2</span>, <span class="tag-var">l1</span>]
+<span class="tag-func">sort(</span><span class="tag-var">listOfLists</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-num">2</span>) => [<span class="tag-var">l1</span>, <span class="tag-var">l2</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1266,16 +1472,20 @@ func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
 each dictionary, be the same type and be an int, float or
 string.
 
-</p><pre class="desc-code">sort(dicts: list, order: string, case: string, key: string) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">sort(</span><span class="tag-var">dicts</span><span class="tag-type">: list</span>, <span class="tag-var">order</span><span class="tag-type">: string</span>, <span class="tag-var">case</span><span class="tag-type">: string</span>, <span class="tag-var">key</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">d1 = dict("name", "Earl Gray", "weight", 1.2)
-d2 = dict("name", "Tea Pot", "weight", 3.5)
-dicts = list(d1, d2)
-sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
-sort(dicts, "descending", "sensitive", "name") => [d2, d1]
+</p><pre class="desc-code">
+<span class="tag-var">d1</span> = <span class="tag-func">dict(</span><span class="tag-string">"name"</span>, <span class="tag-string">"Earl Gray"</span>, <span class="tag-string">"weight"</span>, <span class="tag-num">1.2</span>)
+<span class="tag-var">d2</span> = <span class="tag-func">dict(</span><span class="tag-string">"name"</span>, <span class="tag-string">"Tea Pot"</span>, <span class="tag-string">"weight"</span>, <span class="tag-num">3.5</span>)
+<span class="tag-var">dicts</span> = <span class="tag-func">list(</span><span class="tag-var">d1</span>, <span class="tag-var">d2</span>)
+<span class="tag-func">sort(</span><span class="tag-var">dicts</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-string">"weight"</span>) => [<span class="tag-var">d1</span>, <span class="tag-var">d2</span>]
+<span class="tag-func">sort(</span><span class="tag-var">dicts</span>, <span class="tag-string">"descending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-string">"name"</span>) => [<span class="tag-var">d2</span>, <span class="tag-var">d1</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1286,8 +1496,10 @@ func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
 
-</p><pre class="desc-code">anchors(names: list, type: string) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">anchors(</span><span class="tag-var">names</span><span class="tag-type">: list</span>, <span class="tag-var">type</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+</pre>
+<p>
 type:
 
 </p><ul>
@@ -1297,10 +1509,12 @@ type:
 </li></ul>
 <p>Examples:
 
-</p><pre class="desc-code">list = list("Tea", "Water", "Tea")
-anchores(list, "github") =>
-  ["tea", "water", "tea-1"]
+</p><pre class="desc-code">
+<span class="tag-var">list</span> = <span class="tag-func">list(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"Water"</span>, <span class="tag-string">"Tea"</span>)
+<span class="tag-func">anchores(</span><span class="tag-var">list</span>, <span class="tag-string">"github"</span>) =>
+  [<span class="tag-string">"tea"</span>, <span class="tag-string">"water"</span>, <span class="tag-string">"tea-1"</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1311,18 +1525,22 @@ func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return the argument type, one of: int, float, string, list, dict, bool or func.
 
-</p><pre class="desc-code">type(variable: any) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">type(</span><span class="tag-var">variable</span><span class="tag-type">: any</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">type(2) => "int"
-type(3.14159) => "float"
-type("Tea") => "string"
-type(list(1,2)) => "list"
-type(dict("a", 1)) => "dict"
-type(true) => "bool"
-type(f.cmp[0]) => "func"
+</p><pre class="desc-code">
+<span class="tag-func">type(</span><span class="tag-num">2</span>) => <span class="tag-string">"int"</span>
+<span class="tag-func">type(</span><span class="tag-num">3.14159</span>) => <span class="tag-string">"float"</span>
+<span class="tag-func">type(</span><span class="tag-string">"Tea"</span>) => <span class="tag-string">"string"</span>
+<span class="tag-func">type(</span><span class="tag-func">list(</span><span class="tag-num">1</span>,<span class="tag-num">2</span>)) => <span class="tag-string">"list"</span>
+<span class="tag-func">type(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">1</span>)) => <span class="tag-string">"dict"</span>
+<span class="tag-func">type(</span><span class="tag-true-false">true</span>) => <span class="tag-string">"bool"</span>
+<span class="tag-func">type(</span><span class="tag-var">f.cmp</span>[<span class="tag-num">0</span>]) => <span class="tag-string">"func"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1342,28 +1560,32 @@ platform separator is used.
 is not added. If a component is "", the platform separator is
 used for it.
 
-</p><pre class="desc-code">joinPath(components: list, separator: optional string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">joinPath(</span><span class="tag-var">components</span><span class="tag-type">: list</span>, <span class="tag-var">separator</span>: <span class="tag-type">optional string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">joinPath(["images", "tea"]) =>
-  "images/tea"
+</p><pre class="desc-code">
+<span class="tag-func">joinPath(</span>[<span class="tag-string">"images"</span>, <span class="tag-string">"tea"</span>]) =>
+  <span class="tag-string">"images/tea"</span>
 
-joinPath(["images", "tea"], "/") =>
-  "images/tea"
+<span class="tag-func">joinPath(</span>[<span class="tag-string">"images"</span>, <span class="tag-string">"tea"</span>], <span class="tag-string">"/"</span>) =>
+  <span class="tag-string">"images/tea"</span>
 
-joinPath(["images", "tea"], "\") =>
-  "images\tea"
+<span class="tag-func">joinPath(</span>[<span class="tag-string">"images"</span>, <span class="tag-string">"tea"</span>], <span class="tag-string">"\") =>
+  "</span><span class="tag-var">images</span>\<span class="tag-var">tea</span>"
 
-joinPath(["images/", "tea"]) =>
-  "images/tea"
+<span class="tag-func">joinPath(</span>[<span class="tag-string">"images/"</span>, <span class="tag-string">"tea"</span>]) =>
+  <span class="tag-string">"images/tea"</span>
 
-joinPath(["", "tea"]) =>
-  "/tea"
+<span class="tag-func">joinPath(</span>[<span class="tag-string">""</span>, <span class="tag-string">"tea"</span>]) =>
+  <span class="tag-string">"/tea"</span>
 
-joinPath(["/", "tea"]) =>
-  "/tea"
+<span class="tag-func">joinPath(</span>[<span class="tag-string">"/"</span>, <span class="tag-string">"tea"</span>]) =>
+  <span class="tag-string">"/tea"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1374,19 +1596,23 @@ func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {
 
 <p>Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
-</p><pre class="desc-code">join(strs: list, sep: string, skipEmpty: optional bool) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">join(</span><span class="tag-var">strs</span><span class="tag-type">: list</span>, <span class="tag-var">sep</span><span class="tag-type">: string</span>, <span class="tag-var">skipEmpty</span>: <span class="tag-type">optional bool</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">join(["a", "b"], ", ") => "a, b"
-join(["a", "b"], "") => "ab"
-join(["a", "b", "c"], "") => "abc"
-join(["a"], ", ") => "a"
-join([""], ", ") => ""
-join(["a", "b"], "") => "ab"
-join(["a", "", "c"], "|") => "a||c"
-join(["a", "", "c"], "|", true) => "a|c"
+</p><pre class="desc-code">
+<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>], <span class="tag-string">", "</span>) => <span class="tag-string">"a, b"</span>
+<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>], <span class="tag-string">""</span>) => <span class="tag-string">"ab"</span>
+<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>, <span class="tag-string">"c"</span>], <span class="tag-string">""</span>) => <span class="tag-string">"abc"</span>
+<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>], <span class="tag-string">", "</span>) => <span class="tag-string">"a"</span>
+<span class="tag-func">join(</span>[<span class="tag-string">""</span>], <span class="tag-string">", "</span>) => <span class="tag-string">""</span>
+<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>], <span class="tag-string">""</span>) => <span class="tag-string">"ab"</span>
+<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">""</span>, <span class="tag-string">"c"</span>], <span class="tag-string">"|"</span>) => <span class="tag-string">"a||c"</span>
+<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">""</span>, <span class="tag-string">"c"</span>], <span class="tag-string">"|"</span>, <span class="tag-true-false">true</span>) => <span class="tag-string">"a|c"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1397,16 +1623,22 @@ func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return a warning message and skip the current statement. You can call the warn function without an assignment.
 
-</p><pre class="desc-code">warn(message: string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">warn(</span><span class="tag-var">message</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 You can warn conditionally in a bare if statement:
 
-</p><pre class="desc-code">if0(c, warn("message is 0"))
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">if0(</span><span class="tag-var">c</span>, <span class="tag-func">warn(</span><span class="tag-string">"message is 0"</span>))
+</pre>
+<p>
 You can warn unconditionally using a bare warn statement:
 
-</p><pre class="desc-code">warn("always warn")
+</p><pre class="desc-code">
+<span class="tag-func">warn(</span><span class="tag-string">"always warn"</span>)
 </pre>
+
 
 <pre class="nim-code">
 func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1417,16 +1649,22 @@ func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Log a message to the log file.  You can call the log function without an assignment.
 
-</p><pre class="desc-code">log(message: string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">log(</span><span class="tag-var">message</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 You can log conditionally in a bare if statement:
 
-</p><pre class="desc-code">if0(c, log("log this message when c is 0"))
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">if0(</span><span class="tag-var">c</span>, <span class="tag-func">log(</span><span class="tag-string">"log this message when c is 0"</span>))
+</pre>
+<p>
 You can log unconditionally using a bare log statement:
 
-</p><pre class="desc-code">log("always log")
+</p><pre class="desc-code">
+<span class="tag-func">log(</span><span class="tag-string">"always log"</span>)
 </pre>
+
 
 <pre class="nim-code">
 func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1440,19 +1678,25 @@ func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 </p><p>In a function, the return completes the function and returns
 the value of it.
 
-</p><pre class="desc-code">return(false)
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">return(</span><span class="tag-true-false">false</span>)
+</pre>
+<p>
 You can also use it with a bare IF statement to conditionally
 return a function value.
 
-</p><pre class="desc-code">if(c, return(5))
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-num">5</span>))
+</pre>
+<p>
 In a template command a return controls the replacement block
 looping by returning “skip” and “stop”.
 
-</p><pre class="desc-code">if(c, return("stop"))
-if(c, return("skip"))
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-string">"stop"</span>))
+<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-string">"skip"</span>))
+</pre>
+<p>
 </p><ul>
 <li>“stop” – stops processing the command
 </li><li>“skip” – skips this replacement block and continues with the next iteration
@@ -1460,17 +1704,19 @@ if(c, return("skip"))
 </li></ul>
 <p>The following block command repeats 4 times but skips when t.row is 2.
 
-</p><pre class="desc-code">$$ block t.repeat = 4
-$$ : if((t.row == 2), return(“skip”))
-{t.row}
-$$ endblock
+</p><pre class="desc-code">
+$$ <span class="tag-var">block</span> <span class="tag-var">t.repeat</span> = <span class="tag-num">4</span>
+$$ : <span class="tag-func">if(</span>(<span class="tag-var">t.row</span> == <span class="tag-num">2</span>), <span class="tag-func">return(</span>“<span class="tag-var">skip</span>”))
+{<span class="tag-var">t.row</span>}
+$$ <span class="tag-var">endblock</span>
 
-output:
+<span class="tag-var">output</span>:
 
-0
-1
-3
+<span class="tag-num">0</span>
+<span class="tag-num">1</span>
+<span class="tag-num">3</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult 
@@ -1480,8 +1726,10 @@ func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 
 <p>Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
-</p><pre class="desc-code">string(var: any, stype: optional string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">string(</span><span class="tag-var">var</span><span class="tag-type">: any</span>, <span class="tag-var">stype</span>: <span class="tag-type">optional string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 The default stype is "rb" which is used for replacement blocks.
 
 </p><p>stype:
@@ -1498,48 +1746,58 @@ are printed one per line as "ix: value".
 </li></ul>
 <p>Examples variables:
 
-</p><pre class="desc-code">str = "Earl Grey"
-pi = 3.14159
-one = 1
-a = ["red", "green", "blue"]
-d = dict(["x", 1, "y", 2])
-fn = cmp[0]
-found = true
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">str</span> = <span class="tag-string">"Earl Grey"</span>
+<span class="tag-var">pi</span> = <span class="tag-num">3.14159</span>
+<span class="tag-var">one</span> = <span class="tag-num">1</span>
+<span class="tag-var">a</span> = [<span class="tag-string">"red"</span>, <span class="tag-string">"green"</span>, <span class="tag-string">"blue"</span>]
+<span class="tag-var">d</span> = <span class="tag-func">dict(</span>[<span class="tag-string">"x"</span>, <span class="tag-num">1</span>, <span class="tag-string">"y"</span>, <span class="tag-num">2</span>])
+<span class="tag-var">fn</span> = <span class="tag-var">cmp</span>[<span class="tag-num">0</span>]
+<span class="tag-var">found</span> = <span class="tag-true-false">true</span>
+</pre>
+<p>
 json:
 
-</p><pre class="desc-code">str => "Earl Grey"
-pi => 3.14159
-one => 1
-a => ["red","green","blue"]
-d => {"x":1,"y":2}
-fn => "cmp"
-found => true
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">str</span> => <span class="tag-string">"Earl Grey"</span>
+<span class="tag-var">pi</span> => <span class="tag-num">3.14159</span>
+<span class="tag-var">one</span> => <span class="tag-num">1</span>
+<span class="tag-var">a</span> => [<span class="tag-string">"red"</span>,<span class="tag-string">"green"</span>,<span class="tag-string">"blue"</span>]
+<span class="tag-var">d</span> => {<span class="tag-string">"x"</span>:<span class="tag-num">1</span>,<span class="tag-string">"y"</span>:<span class="tag-num">2</span>}
+<span class="tag-var">fn</span> => <span class="tag-string">"cmp"</span>
+<span class="tag-var">found</span> => <span class="tag-true-false">true</span>
+</pre>
+<p>
 rb:
 
 </p><p>Same as JSON except the following.
 
-</p><pre class="desc-code">str => Earl Grey
-fn => cmp
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">str</span> => <span class="tag-var">Earl</span> <span class="tag-var">Grey</span>
+<span class="tag-var">fn</span> => <span class="tag-var">cmp</span>
+</pre>
+<p>
 dn:
 
 </p><p>Same as JSON except the following.
 
-</p><pre class="desc-code">d =>
-x = 1
-y = 2
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-var">d</span> =>
+<span class="tag-var">x</span> = <span class="tag-num">1</span>
+<span class="tag-var">y</span> = <span class="tag-num">2</span>
+</pre>
+<p>
 vl:
 
 </p><p>Same as JSON except the following.
 
-</p><pre class="desc-code">a =>
-0: "red"
-1: "green"
-2: "blue"
+</p><pre class="desc-code">
+<span class="tag-var">a</span> =>
+<span class="tag-num">0</span>: <span class="tag-string">"red"</span>
+<span class="tag-num">1</span>: <span class="tag-string">"green"</span>
+<span class="tag-num">2</span>: <span class="tag-string">"blue"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1550,17 +1808,21 @@ func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
 
-</p><pre class="desc-code">string(dictName: string: d: dict) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">string(</span><span class="tag-var">dictName</span><span class="tag-type">: string</span>: <span class="tag-var">d</span><span class="tag-type">: dict</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Example:
 
-</p><pre class="desc-code">d = {"x",1, "y":"tea", "z":{"a":8}}
-string("teas", d) =>
+</p><pre class="desc-code">
+<span class="tag-var">d</span> = {<span class="tag-string">"x"</span>,<span class="tag-num">1</span>, <span class="tag-string">"y"</span>:<span class="tag-string">"tea"</span>, <span class="tag-string">"z"</span>:{<span class="tag-string">"a"</span>:<span class="tag-num">8</span>}}
+<span class="tag-func">string(</span><span class="tag-string">"teas"</span>, <span class="tag-var">d</span>) =>
 
-teas.x = 1
-teas.y = "tea"
-teas.z.a = 8
+<span class="tag-var">teas.x</span> = <span class="tag-num">1</span>
+<span class="tag-var">teas.y</span> = <span class="tag-string">"tea"</span>
+<span class="tag-var">teas.z.a</span> = <span class="tag-num">8</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1571,22 +1833,28 @@ func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
 
-</p><pre class="desc-code">format(str: string) string
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">format(</span><span class="tag-var">str</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+</pre>
+<p>
 Example:
 
-</p><pre class="desc-code">let first = "Earl"
-let last = "Grey"
-str = format("name: {first} {last}")
+</p><pre class="desc-code">
+<span class="tag-var">let</span> <span class="tag-var">first</span> = <span class="tag-string">"Earl"</span>
+<span class="tag-var">let</span> <span class="tag-var">last</span> = <span class="tag-string">"Grey"</span>
+<span class="tag-var">str</span> = <span class="tag-func">format(</span><span class="tag-string">"name: {first} {last}"</span>)
 
-str => "name: Earl Grey"
-</pre><p>
+<span class="tag-var">str</span> => <span class="tag-string">"name: Earl Grey"</span>
+</pre>
+<p>
 To enter a left bracket use two in a row.
 
-</p><pre class="desc-code">str = format("use two {{ to get one")
+</p><pre class="desc-code">
+<span class="tag-var">str</span> = <span class="tag-func">format(</span><span class="tag-string">"use two {{ to get one"</span>)
 
-str => "use two { to get one"
+<span class="tag-var">str</span> => <span class="tag-string">"use two { to get one"</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1597,17 +1865,21 @@ func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Define a function.
 
-</p><pre class="desc-code">func(signature: string) func
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">func(</span><span class="tag-var">signature</span><span class="tag-type">: string</span><span class="tag-type">) func</span>
+</pre>
+<p>
 Example:
 
-</p><pre class="desc-code">mycmp = func(numStr1: string, numStr2: string) int
-  ## Compare two number strings
-  ## and return 1, 0, or -1.
-  num1 = int(numStr1)
-  num2 = int(numStr2)
-  return(cmp(num1, num2))
+</p><pre class="desc-code">
+<span class="tag-var">mycmp</span> = <span class="tag-func">func(</span><span class="tag-var">numStr1</span><span class="tag-type">: string</span>, <span class="tag-var">numStr2</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
+  <span class="tag-doc">## Compare two number strings</span>
+  <span class="tag-doc">## and return 1, 0, or -1.</span>
+  <span class="tag-var">num1</span> = <span class="tag-func">int(</span><span class="tag-var">numStr1</span>)
+  <span class="tag-var">num2</span> = <span class="tag-func">int(</span><span class="tag-var">numStr2</span>)
+  <span class="tag-func">return(</span><span class="tag-func">cmp(</span><span class="tag-var">num1</span>, <span class="tag-var">num2</span>))
 </pre>
+
 
 <pre class="nim-code">
 func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult 
@@ -1617,30 +1889,34 @@ func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
 
 <p>Return the function details in a dictionary.
 
-</p><pre class="desc-code">functionDetails(funcVar: func) dict
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">functionDetails(</span><span class="tag-var">funcVar</span><span class="tag-type">: func</span><span class="tag-type">) dict</span>
+</pre>
+<p>
 The following example defines a simple function then gets its
 function details.
 
-</p><pre class="desc-code">mycmp = func(numStr1: string, numStr2: string) int
-  ## Compare two number strings and return 1, 0, or -1.
-  return(cmp(int(numStr1), int(numStr2)))
+</p><pre class="desc-code">
+<span class="tag-var">mycmp</span> = <span class="tag-func">func(</span><span class="tag-var">numStr1</span><span class="tag-type">: string</span>, <span class="tag-var">numStr2</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
+  <span class="tag-doc">## Compare two number strings and return 1, 0, or -1.</span>
+  <span class="tag-func">return(</span><span class="tag-func">cmp(</span><span class="tag-func">int(</span><span class="tag-var">numStr1</span>), <span class="tag-func">int(</span><span class="tag-var">numStr2</span>)))
 
-fd = functionDetails(mycmp)
+<span class="tag-var">fd</span> = <span class="tag-func">functionDetails(</span><span class="tag-var">mycmp</span>)
 
-fd =>
-fd.builtIn = false
-fd.signature.optional = false
-fd.signature.name = "strNumCmp"
-fd.signature.paramNames = ["numStr1","numStr2"]
-fd.signature.paramTypes = ["string","string"]
-fd.signature.returnType = "int"
-fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
-fd.filename = "testcode.tea"
-fd.lineNum = 3
-fd.numLines = 2
-fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
+<span class="tag-var">fd</span> =>
+<span class="tag-var">fd.builtIn</span> = <span class="tag-true-false">false</span>
+<span class="tag-var">fd.signature.optional</span> = <span class="tag-true-false">false</span>
+<span class="tag-var">fd.signature.name</span> = <span class="tag-string">"strNumCmp"</span>
+<span class="tag-var">fd.signature.paramNames</span> = [<span class="tag-string">"numStr1"</span>,<span class="tag-string">"numStr2"</span>]
+<span class="tag-var">fd.signature.paramTypes</span> = [<span class="tag-string">"string"</span>,<span class="tag-string">"string"</span>]
+<span class="tag-var">fd.signature.returnType</span> = <span class="tag-string">"int"</span>
+<span class="tag-var">fd.docComment</span> = <span class="tag-string">"  ## Compare two number strings and return 1, 0, or -1.\n"</span>
+<span class="tag-var">fd.filename</span> = <span class="tag-string">"testcode.tea"</span>
+<span class="tag-var">fd.lineNum</span> = <span class="tag-num">3</span>
+<span class="tag-var">fd.numLines</span> = <span class="tag-num">2</span>
+<span class="tag-var">fd.statements</span> = [<span class="tag-string">"  return(cmp(int(numStr1), int(numStr2)))"</span>]
 </pre>
+
 
 <pre class="nim-code">
 func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1651,16 +1927,20 @@ func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunRes
 
 <p>Check whether a strings starts with the given prefix. Return true when it does, else false.
 
-</p><pre class="desc-code">startsWith(str: string, str: prefix) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">startsWith(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">str</span>: <span class="tag-var">prefix</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">a = startsWith("abcdef", "abc")
-b = startsWith("abcdef", "abf")
+</p><pre class="desc-code">
+<span class="tag-var">a</span> = <span class="tag-func">startsWith(</span><span class="tag-string">"abcdef"</span>, <span class="tag-string">"abc"</span>)
+<span class="tag-var">b</span> = <span class="tag-func">startsWith(</span><span class="tag-string">"abcdef"</span>, <span class="tag-string">"abf"</span>)
 
-a => true
-b => false
+<span class="tag-var">a</span> => <span class="tag-true-false">true</span>
+<span class="tag-var">b</span> => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1671,13 +1951,17 @@ func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult 
 
 <p>Boolean not.
 
-</p><pre class="desc-code">not(value: bool) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">not(</span><span class="tag-var">value</span><span class="tag-type">: bool</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">not(true) => false
-not(false) => true
+</p><pre class="desc-code">
+<span class="tag-func">not(</span><span class="tag-true-false">true</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">not(</span><span class="tag-true-false">false</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1688,16 +1972,20 @@ func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
-</p><pre class="desc-code">and(a: bool, b: bool) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">and(</span><span class="tag-var">a</span><span class="tag-type">: bool</span>, <span class="tag-var">b</span><span class="tag-type">: bool</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">and(true, true) => true
-and(false, true) => false
-and(true, false) => false
-and(false, false) => false
-and(false, warn("not hit")) => false
+</p><pre class="desc-code">
+<span class="tag-func">and(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">and(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">and(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">and(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">and(</span><span class="tag-true-false">false</span>, <span class="tag-func">warn(</span><span class="tag-string">"not hit"</span>)) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult 
@@ -1707,16 +1995,20 @@ func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 
 <p>Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
 
-</p><pre class="desc-code">or(a: bool, b: bool) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">or(</span><span class="tag-var">a</span><span class="tag-type">: bool</span>, <span class="tag-var">b</span><span class="tag-type">: bool</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">or(true, true) => true
-or(false, true) => true
-or(true, false) => true
-or(false, false) => false
-or(true, warn("not hit")) => true
+</p><pre class="desc-code">
+<span class="tag-func">or(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">or(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">or(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">or(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">or(</span><span class="tag-true-false">true</span>, <span class="tag-func">warn(</span><span class="tag-string">"not hit"</span>)) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult 
@@ -1726,13 +2018,17 @@ func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 
 <p>Return true when the two ints are equal.
 
-</p><pre class="desc-code">eq(a: int, b: int) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">eq(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">eq(1, 1) => true
-eq(2, 3) => false
+</p><pre class="desc-code">
+<span class="tag-func">eq(</span><span class="tag-num">1</span>, <span class="tag-num">1</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">eq(</span><span class="tag-num">2</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1743,13 +2039,17 @@ func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when two floats are equal.
 
-</p><pre class="desc-code">eq(a: float, b: float) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">eq(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">eq(1.2, 1.2) => true
-eq(1.2, 3.2) => false
+</p><pre class="desc-code">
+<span class="tag-func">eq(</span><span class="tag-num">1.2</span>, <span class="tag-num">1.2</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">eq(</span><span class="tag-num">1.2</span>, <span class="tag-num">3.2</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1760,13 +2060,17 @@ func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when two strings are equal.  See cmp function for case insensitive compare.
 
-</p><pre class="desc-code">eq(a: string, b: string) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">eq(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">eq("tea", "tea") => true
-eq("1.2", "3.2") => false
+</p><pre class="desc-code">
+<span class="tag-func">eq(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">eq(</span><span class="tag-string">"1.2"</span>, <span class="tag-string">"3.2"</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1777,13 +2081,17 @@ func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when two ints are not equal.
 
-</p><pre class="desc-code">ne(a: int, b: int) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">ne(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">ne(1, 1) => false
-ne(2, 3) => true
+</p><pre class="desc-code">
+<span class="tag-func">ne(</span><span class="tag-num">1</span>, <span class="tag-num">1</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">ne(</span><span class="tag-num">2</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1794,13 +2102,17 @@ func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when two floats are not equal.
 
-</p><pre class="desc-code">ne(a: float, b: float) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">ne(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">ne(1.2, 1.2) => false
-ne(1.2, 3.2) => true
+</p><pre class="desc-code">
+<span class="tag-func">ne(</span><span class="tag-num">1.2</span>, <span class="tag-num">1.2</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">ne(</span><span class="tag-num">1.2</span>, <span class="tag-num">3.2</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1811,13 +2123,17 @@ func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when two strings are not equal.
 
-</p><pre class="desc-code">ne(a: string, b: string) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">ne(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">ne("tea", "tea") => false
-ne("earl", "grey") => true
+</p><pre class="desc-code">
+<span class="tag-func">ne(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">ne(</span><span class="tag-string">"earl"</span>, <span class="tag-string">"grey"</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1828,13 +2144,17 @@ func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when an int is greater then another int.
 
-</p><pre class="desc-code">gt(a: int, b: int) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">gt(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">gt(2, 4) => false
-gt(3, 2) => true
+</p><pre class="desc-code">
+<span class="tag-func">gt(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">gt(</span><span class="tag-num">3</span>, <span class="tag-num">2</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1845,13 +2165,17 @@ func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when one float is greater than another float.
 
-</p><pre class="desc-code">gt(a: float, b: float) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">gt(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">gt(2.8, 4.3) => false
-gt(3.1, 2.5) => true
+</p><pre class="desc-code">
+<span class="tag-func">gt(</span><span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">gt(</span><span class="tag-num">3.1</span>, <span class="tag-num">2.5</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1862,13 +2186,17 @@ func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when an int is greater then or equal to another int.
 
-</p><pre class="desc-code">gte(a: int, b: int) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">gte(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">gte(2, 4) => false
-gte(3, 3) => true
+</p><pre class="desc-code">
+<span class="tag-func">gte(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">gte(</span><span class="tag-num">3</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1879,13 +2207,17 @@ func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when a float is greater than or equal to another float.
 
-</p><pre class="desc-code">gte(a: float, b: float) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">gte(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">gte(2.8, 4.3) => false
-gte(3.1, 3.1) => true
+</p><pre class="desc-code">
+<span class="tag-func">gte(</span><span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-true-false">false</span>
+<span class="tag-func">gte(</span><span class="tag-num">3.1</span>, <span class="tag-num">3.1</span>) => <span class="tag-true-false">true</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1896,13 +2228,17 @@ func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when an int is less than another int.
 
-</p><pre class="desc-code">lt(a: int, b: int) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">lt(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">gt(2, 4) => true
-gt(3, 2) => false
+</p><pre class="desc-code">
+<span class="tag-func">gt(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">gt(</span><span class="tag-num">3</span>, <span class="tag-num">2</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1913,13 +2249,17 @@ func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when a float is less then another float.
 
-</p><pre class="desc-code">lt(a: float, b: float) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">lt(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">lt(2.8, 4.3) => true
-lt(3.1, 2.5) => false
+</p><pre class="desc-code">
+<span class="tag-func">lt(</span><span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">lt(</span><span class="tag-num">3.1</span>, <span class="tag-num">2.5</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1930,14 +2270,18 @@ func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when an int is less than or equal to another int.
 
-</p><pre class="desc-code">lte(a: int, b: int) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">lte(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">lte(2, 4) => true
-lte(3, 3) => true
-lte(4, 3) => false
+</p><pre class="desc-code">
+<span class="tag-func">lte(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">lte(</span><span class="tag-num">3</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">lte(</span><span class="tag-num">4</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1948,14 +2292,18 @@ func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Return true when a float is less than or equal to another float.
 
-</p><pre class="desc-code">lte(a: float, b: float) bool
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">lte(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">lte(2.3, 4.4) => true
-lte(3.0, 3.0) => true
-lte(4.0, 3.0) => false
+</p><pre class="desc-code">
+<span class="tag-func">lte(</span><span class="tag-num">2.3</span>, <span class="tag-num">4.4</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">lte(</span><span class="tag-num">3.0</span>, <span class="tag-num">3.0</span>) => <span class="tag-true-false">true</span>
+<span class="tag-func">lte(</span><span class="tag-num">4.0</span>, <span class="tag-num">3.0</span>) => <span class="tag-true-false">false</span>
 </pre>
+
 
 <pre class="nim-code">
 func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1966,16 +2314,20 @@ func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Convert a JSON string to a variable.
 
-</p><pre class="desc-code">readJson(json: string) any
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">readJson(</span><span class="tag-var">json</span><span class="tag-type">: string</span><span class="tag-type">) any</span>
+</pre>
+<p>
 Examples:
 
-</p><pre class="desc-code">a = readJson(""tea"") => "tea"
-b = readJson("4.5") => 4.5
-c = readJson("[1,2,3]") => [1, 2, 3]
-d = readJson("{"a":1, "b": 2}")
-  => {"a": 1, "b", 2}
+</p><pre class="desc-code">
+<span class="tag-var">a</span> = <span class="tag-func">readJson(</span><span class="tag-string">""</span><span class="tag-var">tea</span>"<span class="tag-string">") => "</span><span class="tag-var">tea</span>"
+<span class="tag-var">b</span> = <span class="tag-func">readJson(</span><span class="tag-string">"4.5"</span>) => <span class="tag-num">4.5</span>
+<span class="tag-var">c</span> = <span class="tag-func">readJson(</span><span class="tag-string">"[1,2,3]"</span>) => [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
+<span class="tag-var">d</span> = <span class="tag-func">readJson(</span><span class="tag-string">"{"</span><span class="tag-var">a</span>":<span class="tag-num">1</span>, <span class="tag-string">"b"</span>: <span class="tag-num">2</span>}<span class="tag-string">")
+  => {"</span><span class="tag-var">a</span>": <span class="tag-num">1</span>, <span class="tag-string">"b"</span>, <span class="tag-num">2</span>}
 </pre>
+
 
 <pre class="nim-code">
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1986,8 +2338,10 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
-</p><pre class="desc-code">markdownList(mdText: string) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">markdownList(</span><span class="tag-var">mdText</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+</pre>
+<p>
 list elements:
 
 </p><ul>
@@ -2008,13 +2362,15 @@ for each bullet point.  The leading “* “ is not part of the
 string.
 
 </li></ul>
-<pre class="desc-code">elements = markdownLite(description)
-elements => [
-  ["p", ["the paragraph which may contain newlines"]]
-  ["code", ["~~~", "code text with newlines", "~~~"]]
-  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+<pre class="desc-code">
+<span class="tag-var">elements</span> = <span class="tag-func">markdownLite(</span><span class="tag-var">description</span>)
+<span class="tag-var">elements</span> => [
+  [<span class="tag-string">"p"</span>, [<span class="tag-string">"the paragraph which may contain newlines"</span>]]
+  [<span class="tag-string">"code"</span>, [<span class="tag-string">"~~~"</span>, <span class="tag-string">"code text with newlines"</span>, <span class="tag-string">"~~~"</span>]]
+  [<span class="tag-string">"bullets"</span>, [<span class="tag-string">"bullet (newlines) 1"</span>, <span class="tag-string">"point 2"</span>, <span class="tag-string">"3"</span>, ...]
 ]
 </pre>
+
 
 <pre class="nim-code">
 func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2025,8 +2381,10 @@ func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
 
 <p>Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
 
-</p><pre class="desc-code">highlight(code: string) list
-</pre><p>
+</p><pre class="desc-code">
+<span class="tag-func">highlight(</span><span class="tag-var">code</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+</pre>
+<p>
 Tags:
 
 </p><ul>
@@ -2042,13 +2400,15 @@ Tags:
 </li></ul>
 <p>Example:
 
-</p><pre class="desc-code">frags = highlight("a = 5")
-frags => [
-  ["var", "a"],
-  ["other", " = "],
-  ["num", "5"],
+</p><pre class="desc-code">
+<span class="tag-var">frags</span> = <span class="tag-func">highlight(</span><span class="tag-string">"a = 5"</span>)
+<span class="tag-var">frags</span> => [
+  [<span class="tag-string">"var"</span>, <span class="tag-string">"a"</span>],
+  [<span class="tag-string">"other"</span>, <span class="tag-string">" = "</span>],
+  [<span class="tag-string">"num"</span>, <span class="tag-string">"5"</span>],
 ]
 </pre>
+
 
 <pre class="nim-code">
 func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.

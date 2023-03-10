@@ -62,7 +62,6 @@ proc linesSideBySide*(gotContent: string, expectedContent: string): string =
 
     var lineNum = $(ix+1)
     if eLine == gLine:
-      # lines.add("$1     same: $2" % [dup(" ", lineNum.len), show(eLine)])
       lines.add("$1     same: $2" % [$lineNum, show(eLine)])
     else:
       lines.add("$1      got: $2" % [lineNum, show(gLine)])

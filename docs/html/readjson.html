@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -125,13 +147,15 @@ func unescapePopularChar(popular: char): char
 
 <p>Parse the quoted json string literal. The startPos points one
 past the leading double quote.  Return the parsed string value
-and the ending position after the trailing whitespace. On
+and the ending position after the trailing quote. On
 failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
-</p><pre class="desc-code">a = "test string"  # test
-     ^             ^
+</p><pre class="desc-code">
+<span class="tag-var">a</span> = <span class="tag-string">"test string"</span>  <span class="tag-comment"># test</span>
+     ^           ^
 </pre>
+
 
 <pre class="nim-code">
 func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr 

@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+color: blue;
+}
+.tag-var {
+color: green;
+}
+.tag-type {
+color: red;
+}
+.tag-num {
+color: IndianRed;
+}
+.tag-string {
+color: SeaGreen;
+}
+.tag-doc {
+color: OrangeRed;
+}
+.tag-comment {
+color: FireBrick;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -43,24 +65,26 @@ pre {
 
 </p><p>Example:
 
-</p><pre class="desc-code">import cmdline
+</p><pre class="desc-code">
+<span class="tag-var">import</span> <span class="tag-var">cmdline</span>
 
-# Define the supported options.
-var options = newSeq[CmlOption]()
-options.add(newCmlOption("help", 'h', cmlStopArgument))
-options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+<span class="tag-comment"># Define the supported options.</span>
+<span class="tag-var">var</span> <span class="tag-var">options</span> = <span class="tag-var">newSeq</span>[<span class="tag-var">CmlOption</span>]()
+<span class="tag-func">options.add(</span><span class="tag-func">newCmlOption(</span><span class="tag-string">"help"</span>, '<span class="tag-var">h</span>', <span class="tag-var">cmlStopArgument</span>))
+<span class="tag-func">options.add(</span><span class="tag-func">newCmlOption(</span><span class="tag-string">"log"</span>, '<span class="tag-var">l</span>', <span class="tag-var">cmlOptionalArgument</span>))
 ...
 
-# Parse the command line.
-let argsOrMessage = cmdline(options, collectArgs())
-if argsOrMessage.kind == cmlMessageKind:
-  # Display the message.
-  echo getMessage(argsOrMessage.messageId,
-    argsOrMessage.problemArg)
-else:
-  # Optionally post process the resulting arguments.
-  let args = newArgs(argsOrMessage.args)
-</pre><p>
+<span class="tag-comment"># Parse the command line.</span>
+<span class="tag-var">let</span> <span class="tag-var">argsOrMessage</span> = <span class="tag-func">cmdline(</span><span class="tag-var">options</span>, <span class="tag-func">collectArgs(</span>))
+<span class="tag-var">if</span> <span class="tag-var">argsOrMessage.kind</span> == <span class="tag-var">cmlMessageKind</span>:
+  <span class="tag-comment"># Display the message.</span>
+  <span class="tag-var">echo</span> <span class="tag-func">getMessage(</span><span class="tag-var">argsOrMessage.messageId</span>,
+    <span class="tag-var">argsOrMessage.problemArg</span>)
+<span class="tag-var">else</span>:
+  <span class="tag-comment"># Optionally post process the resulting arguments.</span>
+  <span class="tag-var">let</span> <span class="tag-var">args</span> = <span class="tag-func">newArgs(</span><span class="tag-var">argsOrMessage.args</span>)
+</pre>
+<p>
 For a complete example see the bottom of the file in the isMainModule
 section.</p>
 

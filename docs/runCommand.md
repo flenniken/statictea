@@ -44,6 +44,7 @@ Run a command and fill in the variables dictionaries.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines if needed.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
+* [matchTabSpace2](#matchtabspace2) &mdash; Match one or more spaces or tabs starting at the given position.
 * [getString](#getstring) &mdash; Return a literal string value and position after it.
 * [getNumber](#getnumber) &mdash; Return the literal number value and position after it.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
@@ -70,6 +71,15 @@ Run a command and fill in the variables dictionaries.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
+* type: [FragmentType2](#fragmenttype2) &mdash; Hightlight fragments.
+* type: [Fragment2](#fragment2) &mdash; A fragment of a string.
+* [newFragment2](#newfragment2) &mdash; 
+* [newFragmentLen2](#newfragmentlen2) &mdash; 
+* [`$`](#-4) &mdash; Return a string representation of a Fragment.
+* [`$`](#-5) &mdash; Return a string representation of a sequence of fragments.
+* [atMultiline](#atmultiline) &mdash; Determine whether the start index points a the start of a multiline string.
+* [lineEnd](#lineend) &mdash; Find the end of the line.
+* [highlightCode](#highlightcode) &mdash; Identify all the fragments in the StaticTea code to highlight.
 
 # tripleQuotes
 
@@ -429,7 +439,7 @@ func removeLineEnd(s: string): string
 
 # yieldStatements
 
-Iterate through the command's statements. A statement can be blank or all whitespace.
+Iterate through the command's statements. A statement can be blank or all whitespace. A statement doesn't end with a newline.
 
 ```nim
 iterator yieldStatements(cmdLines: CmdLines): Statement {.raises: [KeyError],
@@ -457,6 +467,14 @@ whitespace.
 func getMultilineStr(text: string; start: Natural): ValuePosSiOr 
 ```
 
+# matchTabSpace2
+
+Match one or more spaces or tabs starting at the given position.
+
+```nim
+proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches] 
+```
+
 # getString
 
 Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
@@ -467,7 +485,7 @@ var = "hello" # asdf
 ~~~
 
 ```nim
-func getString(statement: Statement; start: Natural): ValuePosSiOr 
+func getString(str: string; start: Natural): ValuePosSiOr 
 ```
 
 # getNumber
@@ -804,6 +822,97 @@ Run each code file and populate the variables.
 proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string]) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError],
     tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect, RootEffect, TimeEffect].}
+```
+
+# FragmentType2
+
+Hightlight fragments.
+
+* hlOther -- not one of the other types
+* hlParamType -- int, float, string, list, dict, bool, func, any and optional
+* hlFuncCall -- a variable name followed by a left parenthesis
+* hlVarName -- a variable name
+* hlNumber -- a literal number
+* hlStringType -- a literal string
+* hlDocComment -- a ## to the end of the line
+* hlComment -- a # to the end of the line
+
+```nim
+FragmentType2 = enum
+  hlOther = "other", hlParamType = "paramType", hlFuncCall = "funcCall",
+  hlVarName = "varName", hlNumber = "number", hlStringType = "string",
+  hlDocComment = "doc", hlComment = "comment", hlMultiline = "multiline"
+```
+
+# Fragment2
+
+A fragment of a string.
+* kind -- the type of fragment
+* start -- the index in the string where the fragment starts
+* fEnd -- the end of the fragment + 1.
+
+```nim
+Fragment2 = object
+  fragmentType*: FragmentType2
+  start*: Natural
+  fEnd*: Natural
+```
+
+# newFragment2
+
+
+
+```nim
+func newFragment2(fragmentType: FragmentType2; start: Natural; fEnd: Natural): Fragment2 
+```
+
+# newFragmentLen2
+
+
+
+```nim
+func newFragmentLen2(fragmentType: FragmentType2; start: Natural;
+                     length: Natural): Fragment2 
+```
+
+# `$`
+
+Return a string representation of a Fragment.
+
+```nim
+func `$`(f: Fragment2): string {.raises: [ValueError], tags: [].}
+```
+
+# `$`
+
+Return a string representation of a sequence of fragments.
+
+```nim
+func `$`(fragments: seq[Fragment2]): string {.raises: [ValueError], tags: [].}
+```
+
+# atMultiline
+
+Determine whether the start index points a the start of a multiline string. Return 0 when it doesn't. Return the position after the triple quotes, either 4 or 5 depending on the line endings.
+
+```nim
+func atMultiline(codeText: string; start: Natural): int 
+```
+
+# lineEnd
+
+Find the end of the line. It returns either one after the first newline or after the end of the string.
+
+```nim
+func lineEnd(str: string; start: Natural): int 
+```
+
+# highlightCode
+
+Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. It doesn't validate but it works for valid code.
+
+```nim
+func highlightCode(codeText: string): seq[Fragment2] 
 ```
 
 

@@ -36,6 +36,8 @@ proc markdownHtml(elements: seq[Element]): string =
           color = "IndianRed"
         of ftString:
           color = "SeaGreen"
+        of ftTrueFalse:
+          color = "black"
         of ftDocComment:
           color = "OrangeRed"
         of ftComment:
@@ -107,8 +109,8 @@ proc testMatchFragment(aLine: string, start: Natural, eFragmentO: Option[Fragmen
       let f = eFragmentO.get()
       echo startColumn(line, f.fEnd, "└─expected end")
 
-proc testHighlightStaticTea(line: string, eFragments: seq[Fragment]): bool =
-  let fragments = highlightStaticTea(line)
+proc testHighlightStaticTea(codeText: string, eFragments: seq[Fragment]): bool =
+  let fragments = highlightStaticTea(codeText)
   if fragments == eFragments:
     return true
   echo linesSideBySide($fragments, $eFragments)
@@ -459,19 +461,35 @@ Examples:
       echo linesSideBySide(html, expectedHtml)
       fail
 
-  test "matchFragment type":
+  test "matchFragment none":
     check testMatchFragment("", 0, none(Fragment))
-    check testMatchFragment("true", 0, some(newFragmentLen(ftType, 0, 4)))
-    check testMatchFragment(" true", 1, some(newFragmentLen(ftType, 1, 4)))
-    check testMatchFragment(" true ", 1, some(newFragmentLen(ftType, 1, 4)))
-    check testMatchFragment("abctrue ", 3, some(newFragmentLen(ftType, 3, 4)))
-    check testMatchFragment("false", 0, some(newFragmentLen(ftType, 0, 5)))
-    check testMatchFragment("int", 0, some(newFragmentLen(ftType, 0, 3)))
-    check testMatchFragment("float", 0, some(newFragmentLen(ftType, 0, 5)))
-    check testMatchFragment("string", 0, some(newFragmentLen(ftType, 0, 6)))
-    check testMatchFragment("dict", 0, some(newFragmentLen(ftType, 0, 4)))
-    check testMatchFragment("list", 0, some(newFragmentLen(ftType, 0, 4)))
-    check testMatchFragment("any", 0, some(newFragmentLen(ftType, 0, 3)))
+
+  test "matchFragment true":
+    check testMatchFragment("true", 0, some(newFragmentLen(ftTrueFalse, 0, 4)))
+    check testMatchFragment(" true", 1, some(newFragmentLen(ftTrueFalse, 1, 4)))
+    check testMatchFragment("true ", 0, some(newFragmentLen(ftTrueFalse, 0, 4)))
+    check testMatchFragment("abctrue", 0, some(newFragmentLen(ftVarName, 0, 7)))
+    check testMatchFragment("trueadb", 0, some(newFragmentLen(ftVarName, 0, 7)))
+    check testMatchFragment("trueadb(", 0, some(newFragmentLen(ftFunc, 0, 8)))
+    check testMatchFragment("true(", 0, some(newFragmentLen(ftTrueFalse, 0, 4)))
+    check testMatchFragment("\"true\"", 0, some(newFragmentLen(ftString, 0, 6)))
+
+  test "matchFragment false":
+    check testMatchFragment("false", 0, some(newFragmentLen(ftTrueFalse, 0, 5)))
+
+  test "matchFragment types":
+    check testMatchFragment(": int", 0, some(newFragmentLen(ftType, 0, 5)))
+    check testMatchFragment(") int", 0, some(newFragmentLen(ftType, 0, 5)))
+    check testMatchFragment(": float", 0, some(newFragmentLen(ftType, 0, 7)))
+    check testMatchFragment(": string", 0, some(newFragmentLen(ftType, 0, 8)))
+    check testMatchFragment(": dict", 0, some(newFragmentLen(ftType, 0, 6)))
+    check testMatchFragment(": list", 0, some(newFragmentLen(ftType, 0, 6)))
+    check testMatchFragment(": any", 0, some(newFragmentLen(ftType, 0, 5)))
+    check testMatchFragment(": func", 0, some(newFragmentLen(ftType, 0, 6)))
+
+  test "matchFragment optional types":
+    check testMatchFragment("optional func", 0, some(newFragmentLen(ftType, 0, 13)))
+    check testMatchFragment("optional int", 0, some(newFragmentLen(ftType, 0, 12)))
 
   test "matchFragment function":
     check testMatchFragment("a(", 0, some(newFragmentLen(ftFunc, 0, 2)))
@@ -515,18 +533,19 @@ Examples:
     check testMatchFragment("#", 0, some(newFragmentLen(ftComment, 0, 1)))
     check testMatchFragment("# asdf", 0, some(newFragmentLen(ftComment, 0, 6)))
 
-  test "matchFragment highlightStaticTea":
-    check testHighlightStaticTea("true", @[newFragmentLen(ftType, 0, 4)])
-    check testHighlightStaticTea("true false", @[
-      newFragmentLen(ftType, 0, 4),
-      newFragmentLen(ftOther, 4, 1),
-      newFragmentLen(ftType, 5, 5),
-    ])
+  test "highlightStaticTea true false":
     check testHighlightStaticTea("a = true", @[
       newFragmentLen(ftVarName, 0, 1),
       newFragmentLen(ftOther, 1, 3),
-      newFragmentLen(ftType, 4, 4),
+      newFragmentLen(ftTrueFalse, 4, 4),
     ])
+  test "list as var ":
+    check testHighlightStaticTea("list = 1", @[
+      newFragmentLen(ftVarName, 0, 4),
+      newFragmentLen(ftOther, 4, 3),
+      newFragmentLen(ftNumber, 7, 1),
+    ])
+  test "var func string ":
     check testHighlightStaticTea("""a = len("abc")""", @[
       newFragmentLen(ftVarName, 0, 1),
       newFragmentLen(ftOther, 1, 3),
@@ -534,11 +553,24 @@ Examples:
       newFragmentLen(ftString, 8, 5),
       newFragmentLen(ftOther, 13, 1),
     ])
+  test "dict function ":
+    check testHighlightStaticTea("""a = dict("abc", 1)""", @[
+      newFragmentLen(ftVarName, 0, 1),
+      newFragmentLen(ftOther, 1, 3),
+      newFragmentLen(ftFunc, 4, 5),
+      newFragmentLen(ftString, 9, 5),
+      newFragmentLen(ftOther, 14, 2),
+      newFragmentLen(ftNumber, 16, 1),
+      newFragmentLen(ftOther, 17, 1),
+    ])
+  test "number":
     check testHighlightStaticTea("""a = 35""", @[
       newFragmentLen(ftVarName, 0, 1),
       newFragmentLen(ftOther, 1, 3),
       newFragmentLen(ftNumber, 4, 2),
     ])
+
+  test "true argument":
     check testHighlightStaticTea("""a = process(35, 44, true)""", @[
       newFragmentLen(ftVarName, 0, 1),
       newFragmentLen(ftOther, 1, 3),
@@ -547,21 +579,33 @@ Examples:
       newFragmentLen(ftOther, 14, 2),
       newFragmentLen(ftNumber, 16, 2),
       newFragmentLen(ftOther, 18, 2),
-      newFragmentLen(ftType, 20, 4),
+      newFragmentLen(ftTrueFalse, 20, 4),
       newFragmentLen(ftOther, 24, 1),
     ])
+  test "commented out code":
     check testHighlightStaticTea("""  #a = process(35, 44, true)""", @[
       newFragmentLen(ftOther, 0, 2),
       newFragmentLen(ftComment, 2, 26),
     ])
+  test "doc comment":
     check testHighlightStaticTea("""  ## this is a doc comment""", @[
       newFragmentLen(ftOther, 0, 2),
       newFragmentLen(ftDocComment, 2, 24),
     ])
+  test "code then comment":
     check testHighlightStaticTea("""a = 5 # comment""", @[
       newFragmentLen(ftVarName, 0, 1),
       newFragmentLen(ftOther, 1, 3),
       newFragmentLen(ftNumber, 4, 1),
       newFragmentLen(ftOther, 5, 1),
       newFragmentLen(ftComment, 6, 9),
+    ])
+  test "optional type":
+                                 #0123456789 123456789 12345
+    check testHighlightStaticTea(", b: optional any) int", @[
+      newFragmentLen(ftOther, 0, 2),
+      newFragmentLen(ftVarName, 2, 1),
+      newFragmentLen(ftOther, 3, 2),
+      newFragmentLen(ftType, 5, 12),
+      newFragmentLen(ftType, 17, 5),
     ])

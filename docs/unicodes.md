@@ -103,7 +103,7 @@ func slice(str: string; start: int; length: int): FunResult
 Return a new string with the tab and line endings and other control characters visible.
 
 ```nim
-func visibleControl(str: string): string 
+func visibleControl(str: string; spacesToo = false): string 
 ```
 
 # startColumn
