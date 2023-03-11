@@ -31,25 +31,25 @@ pre {
 }
 
 .tag-func {
-color: blue;
+    color: #5F34FF;
 }
-.tag-var {
-color: green;
-}
+//.tag-var {
+//    color: #CE7923;
+//}
 .tag-type {
-color: red;
+    color: #34A227;
 }
-.tag-num {
-color: IndianRed;
-}
-.tag-string {
-color: SeaGreen;
-}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
 .tag-doc {
-color: OrangeRed;
+    color: #B03B84;
 }
 .tag-comment {
-color: FireBrick;
+    color: #D7381E;
 }
 
 .desc-code {
@@ -87,13 +87,13 @@ Nim source code: <a href="../../src/parseCmdLine.nim">parseCmdLine.nim</a>
 <p>LineParts holds parsed components of a line.
 
 </p><pre class="desc-code">
-<span class="tag-var">prefix</span> <span class="tag-var">command</span>  [<span class="tag-var">code</span>]   [<span class="tag-var">comment</span>] [<span class="tag-var">continuation</span>]
-|      |        |        |         |[<span class="tag-var">postfix</span>]
-|      |        |        |         ||  [<span class="tag-var">ending</span>]
+<span class="tag-dotName">prefix</span> <span class="tag-dotName">command</span>  [<span class="tag-dotName">code</span>]   [<span class="tag-dotName">comment</span>] [<span class="tag-dotName">continuation</span>]
+|      |        |        |         |[<span class="tag-dotName">postfix</span>]
+|      |        |        |         ||  [<span class="tag-dotName">ending</span>]
 |      |        |        |         ||  |
-<!--$  <span class="tag-var">nextline</span> <span class="tag-var">var</span> = <span class="tag-num">5</span>  <span class="tag-comment"># comment +-->n</span>
-     |
-     <span class="tag-var">optional</span> <span class="tag-var">spaces</span>
+<!<span class="tag-num">-</span>-$  <span class="tag-dotName">nextline</span> <span class="tag-dotName">var</span> = <span class="tag-num">5</span>  <span class="tag-comment"># comment +-->n
+</span>     |
+     <span class="tag-dotName">optional</span> <span class="tag-dotName">spaces</span>
 </pre>
 <p>
 Whitespace must follow a command except on the last line of the file.

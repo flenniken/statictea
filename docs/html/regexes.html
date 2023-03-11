@@ -68,38 +68,38 @@ pre {
 </p><p>Match a string with "abc" in it:
 
 </p><pre class="desc-code">
-<span class="tag-var">let</span> <span class="tag-var">line</span> = <span class="tag-string">"123abc456"</span>
-<span class="tag-var">let</span> <span class="tag-var">pattern</span> = <span class="tag-string">".*abc"</span>
-<span class="tag-var">let</span> <span class="tag-var">matchesO</span> = <span class="tag-func">matchPattern(</span><span class="tag-var">line</span>, <span class="tag-var">pattern</span>, <span class="tag-var">start</span>=<span class="tag-num">0</span>, <span class="tag-var">numGroups</span>=<span class="tag-num">0</span>)
+<span class="tag-dotName">let</span> <span class="tag-dotName">line</span> = <span class="tag-str">"123abc456"</span>
+<span class="tag-dotName">let</span> <span class="tag-dotName">pattern</span> = <span class="tag-str">".*abc"</span>
+<span class="tag-dotName">let</span> <span class="tag-dotName">matchesO</span> = <span class="tag-funcCall">matchPattern</span>(<span class="tag-dotName">line</span>, <span class="tag-dotName">pattern</span>, <span class="tag-dotName">start</span>=<span class="tag-num">0</span>, <span class="tag-dotName">numGroups</span>=<span class="tag-num">0</span>)
 
-<span class="tag-var">check</span> <span class="tag-var">matchesO.isSome</span> == <span class="tag-true-false">true</span>
-<span class="tag-var">check</span> <span class="tag-func">matchesO.get(</span>)<span class="tag-num">.</span><span class="tag-var">length</span> == <span class="tag-num">6</span>
+<span class="tag-dotName">check</span> <span class="tag-dotName">matchesO.isSome</span> == <span class="tag-dotName">true</span>
+<span class="tag-dotName">check</span> <span class="tag-funcCall">matchesO.get</span>().<span class="tag-dotName">length</span> == <span class="tag-num">6</span>
 </pre>
 <p>
 Match a file and line number like: filename(234):
 
 </p><pre class="desc-code">
-<span class="tag-var">let</span> <span class="tag-var">line</span> = <span class="tag-string">"template.html(87)"</span>
-<span class="tag-var">let</span> <span class="tag-var">pattern</span> = <span class="tag-var">r</span>"^(.*)(([<span class="tag-num">0</span><span class="tag-num">-9</span>]+))$<span class="tag-string">"
+<span class="tag-dotName">let</span> <span class="tag-dotName">line</span> = <span class="tag-str">"template.html(87)"</span>
+<span class="tag-dotName">let</span> <span class="tag-dotName">pattern</span> = <span class="tag-dotName">r</span>"^(.*)(([<span class="tag-num">0</span>-<span class="tag-num">9</span>]+))$<span class="tag-str">"
 let matchesO = matchPatternCached(line, pattern, 0, 2)
 
 check matchesO.isSome == true
 let (filename, lineNum) = matchesO.get2Groups()
-check filename == "</span><span class="tag-var">template.html</span>"
-<span class="tag-var">check</span> <span class="tag-var">lineNum</span> == <span class="tag-string">"87"</span>
+check filename == "</span>t<span class="tag-dotName">emplate.html</span>"
+<span class="tag-dotName">check</span> <span class="tag-dotName">lineNum</span> == <span class="tag-str">"87"</span>
 </pre>
 <p>
 Replace the patterns in the string with their replacements:
 
 </p><pre class="desc-code">
-<span class="tag-var">var</span> <span class="tag-var">replacements</span>: <span class="tag-var">seq</span>[<span class="tag-var">Replacement</span>]
-<span class="tag-func">replacements.add(</span><span class="tag-func">newReplacement(</span><span class="tag-string">"abc"</span>, <span class="tag-string">"456"</span>))
-<span class="tag-func">replacements.add(</span><span class="tag-func">newReplacement(</span><span class="tag-string">"def"</span>, <span class="tag-string">""</span>))
+<span class="tag-dotName">var</span> <span class="tag-dotName">replacements</span>: <span class="tag-dotName">seq</span>[<span class="tag-dotName">Replacement</span>]
+<span class="tag-funcCall">replacements.add</span>(<span class="tag-funcCall">newReplacement</span>(<span class="tag-str">"abc"</span>, <span class="tag-str">"456"</span>))
+<span class="tag-funcCall">replacements.add</span>(<span class="tag-funcCall">newReplacement</span>(<span class="tag-str">"def"</span>, <span class="tag-str">""</span>))
 
-<span class="tag-var">let</span> <span class="tag-var">resultStringO</span> = <span class="tag-func">replaceMany(</span><span class="tag-string">"abcdefabc"</span>, <span class="tag-var">replacements</span>)
+<span class="tag-dotName">let</span> <span class="tag-dotName">resultStringO</span> = <span class="tag-funcCall">replaceMany</span>(<span class="tag-str">"abcdefabc"</span>, <span class="tag-dotName">replacements</span>)
 
-<span class="tag-var">check</span> <span class="tag-var">resultStringO.isSome</span>
-<span class="tag-var">check</span> <span class="tag-func">resultStringO.get(</span>) == <span class="tag-string">"456456"</span>
+<span class="tag-dotName">check</span> <span class="tag-dotName">resultStringO.isSome</span>
+<span class="tag-dotName">check</span> <span class="tag-funcCall">resultStringO.get</span>() == <span class="tag-str">"456456"</span>
 </pre>
 
 

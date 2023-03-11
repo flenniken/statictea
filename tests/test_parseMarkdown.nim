@@ -62,8 +62,9 @@ proc markdownHtml(elements: seq[Element]): string =
         result.add("</li>\n")
       result.add("</ul>\n")
 
-proc markdownString(elements: seq[Element]): string =
-  ## Recreate the markdown string from the markdown elements.
+proc roundTripElements(elements: seq[Element]): string =
+  ## Recreate, round trip, the markdown string from the markdown
+  ## elements.
   for element in elements:
     case element.tag
     of nothing:
@@ -85,7 +86,7 @@ proc testParseMarkdown(content: string, expected: string): bool =
   ## Test parseMarkdown
   let elements = parseMarkdown(content)
 
-  let roundtrip = markdownString(elements)
+  let roundtrip = roundTripElements(elements)
   if content != roundtrip:
     echo "roundtrip:"
     echo linesSideBySide(roundtrip, content)
@@ -97,6 +98,22 @@ proc testParseMarkdown(content: string, expected: string): bool =
   echo linesSideBySide(got, expected)
   return false
 
+    # of hlOther:
+    # of hlDotName:
+    # of hlFuncCall:
+    # of hlNumber:
+    # of hlStringType:
+    # of hlMultiline:
+    # of hlDocComment:
+    # of hlComment:
+    # of hlParamName:
+    # of hlParamType:
+
+proc roundTripFragments(codeText: string, fragments: seq[Fragment]): string =
+  ## Recreate, round trip, the code text from the highlight fragments.
+  for f in fragments:
+    result.add(codeText[f.start .. f.fEnd - 1])
+
 proc testHighlightCode(code: string, expected: string): bool =
   ## Test highlightCode.
   let fragments = highlightCode(code)
@@ -106,6 +123,11 @@ proc testHighlightCode(code: string, expected: string): bool =
     got.add(fmt("{f.fragmentType}: {codeFrag}") & "\n")
   
   if got == expected:
+    let roundTrip = roundTripFragments(code, fragments)
+    if roundTrip != code:
+      echo "highlight round trip failed"
+      echo linesSideBySide(roundTrip, code)
+      return false
     return true
   echo "---code:"
   for line in splitNewLines(code):

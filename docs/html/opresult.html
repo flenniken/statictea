@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -116,20 +138,22 @@ func `$`(opResult: OpResult): string
 
 </p><p>Example Usage:
 
-</p><pre class="desc-code">import opresult
+</p><pre class="desc-code">
+<span class="tag-dotName">import</span> <span class="tag-dotName">opresult</span>
 
-proc get_string(): OpResultWarn[string] =
-  if problem:
-    result = opMessage[string](newWarningData(wUnknownArg))
-  else:
-    result = opValue[string]("string of char")
+<span class="tag-dotName">proc</span> <span class="tag-funcCall">get_string</span>(): <span class="tag-dotName">OpResultWarn</span>[<span class="tag-dotName">string</span>] =
+  <span class="tag-dotName">if</span> <span class="tag-dotName">problem</span>:
+    <span class="tag-dotName">result</span> = <span class="tag-dotName">opMessage</span>[<span class="tag-dotName">string</span>](<span class="tag-funcCall">newWarningData</span>(<span class="tag-dotName">wUnknownArg</span>))
+  <span class="tag-dotName">else</span>:
+    <span class="tag-dotName">result</span> = <span class="tag-dotName">opValue</span>[<span class="tag-dotName">string</span>](<span class="tag-str">"string of char"</span>)
 
-let strOr = get_string()
-if strOr.isMessage:
-  echo show_message(strOr.message)
-else:
-  echo "value = " & $strOr.value
+<span class="tag-dotName">let</span> <span class="tag-dotName">strOr</span> = <span class="tag-funcCall">get_string</span>()
+<span class="tag-dotName">if</span> <span class="tag-dotName">strOr.isMessage</span>:
+  <span class="tag-dotName">echo</span> <span class="tag-funcCall">show_message</span>(<span class="tag-dotName">strOr.message</span>)
+<span class="tag-dotName">else</span>:
+  <span class="tag-dotName">echo</span> <span class="tag-str">"value = "</span> & $<span class="tag-dotName">strOr.value</span>
 </pre>
+
 
 <pre class="nim-code">
 OpResultWarn[T] = OpResult[T, WarningData]
@@ -159,20 +183,22 @@ message id that tells why you cannot return the value.
 
 </p><p>Example Usage:
 
-</p><pre class="desc-code">import opresult
+</p><pre class="desc-code">
+<span class="tag-dotName">import</span> <span class="tag-dotName">opresult</span>
 
-proc get_string(): OpResultId[string] =
-  if problem:
-    result = opMessage[string](wUnknownArg)
-  else:
-    result = opValue[string]("string of char")
+<span class="tag-dotName">proc</span> <span class="tag-funcCall">get_string</span>(): <span class="tag-dotName">OpResultId</span>[<span class="tag-dotName">string</span>] =
+  <span class="tag-dotName">if</span> <span class="tag-dotName">problem</span>:
+    <span class="tag-dotName">result</span> = <span class="tag-dotName">opMessage</span>[<span class="tag-dotName">string</span>](<span class="tag-dotName">wUnknownArg</span>)
+  <span class="tag-dotName">else</span>:
+    <span class="tag-dotName">result</span> = <span class="tag-dotName">opValue</span>[<span class="tag-dotName">string</span>](<span class="tag-str">"string of char"</span>)
 
-let strOr = get_string()
-if strOr.isMessage:
-  echo show_message(strOr.message)
-else:
-  echo "value = " & $strOr.value
+<span class="tag-dotName">let</span> <span class="tag-dotName">strOr</span> = <span class="tag-funcCall">get_string</span>()
+<span class="tag-dotName">if</span> <span class="tag-dotName">strOr.isMessage</span>:
+  <span class="tag-dotName">echo</span> <span class="tag-funcCall">show_message</span>(<span class="tag-dotName">strOr.message</span>)
+<span class="tag-dotName">else</span>:
+  <span class="tag-dotName">echo</span> <span class="tag-str">"value = "</span> & $<span class="tag-dotName">strOr.value</span>
 </pre>
+
 
 <pre class="nim-code">
 OpResultId[T] = OpResult[T, MessageId]

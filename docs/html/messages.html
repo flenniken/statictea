@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -331,8 +353,10 @@ func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
 
 <p>Return a formatted warning line. For example:
 
-</p><pre class="desc-code">filename(line): wId: message.
+</p><pre class="desc-code">
+<span class="tag-funcCall">filename</span>(<span class="tag-dotName">line</span>): <span class="tag-dotName">wId</span>: <span class="tag-dotName">message.</span>
 </pre>
+
 
 <pre class="nim-code">
 func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string {.
@@ -343,8 +367,10 @@ func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = "")
 
 <p>Return a formatted warning line. For example:
 
-</p><pre class="desc-code">filename(line): wId: message.
+</p><pre class="desc-code">
+<span class="tag-funcCall">filename</span>(<span class="tag-dotName">line</span>): <span class="tag-dotName">wId</span>: <span class="tag-dotName">message.</span>
 </pre>
+
 
 <pre class="nim-code">
 func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string 
@@ -362,9 +388,11 @@ func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 
 <p>Return a string representation of WarningData.
 
-</p><pre class="desc-code">let warning = newWarningData(wUnknownArg, "p1", 5)
-check $warning == "wUnknownArg(p1):5"
+</p><pre class="desc-code">
+<span class="tag-dotName">let</span> <span class="tag-dotName">warning</span> = <span class="tag-funcCall">newWarningData</span>(<span class="tag-dotName">wUnknownArg</span>, <span class="tag-str">"p1"</span>, <span class="tag-num">5</span>)
+<span class="tag-dotName">check</span> $<span class="tag-dotName">warning</span> == <span class="tag-str">"wUnknownArg(p1):5"</span>
 </pre>
+
 
 <pre class="nim-code">
 func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}

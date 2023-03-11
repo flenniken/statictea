@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -42,24 +64,26 @@ pre {
 <p>Create a temporary file.
 
 </p><p>Example:
-</p><pre class="desc-code">var tempFileO = openTempFile()
-require tempFileO.isSome
-var tempFile = tempFileO.get()
+</p><pre class="desc-code">
+<span class="tag-dotName">var</span> <span class="tag-dotName">tempFileO</span> = <span class="tag-funcCall">openTempFile</span>()
+<span class="tag-dotName">require</span> <span class="tag-dotName">tempFileO.isSome</span>
+<span class="tag-dotName">var</span> <span class="tag-dotName">tempFile</span> = <span class="tag-funcCall">tempFileO.get</span>()
 
-tempFile.file.write("this is a test\n")
-tempFile.file.write("line 2\n")
-tempFile.file.close()
+<span class="tag-funcCall">tempFile.file.write</span>(<span class="tag-str">"this is a test\n"</span>)
+<span class="tag-funcCall">tempFile.file.write</span>(<span class="tag-str">"line 2\n"</span>)
+<span class="tag-funcCall">tempFile.file.close</span>()
 
-var fh = open(tempFile.filename, fmRead)
-let line1 = readline(fh)
-let line2 = readline(fh)
-fh.close()
+<span class="tag-dotName">var</span> <span class="tag-dotName">fh</span> = <span class="tag-funcCall">open</span>(<span class="tag-dotName">tempFile.filename</span>, <span class="tag-dotName">fmRead</span>)
+<span class="tag-dotName">let</span> <span class="tag-dotName">line</span>1 = <span class="tag-funcCall">readline</span>(<span class="tag-dotName">fh</span>)
+<span class="tag-dotName">let</span> <span class="tag-dotName">line</span>2 = <span class="tag-funcCall">readline</span>(<span class="tag-dotName">fh</span>)
+<span class="tag-funcCall">fh.close</span>()
 
-discard tryRemoveFile(tempFile.filename)
+<span class="tag-dotName">discard</span> <span class="tag-funcCall">tryRemoveFile</span>(<span class="tag-dotName">tempFile.filename</span>)
 
-check line1 == "this is a test"
-check line2 == "line 2"
+<span class="tag-dotName">check</span> <span class="tag-dotName">line</span>1 == <span class="tag-str">"this is a test"</span>
+<span class="tag-dotName">check</span> <span class="tag-dotName">line</span>2 == <span class="tag-str">"line 2"</span>
 </pre>
+
 
 Nim source code: <a href="../../src/tempFile.nim">tempFile.nim</a>
 

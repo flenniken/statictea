@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -43,10 +65,12 @@ pre {
 
 </p><p>Usage:
 
-</p><pre class="desc-code">timer = newTimer()
-# run something
-echo timer.seconds()
+</p><pre class="desc-code">
+<span class="tag-dotName">timer</span> = <span class="tag-funcCall">newTimer</span>()
+<span class="tag-comment"># run something
+</span><span class="tag-dotName">echo</span> <span class="tag-funcCall">timer.seconds</span>()
 </pre>
+
 
 Nim source code: <a href="../../src/timer.nim">timer.nim</a>
 

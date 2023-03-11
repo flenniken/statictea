@@ -30,6 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
+.tag-func {
+    color: #5F34FF;
+}
+//.tag-var {
+//    color: #CE7923;
+//}
+.tag-type {
+    color: #34A227;
+}
+//.tag-num {
+//    color: IndianRed;
+//}
+//.tag-string {
+//    color: #B03B84;
+//}
+.tag-doc {
+    color: #B03B84;
+}
+.tag-comment {
+    color: #D7381E;
+}
+
 .desc-code {
     border: 1px solid blue;
     background-color: white;
@@ -43,12 +65,14 @@ pre {
 
 </p><p>Example:
 
-</p><pre class="desc-code">let lbO = newLineBuffer(stream)
-check lbO.isSome == true
-var lb = lbO.get()
-while line = lb.readLine():
-  processLine(line)
+</p><pre class="desc-code">
+<span class="tag-dotName">let</span> <span class="tag-dotName">lbO</span> = <span class="tag-funcCall">newLineBuffer</span>(<span class="tag-dotName">stream</span>)
+<span class="tag-dotName">check</span> <span class="tag-dotName">lbO.isSome</span> == <span class="tag-dotName">true</span>
+<span class="tag-dotName">var</span> <span class="tag-dotName">lb</span> = <span class="tag-funcCall">lbO.get</span>()
+<span class="tag-dotName">while</span> <span class="tag-dotName">line</span> = <span class="tag-funcCall">lb.readLine</span>():
+  <span class="tag-funcCall">processLine</span>(<span class="tag-dotName">line</span>)
 </pre>
+
 
 Nim source code: <a href="../../src/linebuffer.nim">linebuffer.nim</a>
 
