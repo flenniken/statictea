@@ -17,7 +17,8 @@ length.
 * [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a StaticTea language command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
-* [parseMarkdown.nim](parseMarkdown.md) &mdash; Parse the simple markdown used in the function descriptions.
+* [parseMarkdown.nim](parseMarkdown.md) &mdash; Parse the simple markdown used in the function descriptions and
+highlight statictea code.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [processTemplate.nim](processTemplate.md) &mdash; Process the template.
 * [readjson.nim](readjson.md) &mdash; Read json content.

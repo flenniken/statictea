@@ -2086,7 +2086,7 @@ end
 a = 5
 """
     let expected = """
-0: ["var","a"]
+0: ["dotName","a"]
 1: ["other"," = "]
 2: ["num","5"]
 3: ["other","\n"]
@@ -2100,18 +2100,17 @@ len = len("tea")
 # testing
 """
     let expected = """
-0: ["var","a"]
+0: ["dotName","a"]
 1: ["other"," = "]
 2: ["num","5"]
 3: ["other"," "]
-4: ["comment","# comment here"]
-5: ["other","\n"]
-6: ["var","len"]
-7: ["other"," = "]
-8: ["func","len("]
-9: ["string","\"tea\""]
+4: ["comment","# comment here\n"]
+5: ["dotName","len"]
+6: ["other"," = "]
+7: ["funcCall","len"]
+8: ["other","("]
+9: ["str","\"tea\""]
 10: ["other",")\n"]
-11: ["comment","# testing"]
-12: ["other","\n"]
+11: ["comment","# testing\n"]
 """
     check testHighlight(text, expected)

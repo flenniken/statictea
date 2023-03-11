@@ -2777,27 +2777,29 @@ func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:Tags:
   ## @:
   ## @:* other -- not one of the other types
-  ## @:* func -- a function call, var followed by a left parenthesis
-  ## @:* var -- a variable name
-  ## @:* type -- int, float, string, list, dict, bool, any, true, false
+  ## @:* dotName -- a dot name
+  ## @:* funcCall -- a function call; a dot name followed by a left parenthesis
   ## @:* num -- a literal number
-  ## @:* string -- a literal string
+  ## @:* str -- a literal string
+  ## @:* multiline -- a multiline literal string
   ## @:* doc -- a doc comment
   ## @:* comment -- a comment
+  ## @:* param -- a parameter name
+  ## @:* type -- int, float, string, list, dict, bool, func, any and optional
   ## @:
   ## @:Example:
   ## @:
   ## @:~~~
   ## @:frags = highlight("a = 5")
   ## @:frags => [
-  ## @:  ["var", "a"],
+  ## @:  ["dotName", "a"],
   ## @:  ["other", " = "],
   ## @:  ["num", "5"],
   ## @:]
   ## @:~~~~
   tMapParameters("highlight", "sl")
   let codeText = map["a"].stringv
-  var fragments = highlightStaticTea(codeText)
+  var fragments = highlightCode(codeText)
 
   var fragList = newEmptyListValue()
   for fragment in fragments:

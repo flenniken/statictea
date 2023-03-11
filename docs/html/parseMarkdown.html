@@ -61,7 +61,7 @@ pre {
 <body>
 <h1>parseMarkdown.nim</h1>
 
-<p>Parse the simple markdown used in the function descriptions.</p>
+<p>Parse the simple markdown used in the function descriptions and highlight statictea code.</p>
 
 Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 
@@ -73,15 +73,16 @@ Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 <li>type:  <a href="#FragmentType">FragmentType</a> &mdash; Hightlight fragments.</li>
 <li>type:  <a href="#Fragment">Fragment</a> &mdash; A fragment of a string.</li>
 <li> <a href="#newElement">newElement</a> &mdash; Create an Element object.</li>
-<li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the simple description markdown and return a list of elements.</li>
-<li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Element.</li>
-<li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a list of Elements.</li>
 <li> <a href="#newFragment">newFragment</a> &mdash; </li>
-<li> <a href="#newFragmentLen">newFragmentLen</a> &mdash; </li>
-<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a Fragment.</li>
-<li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a sequence of fragments.</li>
-<li> <a href="#matchFragment">matchFragment</a> &mdash; Match a highlight fragment starting at the given position.</li>
-<li> <a href="#highlightStaticTea">highlightStaticTea</a> &mdash; Identify all the fragments in the StaticTea code line to highlight.</li>
+<li> <a href="#newFragmentLen2">newFragmentLen2</a> &mdash; </li>
+<li> <a href="#a__">`$`</a> &mdash; Return a string representation of a Fragment.</li>
+<li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a sequence of fragments.</li>
+<li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the simple description markdown and return a list of elements.</li>
+<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of an Element.</li>
+<li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a list of Elements.</li>
+<li> <a href="#atMultiline">atMultiline</a> &mdash; Determine whether the start index points a the start of a multiline string.</li>
+<li> <a href="#lineEnd">lineEnd</a> &mdash; Find the end of the line.</li>
+<li> <a href="#highlightCode">highlightCode</a> &mdash; Identify all the fragments in the StaticTea code to highlight.</li>
 </ul>
 
 <h3 id="ElementTag">ElementTag</h3>
@@ -108,30 +109,33 @@ Element = object
 <p>Hightlight fragments.
 
 </p><ul>
-<li>ftOther -- not one of the other types
-</li><li>ftType -- int, float, string, list, dict, bool, any, true, false
-</li><li>ftFunc -- a variable name followed by a left parenthesis
-</li><li>ftVarName -- a variable name
-</li><li>ftNumber -- a literal number
-</li><li>ftString -- a literal string
-</li><li>ftDocComment -- a ## to the end of the line
-</li><li>ftComment -- a # to the end of the line</li></ul>
+<li>hlOther -- not one of the other types
+</li><li>hlDotName -- a dot name
+</li><li>hlFuncCall -- a dot name followed by a left parenthesis
+</li><li>hlNumber -- a literal number
+</li><li>hlStringType -- a literal string
+</li><li>hlMultiline -- a multiline literal string
+</li><li>hlDocComment -- a doc comment
+</li><li>hlComment -- a comment
+</li><li>hlParamName -- a parameter name
+</li><li>hlParamType -- int, float, string, list, dict, bool, func, any and optional</li></ul>
 
 
 <pre class="nim-code">
 FragmentType = enum
-  ftOther = "other", ftType = "type", ftFunc = "func", ftVarName = "var",
-  ftNumber = "num", ftString = "string", ftTrueFalse = "true-false",
-  ftDocComment = "doc", ftComment = "comment"
+  hlOther = "other", hlDotName = "dotName", hlFuncCall = "funcCall",
+  hlNumber = "num", hlStringType = "str", hlMultiline = "multiline",
+  hlDocComment = "doc", hlComment = "comment", hlParamName = "param",
+  hlParamType = "type"
 </pre>
 
 <h3 id="Fragment">Fragment</h3>
 
 <p>A fragment of a string.
 </p><ul>
-<li>kind -- the type of fragment
+<li>fragmentType -- the type of fragment
 </li><li>start -- the index in the string where the fragment starts
-</li><li>fEnd -- the end of the fragment + 1.</li></ul>
+</li><li>fEnd -- the end of the fragment, [start, end) half-open interval</li></ul>
 
 
 <pre class="nim-code">
@@ -147,6 +151,38 @@ Fragment = object
 
 <pre class="nim-code">
 proc newElement(tag: ElementTag; content: seq[string]): Element 
+</pre>
+
+<h3 id="newFragment">newFragment</h3>
+
+
+
+<pre class="nim-code">
+func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
+</pre>
+
+<h3 id="newFragmentLen2">newFragmentLen2</h3>
+
+
+
+<pre class="nim-code">
+func newFragmentLen2(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
+</pre>
+
+<h3 id="a__">`$`</h3>
+
+<p>Return a string representation of a Fragment.</p>
+
+<pre class="nim-code">
+func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
+</pre>
+
+<h3 id="a__-1">`$`</h3>
+
+<p>Return a string representation of a sequence of fragments.</p>
+
+<pre class="nim-code">
+func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="parseMarkdown">parseMarkdown</h3>
@@ -178,7 +214,7 @@ not part of the string.</li></ul>
 func parseMarkdown(desc: string): seq[Element] 
 </pre>
 
-<h3 id="a__">`$`</h3>
+<h3 id="a__-2">`$`</h3>
 
 <p>Return a string representation of an Element.</p>
 
@@ -186,7 +222,7 @@ func parseMarkdown(desc: string): seq[Element]
 func `$`(element: Element): string {.raises: [ValueError], tags: [].}
 </pre>
 
-<h3 id="a__-1">`$`</h3>
+<h3 id="a__-3">`$`</h3>
 
 <p>Return a string representation of a list of Elements.</p>
 
@@ -194,54 +230,28 @@ func `$`(element: Element): string {.raises: [ValueError], tags: [].}
 func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
 </pre>
 
-<h3 id="newFragment">newFragment</h3>
+<h3 id="atMultiline">atMultiline</h3>
 
-
+<p>Determine whether the start index points a the start of a multiline string. Return 0 when it doesn't. Return the position after the triple quotes, either 4 or 5 depending on the line endings.</p>
 
 <pre class="nim-code">
-func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
+func atMultiline(codeText: string; start: Natural): int 
 </pre>
 
-<h3 id="newFragmentLen">newFragmentLen</h3>
+<h3 id="lineEnd">lineEnd</h3>
 
-
+<p>Find the end of the line. It returns either one after the first newline or after the end of the string.</p>
 
 <pre class="nim-code">
-func newFragmentLen(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
+func lineEnd(str: string; start: Natural): int 
 </pre>
 
-<h3 id="a__-2">`$`</h3>
+<h3 id="highlightCode">highlightCode</h3>
 
-<p>Return a string representation of a Fragment.</p>
-
-<pre class="nim-code">
-func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
-</pre>
-
-<h3 id="a__-3">`$`</h3>
-
-<p>Return a string representation of a sequence of fragments.</p>
+<p>Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. It doesn't validate but it works for valid code.</p>
 
 <pre class="nim-code">
-func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
-</pre>
-
-<h3 id="matchFragment">matchFragment</h3>
-
-<p>Match a highlight fragment starting at the given position.</p>
-
-<pre class="nim-code">
-func matchFragment(line: string; start: Natural): Option[Fragment] {.
-    raises: [ValueError], tags: [].}
-</pre>
-
-<h3 id="highlightStaticTea">highlightStaticTea</h3>
-
-<p>Identify all the fragments in the StaticTea code line to highlight. The fragments are ordered from left to right.</p>
-
-<pre class="nim-code">
-func highlightStaticTea(codeText: string): seq[Fragment] {.raises: [ValueError],
-    tags: [].}
+func highlightCode(codeText: string): seq[Fragment] 
 </pre>
 
 

@@ -1,6 +1,6 @@
 # parseMarkdown.nim
 
-Parse the simple markdown used in the function descriptions.
+Parse the simple markdown used in the function descriptions and highlight statictea code.
 
 * [parseMarkdown.nim](../src/parseMarkdown.nim) &mdash; Nim source code.
 # Index
@@ -10,15 +10,16 @@ Parse the simple markdown used in the function descriptions.
 * type: [FragmentType](#fragmenttype) &mdash; Hightlight fragments.
 * type: [Fragment](#fragment) &mdash; A fragment of a string.
 * [newElement](#newelement) &mdash; Create an Element object.
-* [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of elements.
-* [`$`](#) &mdash; Return a string representation of an Element.
-* [`$`](#-1) &mdash; Return a string representation of a list of Elements.
 * [newFragment](#newfragment) &mdash; 
-* [newFragmentLen](#newfragmentlen) &mdash; 
-* [`$`](#-2) &mdash; Return a string representation of a Fragment.
-* [`$`](#-3) &mdash; Return a string representation of a sequence of fragments.
-* [matchFragment](#matchfragment) &mdash; Match a highlight fragment starting at the given position.
-* [highlightStaticTea](#highlightstatictea) &mdash; Identify all the fragments in the StaticTea code line to highlight.
+* [newFragmentLen2](#newfragmentlen2) &mdash; 
+* [`$`](#) &mdash; Return a string representation of a Fragment.
+* [`$`](#-1) &mdash; Return a string representation of a sequence of fragments.
+* [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of elements.
+* [`$`](#-2) &mdash; Return a string representation of an Element.
+* [`$`](#-3) &mdash; Return a string representation of a list of Elements.
+* [atMultiline](#atmultiline) &mdash; Determine whether the start index points a the start of a multiline string.
+* [lineEnd](#lineend) &mdash; Find the end of the line.
+* [highlightCode](#highlightcode) &mdash; Identify all the fragments in the StaticTea code to highlight.
 
 # ElementTag
 
@@ -43,28 +44,31 @@ Element = object
 
 Hightlight fragments.
 
-* ftOther -- not one of the other types
-* ftType -- int, float, string, list, dict, bool, any, true, false
-* ftFunc -- a variable name followed by a left parenthesis
-* ftVarName -- a variable name
-* ftNumber -- a literal number
-* ftString -- a literal string
-* ftDocComment -- a ## to the end of the line
-* ftComment -- a # to the end of the line
+* hlOther -- not one of the other types
+* hlDotName -- a dot name
+* hlFuncCall -- a dot name followed by a left parenthesis
+* hlNumber -- a literal number
+* hlStringType -- a literal string
+* hlMultiline -- a multiline literal string
+* hlDocComment -- a doc comment
+* hlComment -- a comment
+* hlParamName -- a parameter name
+* hlParamType -- int, float, string, list, dict, bool, func, any and optional
 
 ```nim
 FragmentType = enum
-  ftOther = "other", ftType = "type", ftFunc = "func", ftVarName = "var",
-  ftNumber = "num", ftString = "string", ftTrueFalse = "true-false",
-  ftDocComment = "doc", ftComment = "comment"
+  hlOther = "other", hlDotName = "dotName", hlFuncCall = "funcCall",
+  hlNumber = "num", hlStringType = "str", hlMultiline = "multiline",
+  hlDocComment = "doc", hlComment = "comment", hlParamName = "param",
+  hlParamType = "type"
 ```
 
 # Fragment
 
 A fragment of a string.
-* kind -- the type of fragment
+* fragmentType -- the type of fragment
 * start -- the index in the string where the fragment starts
-* fEnd -- the end of the fragment + 1.
+* fEnd -- the end of the fragment, [start, end) half-open interval
 
 ```nim
 Fragment = object
@@ -79,6 +83,38 @@ Create an Element object.
 
 ```nim
 proc newElement(tag: ElementTag; content: seq[string]): Element 
+```
+
+# newFragment
+
+
+
+```nim
+func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
+```
+
+# newFragmentLen2
+
+
+
+```nim
+func newFragmentLen2(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
+```
+
+# `$`
+
+Return a string representation of a Fragment.
+
+```nim
+func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
+```
+
+# `$`
+
+Return a string representation of a sequence of fragments.
+
+```nim
+func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
 ```
 
 # parseMarkdown
@@ -120,54 +156,28 @@ Return a string representation of a list of Elements.
 func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
 ```
 
-# newFragment
+# atMultiline
 
-
+Determine whether the start index points a the start of a multiline string. Return 0 when it doesn't. Return the position after the triple quotes, either 4 or 5 depending on the line endings.
 
 ```nim
-func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
+func atMultiline(codeText: string; start: Natural): int 
 ```
 
-# newFragmentLen
+# lineEnd
 
-
+Find the end of the line. It returns either one after the first newline or after the end of the string.
 
 ```nim
-func newFragmentLen(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
+func lineEnd(str: string; start: Natural): int 
 ```
 
-# `$`
+# highlightCode
 
-Return a string representation of a Fragment.
-
-```nim
-func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
-```
-
-# `$`
-
-Return a string representation of a sequence of fragments.
+Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. It doesn't validate but it works for valid code.
 
 ```nim
-func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
-```
-
-# matchFragment
-
-Match a highlight fragment starting at the given position.
-
-```nim
-func matchFragment(line: string; start: Natural): Option[Fragment] {.
-    raises: [ValueError], tags: [].}
-```
-
-# highlightStaticTea
-
-Identify all the fragments in the StaticTea code line to highlight. The fragments are ordered from left to right.
-
-```nim
-func highlightStaticTea(codeText: string): seq[Fragment] {.raises: [ValueError],
-    tags: [].}
+func highlightCode(codeText: string): seq[Fragment] 
 ```
 
 

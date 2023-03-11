@@ -615,20 +615,22 @@ highlight(code: string) list
 Tags:
 
 * other -- not one of the other types
-* func -- a function call, var followed by a left parenthesis
-* var -- a variable name
-* type -- int, float, string, list, dict, bool, any, true, false
+* dotName -- a dot name
+* funcCall -- a function call; a dot name followed by a left parenthesis
 * num -- a literal number
-* string -- a literal string
+* str -- a literal string
+* multiline -- a multiline literal string
 * doc -- a doc comment
 * comment -- a comment
+* param -- a parameter name
+* type -- int, float, string, list, dict, bool, func, any and optional
 
 Example:
 
 ~~~
 frags = highlight("a = 5")
 frags => [
-  ["var", "a"],
+  ["dotName", "a"],
   ["other", " = "],
   ["num", "5"],
 ]
@@ -1695,7 +1697,7 @@ warn("always warn")
     info("fun_gt_iib", dc_fun_gt_iib, 19),
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
     info("fun_gte_iib", dc_fun_gte_iib, 19),
-    info("fun_highlight_sl", dc_fun_highlight_sl, 43),
+    info("fun_highlight_sl", dc_fun_highlight_sl, 45),
     info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 58),
     info("fun_if_baoaa", dc_fun_if_baoaa, 39),
     info("fun_int_fosi", dc_fun_int_fosi, 35),

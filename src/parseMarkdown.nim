@@ -1,9 +1,8 @@
-## Parse the simple markdown used in the function descriptions.
+## Parse the simple markdown used in the function descriptions and
+## highlight statictea code.
 
 import std/strutils
-import std/options
 import lineBuffer
-import regexes
 
 type
   ElementTag* = enum
@@ -19,31 +18,33 @@ type
   FragmentType* = enum
     ## Hightlight fragments.
     ## @:
-    ## @:* ftOther -- not one of the other types
-    ## @:* ftType -- int, float, string, list, dict, bool, any, true, false
-    ## @:* ftFunc -- a variable name followed by a left parenthesis
-    ## @:* ftVarName -- a variable name
-    ## @:* ftNumber -- a literal number
-    ## @:* ftString -- a literal string
-    ## @:* ftDocComment -- a ## to the end of the line
-    ## @:* ftComment -- a # to the end of the line
-    ftOther = "other",
-    ftType = "type",
-    ftFunc = "func",
-    ftVarName = "var",
-    ftNumber = "num",
-    ftString = "string",
-    ftTrueFalse = "true-false",
-    ftDocComment = "doc",
-    ftComment = "comment",
+    ## @:* hlOther -- not one of the other types
+    ## @:* hlDotName -- a dot name
+    ## @:* hlFuncCall -- a dot name followed by a left parenthesis
+    ## @:* hlNumber -- a literal number
+    ## @:* hlStringType -- a literal string
+    ## @:* hlMultiline -- a multiline literal string
+    ## @:* hlDocComment -- a doc comment
+    ## @:* hlComment -- a comment
+    ## @:* hlParamName -- a parameter name
+    ## @:* hlParamType -- int, float, string, list, dict, bool, func, any and optional
+    hlOther = "other",
+    hlDotName = "dotName",
+    hlFuncCall = "funcCall",
+    hlNumber = "num",
+    hlStringType = "str",
+    hlMultiline = "multiline"
+    hlDocComment = "doc",
+    hlComment = "comment",
+    hlParamName = "param",
+    hlParamType = "type",
 
   Fragment* = object
     ## A fragment of a string.
-    ## @:* kind -- the type of fragment
+    ## @:* fragmentType -- the type of fragment
     ## @:* start -- the index in the string where the fragment starts
-    ## @:* fEnd -- the end of the fragment + 1.
+    ## @:* fEnd -- the end of the fragment, [start, end) half-open interval
     fragmentType*: FragmentType
-    # [start, end) half-open interval
     start*: Natural
     fEnd*: Natural
 
@@ -54,6 +55,23 @@ proc newElement*(tag: ElementTag, content: seq[string]): Element =
 proc clear(list: var seq[string]) =
   ## Clear (empty) the list.
   list.setLen(0)
+
+func newFragment*(fragmentType: FragmentType, start: Natural, fEnd: Natural): Fragment =
+  result = Fragment(fragmentType: fragmentType, start: start, fEnd: fEnd)
+
+func newFragmentLen2*(fragmentType: FragmentType, start: Natural, length: Natural): Fragment =
+  result = Fragment(fragmentType: fragmentType, start: start, fEnd: start+length)
+
+func `$`*(f: Fragment): string =
+  ## Return a string representation of a Fragment.
+  result.add("$1, start: $2, end: $3" % [$f.fragmentType, $f.start, $f.fEnd])
+
+func `$`*(fragments: seq[Fragment]): string =
+  ## Return a string representation of a sequence of fragments.
+  if fragments.len == 0:
+    return "no fragments"
+  for f in fragments:
+    result.add("$1, start: $2, fEnd: $3\n" % [$f.fragmentType, $f.start, $f.fEnd])
 
 func parseMarkdown*(desc: string): seq[Element] =
   ## Parse the simple description markdown and return a list of
@@ -183,91 +201,229 @@ func `$`*(elements: seq[Element]): string =
   for element in elements:
     result.add($element)
 
-func newFragment*(fragmentType: FragmentType, start: Natural, fEnd: Natural): Fragment =
-  result = Fragment(fragmentType: fragmentType, start: start, fEnd: fEnd)
+func atMultiline*(codeText: string, start: Natural): int =
+  ## Determine whether the start index points a the start of a
+  ## multiline string. Return 0 when it doesn't. Return the position
+  ## after the triple quotes, either 4 or 5 depending on the line
+  ## endings.
+  # Look for """\n or """\r\n at start.
+  if codeText.len < 4:
+    return 0
+  if not (codeText[start] == '"' and codeText[start+1] == '"' and
+          codeText[start+2] == '"'):
+    return 0
+  if codeText[start+3] == '\n':
+    return 4
+  if codeText.len < 5:
+    return 0
+  if codeText[start+3] == '\r' and codeText[start+4] == '\n':
+    return 5
+  return 0
 
-func newFragmentLen*(fragmentType: FragmentType, start: Natural, length: Natural): Fragment =
-  result = Fragment(fragmentType: fragmentType, start: start, fEnd: start+length)
+func lineEnd*(str: string, start: Natural): int =
+  ## Find the end of the line. It returns either one after the first
+  ## newline or after the end of the string.
+  let pos  = find(str[start .. ^1], '\n')
+  if pos == -1:
+    result = str.len
+  else:
+    result = start + pos + 1
 
-func `$`*(f: Fragment): string =
-  ## Return a string representation of a Fragment.
-  result.add("$1, start: $2, end: $3" % [$f.fragmentType, $f.start, $f.fEnd])
+func highlightCode*(codeText: string): seq[Fragment] =
+  ## Identify all the fragments in the StaticTea code to
+  ## highlight. Return a list of fragments that cover all the
+  ## code. Unlighted areas are in "other" fragments. It doesn't
+  ## validate but it works for valid code.
 
-func `$`*(fragments: seq[Fragment]): string =
-  ## Return a string representation of a sequence of fragments.
-  if fragments.len == 0:
-    return "no fragments"
-  for f in fragments:
-    result.add("$1, start: $2, fEnd: $3\n" % [$f.fragmentType, $f.start, $f.fEnd])
+  # debugEcho "---"
+  # debugEcho codeText
+  # debugEcho "---"
+  type
+    State = enum
+      ## Parsing states.
+      other, dotName, number, multiLine, beforeParam,
+      beforeType, param, paramType, optionalType,
+      beforeReturnType, returnType, strLiteral, slash
 
-func matchFragment*(line: string, start: Natural): Option[Fragment] =
-  ## Match a highlight fragment starting at the given position.
+  template addFrag(fragmentType2: FragmentType) =
+    if currentPos > start:
+      let frag = newFragment(fragmentType2, start, currentPos)
+      # debugEcho "--- $1, '$2'" % [$fragmentType2, codeText[start .. currentPos-1]]
+      result.add(frag)
+    start = currentPos
 
-
-  # todo: move the big pattern making and compiling out of the loop.
-  let patterns = [
-    (ftTrueFalse, r"\b(true|false)\b"),
-    (ftFunc, r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\("),
-    (ftType, r"optional\s*(int|string|float|dict|list|any|bool|func)\b"),
-    (ftType, r"[:\)]\s*(int|string|float|dict|list|any|bool|func)\b"),
-    (ftVarName, r"([a-zA-Z]+[a-zA-Z0-9\.\-_]*)\b"),
-    (ftNumber, r"(\-*[.0-9]*)\b"),
-    (ftString, r"($1(?:\\.|[^\$1])*$1)" % "\""),
-    (ftDocComment, r"(##.*)"),
-    (ftComment, r"(#.*)"),
-  ]
-
-  # Generate an error when the number of patterns does not equal the
-  # number of types minus "other".
-  assert(patterns.len != ord(high(FragmentType))-1,
-    "\n\n\x1b[1;31mThe number of patterns does not equal the number of fragment types - 1.\x1b[0m")
-    
-  # Join the patterns together.
-  var bigPattern: string
-  for (_, pattern) in patterns:
-    if bigPattern.len > 0:
-      bigPattern.add("|")
-    bigPattern.add(pattern)
-    
-  # Compile the big pattern.
-  let compiledPatternO = compilePattern(bigPattern)
-  if not compiledPatternO.isSome:
-    return
-  let compiledPattern = compiledPatternO.get()
-
-  # Look for one of the patterns at the start position.
-  let matchesO = matchRegex(line, compiledPattern, start, patterns.len)
-  if not matchesO.isSome:
-    return
-  let groups = getGroups(matchesO.get(), patterns.len)
-  for ix, group in groups:
-    if group != "":
-      let (fragmentType, _) = patterns[ix]
-      return some(newFragment(fragmentType, start, start+matchesO.get().length))
-
-func highlightStaticTea*(codeText: string): seq[Fragment] =
-  ## Identify all the fragments in the StaticTea code line to
-  ## highlight. The fragments are ordered from left to right.
-
-  var fragList = newSeq[Fragment]()
-  var ix = 0
-  while true:
-    if ix >= codeText.len:
-      break
-    let fragmentO = matchFragment(codeText, ix)
-    if fragmentO.isSome:
-      let fragment = fragmentO.get()
-      fragList.add(fragment)
-      ix = fragment.fEnd
-    else:
-      inc(ix)
-
+  var state = other
   var start = 0
-  for fragment in fragList:
-    let fs = fragment.start
-    if start != fs:
-      result.add(newFragment(ftOther, start, fs))
-    result.add(fragment)
-    start = fragment.fEnd
-  if start != codeText.len:
-    result.add(newFragment(ftOther, start, codeText.len))
+  var currentPos = 0
+
+  # Loop through the text one byte at a time.
+  while true:
+    if currentPos > codeText.len - 1:
+      break
+    let ch = codeText[currentPos]
+    # debugEcho "state = $1, ch = $2" % [$state, $ch]
+    case state
+    of other:
+      case ch
+      of '0'..'9', '-':
+        # We have a number.
+        addFrag(hlOther)
+        state = number
+
+      of 'a'..'z', 'A'..'Z':
+        # We have a dot name, function call or a function definition.
+        addFrag(hlOther)
+        state = dotName
+
+      of '#':
+        # We have a comment or doc comment.
+        addFrag(hlOther)
+
+        # Find the end of the current line (plus 1).
+        let lineEnd = lineEnd(codeText, currentPos)
+
+        # Determine whether it is a doc comment or comment.
+        var tag: FragmentType
+        let plus1 = currentPos + 1
+        if plus1 < codeText.len and codeText[plus1] == '#':
+          tag = hlDocComment
+        else:
+          tag = hlComment
+
+        # Add the doc comment or comment fragment.
+        currentPos = lineEnd
+        addFrag(tag)
+        state = other
+        # Continue so currentPos equals start and isn't incremented at the end.
+        continue
+
+      of '"':
+        # We have a string type or multiline string.
+        addFrag(hlOther)
+
+        let mLen = atMultiline(codeText, currentPos)
+        if mLen != 0:
+          currentPos += mLen
+          state = multiline
+        else:
+          state = strLiteral
+      else:
+        # Stay in the other state.
+        discard
+
+    of strLiteral:
+      case ch
+      of '"':
+        inc(currentPos)
+        addFrag(hlStringType)
+        state = other
+      of '\\':
+        state = slash
+      else:
+        discard
+
+    of slash:
+      state = strLiteral
+
+    of number:
+      case ch
+      of '0'..'9', '.':
+        discard
+      else:
+        addFrag(hlNumber)
+        state = other
+
+    of dotName:
+      case ch
+      of 'a'..'z', 'A'..'Z', '.', '_', '-':
+        discard
+      of '(':
+        # Function call.
+        let name = codeText[start .. currentPos - 1]
+        if name == "func":
+          state = beforeParam
+        else:
+          state = other
+        addFrag(hlFuncCall)
+      else:
+        # Dot name.
+        addFrag(hlDotName)
+        state = other
+
+    of multiLine:
+      let mLen = atMultiline(codeText, currentPos)
+      if mLen != 0:
+        currentPos += mLen
+        addFrag(hlMultiline)
+        state = other
+
+    of beforeParam:
+      case ch
+      of ')':
+        state = beforeReturnType
+      of 'a'..'z', 'A'..'Z':
+        addFrag(hlOther)
+        state = param
+      else:
+        discard
+
+    of param:
+      case ch
+      of 'a'..'z', 'A'..'Z', '_', '-':
+        discard
+      else:
+        addFrag(hlParamName)
+        state = beforeType
+
+    of beforeType:
+      case ch
+      of 'o':
+        addFrag(hlOther)
+        state = optionalType
+      of 'a'..'n', 'p'..'z':
+        addFrag(hlOther)
+        state = paramType
+      else:
+        discard
+
+    of paramType:
+      case ch
+      of ')':
+        addFrag(hlParamType)
+        state = beforeReturnType
+      # int, float, bool, string, dict, list, any
+      of 'a'..'z':
+        discard
+      else:
+        addFrag(hlParamType)
+        state = beforeParam
+
+    of optionalType:
+      case ch
+      # optional a-t
+      of 'a'..'t':
+        discard
+      else:
+        addFrag(hlParamType)
+        state = beforeType
+
+    of beforeReturnType:
+      case ch
+      of 'a'..'z':
+        addFrag(hlOther)
+        state = returnType
+      else:
+        discard
+
+    of returnType:
+      case ch
+      of 'a'..'z':
+        discard
+      else:
+        addFrag(hlParamType)
+        state = other
+
+    inc(currentPos)
+
+  if start < codeText.len:
+    addFrag(hlOther)

@@ -254,15 +254,15 @@ func parseNumber(line: string; start: Natural): ValuePosSiOr
 <p>Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
 
 </p><pre class="desc-code">
-<span class="tag-var">let</span> <span class="tag-var">first</span> = <span class="tag-string">"Earl"</span>
-<span class="tag-var">let</span> <span class="tag-var">last</span> = <span class="tag-string">"Grey"</span>
-<span class="tag-string">"name: {first} {last}"</span> => <span class="tag-string">"name: Earl Grey"</span>
+<span class="tag-dotName">let</span> <span class="tag-dotName">first</span> = <span class="tag-str">"Earl"</span>
+<span class="tag-dotName">let</span> <span class="tag-dotName">last</span> = <span class="tag-str">"Grey"</span>
+<span class="tag-str">"name: {first} {last}"</span> => <span class="tag-str">"name: Earl Grey"</span>
 </pre>
 <p>
 To enter a left bracket use two in a row.
 
 </p><pre class="desc-code">
-<span class="tag-string">"{{"</span> => <span class="tag-string">"{"</span>
+<span class="tag-str">"{{"</span> => <span class="tag-str">"{"</span>
 </pre>
 
 
@@ -276,15 +276,15 @@ proc formatString(variables: Variables; text: string): StringOr {.
 <p>Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
 </p><pre class="desc-code">
-<span class="tag-func">cmp(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">cmp(</span><span class="tag-num">7</span>, <span class="tag-num">9</span>) => <span class="tag-num">-1</span>
-<span class="tag-func">cmp(</span><span class="tag-num">8</span>, <span class="tag-num">8</span>) => <span class="tag-num">0</span>
-<span class="tag-func">cmp(</span><span class="tag-num">9</span>, <span class="tag-num">2</span>) => <span class="tag-num">1</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-num">7</span>, <span class="tag-num">9</span>) => <span class="tag-num">-1</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-num">8</span>, <span class="tag-num">8</span>) => <span class="tag-num">0</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-num">9</span>, <span class="tag-num">2</span>) => <span class="tag-num">1</span>
 </pre>
 
 
@@ -298,15 +298,15 @@ func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
 </p><pre class="desc-code">
-<span class="tag-func">cmp(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">cmp(</span><span class="tag-num">7.8</span>, <span class="tag-num">9.1</span>) => <span class="tag-num">-1</span>
-<span class="tag-func">cmp(</span><span class="tag-num">8.4</span>, <span class="tag-num">8.4</span>) => <span class="tag-num">0</span>
-<span class="tag-func">cmp(</span><span class="tag-num">9.3</span>, <span class="tag-num">2.2</span>) => <span class="tag-num">1</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-num">7.8</span>, <span class="tag-num">9.1</span>) => <span class="tag-num">-1</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-num">8.4</span>, <span class="tag-num">8.4</span>) => <span class="tag-num">0</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-num">9.3</span>, <span class="tag-num">2.2</span>) => <span class="tag-num">1</span>
 </pre>
 
 
@@ -323,17 +323,17 @@ func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
 is the default.
 
 </p><pre class="desc-code">
-<span class="tag-func">cmp(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span>, <span class="tag-var">insensitive</span>: <span class="tag-type">optional bool</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">insensitive</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">bool</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">cmp(</span><span class="tag-string">"coffee"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-num">-1</span>
-<span class="tag-func">cmp(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-num">0</span>
-<span class="tag-func">cmp(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-num">1</span>
-<span class="tag-func">cmp(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"tea"</span>, <span class="tag-true-false">true</span>) => <span class="tag-num">1</span>
-<span class="tag-func">cmp(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"tea"</span>, <span class="tag-true-false">false</span>) => <span class="tag-num">0</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-str">"coffee"</span>, <span class="tag-str">"tea"</span>) => <span class="tag-num">-1</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-str">"tea"</span>, <span class="tag-str">"tea"</span>) => <span class="tag-num">0</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-str">"Tea"</span>, <span class="tag-str">"tea"</span>) => <span class="tag-num">1</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-str">"Tea"</span>, <span class="tag-str">"tea"</span>, <span class="tag-dotName">true</span>) => <span class="tag-num">1</span>
+<span class="tag-funcCall">cmp</span>(<span class="tag-str">"Tea"</span>, <span class="tag-str">"tea"</span>, <span class="tag-dotName">false</span>) => <span class="tag-num">0</span>
 </pre>
 
 
@@ -347,14 +347,14 @@ func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Concatenate two strings. See the join function for more that two arguments.
 
 </p><pre class="desc-code">
-<span class="tag-func">concat(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">concat</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">concat(</span><span class="tag-string">"tea"</span>, <span class="tag-string">" time"</span>) => <span class="tag-string">"tea time"</span>
-<span class="tag-func">concat(</span><span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>) => <span class="tag-string">"ab"</span>
+<span class="tag-funcCall">concat</span>(<span class="tag-str">"tea"</span>, <span class="tag-str">" time"</span>) => <span class="tag-str">"tea time"</span>
+<span class="tag-funcCall">concat</span>(<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>) => <span class="tag-str">"ab"</span>
 </pre>
 
 
@@ -368,14 +368,14 @@ func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Number of unicode characters in a string.
 
 </p><pre class="desc-code">
-<span class="tag-func">len(</span><span class="tag-var">str</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">len</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">len(</span><span class="tag-string">"tea"</span>) => <span class="tag-num">3</span>
-<span class="tag-func">len(</span><span class="tag-string">"añyóng"</span>) => <span class="tag-num">6</span>
+<span class="tag-funcCall">len</span>(<span class="tag-str">"tea"</span>) => <span class="tag-num">3</span>
+<span class="tag-funcCall">len</span>(<span class="tag-str">"añyóng"</span>) => <span class="tag-num">6</span>
 </pre>
 
 
@@ -389,15 +389,15 @@ func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Number of elements in a list.
 
 </p><pre class="desc-code">
-<span class="tag-func">len(</span><span class="tag-var">list</span><span class="tag-type">: list</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">len</span>(<span class="tag-dotName">list</span>: <span class="tag-dotName">list</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">len(</span><span class="tag-func">list(</span>)) => <span class="tag-num">0</span>
-<span class="tag-func">len(</span><span class="tag-func">list(</span><span class="tag-num">1</span>)) => <span class="tag-num">1</span>
-<span class="tag-func">len(</span><span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-num">5</span>)) => <span class="tag-num">2</span>
+<span class="tag-funcCall">len</span>(<span class="tag-funcCall">list</span>()) => <span class="tag-num">0</span>
+<span class="tag-funcCall">len</span>(<span class="tag-funcCall">list</span>(<span class="tag-num">1</span>)) => <span class="tag-num">1</span>
+<span class="tag-funcCall">len</span>(<span class="tag-funcCall">list</span>(<span class="tag-num">4</span>, <span class="tag-num">5</span>)) => <span class="tag-num">2</span>
 </pre>
 
 
@@ -411,15 +411,15 @@ func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Number of elements in a dictionary.
 
 </p><pre class="desc-code">
-<span class="tag-func">len(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">len</span>(<span class="tag-dotName">dictionary</span>: <span class="tag-dotName">dict</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">len(</span><span class="tag-func">dict(</span>)) => <span class="tag-num">0</span>
-<span class="tag-func">len(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">4</span>)) => <span class="tag-num">1</span>
-<span class="tag-func">len(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">4</span>, <span class="tag-string">"b"</span>, <span class="tag-num">3</span>)) => <span class="tag-num">2</span>
+<span class="tag-funcCall">len</span>(<span class="tag-funcCall">dict</span>()) => <span class="tag-num">0</span>
+<span class="tag-funcCall">len</span>(<span class="tag-funcCall">dict</span>(<span class="tag-str">"a"</span>, <span class="tag-num">4</span>)) => <span class="tag-num">1</span>
+<span class="tag-funcCall">len</span>(<span class="tag-funcCall">dict</span>(<span class="tag-str">"a"</span>, <span class="tag-num">4</span>, <span class="tag-str">"b"</span>, <span class="tag-num">3</span>)) => <span class="tag-num">2</span>
 </pre>
 
 
@@ -433,27 +433,27 @@ func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
 
 </p><pre class="desc-code">
-<span class="tag-func">get(</span><span class="tag-var">list</span><span class="tag-type">: list</span>, <span class="tag-var">index</span><span class="tag-type">: int</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">index</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">default</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">list</span> = <span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-string">"a"</span>, <span class="tag-num">10</span>)
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">0</span>) => <span class="tag-num">4</span>
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">1</span>) => <span class="tag-string">"a"</span>
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">2</span>) => <span class="tag-num">10</span>
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">3</span>, <span class="tag-num">99</span>) => <span class="tag-num">99</span>
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-1</span>) => <span class="tag-num">10</span>
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-2</span>) => <span class="tag-string">"a"</span>
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-3</span>) => <span class="tag-num">4</span>
-<span class="tag-func">get(</span><span class="tag-var">list</span>, <span class="tag-num">-4</span>, <span class="tag-num">11</span>) => <span class="tag-num">11</span>
+<span class="tag-dotName">list</span> = <span class="tag-funcCall">list</span>(<span class="tag-num">4</span>, <span class="tag-str">"a"</span>, <span class="tag-num">10</span>)
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">0</span>) => <span class="tag-num">4</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">1</span>) => <span class="tag-str">"a"</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">2</span>) => <span class="tag-num">10</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">3</span>, <span class="tag-num">99</span>) => <span class="tag-num">99</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">-1</span>) => <span class="tag-num">10</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">-2</span>) => <span class="tag-str">"a"</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">-3</span>) => <span class="tag-num">4</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">list</span>, <span class="tag-num">-4</span>, <span class="tag-num">11</span>) => <span class="tag-num">11</span>
 </pre>
 <p>
 You can also use bracket notation to access list items.
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-var">teas</span>[<span class="tag-num">0</span>]
+<span class="tag-dotName">a</span> = <span class="tag-dotName">teas</span>[<span class="tag-num">0</span>]
 </pre>
 
 
@@ -467,7 +467,7 @@ func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
 
 </p><pre class="desc-code">
-<span class="tag-func">get(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span>, <span class="tag-var">key</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">dictionary</span>: <span class="tag-dotName">dict</span>, <span class="tag-dotName">key</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">default</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Note: For dictionary lookup you can use dot notation. It's the
@@ -476,15 +476,15 @@ same as get without the default.
 </p><p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"Earl Grey"</span>)
-<span class="tag-func">get(</span><span class="tag-var">d</span>, <span class="tag-string">"tea"</span>) => <span class="tag-string">"Earl Grey"</span>
-<span class="tag-func">get(</span><span class="tag-var">d</span>, <span class="tag-string">"coffee"</span>, <span class="tag-string">"Tea"</span>) => <span class="tag-string">"Tea"</span>
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">dict</span>(<span class="tag-str">"tea"</span>, <span class="tag-str">"Earl Grey"</span>)
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">d</span>, <span class="tag-str">"tea"</span>) => <span class="tag-str">"Earl Grey"</span>
+<span class="tag-funcCall">get</span>(<span class="tag-dotName">d</span>, <span class="tag-str">"coffee"</span>, <span class="tag-str">"Tea"</span>) => <span class="tag-str">"Tea"</span>
 </pre>
 <p>
 Using dot notation:
 </p><pre class="desc-code">
-<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"Earl Grey"</span>)
-<span class="tag-var">d.tea</span> => <span class="tag-string">"Earl Grey"</span>
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">dict</span>(<span class="tag-str">"tea"</span>, <span class="tag-str">"Earl Grey"</span>)
+<span class="tag-dotName">d.tea</span> => <span class="tag-str">"Earl Grey"</span>
 </pre>
 
 
@@ -513,26 +513,26 @@ func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 the If Functions section.
 
 </p><pre class="desc-code">
-<span class="tag-func">if0(</span><span class="tag-var">condition</span><span class="tag-type">: any</span>, <span class="tag-var">then</span><span class="tag-type">: any</span>, <span class="tag-var">else</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-dotName">if</span>0(<span class="tag-dotName">condition</span>: <span class="tag-dotName">any</span>, <span class="tag-dotName">then</span>: <span class="tag-dotName">any</span>, <span class="tag-dotName">else</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-num">0</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-num">1</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-num">4</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-string">""</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-string">"abc"</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span>[], <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span>[<span class="tag-num">1</span>,<span class="tag-num">2</span>], <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-func">dict(</span>), <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>,<span class="tag-num">1</span>), <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">false</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">tea</span>
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">true</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) => <span class="tag-var">beer</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-num">0</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">tea</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-num">1</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">beer</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-num">4</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">beer</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-str">""</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">tea</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-str">"abc"</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">beer</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0([], <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">tea</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0([<span class="tag-num">1</span>,<span class="tag-num">2</span>], <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">beer</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-funcCall">dict</span>(), <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">tea</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-funcCall">dict</span>(<span class="tag-str">"a"</span>,<span class="tag-num">1</span>), <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">beer</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-dotName">false</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">tea</span>
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-dotName">true</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) => <span class="tag-dotName">beer</span>
 
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">true</span>, <span class="tag-string">"tea"</span>)
-<span class="tag-var">a</span> = <span class="tag-func">if0(</span><span class="tag-true-false">false</span>, <span class="tag-string">"tea"</span>)
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-dotName">true</span>, <span class="tag-str">"tea"</span>)
+<span class="tag-dotName">a</span> = <span class="tag-dotName">if</span>0(<span class="tag-dotName">false</span>, <span class="tag-str">"tea"</span>)
 </pre>
 <p>
 You don't have to assign the result of an if0 function which is
@@ -540,7 +540,7 @@ useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
 </p><pre class="desc-code">
-<span class="tag-func">if0(</span><span class="tag-var">c</span>, <span class="tag-func">warn(</span><span class="tag-string">"got zero value"</span>))
+<span class="tag-dotName">if</span>0(<span class="tag-dotName">c</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"got zero value"</span>))
 </pre>
 
 
@@ -558,16 +558,16 @@ expressions for the condition, see:
 the Boolean Expressions section.
 
 </p><pre class="desc-code">
-<span class="tag-func">if(</span><span class="tag-var">condition</span><span class="tag-type">: bool</span>, <span class="tag-var">then</span><span class="tag-type">: any</span>, <span class="tag-var">else</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">condition</span>: <span class="tag-dotName">bool</span>, <span class="tag-dotName">then</span>: <span class="tag-dotName">any</span>, <span class="tag-dotName">else</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">if(</span><span class="tag-true-false">true</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) <span class="tag-comment"># => tea</span>
-<span class="tag-var">b</span> = <span class="tag-func">if(</span><span class="tag-true-false">false</span>, <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>) <span class="tag-comment"># => beer</span>
-<span class="tag-var">c</span> = <span class="tag-func">if(</span>(<span class="tag-var">v</span> < <span class="tag-num">5</span>), <span class="tag-string">"tea"</span>, <span class="tag-string">"beer"</span>)
-<span class="tag-var">d</span> = <span class="tag-func">if(</span>(<span class="tag-var">v</span> < <span class="tag-num">5</span>), <span class="tag-string">"tea"</span>)
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">if</span>(<span class="tag-dotName">true</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) <span class="tag-comment"># => tea
+</span><span class="tag-dotName">b</span> = <span class="tag-funcCall">if</span>(<span class="tag-dotName">false</span>, <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>) <span class="tag-comment"># => beer
+</span><span class="tag-dotName">c</span> = <span class="tag-funcCall">if</span>((<span class="tag-dotName">v</span> < <span class="tag-num">5</span>), <span class="tag-str">"tea"</span>, <span class="tag-str">"beer"</span>)
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">if</span>((<span class="tag-dotName">v</span> < <span class="tag-num">5</span>), <span class="tag-str">"tea"</span>)
 </pre>
 <p>
 You don't have to assign the result of an if function which is
@@ -575,8 +575,8 @@ useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
 </p><pre class="desc-code">
-<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">warn(</span><span class="tag-string">"c is true"</span>))
-<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-string">"skip"</span>))
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">c</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"c is true"</span>))
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">c</span>, <span class="tag-funcCall">return</span>(<span class="tag-str">"skip"</span>))
 </pre>
 
 
@@ -589,15 +589,15 @@ func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 <p>Add two integers. A warning is generated on overflow.
 
 </p><pre class="desc-code">
-<span class="tag-func">add(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">add</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">add(</span><span class="tag-num">1</span>, <span class="tag-num">2</span>) => <span class="tag-num">3</span>
-<span class="tag-func">add(</span><span class="tag-num">3</span>, <span class="tag-num">-2</span>) => <span class="tag-num">1</span>
-<span class="tag-func">add(</span><span class="tag-num">-2</span>, <span class="tag-num">-5</span>) => <span class="tag-num">-7</span>
+<span class="tag-funcCall">add</span>(<span class="tag-num">1</span>, <span class="tag-num">2</span>) => <span class="tag-num">3</span>
+<span class="tag-funcCall">add</span>(<span class="tag-num">3</span>, <span class="tag-num">-2</span>) => <span class="tag-num">1</span>
+<span class="tag-funcCall">add</span>(<span class="tag-num">-2</span>, <span class="tag-num">-5</span>) => <span class="tag-num">-7</span>
 </pre>
 
 
@@ -611,14 +611,14 @@ func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Add two floats. A warning is generated on overflow.
 
 </p><pre class="desc-code">
-<span class="tag-func">add(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) float</span>
+<span class="tag-funcCall">add</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">float</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">add(</span><span class="tag-num">1.5</span>, <span class="tag-num">2.3</span>) => <span class="tag-num">3.8</span>
-<span class="tag-func">add(</span><span class="tag-num">3.2</span>, <span class="tag-num">-2.2</span>) => <span class="tag-num">1.0</span>
+<span class="tag-funcCall">add</span>(<span class="tag-num">1.5</span>, <span class="tag-num">2.3</span>) => <span class="tag-num">3.8</span>
+<span class="tag-funcCall">add</span>(<span class="tag-num">3.2</span>, <span class="tag-num">-2.2</span>) => <span class="tag-num">1.0</span>
 </pre>
 
 
@@ -632,15 +632,15 @@ func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Subtract two integers. A warning is generated on overflow.
 
 </p><pre class="desc-code">
-<span class="tag-func">sub(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">sub</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">sub(</span><span class="tag-num">3</span>, <span class="tag-num">1</span>) => <span class="tag-num">2</span>
-<span class="tag-func">add(</span><span class="tag-num">3</span>, <span class="tag-num">-2</span>) => <span class="tag-num">5</span>
-<span class="tag-func">add(</span><span class="tag-num">1</span>, <span class="tag-num">5</span>) => <span class="tag-num">-4</span>
+<span class="tag-funcCall">sub</span>(<span class="tag-num">3</span>, <span class="tag-num">1</span>) => <span class="tag-num">2</span>
+<span class="tag-funcCall">add</span>(<span class="tag-num">3</span>, <span class="tag-num">-2</span>) => <span class="tag-num">5</span>
+<span class="tag-funcCall">add</span>(<span class="tag-num">1</span>, <span class="tag-num">5</span>) => <span class="tag-num">-4</span>
 </pre>
 
 
@@ -654,14 +654,14 @@ func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Subtract two floats. A warning is generated on overflow.
 
 </p><pre class="desc-code">
-<span class="tag-func">sub(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) float</span>
+<span class="tag-funcCall">sub</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">float</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">sub(</span><span class="tag-num">4.5</span>, <span class="tag-num">2.3</span>) => <span class="tag-num">2.2</span>
-<span class="tag-func">sub(</span><span class="tag-num">1.0</span>, <span class="tag-num">2.2</span>) => <span class="tag-num">-1.2</span>
+<span class="tag-funcCall">sub</span>(<span class="tag-num">4.5</span>, <span class="tag-num">2.3</span>) => <span class="tag-num">2.2</span>
+<span class="tag-funcCall">sub</span>(<span class="tag-num">1.0</span>, <span class="tag-num">2.2</span>) => <span class="tag-num">-1.2</span>
 </pre>
 
 
@@ -675,15 +675,15 @@ func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
 </p><pre class="desc-code">
-<span class="tag-func">exists(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span>, <span class="tag-var">key</span><span class="tag-type">: string</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">exists</span>(<span class="tag-dotName">dictionary</span>: <span class="tag-dotName">dict</span>, <span class="tag-dotName">key</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"Earl"</span>)
-<span class="tag-func">exists(</span><span class="tag-var">d</span>, <span class="tag-string">"tea"</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">exists(</span><span class="tag-var">d</span>, <span class="tag-string">"coffee"</span>) => <span class="tag-true-false">false</span>
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">dict</span>(<span class="tag-str">"tea"</span>, <span class="tag-str">"Earl"</span>)
+<span class="tag-funcCall">exists</span>(<span class="tag-dotName">d</span>, <span class="tag-str">"tea"</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">exists</span>(<span class="tag-dotName">d</span>, <span class="tag-str">"coffee"</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -707,18 +707,18 @@ generated.  The conditions must be integers. The return values
 can be any type.
 
 </p><pre class="desc-code">
-<span class="tag-func">case(</span><span class="tag-var">condition</span><span class="tag-type">: int</span>, <span class="tag-var">pairs</span><span class="tag-type">: list</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">case</span>(<span class="tag-dotName">condition</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">pairs</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">default</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">cases</span> = <span class="tag-func">list(</span><span class="tag-num">0</span>, <span class="tag-string">"tea"</span>, <span class="tag-num">1</span>, <span class="tag-string">"water"</span>, <span class="tag-num">2</span>, <span class="tag-string">"beer"</span>)
-<span class="tag-func">case(</span><span class="tag-num">0</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"tea"</span>
-<span class="tag-func">case(</span><span class="tag-num">1</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"water"</span>
-<span class="tag-func">case(</span><span class="tag-num">2</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"beer"</span>
-<span class="tag-func">case(</span><span class="tag-num">2</span>, <span class="tag-var">cases</span>, <span class="tag-string">"wine"</span>) => <span class="tag-string">"beer"</span>
-<span class="tag-func">case(</span><span class="tag-num">3</span>, <span class="tag-var">cases</span>, <span class="tag-string">"wine"</span>) => <span class="tag-string">"wine"</span>
+<span class="tag-dotName">cases</span> = <span class="tag-funcCall">list</span>(<span class="tag-num">0</span>, <span class="tag-str">"tea"</span>, <span class="tag-num">1</span>, <span class="tag-str">"water"</span>, <span class="tag-num">2</span>, <span class="tag-str">"beer"</span>)
+<span class="tag-funcCall">case</span>(<span class="tag-num">0</span>, <span class="tag-dotName">cases</span>) => <span class="tag-str">"tea"</span>
+<span class="tag-funcCall">case</span>(<span class="tag-num">1</span>, <span class="tag-dotName">cases</span>) => <span class="tag-str">"water"</span>
+<span class="tag-funcCall">case</span>(<span class="tag-num">2</span>, <span class="tag-dotName">cases</span>) => <span class="tag-str">"beer"</span>
+<span class="tag-funcCall">case</span>(<span class="tag-num">2</span>, <span class="tag-dotName">cases</span>, <span class="tag-str">"wine"</span>) => <span class="tag-str">"beer"</span>
+<span class="tag-funcCall">case</span>(<span class="tag-num">3</span>, <span class="tag-dotName">cases</span>, <span class="tag-str">"wine"</span>) => <span class="tag-str">"wine"</span>
 </pre>
 
 
@@ -742,17 +742,17 @@ generated.  The conditions must be strings. The return values
 can be any type.
 
 </p><pre class="desc-code">
-<span class="tag-func">case(</span><span class="tag-var">condition</span><span class="tag-type">: string</span>, <span class="tag-var">pairs</span><span class="tag-type">: list</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">case</span>(<span class="tag-dotName">condition</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">pairs</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">default</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">cases</span> = <span class="tag-func">list(</span><span class="tag-string">"tea"</span>, <span class="tag-num">15</span>, <span class="tag-string">"water"</span>, <span class="tag-num">2.3</span>, <span class="tag-string">"beer"</span>, <span class="tag-string">"cold"</span>)
-<span class="tag-func">case(</span><span class="tag-string">"tea"</span>, <span class="tag-var">cases</span>) => <span class="tag-num">15</span>
-<span class="tag-func">case(</span><span class="tag-string">"water"</span>, <span class="tag-var">cases</span>) => <span class="tag-num">2.3</span>
-<span class="tag-func">case(</span><span class="tag-string">"beer"</span>, <span class="tag-var">cases</span>) => <span class="tag-string">"cold"</span>
-<span class="tag-func">case(</span><span class="tag-string">"bunch"</span>, <span class="tag-var">cases</span>, <span class="tag-string">"other"</span>) => <span class="tag-string">"other"</span>
+<span class="tag-dotName">cases</span> = <span class="tag-funcCall">list</span>(<span class="tag-str">"tea"</span>, <span class="tag-num">15</span>, <span class="tag-str">"water"</span>, <span class="tag-num">2.3</span>, <span class="tag-str">"beer"</span>, <span class="tag-str">"cold"</span>)
+<span class="tag-funcCall">case</span>(<span class="tag-str">"tea"</span>, <span class="tag-dotName">cases</span>) => <span class="tag-num">15</span>
+<span class="tag-funcCall">case</span>(<span class="tag-str">"water"</span>, <span class="tag-dotName">cases</span>) => <span class="tag-num">2.3</span>
+<span class="tag-funcCall">case</span>(<span class="tag-str">"beer"</span>, <span class="tag-dotName">cases</span>) => <span class="tag-str">"cold"</span>
+<span class="tag-funcCall">case</span>(<span class="tag-str">"bunch"</span>, <span class="tag-dotName">cases</span>, <span class="tag-str">"other"</span>) => <span class="tag-str">"other"</span>
 </pre>
 
 
@@ -774,7 +774,7 @@ func parseVersion(version: string): Option[(int, int, int)]
 <p>Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
 </p><pre class="desc-code">
-<span class="tag-func">cmpVersion(</span><span class="tag-var">versionA</span><span class="tag-type">: string</span>, <span class="tag-var">versionB</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">cmpVersion</span>(<span class="tag-dotName">versionA</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">versionB</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 StaticTea uses [[https://semver.org/][Semantic Versioning]]
@@ -784,9 +784,9 @@ to three digits (no letters).
 </p><p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">cmpVersion(</span><span class="tag-string">"1.2.5"</span>, <span class="tag-string">"1.1.8"</span>) => <span class="tag-num">1</span>
-<span class="tag-func">cmpVersion(</span><span class="tag-string">"1.2.5"</span>, <span class="tag-string">"1.3.0"</span>) => <span class="tag-num">-1</span>
-<span class="tag-func">cmpVersion(</span><span class="tag-string">"1.2.5"</span>, <span class="tag-string">"1.2.5"</span>) => <span class="tag-num">0</span>
+<span class="tag-funcCall">cmpVersion</span>(<span class="tag-str">"1.2.5"</span>, <span class="tag-str">"1.1.8"</span>) => <span class="tag-num">1</span>
+<span class="tag-funcCall">cmpVersion</span>(<span class="tag-str">"1.2.5"</span>, <span class="tag-str">"1.3.0"</span>) => <span class="tag-num">-1</span>
+<span class="tag-funcCall">cmpVersion</span>(<span class="tag-str">"1.2.5"</span>, <span class="tag-str">"1.2.5"</span>) => <span class="tag-num">0</span>
 </pre>
 
 
@@ -800,14 +800,14 @@ func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult 
 <p>Create a float from an int.
 
 </p><pre class="desc-code">
-<span class="tag-func">float(</span><span class="tag-var">num</span><span class="tag-type">: int</span><span class="tag-type">) float</span>
+<span class="tag-funcCall">float</span>(<span class="tag-dotName">num</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">float</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">float(</span><span class="tag-num">2</span>) => <span class="tag-num">2.0</span>
-<span class="tag-func">float(</span><span class="tag-num">-33</span>) => <span class="tag-num">-33.0</span>
+<span class="tag-funcCall">float</span>(<span class="tag-num">2</span>) => <span class="tag-num">2.0</span>
+<span class="tag-funcCall">float</span>(<span class="tag-num">-33</span>) => <span class="tag-num">-33.0</span>
 </pre>
 
 
@@ -821,15 +821,15 @@ func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create a float from a number string.
 
 </p><pre class="desc-code">
-<span class="tag-func">float(</span><span class="tag-var">numString</span><span class="tag-type">: string</span><span class="tag-type">) float</span>
+<span class="tag-funcCall">float</span>(<span class="tag-dotName">numString</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">float</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">float(</span><span class="tag-string">"2"</span>) => <span class="tag-num">2.0</span>
-<span class="tag-func">float(</span><span class="tag-string">"2.4"</span>) => <span class="tag-num">2.4</span>
-<span class="tag-func">float(</span><span class="tag-string">"33"</span>) => <span class="tag-num">33.0</span>
+<span class="tag-funcCall">float</span>(<span class="tag-str">"2"</span>) => <span class="tag-num">2.0</span>
+<span class="tag-funcCall">float</span>(<span class="tag-str">"2.4"</span>) => <span class="tag-num">2.4</span>
+<span class="tag-funcCall">float</span>(<span class="tag-str">"33"</span>) => <span class="tag-num">33.0</span>
 </pre>
 
 
@@ -843,14 +843,14 @@ func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create a float from a number string. If the string is not a number, return the default.
 
 </p><pre class="desc-code">
-<span class="tag-func">float(</span><span class="tag-var">numString</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">float</span>(<span class="tag-dotName">numString</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">default</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">float(</span><span class="tag-string">"2"</span>) => <span class="tag-num">2.0</span>
-<span class="tag-func">float(</span><span class="tag-string">"notnum"</span>, <span class="tag-string">"nan"</span>) => <span class="tag-var">nan</span>
+<span class="tag-funcCall">float</span>(<span class="tag-str">"2"</span>) => <span class="tag-num">2.0</span>
+<span class="tag-funcCall">float</span>(<span class="tag-str">"notnum"</span>, <span class="tag-str">"nan"</span>) => <span class="tag-dotName">nan</span>
 </pre>
 
 
@@ -864,7 +864,7 @@ func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create an int from a float.
 
 </p><pre class="desc-code">
-<span class="tag-func">int(</span><span class="tag-var">num</span><span class="tag-type">: float</span>, <span class="tag-var">roundOption</span>: <span class="tag-type">optional string</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">int</span>(<span class="tag-dotName">num</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">roundOption</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">string</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Round options:
@@ -879,17 +879,17 @@ Round options:
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">int(</span><span class="tag-num">2.34</span>) => <span class="tag-num">2</span>
-<span class="tag-func">int(</span><span class="tag-num">2.34</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">2</span>
-<span class="tag-func">int(</span><span class="tag-num">-2.34</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-2</span>
-<span class="tag-func">int(</span><span class="tag-num">6.5</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">7</span>
-<span class="tag-func">int(</span><span class="tag-num">-6.5</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-7</span>
-<span class="tag-func">int(</span><span class="tag-num">4.57</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">4</span>
-<span class="tag-func">int(</span><span class="tag-num">-4.57</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">-5</span>
-<span class="tag-func">int(</span><span class="tag-num">6.3</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">7</span>
-<span class="tag-func">int(</span><span class="tag-num">-6.3</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">-6</span>
-<span class="tag-func">int(</span><span class="tag-num">6.3456</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">6</span>
-<span class="tag-func">int(</span><span class="tag-num">-6.3456</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">-6</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">2.34</span>) => <span class="tag-num">2</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">2.34</span>, <span class="tag-str">"round"</span>) => <span class="tag-num">2</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">-2.34</span>, <span class="tag-str">"round"</span>) => <span class="tag-num">-2</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">6.5</span>, <span class="tag-str">"round"</span>) => <span class="tag-num">7</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">-6.5</span>, <span class="tag-str">"round"</span>) => <span class="tag-num">-7</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">4.57</span>, <span class="tag-str">"floor"</span>) => <span class="tag-num">4</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">-4.57</span>, <span class="tag-str">"floor"</span>) => <span class="tag-num">-5</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">6.3</span>, <span class="tag-str">"ceiling"</span>) => <span class="tag-num">7</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">-6.3</span>, <span class="tag-str">"ceiling"</span>) => <span class="tag-num">-6</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">6.3456</span>, <span class="tag-str">"truncate"</span>) => <span class="tag-num">6</span>
+<span class="tag-funcCall">int</span>(<span class="tag-num">-6.3456</span>, <span class="tag-str">"truncate"</span>) => <span class="tag-num">-6</span>
 </pre>
 
 
@@ -903,7 +903,7 @@ func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create an int from a number string.
 
 </p><pre class="desc-code">
-<span class="tag-func">int(</span><span class="tag-var">numString</span><span class="tag-type">: string</span>, <span class="tag-var">roundOption</span>: <span class="tag-type">optional string</span><span class="tag-type">) int</span>
+<span class="tag-funcCall">int</span>(<span class="tag-dotName">numString</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">roundOption</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">string</span>) <span class="tag-dotName">int</span>
 </pre>
 <p>
 Round options:
@@ -918,17 +918,17 @@ Round options:
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">int(</span><span class="tag-string">"2"</span>) => <span class="tag-num">2</span>
-<span class="tag-func">int(</span><span class="tag-string">"2.34"</span>) => <span class="tag-num">2</span>
-<span class="tag-func">int(</span><span class="tag-string">"-2.34"</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-2</span>
-<span class="tag-func">int(</span><span class="tag-string">"6.5"</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">7</span>
-<span class="tag-func">int(</span><span class="tag-string">"-6.5"</span>, <span class="tag-string">"round"</span>) => <span class="tag-num">-7</span>
-<span class="tag-func">int(</span><span class="tag-string">"4.57"</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">4</span>
-<span class="tag-func">int(</span><span class="tag-string">"-4.57"</span>, <span class="tag-string">"floor"</span>) => <span class="tag-num">-5</span>
-<span class="tag-func">int(</span><span class="tag-string">"6.3"</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">7</span>
-<span class="tag-func">int(</span><span class="tag-string">"-6.3"</span>, <span class="tag-string">"ceiling"</span>) => <span class="tag-num">-6</span>
-<span class="tag-func">int(</span><span class="tag-string">"6.3456"</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">6</span>
-<span class="tag-func">int(</span><span class="tag-string">"-6.3456"</span>, <span class="tag-string">"truncate"</span>) => <span class="tag-num">-6</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"2"</span>) => <span class="tag-num">2</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"2.34"</span>) => <span class="tag-num">2</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"-2.34"</span>, <span class="tag-str">"round"</span>) => <span class="tag-num">-2</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"6.5"</span>, <span class="tag-str">"round"</span>) => <span class="tag-num">7</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"-6.5"</span>, <span class="tag-str">"round"</span>) => <span class="tag-num">-7</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"4.57"</span>, <span class="tag-str">"floor"</span>) => <span class="tag-num">4</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"-4.57"</span>, <span class="tag-str">"floor"</span>) => <span class="tag-num">-5</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"6.3"</span>, <span class="tag-str">"ceiling"</span>) => <span class="tag-num">7</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"-6.3"</span>, <span class="tag-str">"ceiling"</span>) => <span class="tag-num">-6</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"6.3456"</span>, <span class="tag-str">"truncate"</span>) => <span class="tag-num">6</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"-6.3456"</span>, <span class="tag-str">"truncate"</span>) => <span class="tag-num">-6</span>
 </pre>
 
 
@@ -942,7 +942,7 @@ func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create an int from a number string. If the string is not a number, return the default value.
 
 </p><pre class="desc-code">
-<span class="tag-func">int(</span><span class="tag-var">numString</span><span class="tag-type">: string</span>, <span class="tag-var">roundOption</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">int</span>(<span class="tag-dotName">numString</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">roundOption</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">default</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Round options:
@@ -957,8 +957,8 @@ Round options:
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">int(</span><span class="tag-string">"2"</span>, <span class="tag-string">"round"</span>, <span class="tag-string">"nan"</span>) => <span class="tag-num">2</span>
-<span class="tag-func">int(</span><span class="tag-string">"notnum"</span>, <span class="tag-string">"round"</span>, <span class="tag-string">"nan"</span>) => <span class="tag-var">nan</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"2"</span>, <span class="tag-str">"round"</span>, <span class="tag-str">"nan"</span>) => <span class="tag-num">2</span>
+<span class="tag-funcCall">int</span>(<span class="tag-str">"notnum"</span>, <span class="tag-str">"round"</span>, <span class="tag-str">"nan"</span>) => <span class="tag-dotName">nan</span>
 </pre>
 
 
@@ -980,7 +980,7 @@ func if0Condition(cond: Value): bool
 <p>Create an bool from a value.
 
 </p><pre class="desc-code">
-<span class="tag-func">bool(</span><span class="tag-var">value</span>: <span class="tag-var">Value</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-dotName">value</span>: <span class="tag-dotName">Value</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 False values by variable types:
@@ -998,17 +998,17 @@ False values by variable types:
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">bool(</span><span class="tag-num">0</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">bool(</span><span class="tag-num">0.0</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">bool(</span>[]) => <span class="tag-true-false">false</span>
-<span class="tag-func">bool(</span><span class="tag-string">""</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">bool(</span><span class="tag-func">dict(</span>)) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-num">0</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-num">0.0</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">bool</span>([]) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-str">""</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-funcCall">dict</span>()) => <span class="tag-dotName">false</span>
 
-<span class="tag-func">bool(</span><span class="tag-num">5</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">bool(</span><span class="tag-num">3.3</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">bool(</span>[<span class="tag-num">8</span>]) => <span class="tag-true-false">true</span>
-<span class="tag-func">bool(</span><span class="tag-string">"tea"</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">bool(</span><span class="tag-func">dict(</span><span class="tag-string">"tea"</span>, <span class="tag-num">2</span>)) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-num">5</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-num">3.3</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">bool</span>([<span class="tag-num">8</span>]) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-str">"tea"</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">bool</span>(<span class="tag-funcCall">dict</span>(<span class="tag-str">"tea"</span>, <span class="tag-num">2</span>)) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -1022,20 +1022,20 @@ func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
 
 </p><pre class="desc-code">
-<span class="tag-func">find(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">substring</span><span class="tag-type">: string</span>, <span class="tag-var">default</span>: <span class="tag-type">optional any</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">find</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">substring</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">default</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
        <span class="tag-num">0123456789</span> <span class="tag-num">1234567</span>
-<span class="tag-var">msg</span> = <span class="tag-string">"Tea time at 3:30."</span>
-<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"Tea"</span>) = <span class="tag-num">0</span>
-<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"time"</span>) = <span class="tag-num">4</span>
-<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"me"</span>) = <span class="tag-num">6</span>
-<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"party"</span>, <span class="tag-num">-1</span>) = <span class="tag-num">-1</span>
-<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"party"</span>, <span class="tag-func">len(</span><span class="tag-var">msg</span>)) = <span class="tag-num">17</span>
-<span class="tag-func">find(</span><span class="tag-var">msg</span>, <span class="tag-string">"party"</span>, <span class="tag-num">0</span>) = <span class="tag-num">0</span>
+<span class="tag-dotName">msg</span> = <span class="tag-str">"Tea time at 3:30."</span>
+<span class="tag-funcCall">find</span>(<span class="tag-dotName">msg</span>, <span class="tag-str">"Tea"</span>) = <span class="tag-num">0</span>
+<span class="tag-funcCall">find</span>(<span class="tag-dotName">msg</span>, <span class="tag-str">"time"</span>) = <span class="tag-num">4</span>
+<span class="tag-funcCall">find</span>(<span class="tag-dotName">msg</span>, <span class="tag-str">"me"</span>) = <span class="tag-num">6</span>
+<span class="tag-funcCall">find</span>(<span class="tag-dotName">msg</span>, <span class="tag-str">"party"</span>, <span class="tag-num">-1</span>) = <span class="tag-num">-1</span>
+<span class="tag-funcCall">find</span>(<span class="tag-dotName">msg</span>, <span class="tag-str">"party"</span>, <span class="tag-funcCall">len</span>(<span class="tag-dotName">msg</span>)) = <span class="tag-num">17</span>
+<span class="tag-funcCall">find</span>(<span class="tag-dotName">msg</span>, <span class="tag-str">"party"</span>, <span class="tag-num">0</span>) = <span class="tag-num">0</span>
 </pre>
 
 
@@ -1051,15 +1051,15 @@ func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 </p><p>The start index and length are by unicode characters not bytes.
 
 </p><pre class="desc-code">
-<span class="tag-func">slice(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">start</span><span class="tag-type">: int</span>, <span class="tag-var">length</span>: <span class="tag-type">optional int</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">slice</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">start</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">length</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">int</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">slice(</span><span class="tag-string">"Earl Grey"</span>, <span class="tag-num">1</span>, <span class="tag-num">3</span>) => <span class="tag-string">"arl"</span>
-<span class="tag-func">slice(</span><span class="tag-string">"Earl Grey"</span>, <span class="tag-num">6</span>) => <span class="tag-string">"rey"</span>
-<span class="tag-func">slice(</span><span class="tag-string">"añyóng"</span>, <span class="tag-num">0</span>, <span class="tag-num">3</span>) => <span class="tag-string">"añy"</span>
+<span class="tag-funcCall">slice</span>(<span class="tag-str">"Earl Grey"</span>, <span class="tag-num">1</span>, <span class="tag-num">3</span>) => <span class="tag-str">"arl"</span>
+<span class="tag-funcCall">slice</span>(<span class="tag-str">"Earl Grey"</span>, <span class="tag-num">6</span>) => <span class="tag-str">"rey"</span>
+<span class="tag-funcCall">slice</span>(<span class="tag-str">"añyóng"</span>, <span class="tag-num">0</span>, <span class="tag-num">3</span>) => <span class="tag-str">"añy"</span>
 </pre>
 
 
@@ -1073,17 +1073,17 @@ func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
 
 </p><pre class="desc-code">
-<span class="tag-func">dup(</span><span class="tag-var">pattern</span><span class="tag-type">: string</span>, <span class="tag-var">count</span><span class="tag-type">: int</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">dup</span>(<span class="tag-dotName">pattern</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">count</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">dup(</span><span class="tag-string">"="</span>, <span class="tag-num">3</span>) => <span class="tag-string">"==="</span>
-<span class="tag-func">dup(</span><span class="tag-string">"abc"</span>, <span class="tag-num">0</span>) => <span class="tag-string">""</span>
-<span class="tag-func">dup(</span><span class="tag-string">"abc"</span>, <span class="tag-num">1</span>) => <span class="tag-string">"abc"</span>
-<span class="tag-func">dup(</span><span class="tag-string">"abc"</span>, <span class="tag-num">2</span>) => <span class="tag-string">"abcabc"</span>
-<span class="tag-func">dup(</span><span class="tag-string">""</span>, <span class="tag-num">3</span>) => <span class="tag-string">""</span>
+<span class="tag-funcCall">dup</span>(<span class="tag-str">"="</span>, <span class="tag-num">3</span>) => <span class="tag-str">"==="</span>
+<span class="tag-funcCall">dup</span>(<span class="tag-str">"abc"</span>, <span class="tag-num">0</span>) => <span class="tag-str">""</span>
+<span class="tag-funcCall">dup</span>(<span class="tag-str">"abc"</span>, <span class="tag-num">1</span>) => <span class="tag-str">"abc"</span>
+<span class="tag-funcCall">dup</span>(<span class="tag-str">"abc"</span>, <span class="tag-num">2</span>) => <span class="tag-str">"abcabc"</span>
+<span class="tag-funcCall">dup</span>(<span class="tag-str">""</span>, <span class="tag-num">3</span>) => <span class="tag-str">""</span>
 </pre>
 
 
@@ -1097,16 +1097,16 @@ func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
 </p><pre class="desc-code">
-<span class="tag-func">dict(</span><span class="tag-var">pairs</span>: <span class="tag-type">optional list</span><span class="tag-type">) dict</span>
+<span class="tag-funcCall">dict</span>(<span class="tag-dotName">pairs</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">list</span>) <span class="tag-dotName">dict</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">dict(</span>) => {}
-<span class="tag-func">dict(</span>[<span class="tag-string">"a"</span>, <span class="tag-num">5</span>]) => {<span class="tag-string">"a"</span>: <span class="tag-num">5</span>}
-<span class="tag-func">dict(</span>[<span class="tag-string">"a"</span>, <span class="tag-num">5</span>, <span class="tag-string">"b"</span>, <span class="tag-num">33</span>, <span class="tag-string">"c"</span>, <span class="tag-num">0</span>]) =>
-  {<span class="tag-string">"a"</span>: <span class="tag-num">5</span>, <span class="tag-string">"b"</span>: <span class="tag-num">33</span>, <span class="tag-string">"c"</span>: <span class="tag-num">0</span>}
+<span class="tag-funcCall">dict</span>() => {}
+<span class="tag-funcCall">dict</span>([<span class="tag-str">"a"</span>, <span class="tag-num">5</span>]) => {<span class="tag-str">"a"</span>: <span class="tag-num">5</span>}
+<span class="tag-funcCall">dict</span>([<span class="tag-str">"a"</span>, <span class="tag-num">5</span>, <span class="tag-str">"b"</span>, <span class="tag-num">33</span>, <span class="tag-str">"c"</span>, <span class="tag-num">0</span>]) =>
+  {<span class="tag-str">"a"</span>: <span class="tag-num">5</span>, <span class="tag-str">"b"</span>: <span class="tag-num">33</span>, <span class="tag-str">"c"</span>: <span class="tag-num">0</span>}
 </pre>
 
 
@@ -1120,20 +1120,20 @@ func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create a list of variables. You can also create a list with brackets.
 
 </p><pre class="desc-code">
-<span class="tag-func">list(</span>...<span class="tag-type">) list</span>
+<span class="tag-funcCall">list</span>(...) <span class="tag-dotName">list</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">list(</span>)
-<span class="tag-var">a</span> = <span class="tag-func">list(</span><span class="tag-num">1</span>)
-<span class="tag-var">a</span> = <span class="tag-func">list(</span><span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>)
-<span class="tag-var">a</span> = <span class="tag-func">list(</span><span class="tag-string">"a"</span>, <span class="tag-num">5</span>, <span class="tag-string">"b"</span>)
-<span class="tag-var">a</span> = []
-<span class="tag-var">a</span> = [<span class="tag-num">1</span>]
-<span class="tag-var">a</span> = [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
-<span class="tag-var">a</span> = [<span class="tag-string">"a"</span>, <span class="tag-num">5</span>, <span class="tag-string">"b"</span>]
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">list</span>()
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">list</span>(<span class="tag-num">1</span>)
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">list</span>(<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>)
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">list</span>(<span class="tag-str">"a"</span>, <span class="tag-num">5</span>, <span class="tag-str">"b"</span>)
+<span class="tag-dotName">a</span> = []
+<span class="tag-dotName">a</span> = [<span class="tag-num">1</span>]
+<span class="tag-dotName">a</span> = [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
+<span class="tag-dotName">a</span> = [<span class="tag-str">"a"</span>, <span class="tag-num">5</span>, <span class="tag-str">"b"</span>]
 </pre>
 
 
@@ -1151,7 +1151,7 @@ returns whether the callback stopped early or not and you can
 ignore it using a bare form..
 
 </p><pre class="desc-code">
-<span class="tag-func">listLoop(</span><span class="tag-var">a</span><span class="tag-type">: list</span>, <span class="tag-var">container</span><span class="tag-type">: any</span>, <span class="tag-var">listCallback</span><span class="tag-type">: func</span>, <span class="tag-var">state</span>: <span class="tag-type">optional any</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">listLoop</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">container</span>: <span class="tag-dotName">any</span>, <span class="tag-dotName">listCallback</span>: <span class="tag-dotName">func</span>, <span class="tag-dotName">state</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 The callback gets passed the index to the item, its value, the
@@ -1160,26 +1160,26 @@ information and adds to the container when appropriate. The
 callback returns true to stop iterating.
 
 </p><pre class="desc-code">
-<span class="tag-func">listCallback(</span><span class="tag-var">ix</span><span class="tag-type">: int</span>, <span class="tag-var">item</span><span class="tag-type">: any</span>, <span class="tag-var">container</span><span class="tag-type">: any</span>, <span class="tag-var">state</span>: <span class="tag-type">optional any</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">listCallback</span>(<span class="tag-dotName">ix</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">item</span>: <span class="tag-dotName">any</span>, <span class="tag-dotName">container</span>: <span class="tag-dotName">any</span>, <span class="tag-dotName">state</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">any</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
 </p><pre class="desc-code">
-<span class="tag-var">o.container</span> = []
-<span class="tag-var">list</span> = [<span class="tag-num">2</span>,<span class="tag-num">4</span>,<span class="tag-num">6</span>,<span class="tag-num">8</span>]
-<span class="tag-func">listLoop(</span><span class="tag-var">list</span>, <span class="tag-var">o.container</span>, <span class="tag-var">b5</span>)
-<span class="tag-comment"># o.container => [6, 8]</span>
-</pre>
+<span class="tag-dotName">o.container</span> = []
+<span class="tag-dotName">list</span> = [<span class="tag-num">2</span>,<span class="tag-num">4</span>,<span class="tag-num">6</span>,<span class="tag-num">8</span>]
+<span class="tag-funcCall">listLoop</span>(<span class="tag-dotName">list</span>, <span class="tag-dotName">o.container</span>, <span class="tag-dotName">b</span>5)
+<span class="tag-comment"># o.container => [6, 8]
+</span></pre>
 <p>
 Below is the definition of the b5 callback function.
 
 </p><pre class="desc-code">
-<span class="tag-var">b5</span> = <span class="tag-func">func(</span><span class="tag-var">ix</span><span class="tag-type">: int</span>, <span class="tag-var">value</span><span class="tag-type">: int</span>, <span class="tag-var">container</span><span class="tag-type">: list</span><span class="tag-type">) bool</span>
-  <span class="tag-doc">## Collect values greater than 5.</span>
-  <span class="tag-var">container</span> &= <span class="tag-func">if(</span> (<span class="tag-var">value</span> > <span class="tag-num">5</span>), <span class="tag-var">value</span>)
-  <span class="tag-func">return(</span><span class="tag-true-false">false</span>)
+<span class="tag-dotName">b</span>5 = <span class="tag-funcCall">func</span>(<span class="tag-param">ix</span>: <span class="tag-type">int</span>, <span class="tag-param">value</span>: <span class="tag-type">int</span>, <span class="tag-param">container</span>: <span class="tag-type">list</span>) <span class="tag-type">bool</span>
+  <span class="tag-doc">## Collect values greater than 5.
+</span>  <span class="tag-dotName">container</span> &= <span class="tag-funcCall">if</span>( (<span class="tag-dotName">value</span> > <span class="tag-num">5</span>), <span class="tag-dotName">value</span>)
+  <span class="tag-funcCall">return</span>(<span class="tag-dotName">false</span>)
 </pre>
 
 
@@ -1192,7 +1192,7 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 <p>Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
 
 </p><pre class="desc-code">
-<span class="tag-func">replace(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">start</span><span class="tag-type">: int</span>, <span class="tag-var">length</span><span class="tag-type">: int</span>, <span class="tag-var">replacement</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">start</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">length</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">replacement</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 </p><ul>
@@ -1206,45 +1206,45 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 
 </p><p>Replace:
 </p><pre class="desc-code">
-<span class="tag-func">replace(</span><span class="tag-string">"Earl Grey"</span>, <span class="tag-num">5</span>, <span class="tag-num">4</span>, <span class="tag-string">"of Sandwich"</span>)
-  => <span class="tag-string">"Earl of Sandwich"</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">1</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd23</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">2</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd3</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"Earl Grey"</span>, <span class="tag-num">5</span>, <span class="tag-num">4</span>, <span class="tag-str">"of Sandwich"</span>)
+  => <span class="tag-str">"Earl of Sandwich"</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">1</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-dotName">abcd</span>2<span class="tag-num">3</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">2</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-dotName">abcd</span>3
 
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">1</span>, <span class="tag-string">"abcd"</span>) => 1<span class="tag-var">abcd3</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-string">"abcd"</span>) => 1<span class="tag-var">abcd</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">1</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-num">1</span>a<span class="tag-dotName">bcd</span>3
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-num">1</span>a<span class="tag-dotName">bcd</span>
 
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">1</span>, <span class="tag-string">"abcd"</span>) => 12<span class="tag-var">abcd</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">1</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-num">12</span>a<span class="tag-dotName">bcd</span>
 </pre>
 <p>Insert:
 </p><pre class="desc-code">
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd123</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 1<span class="tag-var">abcd23</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 12<span class="tag-var">abcd3</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">3</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 123<span class="tag-var">abcd</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-dotName">abcd</span>1<span class="tag-num">23</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">0</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-num">1</span>a<span class="tag-dotName">bcd</span>2<span class="tag-num">3</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">0</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-num">12</span>a<span class="tag-dotName">bcd</span>3
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">3</span>, <span class="tag-num">0</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-num">123</span>a<span class="tag-dotName">bcd</span>
 </pre>
 <p>Append:
 </p><pre class="desc-code">
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">3</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => 123<span class="tag-var">abcd</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">3</span>, <span class="tag-num">0</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-num">123</span>a<span class="tag-dotName">bcd</span>
 </pre>
 <p>Delete:
 </p><pre class="desc-code">
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">1</span>, <span class="tag-string">""</span>) => <span class="tag-num">23</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">2</span>, <span class="tag-string">""</span>) => <span class="tag-num">3</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">3</span>, <span class="tag-string">""</span>) => <span class="tag-string">""</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">1</span>, <span class="tag-str">""</span>) => <span class="tag-num">23</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">2</span>, <span class="tag-str">""</span>) => <span class="tag-num">3</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">0</span>, <span class="tag-num">3</span>, <span class="tag-str">""</span>) => <span class="tag-str">""</span>
 
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">1</span>, <span class="tag-string">""</span>) => <span class="tag-num">13</span>
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-string">""</span>) => <span class="tag-num">1</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">1</span>, <span class="tag-str">""</span>) => <span class="tag-num">13</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-str">""</span>) => <span class="tag-num">1</span>
 
-<span class="tag-func">replace(</span><span class="tag-string">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">1</span>, <span class="tag-string">""</span>) => <span class="tag-num">12</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">"123"</span>, <span class="tag-num">2</span>, <span class="tag-num">1</span>, <span class="tag-str">""</span>) => <span class="tag-num">12</span>
 </pre>
 <p>Edge Cases:
 </p><pre class="desc-code">
-<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">""</span>) =>
-<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"a"</span>) => <span class="tag-var">a</span>
-<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"ab"</span>) => <span class="tag-var">ab</span>
-<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"abc"</span>) => <span class="tag-var">abc</span>
-<span class="tag-func">replace(</span><span class="tag-string">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-string">"abcd"</span>) => <span class="tag-var">abcd</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-str">""</span>) =>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-str">"a"</span>) => <span class="tag-dotName">a</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-str">"ab"</span>) => <span class="tag-dotName">ab</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-str">"abc"</span>) => <span class="tag-dotName">abc</span>
+<span class="tag-funcCall">replace</span>(<span class="tag-str">""</span>, <span class="tag-num">0</span>, <span class="tag-num">0</span>, <span class="tag-str">"abcd"</span>) => <span class="tag-dotName">abcd</span>
 </pre>
 
 
@@ -1261,15 +1261,15 @@ func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult {
 replacements.
 
 </p><pre class="desc-code">
-<span class="tag-func">replaceRe(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">pairs</span><span class="tag-type">: list</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">replaceRe</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">pairs</span>: <span class="tag-dotName">list</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">list</span> = <span class="tag-func">list(</span><span class="tag-string">"abc"</span>, <span class="tag-string">"456"</span>, <span class="tag-string">"def"</span>, <span class="tag-string">""</span>)
-<span class="tag-func">replaceRe(</span><span class="tag-string">"abcdefabc"</span>, <span class="tag-var">list</span>))
-  => <span class="tag-string">"456456"</span>
+<span class="tag-dotName">list</span> = <span class="tag-funcCall">list</span>(<span class="tag-str">"abc"</span>, <span class="tag-str">"456"</span>, <span class="tag-str">"def"</span>, <span class="tag-str">""</span>)
+<span class="tag-funcCall">replaceRe</span>(<span class="tag-str">"abcdefabc"</span>, <span class="tag-dotName">list</span>))
+  => <span class="tag-str">"456456"</span>
 </pre>
 <p>
 For developing and debugging regular expressions see the
@@ -1297,24 +1297,24 @@ slash or or backslash. When no separator, the current
 system separator is used.
 
 </p><pre class="desc-code">
-<span class="tag-func">path(</span><span class="tag-var">filename</span><span class="tag-type">: string</span>, <span class="tag-var">separator</span>: <span class="tag-type">optional string</span><span class="tag-type">) dict</span>
+<span class="tag-funcCall">path</span>(<span class="tag-dotName">filename</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">separator</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">string</span>) <span class="tag-dotName">dict</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">path(</span><span class="tag-string">"src/functions.nim"</span>) => {
-  <span class="tag-string">"filename"</span>: <span class="tag-string">"functions.nim"</span>,
-  <span class="tag-string">"basename"</span>: <span class="tag-string">"functions"</span>,
-  <span class="tag-string">"ext"</span>: <span class="tag-string">".nim"</span>,
-  <span class="tag-string">"dir"</span>: <span class="tag-string">"src/"</span>,
+<span class="tag-funcCall">path</span>(<span class="tag-str">"src/functions.nim"</span>) => {
+  <span class="tag-str">"filename"</span>: <span class="tag-str">"functions.nim"</span>,
+  <span class="tag-str">"basename"</span>: <span class="tag-str">"functions"</span>,
+  <span class="tag-str">"ext"</span>: <span class="tag-str">".nim"</span>,
+  <span class="tag-str">"dir"</span>: <span class="tag-str">"src/"</span>,
 }
 
-<span class="tag-func">path(</span><span class="tag-string">"src\functions.nim"</span>, <span class="tag-string">"\") => {
-  "</span><span class="tag-var">filename</span>": <span class="tag-string">"functions.nim"</span>,
-  <span class="tag-string">"basename"</span>: <span class="tag-string">"functions"</span>,
-  <span class="tag-string">"ext"</span>: <span class="tag-string">".nim"</span>,
-  <span class="tag-string">"dir"</span>: <span class="tag-string">"src\"</span>,
+<span class="tag-funcCall">path</span>(<span class="tag-str">"src\functions.nim"</span>, <span class="tag-str">"\") => {
+  "</span>f<span class="tag-dotName">ilename</span>": <span class="tag-str">"functions.nim"</span>,
+  <span class="tag-str">"basename"</span>: <span class="tag-str">"functions"</span>,
+  <span class="tag-str">"ext"</span>: <span class="tag-str">".nim"</span>,
+  <span class="tag-str">"dir"</span>: "src\",
 }
 </pre>
 
@@ -1329,15 +1329,15 @@ func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Lowercase a string.
 
 </p><pre class="desc-code">
-<span class="tag-func">lower(</span><span class="tag-var">str</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">lower</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">lower(</span><span class="tag-string">"Tea"</span>) => <span class="tag-string">"tea"</span>
-<span class="tag-func">lower(</span><span class="tag-string">"TEA"</span>) => <span class="tag-string">"tea"</span>
-<span class="tag-func">lower(</span><span class="tag-string">"TEĀ"</span>) => <span class="tag-string">"teā"</span>
+<span class="tag-funcCall">lower</span>(<span class="tag-str">"Tea"</span>) => <span class="tag-str">"tea"</span>
+<span class="tag-funcCall">lower</span>(<span class="tag-str">"TEA"</span>) => <span class="tag-str">"tea"</span>
+<span class="tag-funcCall">lower</span>(<span class="tag-str">"TEĀ"</span>) => <span class="tag-str">"teā"</span>
 </pre>
 
 
@@ -1351,15 +1351,15 @@ func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create a list from the keys in a dictionary.
 
 </p><pre class="desc-code">
-<span class="tag-func">keys(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">keys</span>(<span class="tag-dotName">dictionary</span>: <span class="tag-dotName">dict</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">1</span>, <span class="tag-string">"b"</span>, <span class="tag-num">2</span>, <span class="tag-string">"c"</span>, <span class="tag-num">3</span>)
-<span class="tag-func">keys(</span><span class="tag-var">d</span>) => [<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>, <span class="tag-string">"c"</span>]
-<span class="tag-func">values(</span><span class="tag-var">d</span>) => [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">dict</span>(<span class="tag-str">"a"</span>, <span class="tag-num">1</span>, <span class="tag-str">"b"</span>, <span class="tag-num">2</span>, <span class="tag-str">"c"</span>, <span class="tag-num">3</span>)
+<span class="tag-funcCall">keys</span>(<span class="tag-dotName">d</span>) => [<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>, <span class="tag-str">"c"</span>]
+<span class="tag-funcCall">values</span>(<span class="tag-dotName">d</span>) => [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
 </pre>
 
 
@@ -1373,15 +1373,15 @@ func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create a list out of the values in the specified dictionary.
 
 </p><pre class="desc-code">
-<span class="tag-func">values(</span><span class="tag-var">dictionary</span><span class="tag-type">: dict</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">values</span>(<span class="tag-dotName">dictionary</span>: <span class="tag-dotName">dict</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">d</span> = <span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-string">"apple"</span>, <span class="tag-string">"b"</span>, <span class="tag-num">2</span>, <span class="tag-string">"c"</span>, <span class="tag-num">3</span>)
-<span class="tag-func">keys(</span><span class="tag-var">d</span>) => [<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>, <span class="tag-string">"c"</span>]
-<span class="tag-func">values(</span><span class="tag-var">d</span>) => [<span class="tag-string">"apple"</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">dict</span>(<span class="tag-str">"a"</span>, <span class="tag-str">"apple"</span>, <span class="tag-str">"b"</span>, <span class="tag-num">2</span>, <span class="tag-str">"c"</span>, <span class="tag-num">3</span>)
+<span class="tag-funcCall">keys</span>(<span class="tag-dotName">d</span>) => [<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>, <span class="tag-str">"c"</span>]
+<span class="tag-funcCall">values</span>(<span class="tag-dotName">d</span>) => [<span class="tag-str">"apple"</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
 </pre>
 
 
@@ -1400,24 +1400,24 @@ func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 "sensitive" is the default.
 
 </p><pre class="desc-code">
-<span class="tag-func">sort(</span><span class="tag-var">values</span><span class="tag-type">: list</span>, <span class="tag-var">order</span><span class="tag-type">: string</span>, <span class="tag-var">insensitive</span>: <span class="tag-type">optional string</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">values</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">order</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">insensitive</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">string</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">ints</span> = <span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">5</span>, <span class="tag-num">5</span>, <span class="tag-num">2</span>, <span class="tag-num">4</span>)
-<span class="tag-func">sort(</span><span class="tag-var">list</span>, <span class="tag-string">"ascending"</span>) => [<span class="tag-num">2</span>, <span class="tag-num">3</span>, <span class="tag-num">4</span>, <span class="tag-num">4</span>, <span class="tag-num">5</span>, <span class="tag-num">5</span>]
-<span class="tag-func">sort(</span><span class="tag-var">list</span>, <span class="tag-string">"descending"</span>) => [<span class="tag-num">5</span>, <span class="tag-num">5</span>, <span class="tag-num">4</span>, <span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">2</span>]
+<span class="tag-dotName">ints</span> = <span class="tag-funcCall">list</span>(<span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">5</span>, <span class="tag-num">5</span>, <span class="tag-num">2</span>, <span class="tag-num">4</span>)
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">list</span>, <span class="tag-str">"ascending"</span>) => [<span class="tag-num">2</span>, <span class="tag-num">3</span>, <span class="tag-num">4</span>, <span class="tag-num">4</span>, <span class="tag-num">5</span>, <span class="tag-num">5</span>]
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">list</span>, <span class="tag-str">"descending"</span>) => [<span class="tag-num">5</span>, <span class="tag-num">5</span>, <span class="tag-num">4</span>, <span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">2</span>]
 
-<span class="tag-var">floats</span> = <span class="tag-func">list(</span><span class="tag-num">4.4</span>, <span class="tag-num">3.1</span>, <span class="tag-num">5.9</span>)
-<span class="tag-func">sort(</span><span class="tag-var">floats</span>, <span class="tag-string">"ascending"</span>) => [<span class="tag-num">3.1</span>, <span class="tag-num">4.4</span>, <span class="tag-num">5.9</span>]
-<span class="tag-func">sort(</span><span class="tag-var">floats</span>, <span class="tag-string">"descending"</span>) => [<span class="tag-num">5.9</span>, <span class="tag-num">4.4</span>, <span class="tag-num">3.1</span>]
+<span class="tag-dotName">floats</span> = <span class="tag-funcCall">list</span>(<span class="tag-num">4.4</span>, <span class="tag-num">3.1</span>, <span class="tag-num">5.9</span>)
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">floats</span>, <span class="tag-str">"ascending"</span>) => [<span class="tag-num">3.1</span>, <span class="tag-num">4.4</span>, <span class="tag-num">5.9</span>]
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">floats</span>, <span class="tag-str">"descending"</span>) => [<span class="tag-num">5.9</span>, <span class="tag-num">4.4</span>, <span class="tag-num">3.1</span>]
 
-<span class="tag-var">strs</span> = <span class="tag-func">list(</span><span class="tag-string">"T"</span>, <span class="tag-string">"e"</span>, <span class="tag-string">"a"</span>)
-<span class="tag-func">sort(</span><span class="tag-var">strs</span>, <span class="tag-string">"ascending"</span>) => [<span class="tag-string">"T"</span>, <span class="tag-string">"a"</span>, <span class="tag-string">"e"</span>]
-<span class="tag-func">sort(</span><span class="tag-var">strs</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>) => [<span class="tag-string">"T"</span>, <span class="tag-string">"a"</span>, <span class="tag-string">"e"</span>]
-<span class="tag-func">sort(</span><span class="tag-var">strs</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"insensitive"</span>) => [<span class="tag-string">"a"</span>, <span class="tag-string">"e"</span>, <span class="tag-string">"T"</span>]
+<span class="tag-dotName">strs</span> = <span class="tag-funcCall">list</span>(<span class="tag-str">"T"</span>, <span class="tag-str">"e"</span>, <span class="tag-str">"a"</span>)
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">strs</span>, <span class="tag-str">"ascending"</span>) => [<span class="tag-str">"T"</span>, <span class="tag-str">"a"</span>, <span class="tag-str">"e"</span>]
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">strs</span>, <span class="tag-str">"ascending"</span>, <span class="tag-str">"sensitive"</span>) => [<span class="tag-str">"T"</span>, <span class="tag-str">"a"</span>, <span class="tag-str">"e"</span>]
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">strs</span>, <span class="tag-str">"ascending"</span>, <span class="tag-str">"insensitive"</span>) => [<span class="tag-str">"a"</span>, <span class="tag-str">"e"</span>, <span class="tag-str">"T"</span>]
 </pre>
 
 
@@ -1440,17 +1440,17 @@ must exist in each list, be the same type and be an int, float,
 or string.
 
 </p><pre class="desc-code">
-<span class="tag-func">sort(</span><span class="tag-var">lists</span><span class="tag-type">: list</span>, <span class="tag-var">order</span><span class="tag-type">: string</span>, <span class="tag-var">case</span><span class="tag-type">: string</span>, <span class="tag-var">index</span><span class="tag-type">: int</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">lists</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">order</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">case</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">index</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">l1</span> = <span class="tag-func">list(</span><span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">1</span>)
-<span class="tag-var">l2</span> = <span class="tag-func">list(</span><span class="tag-num">2</span>, <span class="tag-num">3</span>, <span class="tag-num">4</span>)
-<span class="tag-var">listOfLists</span> = <span class="tag-func">list(</span><span class="tag-var">l1</span>, <span class="tag-var">l2</span>)
-<span class="tag-func">sort(</span><span class="tag-var">listOfLists</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-num">0</span>) => [<span class="tag-var">l2</span>, <span class="tag-var">l1</span>]
-<span class="tag-func">sort(</span><span class="tag-var">listOfLists</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-num">2</span>) => [<span class="tag-var">l1</span>, <span class="tag-var">l2</span>]
+<span class="tag-dotName">l</span>1 = <span class="tag-funcCall">list</span>(<span class="tag-num">4</span>, <span class="tag-num">3</span>, <span class="tag-num">1</span>)
+<span class="tag-dotName">l</span>2 = <span class="tag-funcCall">list</span>(<span class="tag-num">2</span>, <span class="tag-num">3</span>, <span class="tag-num">4</span>)
+<span class="tag-dotName">listOfLists</span> = <span class="tag-funcCall">list</span>(<span class="tag-dotName">l</span>1, <span class="tag-dotName">l</span>2)
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">listOfLists</span>, <span class="tag-str">"ascending"</span>, <span class="tag-str">"sensitive"</span>, <span class="tag-num">0</span>) => [<span class="tag-dotName">l</span>2, <span class="tag-dotName">l</span>1]
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">listOfLists</span>, <span class="tag-str">"ascending"</span>, <span class="tag-str">"sensitive"</span>, <span class="tag-num">2</span>) => [<span class="tag-dotName">l</span>1, <span class="tag-dotName">l</span>2]
 </pre>
 
 
@@ -1473,17 +1473,17 @@ each dictionary, be the same type and be an int, float or
 string.
 
 </p><pre class="desc-code">
-<span class="tag-func">sort(</span><span class="tag-var">dicts</span><span class="tag-type">: list</span>, <span class="tag-var">order</span><span class="tag-type">: string</span>, <span class="tag-var">case</span><span class="tag-type">: string</span>, <span class="tag-var">key</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">dicts</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">order</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">case</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">key</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">d1</span> = <span class="tag-func">dict(</span><span class="tag-string">"name"</span>, <span class="tag-string">"Earl Gray"</span>, <span class="tag-string">"weight"</span>, <span class="tag-num">1.2</span>)
-<span class="tag-var">d2</span> = <span class="tag-func">dict(</span><span class="tag-string">"name"</span>, <span class="tag-string">"Tea Pot"</span>, <span class="tag-string">"weight"</span>, <span class="tag-num">3.5</span>)
-<span class="tag-var">dicts</span> = <span class="tag-func">list(</span><span class="tag-var">d1</span>, <span class="tag-var">d2</span>)
-<span class="tag-func">sort(</span><span class="tag-var">dicts</span>, <span class="tag-string">"ascending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-string">"weight"</span>) => [<span class="tag-var">d1</span>, <span class="tag-var">d2</span>]
-<span class="tag-func">sort(</span><span class="tag-var">dicts</span>, <span class="tag-string">"descending"</span>, <span class="tag-string">"sensitive"</span>, <span class="tag-string">"name"</span>) => [<span class="tag-var">d2</span>, <span class="tag-var">d1</span>]
+<span class="tag-dotName">d</span>1 = <span class="tag-funcCall">dict</span>(<span class="tag-str">"name"</span>, <span class="tag-str">"Earl Gray"</span>, <span class="tag-str">"weight"</span>, <span class="tag-num">1.2</span>)
+<span class="tag-dotName">d</span>2 = <span class="tag-funcCall">dict</span>(<span class="tag-str">"name"</span>, <span class="tag-str">"Tea Pot"</span>, <span class="tag-str">"weight"</span>, <span class="tag-num">3.5</span>)
+<span class="tag-dotName">dicts</span> = <span class="tag-funcCall">list</span>(<span class="tag-dotName">d</span>1, <span class="tag-dotName">d</span>2)
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">dicts</span>, <span class="tag-str">"ascending"</span>, <span class="tag-str">"sensitive"</span>, <span class="tag-str">"weight"</span>) => [<span class="tag-dotName">d</span>1, <span class="tag-dotName">d</span>2]
+<span class="tag-funcCall">sort</span>(<span class="tag-dotName">dicts</span>, <span class="tag-str">"descending"</span>, <span class="tag-str">"sensitive"</span>, <span class="tag-str">"name"</span>) => [<span class="tag-dotName">d</span>2, <span class="tag-dotName">d</span>1]
 </pre>
 
 
@@ -1497,7 +1497,7 @@ func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
 
 </p><pre class="desc-code">
-<span class="tag-func">anchors(</span><span class="tag-var">names</span><span class="tag-type">: list</span>, <span class="tag-var">type</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">anchors</span>(<span class="tag-dotName">names</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">type</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 type:
@@ -1510,9 +1510,9 @@ type:
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">list</span> = <span class="tag-func">list(</span><span class="tag-string">"Tea"</span>, <span class="tag-string">"Water"</span>, <span class="tag-string">"Tea"</span>)
-<span class="tag-func">anchores(</span><span class="tag-var">list</span>, <span class="tag-string">"github"</span>) =>
-  [<span class="tag-string">"tea"</span>, <span class="tag-string">"water"</span>, <span class="tag-string">"tea-1"</span>]
+<span class="tag-dotName">list</span> = <span class="tag-funcCall">list</span>(<span class="tag-str">"Tea"</span>, <span class="tag-str">"Water"</span>, <span class="tag-str">"Tea"</span>)
+<span class="tag-funcCall">anchores</span>(<span class="tag-dotName">list</span>, <span class="tag-str">"github"</span>) =>
+  [<span class="tag-str">"tea"</span>, <span class="tag-str">"water"</span>, <span class="tag-str">"tea-1"</span>]
 </pre>
 
 
@@ -1526,19 +1526,19 @@ func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return the argument type, one of: int, float, string, list, dict, bool or func.
 
 </p><pre class="desc-code">
-<span class="tag-func">type(</span><span class="tag-var">variable</span><span class="tag-type">: any</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">type</span>(<span class="tag-dotName">variable</span>: <span class="tag-dotName">any</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">type(</span><span class="tag-num">2</span>) => <span class="tag-string">"int"</span>
-<span class="tag-func">type(</span><span class="tag-num">3.14159</span>) => <span class="tag-string">"float"</span>
-<span class="tag-func">type(</span><span class="tag-string">"Tea"</span>) => <span class="tag-string">"string"</span>
-<span class="tag-func">type(</span><span class="tag-func">list(</span><span class="tag-num">1</span>,<span class="tag-num">2</span>)) => <span class="tag-string">"list"</span>
-<span class="tag-func">type(</span><span class="tag-func">dict(</span><span class="tag-string">"a"</span>, <span class="tag-num">1</span>)) => <span class="tag-string">"dict"</span>
-<span class="tag-func">type(</span><span class="tag-true-false">true</span>) => <span class="tag-string">"bool"</span>
-<span class="tag-func">type(</span><span class="tag-var">f.cmp</span>[<span class="tag-num">0</span>]) => <span class="tag-string">"func"</span>
+<span class="tag-funcCall">type</span>(<span class="tag-num">2</span>) => <span class="tag-str">"int"</span>
+<span class="tag-funcCall">type</span>(<span class="tag-num">3.14159</span>) => <span class="tag-str">"float"</span>
+<span class="tag-funcCall">type</span>(<span class="tag-str">"Tea"</span>) => <span class="tag-str">"string"</span>
+<span class="tag-funcCall">type</span>(<span class="tag-funcCall">list</span>(<span class="tag-num">1</span>,<span class="tag-num">2</span>)) => <span class="tag-str">"list"</span>
+<span class="tag-funcCall">type</span>(<span class="tag-funcCall">dict</span>(<span class="tag-str">"a"</span>, <span class="tag-num">1</span>)) => <span class="tag-str">"dict"</span>
+<span class="tag-funcCall">type</span>(<span class="tag-dotName">true</span>) => <span class="tag-str">"bool"</span>
+<span class="tag-funcCall">type</span>(<span class="tag-dotName">f.cmp</span>[<span class="tag-num">0</span>]) => <span class="tag-str">"func"</span>
 </pre>
 
 
@@ -1561,29 +1561,29 @@ is not added. If a component is "", the platform separator is
 used for it.
 
 </p><pre class="desc-code">
-<span class="tag-func">joinPath(</span><span class="tag-var">components</span><span class="tag-type">: list</span>, <span class="tag-var">separator</span>: <span class="tag-type">optional string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">joinPath</span>(<span class="tag-dotName">components</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">separator</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">joinPath(</span>[<span class="tag-string">"images"</span>, <span class="tag-string">"tea"</span>]) =>
-  <span class="tag-string">"images/tea"</span>
+<span class="tag-funcCall">joinPath</span>([<span class="tag-str">"images"</span>, <span class="tag-str">"tea"</span>]) =>
+  <span class="tag-str">"images/tea"</span>
 
-<span class="tag-func">joinPath(</span>[<span class="tag-string">"images"</span>, <span class="tag-string">"tea"</span>], <span class="tag-string">"/"</span>) =>
-  <span class="tag-string">"images/tea"</span>
+<span class="tag-funcCall">joinPath</span>([<span class="tag-str">"images"</span>, <span class="tag-str">"tea"</span>], <span class="tag-str">"/"</span>) =>
+  <span class="tag-str">"images/tea"</span>
 
-<span class="tag-func">joinPath(</span>[<span class="tag-string">"images"</span>, <span class="tag-string">"tea"</span>], <span class="tag-string">"\") =>
-  "</span><span class="tag-var">images</span>\<span class="tag-var">tea</span>"
+<span class="tag-funcCall">joinPath</span>([<span class="tag-str">"images"</span>, <span class="tag-str">"tea"</span>], <span class="tag-str">"\") =>
+  "</span>i<span class="tag-dotName">mages</span>\<span class="tag-dotName">tea</span>"
 
-<span class="tag-func">joinPath(</span>[<span class="tag-string">"images/"</span>, <span class="tag-string">"tea"</span>]) =>
-  <span class="tag-string">"images/tea"</span>
+<span class="tag-funcCall">joinPath</span>([<span class="tag-str">"images/"</span>, <span class="tag-str">"tea"</span>]) =>
+  <span class="tag-str">"images/tea"</span>
 
-<span class="tag-func">joinPath(</span>[<span class="tag-string">""</span>, <span class="tag-string">"tea"</span>]) =>
-  <span class="tag-string">"/tea"</span>
+<span class="tag-funcCall">joinPath</span>([<span class="tag-str">""</span>, <span class="tag-str">"tea"</span>]) =>
+  <span class="tag-str">"/tea"</span>
 
-<span class="tag-func">joinPath(</span>[<span class="tag-string">"/"</span>, <span class="tag-string">"tea"</span>]) =>
-  <span class="tag-string">"/tea"</span>
+<span class="tag-funcCall">joinPath</span>([<span class="tag-str">"/"</span>, <span class="tag-str">"tea"</span>]) =>
+  <span class="tag-str">"/tea"</span>
 </pre>
 
 
@@ -1597,20 +1597,20 @@ func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {
 <p>Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
 </p><pre class="desc-code">
-<span class="tag-func">join(</span><span class="tag-var">strs</span><span class="tag-type">: list</span>, <span class="tag-var">sep</span><span class="tag-type">: string</span>, <span class="tag-var">skipEmpty</span>: <span class="tag-type">optional bool</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">join</span>(<span class="tag-dotName">strs</span>: <span class="tag-dotName">list</span>, <span class="tag-dotName">sep</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">skipEmpty</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">bool</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>], <span class="tag-string">", "</span>) => <span class="tag-string">"a, b"</span>
-<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>], <span class="tag-string">""</span>) => <span class="tag-string">"ab"</span>
-<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>, <span class="tag-string">"c"</span>], <span class="tag-string">""</span>) => <span class="tag-string">"abc"</span>
-<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>], <span class="tag-string">", "</span>) => <span class="tag-string">"a"</span>
-<span class="tag-func">join(</span>[<span class="tag-string">""</span>], <span class="tag-string">", "</span>) => <span class="tag-string">""</span>
-<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">"b"</span>], <span class="tag-string">""</span>) => <span class="tag-string">"ab"</span>
-<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">""</span>, <span class="tag-string">"c"</span>], <span class="tag-string">"|"</span>) => <span class="tag-string">"a||c"</span>
-<span class="tag-func">join(</span>[<span class="tag-string">"a"</span>, <span class="tag-string">""</span>, <span class="tag-string">"c"</span>], <span class="tag-string">"|"</span>, <span class="tag-true-false">true</span>) => <span class="tag-string">"a|c"</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>], <span class="tag-str">", "</span>) => <span class="tag-str">"a, b"</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>], <span class="tag-str">""</span>) => <span class="tag-str">"ab"</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>, <span class="tag-str">"c"</span>], <span class="tag-str">""</span>) => <span class="tag-str">"abc"</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">"a"</span>], <span class="tag-str">", "</span>) => <span class="tag-str">"a"</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">""</span>], <span class="tag-str">", "</span>) => <span class="tag-str">""</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>], <span class="tag-str">""</span>) => <span class="tag-str">"ab"</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">"a"</span>, <span class="tag-str">""</span>, <span class="tag-str">"c"</span>], <span class="tag-str">"|"</span>) => <span class="tag-str">"a||c"</span>
+<span class="tag-funcCall">join</span>([<span class="tag-str">"a"</span>, <span class="tag-str">""</span>, <span class="tag-str">"c"</span>], <span class="tag-str">"|"</span>, <span class="tag-dotName">true</span>) => <span class="tag-str">"a|c"</span>
 </pre>
 
 
@@ -1624,19 +1624,19 @@ func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return a warning message and skip the current statement. You can call the warn function without an assignment.
 
 </p><pre class="desc-code">
-<span class="tag-func">warn(</span><span class="tag-var">message</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">warn</span>(<span class="tag-dotName">message</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 You can warn conditionally in a bare if statement:
 
 </p><pre class="desc-code">
-<span class="tag-func">if0(</span><span class="tag-var">c</span>, <span class="tag-func">warn(</span><span class="tag-string">"message is 0"</span>))
+<span class="tag-dotName">if</span>0(<span class="tag-dotName">c</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"message is 0"</span>))
 </pre>
 <p>
 You can warn unconditionally using a bare warn statement:
 
 </p><pre class="desc-code">
-<span class="tag-func">warn(</span><span class="tag-string">"always warn"</span>)
+<span class="tag-funcCall">warn</span>(<span class="tag-str">"always warn"</span>)
 </pre>
 
 
@@ -1650,19 +1650,19 @@ func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Log a message to the log file.  You can call the log function without an assignment.
 
 </p><pre class="desc-code">
-<span class="tag-func">log(</span><span class="tag-var">message</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">log</span>(<span class="tag-dotName">message</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 You can log conditionally in a bare if statement:
 
 </p><pre class="desc-code">
-<span class="tag-func">if0(</span><span class="tag-var">c</span>, <span class="tag-func">log(</span><span class="tag-string">"log this message when c is 0"</span>))
+<span class="tag-dotName">if</span>0(<span class="tag-dotName">c</span>, <span class="tag-funcCall">log</span>(<span class="tag-str">"log this message when c is 0"</span>))
 </pre>
 <p>
 You can log unconditionally using a bare log statement:
 
 </p><pre class="desc-code">
-<span class="tag-func">log(</span><span class="tag-string">"always log"</span>)
+<span class="tag-funcCall">log</span>(<span class="tag-str">"always log"</span>)
 </pre>
 
 
@@ -1679,22 +1679,22 @@ func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 the value of it.
 
 </p><pre class="desc-code">
-<span class="tag-func">return(</span><span class="tag-true-false">false</span>)
+<span class="tag-funcCall">return</span>(<span class="tag-dotName">false</span>)
 </pre>
 <p>
 You can also use it with a bare IF statement to conditionally
 return a function value.
 
 </p><pre class="desc-code">
-<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-num">5</span>))
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">c</span>, <span class="tag-funcCall">return</span>(<span class="tag-num">5</span>))
 </pre>
 <p>
 In a template command a return controls the replacement block
 looping by returning “skip” and “stop”.
 
 </p><pre class="desc-code">
-<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-string">"stop"</span>))
-<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">return(</span><span class="tag-string">"skip"</span>))
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">c</span>, <span class="tag-funcCall">return</span>(<span class="tag-str">"stop"</span>))
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">c</span>, <span class="tag-funcCall">return</span>(<span class="tag-str">"skip"</span>))
 </pre>
 <p>
 </p><ul>
@@ -1705,12 +1705,12 @@ looping by returning “skip” and “stop”.
 <p>The following block command repeats 4 times but skips when t.row is 2.
 
 </p><pre class="desc-code">
-$$ <span class="tag-var">block</span> <span class="tag-var">t.repeat</span> = <span class="tag-num">4</span>
-$$ : <span class="tag-func">if(</span>(<span class="tag-var">t.row</span> == <span class="tag-num">2</span>), <span class="tag-func">return(</span>“<span class="tag-var">skip</span>”))
-{<span class="tag-var">t.row</span>}
-$$ <span class="tag-var">endblock</span>
+$$ <span class="tag-dotName">block</span> <span class="tag-dotName">t.repeat</span> = <span class="tag-num">4</span>
+$$ : <span class="tag-funcCall">if</span>((<span class="tag-dotName">t.row</span> == <span class="tag-num">2</span>), <span class="tag-funcCall">return</span>(“<span class="tag-dotName">skip</span>”))
+{<span class="tag-dotName">t.row</span>}
+$$ <span class="tag-dotName">endblock</span>
 
-<span class="tag-var">output</span>:
+<span class="tag-dotName">output</span>:
 
 <span class="tag-num">0</span>
 <span class="tag-num">1</span>
@@ -1727,7 +1727,7 @@ func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 <p>Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
 </p><pre class="desc-code">
-<span class="tag-func">string(</span><span class="tag-var">var</span><span class="tag-type">: any</span>, <span class="tag-var">stype</span>: <span class="tag-type">optional string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">string</span>(<span class="tag-dotName">var</span>: <span class="tag-dotName">any</span>, <span class="tag-dotName">stype</span>: <span class="tag-dotName">optional</span> <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 The default stype is "rb" which is used for replacement blocks.
@@ -1747,25 +1747,25 @@ are printed one per line as "ix: value".
 <p>Examples variables:
 
 </p><pre class="desc-code">
-<span class="tag-var">str</span> = <span class="tag-string">"Earl Grey"</span>
-<span class="tag-var">pi</span> = <span class="tag-num">3.14159</span>
-<span class="tag-var">one</span> = <span class="tag-num">1</span>
-<span class="tag-var">a</span> = [<span class="tag-string">"red"</span>, <span class="tag-string">"green"</span>, <span class="tag-string">"blue"</span>]
-<span class="tag-var">d</span> = <span class="tag-func">dict(</span>[<span class="tag-string">"x"</span>, <span class="tag-num">1</span>, <span class="tag-string">"y"</span>, <span class="tag-num">2</span>])
-<span class="tag-var">fn</span> = <span class="tag-var">cmp</span>[<span class="tag-num">0</span>]
-<span class="tag-var">found</span> = <span class="tag-true-false">true</span>
+<span class="tag-dotName">str</span> = <span class="tag-str">"Earl Grey"</span>
+<span class="tag-dotName">pi</span> = <span class="tag-num">3.14159</span>
+<span class="tag-dotName">one</span> = <span class="tag-num">1</span>
+<span class="tag-dotName">a</span> = [<span class="tag-str">"red"</span>, <span class="tag-str">"green"</span>, <span class="tag-str">"blue"</span>]
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">dict</span>([<span class="tag-str">"x"</span>, <span class="tag-num">1</span>, <span class="tag-str">"y"</span>, <span class="tag-num">2</span>])
+<span class="tag-dotName">fn</span> = <span class="tag-dotName">cmp</span>[<span class="tag-num">0</span>]
+<span class="tag-dotName">found</span> = <span class="tag-dotName">true</span>
 </pre>
 <p>
 json:
 
 </p><pre class="desc-code">
-<span class="tag-var">str</span> => <span class="tag-string">"Earl Grey"</span>
-<span class="tag-var">pi</span> => <span class="tag-num">3.14159</span>
-<span class="tag-var">one</span> => <span class="tag-num">1</span>
-<span class="tag-var">a</span> => [<span class="tag-string">"red"</span>,<span class="tag-string">"green"</span>,<span class="tag-string">"blue"</span>]
-<span class="tag-var">d</span> => {<span class="tag-string">"x"</span>:<span class="tag-num">1</span>,<span class="tag-string">"y"</span>:<span class="tag-num">2</span>}
-<span class="tag-var">fn</span> => <span class="tag-string">"cmp"</span>
-<span class="tag-var">found</span> => <span class="tag-true-false">true</span>
+<span class="tag-dotName">str</span> => <span class="tag-str">"Earl Grey"</span>
+<span class="tag-dotName">pi</span> => <span class="tag-num">3.14159</span>
+<span class="tag-dotName">one</span> => <span class="tag-num">1</span>
+<span class="tag-dotName">a</span> => [<span class="tag-str">"red"</span>,<span class="tag-str">"green"</span>,<span class="tag-str">"blue"</span>]
+<span class="tag-dotName">d</span> => {<span class="tag-str">"x"</span>:<span class="tag-num">1</span>,<span class="tag-str">"y"</span>:<span class="tag-num">2</span>}
+<span class="tag-dotName">fn</span> => <span class="tag-str">"cmp"</span>
+<span class="tag-dotName">found</span> => <span class="tag-dotName">true</span>
 </pre>
 <p>
 rb:
@@ -1773,8 +1773,8 @@ rb:
 </p><p>Same as JSON except the following.
 
 </p><pre class="desc-code">
-<span class="tag-var">str</span> => <span class="tag-var">Earl</span> <span class="tag-var">Grey</span>
-<span class="tag-var">fn</span> => <span class="tag-var">cmp</span>
+<span class="tag-dotName">str</span> => <span class="tag-dotName">Earl</span> <span class="tag-dotName">Grey</span>
+<span class="tag-dotName">fn</span> => <span class="tag-dotName">cmp</span>
 </pre>
 <p>
 dn:
@@ -1782,9 +1782,9 @@ dn:
 </p><p>Same as JSON except the following.
 
 </p><pre class="desc-code">
-<span class="tag-var">d</span> =>
-<span class="tag-var">x</span> = <span class="tag-num">1</span>
-<span class="tag-var">y</span> = <span class="tag-num">2</span>
+<span class="tag-dotName">d</span> =>
+<span class="tag-dotName">x</span> = <span class="tag-num">1</span>
+<span class="tag-dotName">y</span> = <span class="tag-num">2</span>
 </pre>
 <p>
 vl:
@@ -1792,10 +1792,10 @@ vl:
 </p><p>Same as JSON except the following.
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> =>
-<span class="tag-num">0</span>: <span class="tag-string">"red"</span>
-<span class="tag-num">1</span>: <span class="tag-string">"green"</span>
-<span class="tag-num">2</span>: <span class="tag-string">"blue"</span>
+<span class="tag-dotName">a</span> =>
+<span class="tag-num">0</span>: <span class="tag-str">"red"</span>
+<span class="tag-num">1</span>: <span class="tag-str">"green"</span>
+<span class="tag-num">2</span>: <span class="tag-str">"blue"</span>
 </pre>
 
 
@@ -1809,18 +1809,18 @@ func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
 
 </p><pre class="desc-code">
-<span class="tag-func">string(</span><span class="tag-var">dictName</span><span class="tag-type">: string</span>: <span class="tag-var">d</span><span class="tag-type">: dict</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">string</span>(<span class="tag-dotName">dictName</span>: <span class="tag-dotName">string</span>: <span class="tag-dotName">d</span>: <span class="tag-dotName">dict</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Example:
 
 </p><pre class="desc-code">
-<span class="tag-var">d</span> = {<span class="tag-string">"x"</span>,<span class="tag-num">1</span>, <span class="tag-string">"y"</span>:<span class="tag-string">"tea"</span>, <span class="tag-string">"z"</span>:{<span class="tag-string">"a"</span>:<span class="tag-num">8</span>}}
-<span class="tag-func">string(</span><span class="tag-string">"teas"</span>, <span class="tag-var">d</span>) =>
+<span class="tag-dotName">d</span> = {<span class="tag-str">"x"</span>,<span class="tag-num">1</span>, <span class="tag-str">"y"</span>:<span class="tag-str">"tea"</span>, <span class="tag-str">"z"</span>:{<span class="tag-str">"a"</span>:<span class="tag-num">8</span>}}
+<span class="tag-funcCall">string</span>(<span class="tag-str">"teas"</span>, <span class="tag-dotName">d</span>) =>
 
-<span class="tag-var">teas.x</span> = <span class="tag-num">1</span>
-<span class="tag-var">teas.y</span> = <span class="tag-string">"tea"</span>
-<span class="tag-var">teas.z.a</span> = <span class="tag-num">8</span>
+<span class="tag-dotName">teas.x</span> = <span class="tag-num">1</span>
+<span class="tag-dotName">teas.y</span> = <span class="tag-str">"tea"</span>
+<span class="tag-dotName">teas.z.a</span> = <span class="tag-num">8</span>
 </pre>
 
 
@@ -1834,25 +1834,25 @@ func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
 
 </p><pre class="desc-code">
-<span class="tag-func">format(</span><span class="tag-var">str</span><span class="tag-type">: string</span><span class="tag-type">) string</span>
+<span class="tag-funcCall">format</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
 </pre>
 <p>
 Example:
 
 </p><pre class="desc-code">
-<span class="tag-var">let</span> <span class="tag-var">first</span> = <span class="tag-string">"Earl"</span>
-<span class="tag-var">let</span> <span class="tag-var">last</span> = <span class="tag-string">"Grey"</span>
-<span class="tag-var">str</span> = <span class="tag-func">format(</span><span class="tag-string">"name: {first} {last}"</span>)
+<span class="tag-dotName">let</span> <span class="tag-dotName">first</span> = <span class="tag-str">"Earl"</span>
+<span class="tag-dotName">let</span> <span class="tag-dotName">last</span> = <span class="tag-str">"Grey"</span>
+<span class="tag-dotName">str</span> = <span class="tag-funcCall">format</span>(<span class="tag-str">"name: {first} {last}"</span>)
 
-<span class="tag-var">str</span> => <span class="tag-string">"name: Earl Grey"</span>
+<span class="tag-dotName">str</span> => <span class="tag-str">"name: Earl Grey"</span>
 </pre>
 <p>
 To enter a left bracket use two in a row.
 
 </p><pre class="desc-code">
-<span class="tag-var">str</span> = <span class="tag-func">format(</span><span class="tag-string">"use two {{ to get one"</span>)
+<span class="tag-dotName">str</span> = <span class="tag-funcCall">format</span>(<span class="tag-str">"use two {{ to get one"</span>)
 
-<span class="tag-var">str</span> => <span class="tag-string">"use two { to get one"</span>
+<span class="tag-dotName">str</span> => <span class="tag-str">"use two { to get one"</span>
 </pre>
 
 
@@ -1866,18 +1866,18 @@ func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Define a function.
 
 </p><pre class="desc-code">
-<span class="tag-func">func(</span><span class="tag-var">signature</span><span class="tag-type">: string</span><span class="tag-type">) func</span>
+<span class="tag-funcCall">func</span>(<span class="tag-param">signature</span>: <span class="tag-type">string</span>) <span class="tag-type">func</span>
 </pre>
 <p>
 Example:
 
 </p><pre class="desc-code">
-<span class="tag-var">mycmp</span> = <span class="tag-func">func(</span><span class="tag-var">numStr1</span><span class="tag-type">: string</span>, <span class="tag-var">numStr2</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
-  <span class="tag-doc">## Compare two number strings</span>
-  <span class="tag-doc">## and return 1, 0, or -1.</span>
-  <span class="tag-var">num1</span> = <span class="tag-func">int(</span><span class="tag-var">numStr1</span>)
-  <span class="tag-var">num2</span> = <span class="tag-func">int(</span><span class="tag-var">numStr2</span>)
-  <span class="tag-func">return(</span><span class="tag-func">cmp(</span><span class="tag-var">num1</span>, <span class="tag-var">num2</span>))
+<span class="tag-dotName">mycmp</span> = <span class="tag-funcCall">func</span>(<span class="tag-param">numStr</span>1: <span class="tag-type">string</span>, <span class="tag-param">numStr</span>2: <span class="tag-type">string</span>) <span class="tag-type">int</span>
+  <span class="tag-doc">## Compare two number strings
+</span>  <span class="tag-doc">## and return 1, 0, or -1.
+</span>  <span class="tag-dotName">num</span>1 = <span class="tag-funcCall">int</span>(<span class="tag-dotName">numStr</span>1)
+  <span class="tag-dotName">num</span>2 = <span class="tag-funcCall">int</span>(<span class="tag-dotName">numStr</span>2)
+  <span class="tag-funcCall">return</span>(<span class="tag-funcCall">cmp</span>(<span class="tag-dotName">num</span>1, <span class="tag-dotName">num</span>2))
 </pre>
 
 
@@ -1890,31 +1890,31 @@ func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
 <p>Return the function details in a dictionary.
 
 </p><pre class="desc-code">
-<span class="tag-func">functionDetails(</span><span class="tag-var">funcVar</span><span class="tag-type">: func</span><span class="tag-type">) dict</span>
+<span class="tag-funcCall">functionDetails</span>(<span class="tag-dotName">funcVar</span>: <span class="tag-dotName">func</span>) <span class="tag-dotName">dict</span>
 </pre>
 <p>
 The following example defines a simple function then gets its
 function details.
 
 </p><pre class="desc-code">
-<span class="tag-var">mycmp</span> = <span class="tag-func">func(</span><span class="tag-var">numStr1</span><span class="tag-type">: string</span>, <span class="tag-var">numStr2</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
-  <span class="tag-doc">## Compare two number strings and return 1, 0, or -1.</span>
-  <span class="tag-func">return(</span><span class="tag-func">cmp(</span><span class="tag-func">int(</span><span class="tag-var">numStr1</span>), <span class="tag-func">int(</span><span class="tag-var">numStr2</span>)))
+<span class="tag-dotName">mycmp</span> = <span class="tag-funcCall">func</span>(<span class="tag-param">numStr</span>1: <span class="tag-type">string</span>, <span class="tag-param">numStr</span>2: <span class="tag-type">string</span>) <span class="tag-type">int</span>
+  <span class="tag-doc">## Compare two number strings and return 1, 0, or -1.
+</span>  <span class="tag-funcCall">return</span>(<span class="tag-funcCall">cmp</span>(<span class="tag-funcCall">int</span>(<span class="tag-dotName">numStr</span>1), <span class="tag-funcCall">int</span>(<span class="tag-dotName">numStr</span>2)))
 
-<span class="tag-var">fd</span> = <span class="tag-func">functionDetails(</span><span class="tag-var">mycmp</span>)
+<span class="tag-dotName">fd</span> = <span class="tag-funcCall">functionDetails</span>(<span class="tag-dotName">mycmp</span>)
 
-<span class="tag-var">fd</span> =>
-<span class="tag-var">fd.builtIn</span> = <span class="tag-true-false">false</span>
-<span class="tag-var">fd.signature.optional</span> = <span class="tag-true-false">false</span>
-<span class="tag-var">fd.signature.name</span> = <span class="tag-string">"strNumCmp"</span>
-<span class="tag-var">fd.signature.paramNames</span> = [<span class="tag-string">"numStr1"</span>,<span class="tag-string">"numStr2"</span>]
-<span class="tag-var">fd.signature.paramTypes</span> = [<span class="tag-string">"string"</span>,<span class="tag-string">"string"</span>]
-<span class="tag-var">fd.signature.returnType</span> = <span class="tag-string">"int"</span>
-<span class="tag-var">fd.docComment</span> = <span class="tag-string">"  ## Compare two number strings and return 1, 0, or -1.\n"</span>
-<span class="tag-var">fd.filename</span> = <span class="tag-string">"testcode.tea"</span>
-<span class="tag-var">fd.lineNum</span> = <span class="tag-num">3</span>
-<span class="tag-var">fd.numLines</span> = <span class="tag-num">2</span>
-<span class="tag-var">fd.statements</span> = [<span class="tag-string">"  return(cmp(int(numStr1), int(numStr2)))"</span>]
+<span class="tag-dotName">fd</span> =>
+<span class="tag-dotName">fd.builtIn</span> = <span class="tag-dotName">false</span>
+<span class="tag-dotName">fd.signature.optional</span> = <span class="tag-dotName">false</span>
+<span class="tag-dotName">fd.signature.name</span> = <span class="tag-str">"strNumCmp"</span>
+<span class="tag-dotName">fd.signature.paramNames</span> = [<span class="tag-str">"numStr1"</span>,<span class="tag-str">"numStr2"</span>]
+<span class="tag-dotName">fd.signature.paramTypes</span> = [<span class="tag-str">"string"</span>,<span class="tag-str">"string"</span>]
+<span class="tag-dotName">fd.signature.returnType</span> = <span class="tag-str">"int"</span>
+<span class="tag-dotName">fd.docComment</span> = <span class="tag-str">"  ## Compare two number strings and return 1, 0, or -1.\n"</span>
+<span class="tag-dotName">fd.filename</span> = <span class="tag-str">"testcode.tea"</span>
+<span class="tag-dotName">fd.lineNum</span> = <span class="tag-num">3</span>
+<span class="tag-dotName">fd.numLines</span> = <span class="tag-num">2</span>
+<span class="tag-dotName">fd.statements</span> = [<span class="tag-str">"  return(cmp(int(numStr1), int(numStr2)))"</span>]
 </pre>
 
 
@@ -1928,17 +1928,17 @@ func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunRes
 <p>Check whether a strings starts with the given prefix. Return true when it does, else false.
 
 </p><pre class="desc-code">
-<span class="tag-func">startsWith(</span><span class="tag-var">str</span><span class="tag-type">: string</span>, <span class="tag-var">str</span>: <span class="tag-var">prefix</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">startsWith</span>(<span class="tag-dotName">str</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">str</span>: <span class="tag-dotName">prefix</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">startsWith(</span><span class="tag-string">"abcdef"</span>, <span class="tag-string">"abc"</span>)
-<span class="tag-var">b</span> = <span class="tag-func">startsWith(</span><span class="tag-string">"abcdef"</span>, <span class="tag-string">"abf"</span>)
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">startsWith</span>(<span class="tag-str">"abcdef"</span>, <span class="tag-str">"abc"</span>)
+<span class="tag-dotName">b</span> = <span class="tag-funcCall">startsWith</span>(<span class="tag-str">"abcdef"</span>, <span class="tag-str">"abf"</span>)
 
-<span class="tag-var">a</span> => <span class="tag-true-false">true</span>
-<span class="tag-var">b</span> => <span class="tag-true-false">false</span>
+<span class="tag-dotName">a</span> => <span class="tag-dotName">true</span>
+<span class="tag-dotName">b</span> => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -1952,14 +1952,14 @@ func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult 
 <p>Boolean not.
 
 </p><pre class="desc-code">
-<span class="tag-func">not(</span><span class="tag-var">value</span><span class="tag-type">: bool</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">not</span>(<span class="tag-dotName">value</span>: <span class="tag-dotName">bool</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">not(</span><span class="tag-true-false">true</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">not(</span><span class="tag-true-false">false</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">not</span>(<span class="tag-dotName">true</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">not</span>(<span class="tag-dotName">false</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -1973,17 +1973,17 @@ func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 </p><pre class="desc-code">
-<span class="tag-func">and(</span><span class="tag-var">a</span><span class="tag-type">: bool</span>, <span class="tag-var">b</span><span class="tag-type">: bool</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">and</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">bool</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">bool</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">and(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">and(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">and(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">and(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">and(</span><span class="tag-true-false">false</span>, <span class="tag-func">warn(</span><span class="tag-string">"not hit"</span>)) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">and</span>(<span class="tag-dotName">true</span>, <span class="tag-dotName">true</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">and</span>(<span class="tag-dotName">false</span>, <span class="tag-dotName">true</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">and</span>(<span class="tag-dotName">true</span>, <span class="tag-dotName">false</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">and</span>(<span class="tag-dotName">false</span>, <span class="tag-dotName">false</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">and</span>(<span class="tag-dotName">false</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"not hit"</span>)) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -1996,17 +1996,17 @@ func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 <p>Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
 
 </p><pre class="desc-code">
-<span class="tag-func">or(</span><span class="tag-var">a</span><span class="tag-type">: bool</span>, <span class="tag-var">b</span><span class="tag-type">: bool</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">or</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">bool</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">bool</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">or(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">or(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">true</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">or(</span><span class="tag-true-false">true</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">or(</span><span class="tag-true-false">false</span>, <span class="tag-true-false">false</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">or(</span><span class="tag-true-false">true</span>, <span class="tag-func">warn(</span><span class="tag-string">"not hit"</span>)) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">or</span>(<span class="tag-dotName">true</span>, <span class="tag-dotName">true</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">or</span>(<span class="tag-dotName">false</span>, <span class="tag-dotName">true</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">or</span>(<span class="tag-dotName">true</span>, <span class="tag-dotName">false</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">or</span>(<span class="tag-dotName">false</span>, <span class="tag-dotName">false</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">or</span>(<span class="tag-dotName">true</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"not hit"</span>)) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2019,14 +2019,14 @@ func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 <p>Return true when the two ints are equal.
 
 </p><pre class="desc-code">
-<span class="tag-func">eq(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">eq(</span><span class="tag-num">1</span>, <span class="tag-num">1</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">eq(</span><span class="tag-num">2</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-num">1</span>, <span class="tag-num">1</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-num">2</span>, <span class="tag-num">3</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -2040,14 +2040,14 @@ func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when two floats are equal.
 
 </p><pre class="desc-code">
-<span class="tag-func">eq(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">eq(</span><span class="tag-num">1.2</span>, <span class="tag-num">1.2</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">eq(</span><span class="tag-num">1.2</span>, <span class="tag-num">3.2</span>) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-num">1.2</span>, <span class="tag-num">1.2</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-num">1.2</span>, <span class="tag-num">3.2</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -2061,14 +2061,14 @@ func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when two strings are equal.  See cmp function for case insensitive compare.
 
 </p><pre class="desc-code">
-<span class="tag-func">eq(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">eq(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">eq(</span><span class="tag-string">"1.2"</span>, <span class="tag-string">"3.2"</span>) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-str">"tea"</span>, <span class="tag-str">"tea"</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">eq</span>(<span class="tag-str">"1.2"</span>, <span class="tag-str">"3.2"</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -2082,14 +2082,14 @@ func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when two ints are not equal.
 
 </p><pre class="desc-code">
-<span class="tag-func">ne(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">ne(</span><span class="tag-num">1</span>, <span class="tag-num">1</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">ne(</span><span class="tag-num">2</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-num">1</span>, <span class="tag-num">1</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-num">2</span>, <span class="tag-num">3</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2103,14 +2103,14 @@ func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when two floats are not equal.
 
 </p><pre class="desc-code">
-<span class="tag-func">ne(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">ne(</span><span class="tag-num">1.2</span>, <span class="tag-num">1.2</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">ne(</span><span class="tag-num">1.2</span>, <span class="tag-num">3.2</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-num">1.2</span>, <span class="tag-num">1.2</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-num">1.2</span>, <span class="tag-num">3.2</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2124,14 +2124,14 @@ func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when two strings are not equal.
 
 </p><pre class="desc-code">
-<span class="tag-func">ne(</span><span class="tag-var">a</span><span class="tag-type">: string</span>, <span class="tag-var">b</span><span class="tag-type">: string</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">string</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">ne(</span><span class="tag-string">"tea"</span>, <span class="tag-string">"tea"</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">ne(</span><span class="tag-string">"earl"</span>, <span class="tag-string">"grey"</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-str">"tea"</span>, <span class="tag-str">"tea"</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">ne</span>(<span class="tag-str">"earl"</span>, <span class="tag-str">"grey"</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2145,14 +2145,14 @@ func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when an int is greater then another int.
 
 </p><pre class="desc-code">
-<span class="tag-func">gt(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">gt(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">gt(</span><span class="tag-num">3</span>, <span class="tag-num">2</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-num">3</span>, <span class="tag-num">2</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2166,14 +2166,14 @@ func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when one float is greater than another float.
 
 </p><pre class="desc-code">
-<span class="tag-func">gt(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">gt(</span><span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">gt(</span><span class="tag-num">3.1</span>, <span class="tag-num">2.5</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-num">3.1</span>, <span class="tag-num">2.5</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2187,14 +2187,14 @@ func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when an int is greater then or equal to another int.
 
 </p><pre class="desc-code">
-<span class="tag-func">gte(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">gte</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">gte(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">gte(</span><span class="tag-num">3</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">gte</span>(<span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">gte</span>(<span class="tag-num">3</span>, <span class="tag-num">3</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2208,14 +2208,14 @@ func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when a float is greater than or equal to another float.
 
 </p><pre class="desc-code">
-<span class="tag-func">gte(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">gte</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">gte(</span><span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-true-false">false</span>
-<span class="tag-func">gte(</span><span class="tag-num">3.1</span>, <span class="tag-num">3.1</span>) => <span class="tag-true-false">true</span>
+<span class="tag-funcCall">gte</span>(<span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-dotName">false</span>
+<span class="tag-funcCall">gte</span>(<span class="tag-num">3.1</span>, <span class="tag-num">3.1</span>) => <span class="tag-dotName">true</span>
 </pre>
 
 
@@ -2229,14 +2229,14 @@ func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when an int is less than another int.
 
 </p><pre class="desc-code">
-<span class="tag-func">lt(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">lt</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">gt(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">gt(</span><span class="tag-num">3</span>, <span class="tag-num">2</span>) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">gt</span>(<span class="tag-num">3</span>, <span class="tag-num">2</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -2250,14 +2250,14 @@ func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when a float is less then another float.
 
 </p><pre class="desc-code">
-<span class="tag-func">lt(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">lt</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">lt(</span><span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">lt(</span><span class="tag-num">3.1</span>, <span class="tag-num">2.5</span>) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">lt</span>(<span class="tag-num">2.8</span>, <span class="tag-num">4.3</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">lt</span>(<span class="tag-num">3.1</span>, <span class="tag-num">2.5</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -2271,15 +2271,15 @@ func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when an int is less than or equal to another int.
 
 </p><pre class="desc-code">
-<span class="tag-func">lte(</span><span class="tag-var">a</span><span class="tag-type">: int</span>, <span class="tag-var">b</span><span class="tag-type">: int</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">int</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">lte(</span><span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">lte(</span><span class="tag-num">3</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">lte(</span><span class="tag-num">4</span>, <span class="tag-num">3</span>) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-num">2</span>, <span class="tag-num">4</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-num">3</span>, <span class="tag-num">3</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-num">4</span>, <span class="tag-num">3</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -2293,15 +2293,15 @@ func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Return true when a float is less than or equal to another float.
 
 </p><pre class="desc-code">
-<span class="tag-func">lte(</span><span class="tag-var">a</span><span class="tag-type">: float</span>, <span class="tag-var">b</span><span class="tag-type">: float</span><span class="tag-type">) bool</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>) <span class="tag-dotName">bool</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-func">lte(</span><span class="tag-num">2.3</span>, <span class="tag-num">4.4</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">lte(</span><span class="tag-num">3.0</span>, <span class="tag-num">3.0</span>) => <span class="tag-true-false">true</span>
-<span class="tag-func">lte(</span><span class="tag-num">4.0</span>, <span class="tag-num">3.0</span>) => <span class="tag-true-false">false</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-num">2.3</span>, <span class="tag-num">4.4</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-num">3.0</span>, <span class="tag-num">3.0</span>) => <span class="tag-dotName">true</span>
+<span class="tag-funcCall">lte</span>(<span class="tag-num">4.0</span>, <span class="tag-num">3.0</span>) => <span class="tag-dotName">false</span>
 </pre>
 
 
@@ -2315,17 +2315,17 @@ func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Convert a JSON string to a variable.
 
 </p><pre class="desc-code">
-<span class="tag-func">readJson(</span><span class="tag-var">json</span><span class="tag-type">: string</span><span class="tag-type">) any</span>
+<span class="tag-funcCall">readJson</span>(<span class="tag-dotName">json</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">any</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">readJson(</span><span class="tag-string">""</span><span class="tag-var">tea</span>"<span class="tag-string">") => "</span><span class="tag-var">tea</span>"
-<span class="tag-var">b</span> = <span class="tag-func">readJson(</span><span class="tag-string">"4.5"</span>) => <span class="tag-num">4.5</span>
-<span class="tag-var">c</span> = <span class="tag-func">readJson(</span><span class="tag-string">"[1,2,3]"</span>) => [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
-<span class="tag-var">d</span> = <span class="tag-func">readJson(</span><span class="tag-string">"{"</span><span class="tag-var">a</span>":<span class="tag-num">1</span>, <span class="tag-string">"b"</span>: <span class="tag-num">2</span>}<span class="tag-string">")
-  => {"</span><span class="tag-var">a</span>": <span class="tag-num">1</span>, <span class="tag-string">"b"</span>, <span class="tag-num">2</span>}
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">readJson</span>(<span class="tag-str">""</span>t<span class="tag-dotName">ea</span>"<span class="tag-str">") => "</span>t<span class="tag-dotName">ea</span>"
+<span class="tag-dotName">b</span> = <span class="tag-funcCall">readJson</span>(<span class="tag-str">"4.5"</span>) => <span class="tag-num">4.5</span>
+<span class="tag-dotName">c</span> = <span class="tag-funcCall">readJson</span>(<span class="tag-str">"[1,2,3]"</span>) => [<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>]
+<span class="tag-dotName">d</span> = <span class="tag-funcCall">readJson</span>(<span class="tag-str">"{"</span>a<span class="tag-str">":1, "</span>b<span class="tag-str">": 2}"</span>)
+  => {<span class="tag-str">"a"</span>: <span class="tag-num">1</span>, <span class="tag-str">"b"</span>, <span class="tag-num">2</span>}
 </pre>
 
 
@@ -2339,7 +2339,7 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
 </p><pre class="desc-code">
-<span class="tag-func">markdownList(</span><span class="tag-var">mdText</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">markdownList</span>(<span class="tag-dotName">mdText</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 list elements:
@@ -2363,11 +2363,11 @@ string.
 
 </li></ul>
 <pre class="desc-code">
-<span class="tag-var">elements</span> = <span class="tag-func">markdownLite(</span><span class="tag-var">description</span>)
-<span class="tag-var">elements</span> => [
-  [<span class="tag-string">"p"</span>, [<span class="tag-string">"the paragraph which may contain newlines"</span>]]
-  [<span class="tag-string">"code"</span>, [<span class="tag-string">"~~~"</span>, <span class="tag-string">"code text with newlines"</span>, <span class="tag-string">"~~~"</span>]]
-  [<span class="tag-string">"bullets"</span>, [<span class="tag-string">"bullet (newlines) 1"</span>, <span class="tag-string">"point 2"</span>, <span class="tag-string">"3"</span>, ...]
+<span class="tag-dotName">elements</span> = <span class="tag-funcCall">markdownLite</span>(<span class="tag-dotName">description</span>)
+<span class="tag-dotName">elements</span> => [
+  [<span class="tag-str">"p"</span>, [<span class="tag-str">"the paragraph which may contain newlines"</span>]]
+  [<span class="tag-str">"code"</span>, [<span class="tag-str">"~~~"</span>, <span class="tag-str">"code text with newlines"</span>, <span class="tag-str">"~~~"</span>]]
+  [<span class="tag-str">"bullets"</span>, [<span class="tag-str">"bullet (newlines) 1"</span>, <span class="tag-str">"point 2"</span>, <span class="tag-str">"3"</span>, ...]
 ]
 </pre>
 
@@ -2382,37 +2382,39 @@ func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
 <p>Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
 
 </p><pre class="desc-code">
-<span class="tag-func">highlight(</span><span class="tag-var">code</span><span class="tag-type">: string</span><span class="tag-type">) list</span>
+<span class="tag-funcCall">highlight</span>(<span class="tag-dotName">code</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">list</span>
 </pre>
 <p>
 Tags:
 
 </p><ul>
 <li>other -- not one of the other types
-</li><li>func -- a function call, var followed by a left parenthesis
-</li><li>var -- a variable name
-</li><li>type -- int, float, string, list, dict, bool, any, true, false
+</li><li>dotName -- a dot name
+</li><li>funcCall -- a function call; a dot name followed by a left parenthesis
 </li><li>num -- a literal number
-</li><li>string -- a literal string
+</li><li>str -- a literal string
+</li><li>multiline -- a multiline literal string
 </li><li>doc -- a doc comment
 </li><li>comment -- a comment
+</li><li>param -- a parameter name
+</li><li>type -- int, float, string, list, dict, bool, func, any and optional
 
 </li></ul>
 <p>Example:
 
 </p><pre class="desc-code">
-<span class="tag-var">frags</span> = <span class="tag-func">highlight(</span><span class="tag-string">"a = 5"</span>)
-<span class="tag-var">frags</span> => [
-  [<span class="tag-string">"var"</span>, <span class="tag-string">"a"</span>],
-  [<span class="tag-string">"other"</span>, <span class="tag-string">" = "</span>],
-  [<span class="tag-string">"num"</span>, <span class="tag-string">"5"</span>],
+<span class="tag-dotName">frags</span> = <span class="tag-funcCall">highlight</span>(<span class="tag-str">"a = 5"</span>)
+<span class="tag-dotName">frags</span> => [
+  [<span class="tag-str">"dotName"</span>, <span class="tag-str">"a"</span>],
+  [<span class="tag-str">"other"</span>, <span class="tag-str">" = "</span>],
+  [<span class="tag-str">"num"</span>, <span class="tag-str">"5"</span>],
 ]
 </pre>
 
 
 <pre class="nim-code">
 func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError, ValueError], tags: [].}
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="functionsDict">functionsDict</h3>

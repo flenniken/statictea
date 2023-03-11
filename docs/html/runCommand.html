@@ -134,15 +134,6 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#runCommand">runCommand</a> &mdash; Run a command and fill in the variables dictionaries.</li>
 <li> <a href="#runCodeFile">runCodeFile</a> &mdash; Run the code file and fill in the variables.</li>
 <li> <a href="#runCodeFiles">runCodeFiles</a> &mdash; Run each code file and populate the variables.</li>
-<li>type:  <a href="#FragmentType2">FragmentType2</a> &mdash; Hightlight fragments.</li>
-<li>type:  <a href="#Fragment2">Fragment2</a> &mdash; A fragment of a string.</li>
-<li> <a href="#newFragment2">newFragment2</a> &mdash; </li>
-<li> <a href="#newFragmentLen2">newFragmentLen2</a> &mdash; </li>
-<li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a Fragment.</li>
-<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a sequence of fragments.</li>
-<li> <a href="#atMultiline">atMultiline</a> &mdash; Determine whether the start index points a the start of a multiline string.</li>
-<li> <a href="#lineEnd">lineEnd</a> &mdash; Find the end of the line.</li>
-<li> <a href="#highlightCode">highlightCode</a> &mdash; Identify all the fragments in the StaticTea code to highlight.</li>
 </ul>
 
 <h3 id="tripleQuotes">tripleQuotes</h3>
@@ -426,12 +417,12 @@ func getRightType(statement: Statement; start: Natural): RightType
 <p>Get a variable name from the statement. Start points at a name.
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">var-name(</span> <span class="tag-num">1</span> )
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">var-name</span>( <span class="tag-num">1</span> )
     ^         ^
-<span class="tag-var">a</span> = <span class="tag-var">abc</span> <span class="tag-comment"># comment</span>
-    ^   ^
-<span class="tag-var">a</span> = <span class="tag-var">o.def.bbb</span> <span class="tag-comment"># comment</span>
-    ^         ^
+<span class="tag-dotName">a</span> = <span class="tag-dotName">abc</span> <span class="tag-comment"># comment
+</span>    ^   ^
+<span class="tag-dotName">a</span> = <span class="tag-dotName">o.def.bbb</span> <span class="tag-comment"># comment
+</span>    ^         ^
 </pre>
 
 
@@ -553,8 +544,8 @@ proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches]
 <p>Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
 
 </p><pre class="desc-code">
-<span class="tag-var">var</span> = <span class="tag-string">"hello"</span> <span class="tag-comment"># asdf</span>
-      ^       ^
+<span class="tag-dotName">var</span> = <span class="tag-str">"hello"</span> <span class="tag-comment"># asdf
+</span>      ^       ^
 </pre>
 
 
@@ -574,10 +565,10 @@ func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 
 <p>Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">fn(</span> <span class="tag-num">1</span> )
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">fn</span>( <span class="tag-num">1</span> )
         ^ ^
           ^^
-<span class="tag-var">a</span> = <span class="tag-func">fn(</span> <span class="tag-num">1</span> , <span class="tag-num">2</span> )
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">fn</span>( <span class="tag-num">1</span> , <span class="tag-num">2</span> )
         ^ ^
 </pre>
 
@@ -593,9 +584,9 @@ func skipArgument(statement: Statement; startPos: Natural): PosOr
 </p><p>This handles the three parameter form with an assignment.
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">if(</span><span class="tag-var">cond</span>, <span class="tag-var">then</span>, <span class="tag-var">else</span>)
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">if</span>(<span class="tag-dotName">cond</span>, <span class="tag-dotName">then</span>, <span class="tag-dotName">else</span>)
        ^                ^
-<span class="tag-var">a</span> = <span class="tag-func">if(</span><span class="tag-var">cond</span>, <span class="tag-var">then</span>)
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">if</span>(<span class="tag-dotName">cond</span>, <span class="tag-dotName">then</span>)
        ^          ^
 </pre>
 
@@ -612,9 +603,9 @@ proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
 <p>Handle the bare if/if0. Return the resulting value and the position in the statement after the if.
 
 </p><pre class="desc-code">
-<span class="tag-func">if(</span><span class="tag-var">cond</span>, <span class="tag-func">return(</span><span class="tag-string">"stop"</span>))
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">cond</span>, <span class="tag-funcCall">return</span>(<span class="tag-str">"stop"</span>))
    ^                    ^
-<span class="tag-func">if(</span><span class="tag-var">c</span>, <span class="tag-func">warn(</span><span class="tag-string">"c is true"</span>))
+<span class="tag-funcCall">if</span>(<span class="tag-dotName">c</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"c is true"</span>))
    ^                    ^
 </pre>
 
@@ -640,10 +631,10 @@ proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
 
 <p>Get the function arguments and the position of each. If an argument has a side effect, the return value and pos and side effect is returned, else a 0 value and seNone is returned.
 </p><pre class="desc-code">
-<span class="tag-var">newList</span> = <span class="tag-func">listLoop(</span><span class="tag-var">list</span>, <span class="tag-var">callback</span>, <span class="tag-var">state</span>)  <span class="tag-comment"># comment</span>
-                   ^                       ^
-<span class="tag-var">newList</span> = <span class="tag-func">listLoop(</span><span class="tag-func">return(</span><span class="tag-num">3</span>), <span class="tag-var">callback</span>, <span class="tag-var">state</span>)  <span class="tag-comment"># comment</span>
-                          ^ ^
+<span class="tag-dotName">newList</span> = <span class="tag-funcCall">listLoop</span>(<span class="tag-dotName">list</span>, <span class="tag-dotName">callback</span>, <span class="tag-dotName">state</span>)  <span class="tag-comment"># comment
+</span>                   ^                       ^
+<span class="tag-dotName">newList</span> = <span class="tag-funcCall">listLoop</span>(<span class="tag-funcCall">return</span>(<span class="tag-num">3</span>), <span class="tag-dotName">callback</span>, <span class="tag-dotName">state</span>)  <span class="tag-comment"># comment
+</span>                          ^ ^
 </pre>
 
 
@@ -659,9 +650,9 @@ proc getArguments(env: var Env; statement: Statement; start: Natural;
 <p>Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-func">get(</span><span class="tag-var">b</span>, <span class="tag-num">2</span>, <span class="tag-var">c</span>) <span class="tag-comment"># condition</span>
-        ^        ^
-<span class="tag-var">a</span> = <span class="tag-func">get(</span><span class="tag-var">b</span>, <span class="tag-func">len(</span><span class="tag-string">"hi"</span>), <span class="tag-var">c</span>)
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">get</span>(<span class="tag-dotName">b</span>, <span class="tag-num">2</span>, <span class="tag-dotName">c</span>) <span class="tag-comment"># condition
+</span>        ^        ^
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">get</span>(<span class="tag-dotName">b</span>, <span class="tag-funcCall">len</span>(<span class="tag-str">"hi"</span>), <span class="tag-dotName">c</span>)
                ^    ^
 </pre>
 
@@ -695,8 +686,8 @@ func runCompareOp(left: Value; op: string; right: Value): Value
 <p>Return the bool value of the condition expression and the position after it.  The start index points at the ( left parentheses. The position includes the trailing whitespace after the ending ).
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = (<span class="tag-num">5</span> < <span class="tag-num">3</span>) <span class="tag-comment"># condition</span>
-    ^       ^
+<span class="tag-dotName">a</span> = (<span class="tag-num">5</span> < <span class="tag-num">3</span>) <span class="tag-comment"># condition
+</span>    ^       ^
 </pre>
 
 
@@ -711,9 +702,9 @@ proc getCondition(env: var Env; statement: Statement; start: Natural;
 <p>Return the value of the bracketed variable and the position after the trailing whitespace.. Start points at the the first argument.
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-var">list</span>[ <span class="tag-num">4</span> ]
+<span class="tag-dotName">a</span> = <span class="tag-dotName">list</span>[ <span class="tag-num">4</span> ]
           ^  ^
-<span class="tag-var">a</span> = <span class="tag-var">dict</span>[ <span class="tag-string">"abc"</span> ]
+<span class="tag-dotName">a</span> = <span class="tag-dotName">dict</span>[ <span class="tag-str">"abc"</span> ]
           ^      ^
 </pre>
 
@@ -734,7 +725,7 @@ includes the trailing whitespace after the ending right
 parentheses.
 
 </p><pre class="desc-code">
-<span class="tag-var">stopped</span> = <span class="tag-func">listLoop(</span><span class="tag-var">list</span>, <span class="tag-var">new</span>, <span class="tag-var">callback</span>, <span class="tag-var">state</span>)
+<span class="tag-dotName">stopped</span> = <span class="tag-funcCall">listLoop</span>(<span class="tag-dotName">list</span>, <span class="tag-dotName">new</span>, <span class="tag-dotName">callback</span>, <span class="tag-dotName">state</span>)
                    ^                          ^
 </pre>
 
@@ -750,12 +741,12 @@ proc listLoop(env: var Env; specialFunction: SpecialFunction;
 <p>Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.  The position returned includes the trailing whitespace after the item. The ending position is pointing at the end of the statement, or at the first non-whitespace character after the argument. A true topLevel parameter means the item pointed to by start is the first item after the equal sign (not an argument).
 
 </p><pre class="desc-code">
-<span class="tag-var">a</span> = <span class="tag-string">"tea"</span> <span class="tag-comment"># string</span>
-    ^     ^
-<span class="tag-var">a</span> = <span class="tag-func">cmp(</span><span class="tag-var">b</span>, <span class="tag-var">c</span>) <span class="tag-comment"># calling variable</span>
-    ^         ^
-<span class="tag-var">a</span> = <span class="tag-func">if(</span> <span class="tag-func">bool(</span><span class="tag-func">len(</span><span class="tag-var">b</span>)), <span class="tag-var">d</span>, <span class="tag-var">e</span>) <span class="tag-comment"># if</span>
-        ^             ^
+<span class="tag-dotName">a</span> = <span class="tag-str">"tea"</span> <span class="tag-comment"># string
+</span>    ^     ^
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">cmp</span>(<span class="tag-dotName">b</span>, <span class="tag-dotName">c</span>) <span class="tag-comment"># calling variable
+</span>    ^         ^
+<span class="tag-dotName">a</span> = <span class="tag-funcCall">if</span>( <span class="tag-funcCall">bool</span>(<span class="tag-funcCall">len</span>(<span class="tag-dotName">b</span>)), <span class="tag-dotName">d</span>, <span class="tag-dotName">e</span>) <span class="tag-comment"># if
+</span>        ^             ^
 </pre>
 
 
@@ -770,9 +761,9 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 <p>Handle bare function: if, if0, return, warn, log and listLoop. A bare function does not assign a variable.
 
 </p><pre class="desc-code">
-<span class="tag-func">if(</span> <span class="tag-true-false">true</span>, <span class="tag-func">warn(</span><span class="tag-string">"tea time"</span>)) <span class="tag-comment"># test</span>
-^                           ^
-<span class="tag-func">return(</span><span class="tag-num">5</span>)
+<span class="tag-funcCall">if</span>( <span class="tag-dotName">true</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"tea time"</span>)) <span class="tag-comment"># test
+</span>^                           ^
+<span class="tag-funcCall">return</span>(<span class="tag-num">5</span>)
 ^        ^
 </pre>
 
@@ -788,12 +779,12 @@ proc runBareFunction(env: var Env; statement: Statement; start: Natural;
 <p>Convert var[key] to a dot name.
 
 </p><pre class="desc-code">
-<span class="tag-var">key</span> = <span class="tag-string">"hello"</span>
-<span class="tag-var">name</span>[<span class="tag-var">key</span>] = <span class="tag-num">20</span>
+<span class="tag-dotName">key</span> = <span class="tag-str">"hello"</span>
+<span class="tag-dotName">name</span>[<span class="tag-dotName">key</span>] = <span class="tag-num">20</span>
 ^         ^
-=> <span class="tag-var">name.hello</span>, <span class="tag-var">pos</span>
+=> <span class="tag-dotName">name.hello</span>, <span class="tag-dotName">pos</span>
 
-<span class="tag-var">name</span>[<span class="tag-string">"hello"</span>] = <span class="tag-num">20</span>
+<span class="tag-dotName">name</span>[<span class="tag-str">"hello"</span>] = <span class="tag-num">20</span>
 ^             ^
 </pre>
 
@@ -848,7 +839,7 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 <p>Parse the signature and return the list of parameters or a message.
 
 </p><pre class="desc-code">
-<span class="tag-var">cmp</span> = <span class="tag-func">func(</span><span class="tag-var">numStr1</span><span class="tag-type">: string</span>, <span class="tag-var">numStr2</span><span class="tag-type">: string</span><span class="tag-type">) int</span>
+<span class="tag-dotName">cmp</span> = <span class="tag-funcCall">func</span>(<span class="tag-param">numStr</span>1: <span class="tag-type">string</span>, <span class="tag-param">numStr</span>2: <span class="tag-type">string</span>) <span class="tag-type">int</span>
            ^
 </pre>
 
@@ -908,103 +899,6 @@ proc runCodeFile(env: var Env; variables: var Variables; filename: string) {.
 proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string]) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError],
     tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect, RootEffect, TimeEffect].}
-</pre>
-
-<h3 id="FragmentType2">FragmentType2</h3>
-
-<p>Hightlight fragments.
-
-</p><ul>
-<li>hlOther -- not one of the other types
-</li><li>hlParamType -- int, float, string, list, dict, bool, func, any and optional
-</li><li>hlFuncCall -- a variable name followed by a left parenthesis
-</li><li>hlDotName -- a dot name
-</li><li>hlParamName -- a parameter name
-</li><li>hlNumber -- a literal number
-</li><li>hlStringType -- a literal string
-</li><li>hlDocComment -- a ## to the end of the line
-</li><li>hlComment -- a # to the end of the line</li></ul>
-
-
-<pre class="nim-code">
-FragmentType2 = enum
-  hlOther = "other", hlParamType = "paramType", hlFuncCall = "funcCall",
-  hlDotName = "dotName", hlParamName = "paramName", hlNumber = "number",
-  hlStringType = "string", hlDocComment = "doc", hlComment = "comment",
-  hlMultiline = "multiline"
-</pre>
-
-<h3 id="Fragment2">Fragment2</h3>
-
-<p>A fragment of a string.
-</p><ul>
-<li>kind -- the type of fragment
-</li><li>start -- the index in the string where the fragment starts
-</li><li>fEnd -- the end of the fragment + 1.</li></ul>
-
-
-<pre class="nim-code">
-Fragment2 = object
-  fragmentType*: FragmentType2
-  start*: Natural
-  fEnd*: Natural
-</pre>
-
-<h3 id="newFragment2">newFragment2</h3>
-
-
-
-<pre class="nim-code">
-func newFragment2(fragmentType: FragmentType2; start: Natural; fEnd: Natural): Fragment2 
-</pre>
-
-<h3 id="newFragmentLen2">newFragmentLen2</h3>
-
-
-
-<pre class="nim-code">
-func newFragmentLen2(fragmentType: FragmentType2; start: Natural;
-                     length: Natural): Fragment2 
-</pre>
-
-<h3 id="a__-1">`$`</h3>
-
-<p>Return a string representation of a Fragment.</p>
-
-<pre class="nim-code">
-func `$`(f: Fragment2): string {.raises: [ValueError], tags: [].}
-</pre>
-
-<h3 id="a__-2">`$`</h3>
-
-<p>Return a string representation of a sequence of fragments.</p>
-
-<pre class="nim-code">
-func `$`(fragments: seq[Fragment2]): string {.raises: [ValueError], tags: [].}
-</pre>
-
-<h3 id="atMultiline">atMultiline</h3>
-
-<p>Determine whether the start index points a the start of a multiline string. Return 0 when it doesn't. Return the position after the triple quotes, either 4 or 5 depending on the line endings.</p>
-
-<pre class="nim-code">
-func atMultiline(codeText: string; start: Natural): int 
-</pre>
-
-<h3 id="lineEnd">lineEnd</h3>
-
-<p>Find the end of the line. It returns either one after the first newline or after the end of the string.</p>
-
-<pre class="nim-code">
-func lineEnd(str: string; start: Natural): int 
-</pre>
-
-<h3 id="highlightCode">highlightCode</h3>
-
-<p>Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. It doesn't validate but it works for valid code.</p>
-
-<pre class="nim-code">
-func highlightCode(codeText: string): seq[Fragment2] 
 </pre>
 
 

@@ -71,15 +71,6 @@ Run a command and fill in the variables dictionaries.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
-* type: [FragmentType2](#fragmenttype2) &mdash; Hightlight fragments.
-* type: [Fragment2](#fragment2) &mdash; A fragment of a string.
-* [newFragment2](#newfragment2) &mdash; 
-* [newFragmentLen2](#newfragmentlen2) &mdash; 
-* [`$`](#-4) &mdash; Return a string representation of a Fragment.
-* [`$`](#-5) &mdash; Return a string representation of a sequence of fragments.
-* [atMultiline](#atmultiline) &mdash; Determine whether the start index points a the start of a multiline string.
-* [lineEnd](#lineend) &mdash; Find the end of the line.
-* [highlightCode](#highlightcode) &mdash; Identify all the fragments in the StaticTea code to highlight.
 
 # tripleQuotes
 
@@ -822,99 +813,6 @@ Run each code file and populate the variables.
 proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string]) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError],
     tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect, RootEffect, TimeEffect].}
-```
-
-# FragmentType2
-
-Hightlight fragments.
-
-* hlOther -- not one of the other types
-* hlParamType -- int, float, string, list, dict, bool, func, any and optional
-* hlFuncCall -- a variable name followed by a left parenthesis
-* hlDotName -- a dot name
-* hlParamName -- a parameter name
-* hlNumber -- a literal number
-* hlStringType -- a literal string
-* hlDocComment -- a ## to the end of the line
-* hlComment -- a # to the end of the line
-
-```nim
-FragmentType2 = enum
-  hlOther = "other", hlParamType = "paramType", hlFuncCall = "funcCall",
-  hlDotName = "dotName", hlParamName = "paramName", hlNumber = "number",
-  hlStringType = "string", hlDocComment = "doc", hlComment = "comment",
-  hlMultiline = "multiline"
-```
-
-# Fragment2
-
-A fragment of a string.
-* kind -- the type of fragment
-* start -- the index in the string where the fragment starts
-* fEnd -- the end of the fragment + 1.
-
-```nim
-Fragment2 = object
-  fragmentType*: FragmentType2
-  start*: Natural
-  fEnd*: Natural
-```
-
-# newFragment2
-
-
-
-```nim
-func newFragment2(fragmentType: FragmentType2; start: Natural; fEnd: Natural): Fragment2 
-```
-
-# newFragmentLen2
-
-
-
-```nim
-func newFragmentLen2(fragmentType: FragmentType2; start: Natural;
-                     length: Natural): Fragment2 
-```
-
-# `$`
-
-Return a string representation of a Fragment.
-
-```nim
-func `$`(f: Fragment2): string {.raises: [ValueError], tags: [].}
-```
-
-# `$`
-
-Return a string representation of a sequence of fragments.
-
-```nim
-func `$`(fragments: seq[Fragment2]): string {.raises: [ValueError], tags: [].}
-```
-
-# atMultiline
-
-Determine whether the start index points a the start of a multiline string. Return 0 when it doesn't. Return the position after the triple quotes, either 4 or 5 depending on the line endings.
-
-```nim
-func atMultiline(codeText: string; start: Natural): int 
-```
-
-# lineEnd
-
-Find the end of the line. It returns either one after the first newline or after the end of the string.
-
-```nim
-func lineEnd(str: string; start: Natural): int 
-```
-
-# highlightCode
-
-Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. It doesn't validate but it works for valid code.
-
-```nim
-func highlightCode(codeText: string): seq[Fragment2] 
 ```
 
 

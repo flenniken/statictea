@@ -1,11 +1,13 @@
 import std/unittest
 import std/strutils
-import std/options
 import std/strFormat
 import parseMarkdown
 import sharedtestcode
 import compareLines
 import unicodes
+
+const
+  tripleQuotes = "\"\"\""
 
 proc markdownHtml(elements: seq[Element]): string =
   ## Generate HTML from the markdown elements.
@@ -20,27 +22,29 @@ proc markdownHtml(elements: seq[Element]): string =
     of code:
       result.add("""<pre class="nim-code">""" & "\n")
       let codeString = element.content[1]
-      let fragments = highlightStaticTea(codeString)
+      let fragments = highlightCode(codeString)
       for fragment in fragments:
         var color: string
         case fragment.fragmentType
-        of ftOther:
+        of hlOther:
           color = ""
-        of ftType:
+        of hlParamName:
+          color = ""
+        of hlParamType:
           color = "red"
-        of ftFunc:
-          color = "blue"
-        of ftVarName:
+        of hlMultiline:
           color = "green"
-        of ftNumber:
+        of hlFuncCall:
+          color = "blue"
+        of hlDotName:
+          color = "green"
+        of hlNumber:
           color = "IndianRed"
-        of ftString:
+        of hlStringType:
           color = "SeaGreen"
-        of ftTrueFalse:
-          color = "black"
-        of ftDocComment:
+        of hlDocComment:
           color = "OrangeRed"
-        of ftComment:
+        of hlComment:
           color = "FireBrick"
 
         if color != "":
@@ -93,27 +97,25 @@ proc testParseMarkdown(content: string, expected: string): bool =
   echo linesSideBySide(got, expected)
   return false
 
-proc testMatchFragment(aLine: string, start: Natural, eFragmentO: Option[Fragment]): bool =
-  ## Test matchFragment. a ! in the line is replaced with a quote.
-  let line = replace(aLine, '!', '"')
-  let fragmentO = matchFragment(line, start)
-  result = gotExpected($fragmentO, $eFragmentO)
-  if not result:
-    echo "start: $1" % $start
-    echo startColumn(line, start, "┌─start")
-    echo line
-    if fragmentO.isSome:
-      let f = fragmentO.get()
-      echo startColumn(line, f.fEnd, "└─got end")
-    if eFragmentO.isSome:
-      let f = eFragmentO.get()
-      echo startColumn(line, f.fEnd, "└─expected end")
-
-proc testHighlightStaticTea(codeText: string, eFragments: seq[Fragment]): bool =
-  let fragments = highlightStaticTea(codeText)
-  if fragments == eFragments:
+proc testHighlightCode(code: string, expected: string): bool =
+  ## Test highlightCode.
+  let fragments = highlightCode(code)
+  var got: string
+  for f in fragments:
+    let codeFrag = visibleControl(code[f.start .. f.fEnd - 1], spacesToo=true)
+    got.add(fmt("{f.fragmentType}: {codeFrag}") & "\n")
+  
+  if got == expected:
     return true
-  echo linesSideBySide($fragments, $eFragments)
+  echo "---code:"
+  for line in splitNewLines(code):
+    echo visibleControl(line)
+  if expected == "":
+    echo "---got:"
+    echo got
+    echo "---"
+  else:
+    echo linesSideBySide(got, expected)
   return false
 
 suite "parseMarkdown.nim":
@@ -461,151 +463,226 @@ Examples:
       echo linesSideBySide(html, expectedHtml)
       fail
 
-  test "matchFragment none":
-    check testMatchFragment("", 0, none(Fragment))
+  test "atMultiline":
+      check atMultiline("$1\n" % tripleQuotes, 0) == 4
+      check atMultiline(" $1\n" % tripleQuotes, 1) == 4
+      check atMultiline(" $1\n  " % tripleQuotes, 1) == 4
+      check atMultiline("$1\r\n" % tripleQuotes, 0) == 5
+      check atMultiline(" $1\r\n" % tripleQuotes, 1) == 5
+      check atMultiline(" $1\r\n  " % tripleQuotes, 1) == 5
 
-  test "matchFragment true":
-    check testMatchFragment("true", 0, some(newFragmentLen(ftTrueFalse, 0, 4)))
-    check testMatchFragment(" true", 1, some(newFragmentLen(ftTrueFalse, 1, 4)))
-    check testMatchFragment("true ", 0, some(newFragmentLen(ftTrueFalse, 0, 4)))
-    check testMatchFragment("abctrue", 0, some(newFragmentLen(ftVarName, 0, 7)))
-    check testMatchFragment("trueadb", 0, some(newFragmentLen(ftVarName, 0, 7)))
-    check testMatchFragment("trueadb(", 0, some(newFragmentLen(ftFunc, 0, 8)))
-    check testMatchFragment("true(", 0, some(newFragmentLen(ftTrueFalse, 0, 4)))
-    check testMatchFragment("\"true\"", 0, some(newFragmentLen(ftString, 0, 6)))
+  test "atMultiline false":
+      check atMultiline("", 0) == 0
+      check atMultiline("a", 0) == 0
+      check atMultiline("\"", 0) == 0
+      check atMultiline("\"\n", 0) == 0
+      check atMultiline("\"\"\n", 0) == 0
+      check atMultiline("\"\"\"", 0) == 0
+      check atMultiline("\"\"\r\n", 0) == 0
+      check atMultiline("\"\"\"\r", 0) == 0
 
-  test "matchFragment false":
-    check testMatchFragment("false", 0, some(newFragmentLen(ftTrueFalse, 0, 5)))
+  test "lineEnd":
+    check lineEnd("", 0) == 0
+    check lineEnd("a", 0) == 1
+    check lineEnd("ab", 0) == 2
+    check lineEnd("ab\n", 0) == 3
+    check lineEnd("ab\r\n", 0) == 4
+                  #01 234 5678
+    check lineEnd("ab\nde\nfg", 0) == 3
+    check lineEnd("ab\nde\nfg", 1) == 3
+    check lineEnd("ab\nde\nfg", 2) == 3
+    check lineEnd("ab\nde\nfg", 3) == 6
+    check lineEnd("ab\nde\nfg", 4) == 6
+    check lineEnd("ab\nde\nfg", 5) == 6
+    check lineEnd("ab\nde\nfg", 6) == 8
+    check lineEnd("ab\nde\nfg", 7) == 8
 
-  test "matchFragment types":
-    check testMatchFragment(": int", 0, some(newFragmentLen(ftType, 0, 5)))
-    check testMatchFragment(") int", 0, some(newFragmentLen(ftType, 0, 5)))
-    check testMatchFragment(": float", 0, some(newFragmentLen(ftType, 0, 7)))
-    check testMatchFragment(": string", 0, some(newFragmentLen(ftType, 0, 8)))
-    check testMatchFragment(": dict", 0, some(newFragmentLen(ftType, 0, 6)))
-    check testMatchFragment(": list", 0, some(newFragmentLen(ftType, 0, 6)))
-    check testMatchFragment(": any", 0, some(newFragmentLen(ftType, 0, 5)))
-    check testMatchFragment(": func", 0, some(newFragmentLen(ftType, 0, 6)))
+  test "highlightCode empty":
+    check testHighlightCode("", "")
 
-  test "matchFragment optional types":
-    check testMatchFragment("optional func", 0, some(newFragmentLen(ftType, 0, 13)))
-    check testMatchFragment("optional int", 0, some(newFragmentLen(ftType, 0, 12)))
+  test "highlightCode one other":
+    let code = "**!@"
+    let expected = """
+other: **!@
+"""
+    check testHighlightCode(code, expected)
 
-  test "matchFragment function":
-    check testMatchFragment("a(", 0, some(newFragmentLen(ftFunc, 0, 2)))
-    check testMatchFragment("abc(", 0, some(newFragmentLen(ftFunc, 0, 4)))
-    check testMatchFragment(" abc(", 1, some(newFragmentLen(ftFunc, 1, 4)))
-    check testMatchFragment("s.aAZz-4_3(", 0, some(newFragmentLen(ftFunc, 0, 11)))
+  test "highlightCode symbols":
+    let code = """
+*!
+@$
+"""
+    let expected = """
+other: *!␊@$␊
+"""
+    check testHighlightCode(code, expected)
 
-  test "matchFragment var name":
-    check testMatchFragment("", 0, none(Fragment))
-    check testMatchFragment("a", 0, some(newFragmentLen(ftVarName, 0, 1)))
-    check testMatchFragment("s.d", 0, some(newFragmentLen(ftVarName, 0, 3)))
-    check testMatchFragment(r"a\bc(", 0, some(newFragmentLen(ftVarName, 0, 1)))
-    check testMatchFragment("trueabc", 0, some(newFragmentLen(ftVarName, 0, 7)))
-    check testMatchFragment(" tru", 1, some(newFragmentLen(ftVarName, 1, 3)))
-    check testMatchFragment(" True", 1, some(newFragmentLen(ftVarName, 1, 4)))
-    check testMatchFragment("f.cmp", 0, some(newFragmentLen(ftVarName, 0, 5)))
+  test "highlightCode a = 5":
+    let code = """
+a = 5
+"""
+    let expected = """
+dotName: a
+other: ␠=␠
+num: 5
+other: ␊
+"""
+    check testHighlightCode(code, expected)
 
-  test "matchFragment number":
-    check testMatchFragment(r"1", 0, some(newFragmentLen(ftNumber, 0, 1)))
-    check testMatchFragment(r"-1", 0, some(newFragmentLen(ftNumber, 0, 2)))
-    check testMatchFragment(r"1.2", 0, some(newFragmentLen(ftNumber, 0, 3)))
-    check testMatchFragment(r"123.24", 0, some(newFragmentLen(ftNumber, 0, 6)))
+  test "highlightCode func, string, comment":
+    let code = """
+d.tea = len("Earl Gray") # comment
+"""
+    let expected = """
+dotName: d.tea
+other: ␠=␠
+funcCall: len
+other: (
+str: "Earl␠Gray"
+other: )␠
+comment: #␠comment␊
+"""
+    check testHighlightCode(code, expected)
 
-  test "matchFragment string":
-    check testMatchFragment("!!", 0, some(newFragmentLen(ftString, 0, 2)))
-    check testMatchFragment("!a!", 0, some(newFragmentLen(ftString, 0, 3)))
-    check testMatchFragment("!123!", 0, some(newFragmentLen(ftString, 0, 5)))
-    check testMatchFragment(" !123!", 1, some(newFragmentLen(ftString, 1, 5)))
-    check testMatchFragment(r"!1\n23!", 0, some(newFragmentLen(ftString, 0, 7)))
-    check testMatchFragment(r"!1\\23!", 0, some(newFragmentLen(ftString, 0, 7)))
-    check testMatchFragment(r"!1\!23!", 0, some(newFragmentLen(ftString, 0, 7)))
-    check testMatchFragment(r"!1\b23!", 0, some(newFragmentLen(ftString, 0, 7)))
-    check testMatchFragment("!", 0, none(Fragment))
-    check testMatchFragment("!  ", 0, none(Fragment))
+  test "highlightCode int func":
+    let code = """
+tea = int(4.3)
+"""
+    let expected = """
+dotName: tea
+other: ␠=␠
+funcCall: int
+other: (
+num: 4.3
+other: )␊
+"""
+    check testHighlightCode(code, expected)
 
-  test "matchFragment doc comment":
-    check testMatchFragment("##", 0, some(newFragmentLen(ftDocComment, 0, 2)))
-    check testMatchFragment("## asdf", 0, some(newFragmentLen(ftDocComment, 0, 7)))
+  test "highlightCode var, string":
+    let code = """
+tea = "tea"
+# hello
+asdf = concat("a", "b")
+"""
+    let expected = """
+dotName: tea
+other: ␠=␠
+str: "tea"
+other: ␊
+comment: #␠hello␊
+dotName: asdf
+other: ␠=␠
+funcCall: concat
+other: (
+str: "a"
+other: ,␠
+str: "b"
+other: )␊
+"""
+    check testHighlightCode(code, expected)
 
-  test "matchFragment comment":
-    check testMatchFragment("#", 0, some(newFragmentLen(ftComment, 0, 1)))
-    check testMatchFragment("# asdf", 0, some(newFragmentLen(ftComment, 0, 6)))
+  test "highlightCode spaces":
+    let code = """
+a =  add(   456  , 321   )
+"""
+    let expected = """
+dotName: a
+other: ␠=␠␠
+funcCall: add
+other: (␠␠␠
+num: 456
+other: ␠␠,␠
+num: 321
+other: ␠␠␠)␊
+"""
+    check testHighlightCode(code, expected)
 
-  test "highlightStaticTea true false":
-    check testHighlightStaticTea("a = true", @[
-      newFragmentLen(ftVarName, 0, 1),
-      newFragmentLen(ftOther, 1, 3),
-      newFragmentLen(ftTrueFalse, 4, 4),
-    ])
-  test "list as var ":
-    check testHighlightStaticTea("list = 1", @[
-      newFragmentLen(ftVarName, 0, 4),
-      newFragmentLen(ftOther, 4, 3),
-      newFragmentLen(ftNumber, 7, 1),
-    ])
-  test "var func string ":
-    check testHighlightStaticTea("""a = len("abc")""", @[
-      newFragmentLen(ftVarName, 0, 1),
-      newFragmentLen(ftOther, 1, 3),
-      newFragmentLen(ftFunc, 4, 4),
-      newFragmentLen(ftString, 8, 5),
-      newFragmentLen(ftOther, 13, 1),
-    ])
-  test "dict function ":
-    check testHighlightStaticTea("""a = dict("abc", 1)""", @[
-      newFragmentLen(ftVarName, 0, 1),
-      newFragmentLen(ftOther, 1, 3),
-      newFragmentLen(ftFunc, 4, 5),
-      newFragmentLen(ftString, 9, 5),
-      newFragmentLen(ftOther, 14, 2),
-      newFragmentLen(ftNumber, 16, 1),
-      newFragmentLen(ftOther, 17, 1),
-    ])
-  test "number":
-    check testHighlightStaticTea("""a = 35""", @[
-      newFragmentLen(ftVarName, 0, 1),
-      newFragmentLen(ftOther, 1, 3),
-      newFragmentLen(ftNumber, 4, 2),
-    ])
+  test "highlightCode multiline":
+    let code = """
+multi = $1
+123
+abc
+"hello" asdf
+$1
+""" % tripleQuotes
+    let expected = """
+dotName: multi
+other: ␠=␠
+multiline: $1␊123␊abc␊"hello"␠asdf␊$1␊
+""" % tripleQuotes
+    check testHighlightCode(code, expected)
 
-  test "true argument":
-    check testHighlightStaticTea("""a = process(35, 44, true)""", @[
-      newFragmentLen(ftVarName, 0, 1),
-      newFragmentLen(ftOther, 1, 3),
-      newFragmentLen(ftFunc, 4, 8),
-      newFragmentLen(ftNumber, 12, 2),
-      newFragmentLen(ftOther, 14, 2),
-      newFragmentLen(ftNumber, 16, 2),
-      newFragmentLen(ftOther, 18, 2),
-      newFragmentLen(ftTrueFalse, 20, 4),
-      newFragmentLen(ftOther, 24, 1),
-    ])
-  test "commented out code":
-    check testHighlightStaticTea("""  #a = process(35, 44, true)""", @[
-      newFragmentLen(ftOther, 0, 2),
-      newFragmentLen(ftComment, 2, 26),
-    ])
-  test "doc comment":
-    check testHighlightStaticTea("""  ## this is a doc comment""", @[
-      newFragmentLen(ftOther, 0, 2),
-      newFragmentLen(ftDocComment, 2, 24),
-    ])
-  test "code then comment":
-    check testHighlightStaticTea("""a = 5 # comment""", @[
-      newFragmentLen(ftVarName, 0, 1),
-      newFragmentLen(ftOther, 1, 3),
-      newFragmentLen(ftNumber, 4, 1),
-      newFragmentLen(ftOther, 5, 1),
-      newFragmentLen(ftComment, 6, 9),
-    ])
-  test "optional type":
-                                 #0123456789 123456789 12345
-    check testHighlightStaticTea(", b: optional any) int", @[
-      newFragmentLen(ftOther, 0, 2),
-      newFragmentLen(ftVarName, 2, 1),
-      newFragmentLen(ftOther, 3, 2),
-      newFragmentLen(ftType, 5, 12),
-      newFragmentLen(ftType, 17, 5),
-    ])
+  test "highlightCode signature":
+    let code = """
+a = func(num: int) int
+  ## test function
+  return(0)
+""" % tripleQuotes
+    let expected = """
+dotName: a
+other: ␠=␠
+funcCall: func
+other: (
+param: num
+other: :␠
+type: int
+other: )␠
+type: int
+other: ␊␠␠
+doc: ##␠test␠function␊
+other: ␠␠
+funcCall: return
+other: (
+num: 0
+other: )␊
+""" % tripleQuotes
+    check testHighlightCode(code, expected)
+
+  test "highlightCode sig types":
+    let code = """
+a = func(num: int, str: string, d: dict, ls: optional list) any
+  ## test function
+  return(0)
+""" % tripleQuotes
+    let expected = """
+dotName: a
+other: ␠=␠
+funcCall: func
+other: (
+param: num
+other: :␠
+type: int
+other: ,␠
+param: str
+other: :␠
+type: string
+other: ,␠
+param: d
+other: :␠
+type: dict
+other: ,␠
+param: ls
+other: :␠
+type: optional
+other: ␠
+type: list
+other: )␠
+type: any
+other: ␊␠␠
+doc: ##␠test␠function␊
+other: ␠␠
+funcCall: return
+other: (
+num: 0
+other: )␊
+""" % tripleQuotes
+    check testHighlightCode(code, expected)
+
+  test "highlightCode drink me":
+    let code = "drink = $1\nme\n$1" % "\""
+    let expected = """
+dotName: drink
+other: ␠=␠
+str: "␊me␊"
+"""
+    check testHighlightCode(code, expected)
