@@ -1,3 +1,4 @@
+$$ ## Create the functions documentation from the f dictionary.
 # Statictea Functions
 
 [![teapot](logo/teapotlogo.svg)](#)

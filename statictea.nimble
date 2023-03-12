@@ -8,6 +8,12 @@ import std/algorithm
 include src/version
 include src/dot
 
+proc get_last_argument(): string =
+  ## Get the last argument specified on the command line. It is the
+  ## nimble task name when no extra args are given.
+  let count = system.paramCount()+1
+  return system.paramStr(count-1)
+
 proc getDirName(): string =
   ## Return a directory name corresponding to the given nim hostOS
   ## name.  The name is good for storing host specific files, for
@@ -750,8 +756,7 @@ proc get_stf_filenames(): seq[string] =
 
 proc runRunStf() =
   # Get the name of the stf to run.
-  let count = system.paramCount()+1
-  var name = system.paramStr(count-1)
+  let name = get_last_argument()
 
   # When the name is "rt" that means no name was specified.  Run the
   # whole directory using the -d option.
@@ -886,15 +891,44 @@ proc makeJsonDoc(filename: string) =
   # echo cmd
   exec cmd
 
+proc taskTea2Html(teaBasename: string) =
+  ## Create an html file from a tea file using a statictea template.
+
+  let filename = fmt"templates/{teaBasename}"
+  if not fileExists(filename):
+    echo fmt"{filename} doesn't exist"
+    return
+
+  let statictea = fmt"bin/{dirName}/statictea"
+  let server = "docs/file.json"
+  let templateFile = "templates/tea2html.html"
+  let teaFile = "templates/tea2html.tea"
+  let name = removeExt(filename)
+  let result = fmt"docs/html/{name}.html"
+
+  # Create the server json file with the tea file as a string element.
+  let text = jsonQuote(slurp(filename))
+  let jsonStr = fmt"""{{
+"filename": "{filename}",
+"text": "{text}"
+}}
+"""
+  writeFile(server, jsonStr)
+
+  # Build the html file.
+  echo fmt"open: file:///{getCurrentDir()}/{result}"
+  let cmd = fmt"{statictea} -s {server} -t {templateFile} -o {teaFile} -r {result}"
+  exec cmd
+
+  rmFile(server)
+
 # Tasks below
 
 task n, "\tShow available tasks.":
   exec "nimble tasks"
 
 task test, "\tRun one or more tests; specify part of the name.":
-  let count = system.paramCount()+1
-  let name = system.paramStr(count-1)
-
+  let name = get_last_argument()
   runUnitTests(name)
 
 task other, "\tRun stf tests, build release exe and other tests.":
@@ -907,6 +941,7 @@ proc taskDocsAll() =
   taskDocs2("")
   taskFuncDocs()
   taskTestfilesReadme()
+  taskTea2Html("")
   createDependencyGraph()
   createDependencyGraph2()
 
@@ -928,13 +963,11 @@ task docsix2, "\tCreate html docs index (docs/html/index.html).":
   taskDocsIx2()
 
 task docs, "\tCreate one or more markdown docs; specify part of the name.":
-  let count = system.paramCount()+1
-  var namePart = system.paramStr(count-1)
+  let namePart = get_last_argument()
   taskDocs(namePart, true)
 
 task docs2, "\tCreate one or more html docs; specify part of the name.":
-  let count = system.paramCount()+1
-  var namePart = system.paramStr(count-1)
+  let namePart = get_last_argument()
   taskDocs2(namePart, true)
 
 task jsonix, "\tDisplay markdown docs index json.":
@@ -944,8 +977,7 @@ task jsonix, "\tDisplay markdown docs index json.":
     echo line
 
 task json, "\tDisplay one or more source file's json doc comments; specify part of the name.":
-  let count = system.paramCount()+1
-  let name = system.paramStr(count-1)
+  let name = get_last_argument()
   let filenames = get_source_filenames()
   for filename in filenames:
     if name.toLower in filename.toLower:
@@ -1037,8 +1069,7 @@ task stfjson, "\tDisplay stf test files index JSON.":
     echo line
 
 task newstf, "\tCreate new stf test skeleton, specify a name no ext.":
-  let count = system.paramCount()+1
-  var name = system.paramStr(count-1)
+  let name = get_last_argument()
   if name == "newstf":
     echo "Specify a name for a new stf test file."
   else:
@@ -1173,3 +1204,9 @@ task replace, "\tShow pattern for text search and replace in all the nim source 
   let cmd = r"find . -name \*.nim -type f | xargs -n 1 gsed -i 's/stateVariables/startVariables/g'"
   echo cmd
 
+task tea2html, "Convert a tea file to html.":
+  let namePart = get_last_argument()
+  let filenames = get_dir_filenames("templates", ".tea")
+  for basename in filenames:
+    if (namePart.toLower in basename.toLower) or namePart == "tea2html":
+      taskTea2Html(basename)

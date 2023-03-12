@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>templates/tea2html.tea</title>
+<style>
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+#staticteadep {
+    width: 100%;
+}
+
+.signature {
+    color: green;
+}
+
+.description {
+    white-space: pre-wrap;
+}
+
+pre {
+//    border-left: 6px solid green;
+    padding: 1em;
+    background-color: #f6f8fa;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.desc-code {
+    border: 1px solid blue;
+    background-color: white;
+}
+
+//.t-other {
+//    color: #D7381E;
+//}
+//.t-dotName {
+//    color: #CE7923;
+//}
+.t-funcCall {
+    color: #5F34FF;
+}
+.t-num {
+    color: IndianRed;
+}
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
+    color: #B03B84;
+}
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {v
+    color: #D7381E;
+}
+
+</style>
+
+
+</head>
+<body>
+<h1>templates/tea2html.tea</h1>
+
+<pre>
+<span class="t-doc">## Highlight the statictea code with colored html spans.
+</span>
+<span class="t-dotName">u.handle-fragment</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">fragment</span>: <span class="t-type">list</span>, <span class="t-param">frags</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Highlight the fragment for html and add it to frags.
+</span>  <span class="t-dotName">tag</span> = <span class="t-dotName">fragment</span>[<span class="t-num">0</span>]
+  <span class="t-dotName">str</span> = <span class="t-dotName">fragment</span>[<span class="t-num">1</span>]
+  <span class="t-dotName">frags</span> &= <span class="t-funcCall">if</span>((<span class="t-dotName">tag</span> == <span class="t-str">"other"</span>), <span class="t-dotName">str</span>, +
+    <span class="t-funcCall">format</span>(<span class="t-str">"<span class=\"t-{tag}\">{str}</span>"</span>))
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-comment"># Syntax highlight the server code.
+</span><span class="t-dotName">highlightedFrags</span> = []
+<span class="t-funcCall">listLoop</span>(<span class="t-funcCall">highlight</span>(<span class="t-dotName">s.text</span>), <span class="t-dotName">highlightedFrags</span>, <span class="t-dotName">u.handle-fragment</span>)
+<span class="t-dotName">o.htmlText</span> = <span class="t-funcCall">join</span>(<span class="t-dotName">highlightedFrags</span>, <span class="t-str">""</span>)
+</pre>
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
-$$ # StaticTea template for generating a markdown document from a nim
-$$ # module's doc comments.
-$$ #
+$$ ## StaticTea template for generating a markdown document from a nim
+$$ ## module's doc comments.
+$$ ##
 $$ block
 # {o.moduleName}
 
