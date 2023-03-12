@@ -1,5 +1,3 @@
-$$ ## StaticTea template for generating a markdown index for the source files.
-$$ ##
 # StaticTea Modules
 
 StaticTea nim source code documentation.

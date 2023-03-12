@@ -569,7 +569,7 @@ proc taskDocsIx() =
   exec cmd
 
   rmFile(jsonFile)
-  echo fmt"Generated {resultFile}"
+  echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
 
 proc taskDocsIx2() =
   ## Create the index html file.
@@ -588,7 +588,7 @@ proc taskDocsIx2() =
   exec cmd
 
   rmFile(jsonFile)
-  echo fmt"Generated {resultFile}"
+  echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
 
 proc taskTestfilesReadme() =
   ## Create a testfiles folder readme containing an index to the stf
@@ -668,7 +668,7 @@ proc taskDocs(namePart: string, forceRebuild = false) =
       echo output
       exec fmt"rm {resultFile}"
     else:
-      echo fmt"Created {resultFile}."
+      echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)
 
 proc taskDocs2(namePart: string, forceRebuild = false) =
@@ -708,7 +708,7 @@ proc taskDocs2(namePart: string, forceRebuild = false) =
       echo output
       exec fmt"rm {resultFile}"
     else:
-      echo fmt"Created {resultFile}."
+      echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)
 
 proc taskFuncDocs() =
@@ -922,6 +922,12 @@ proc taskTea2Html(teaBasename: string) =
 
   rmFile(server)
 
+proc taskTea2HtmlLoop(namePart: string) = 
+  let filenames = get_dir_filenames("templates", ".tea")
+  for basename in filenames:
+    if (namePart.toLower in basename.toLower) or namePart == "tea2html":
+      taskTea2Html(basename)
+
 # Tasks below
 
 task n, "\tShow available tasks.":
@@ -941,7 +947,7 @@ proc taskDocsAll() =
   taskDocs2("")
   taskFuncDocs()
   taskTestfilesReadme()
-  taskTea2Html("")
+  taskTea2HtmlLoop("tea2html")
   createDependencyGraph()
   createDependencyGraph2()
 
@@ -1206,7 +1212,4 @@ task replace, "\tShow pattern for text search and replace in all the nim source 
 
 task tea2html, "Convert a tea file to html.":
   let namePart = get_last_argument()
-  let filenames = get_dir_filenames("templates", ".tea")
-  for basename in filenames:
-    if (namePart.toLower in basename.toLower) or namePart == "tea2html":
-      taskTea2Html(basename)
+  taskTea2HtmlLoop(namePart)

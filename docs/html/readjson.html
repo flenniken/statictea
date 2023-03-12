@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -152,7 +155,7 @@ failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = <span class="tag-str">"test string"</span>  <span class="tag-comment"># test
+<span class="t-dotName">a</span> = <span class="t-str">"test string"</span>  <span class="t-comment"># test
 </span>     ^           ^
 </pre>
 

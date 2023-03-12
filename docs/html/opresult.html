@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -139,19 +142,19 @@ func `$`(opResult: OpResult): string
 </p><p>Example Usage:
 
 </p><pre class="desc-code">
-<span class="tag-dotName">import</span> <span class="tag-dotName">opresult</span>
+<span class="t-dotName">import</span> <span class="t-dotName">opresult</span>
 
-<span class="tag-dotName">proc</span> <span class="tag-funcCall">get_string</span>(): <span class="tag-dotName">OpResultWarn</span>[<span class="tag-dotName">string</span>] =
-  <span class="tag-dotName">if</span> <span class="tag-dotName">problem</span>:
-    <span class="tag-dotName">result</span> = <span class="tag-dotName">opMessage</span>[<span class="tag-dotName">string</span>](<span class="tag-funcCall">newWarningData</span>(<span class="tag-dotName">wUnknownArg</span>))
-  <span class="tag-dotName">else</span>:
-    <span class="tag-dotName">result</span> = <span class="tag-dotName">opValue</span>[<span class="tag-dotName">string</span>](<span class="tag-str">"string of char"</span>)
+<span class="t-dotName">proc</span> <span class="t-funcCall">get_string</span>(): <span class="t-dotName">OpResultWarn</span>[<span class="t-dotName">string</span>] =
+  <span class="t-dotName">if</span> <span class="t-dotName">problem</span>:
+    <span class="t-dotName">result</span> = <span class="t-dotName">opMessage</span>[<span class="t-dotName">string</span>](<span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>))
+  <span class="t-dotName">else</span>:
+    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">"string of char"</span>)
 
-<span class="tag-dotName">let</span> <span class="tag-dotName">strOr</span> = <span class="tag-funcCall">get_string</span>()
-<span class="tag-dotName">if</span> <span class="tag-dotName">strOr.isMessage</span>:
-  <span class="tag-dotName">echo</span> <span class="tag-funcCall">show_message</span>(<span class="tag-dotName">strOr.message</span>)
-<span class="tag-dotName">else</span>:
-  <span class="tag-dotName">echo</span> <span class="tag-str">"value = "</span> & $<span class="tag-dotName">strOr.value</span>
+<span class="t-dotName">let</span> <span class="t-dotName">strOr</span> = <span class="t-funcCall">get_string</span>()
+<span class="t-dotName">if</span> <span class="t-dotName">strOr.isMessage</span>:
+  <span class="t-dotName">echo</span> <span class="t-funcCall">show_message</span>(<span class="t-dotName">strOr.message</span>)
+<span class="t-dotName">else</span>:
+  <span class="t-dotName">echo</span> <span class="t-str">"value = "</span> & $<span class="t-dotName">strOr.value</span>
 </pre>
 
 
@@ -184,19 +187,19 @@ message id that tells why you cannot return the value.
 </p><p>Example Usage:
 
 </p><pre class="desc-code">
-<span class="tag-dotName">import</span> <span class="tag-dotName">opresult</span>
+<span class="t-dotName">import</span> <span class="t-dotName">opresult</span>
 
-<span class="tag-dotName">proc</span> <span class="tag-funcCall">get_string</span>(): <span class="tag-dotName">OpResultId</span>[<span class="tag-dotName">string</span>] =
-  <span class="tag-dotName">if</span> <span class="tag-dotName">problem</span>:
-    <span class="tag-dotName">result</span> = <span class="tag-dotName">opMessage</span>[<span class="tag-dotName">string</span>](<span class="tag-dotName">wUnknownArg</span>)
-  <span class="tag-dotName">else</span>:
-    <span class="tag-dotName">result</span> = <span class="tag-dotName">opValue</span>[<span class="tag-dotName">string</span>](<span class="tag-str">"string of char"</span>)
+<span class="t-dotName">proc</span> <span class="t-funcCall">get_string</span>(): <span class="t-dotName">OpResultId</span>[<span class="t-dotName">string</span>] =
+  <span class="t-dotName">if</span> <span class="t-dotName">problem</span>:
+    <span class="t-dotName">result</span> = <span class="t-dotName">opMessage</span>[<span class="t-dotName">string</span>](<span class="t-dotName">wUnknownArg</span>)
+  <span class="t-dotName">else</span>:
+    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">"string of char"</span>)
 
-<span class="tag-dotName">let</span> <span class="tag-dotName">strOr</span> = <span class="tag-funcCall">get_string</span>()
-<span class="tag-dotName">if</span> <span class="tag-dotName">strOr.isMessage</span>:
-  <span class="tag-dotName">echo</span> <span class="tag-funcCall">show_message</span>(<span class="tag-dotName">strOr.message</span>)
-<span class="tag-dotName">else</span>:
-  <span class="tag-dotName">echo</span> <span class="tag-str">"value = "</span> & $<span class="tag-dotName">strOr.value</span>
+<span class="t-dotName">let</span> <span class="t-dotName">strOr</span> = <span class="t-funcCall">get_string</span>()
+<span class="t-dotName">if</span> <span class="t-dotName">strOr.isMessage</span>:
+  <span class="t-dotName">echo</span> <span class="t-funcCall">show_message</span>(<span class="t-dotName">strOr.message</span>)
+<span class="t-dotName">else</span>:
+  <span class="t-dotName">echo</span> <span class="t-str">"value = "</span> & $<span class="t-dotName">strOr.value</span>
 </pre>
 
 

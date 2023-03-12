@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -417,11 +420,11 @@ func getRightType(statement: Statement; start: Natural): RightType
 <p>Get a variable name from the statement. Start points at a name.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">var-name</span>( <span class="tag-num">1</span> )
+<span class="t-dotName">a</span> = <span class="t-funcCall">var-name</span>( <span class="t-num">1</span> )
     ^         ^
-<span class="tag-dotName">a</span> = <span class="tag-dotName">abc</span> <span class="tag-comment"># comment
+<span class="t-dotName">a</span> = <span class="t-dotName">abc</span> <span class="t-comment"># comment
 </span>    ^   ^
-<span class="tag-dotName">a</span> = <span class="tag-dotName">o.def.bbb</span> <span class="tag-comment"># comment
+<span class="t-dotName">a</span> = <span class="t-dotName">o.def.bbb</span> <span class="t-comment"># comment
 </span>    ^         ^
 </pre>
 
@@ -544,7 +547,7 @@ proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches]
 <p>Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">var</span> = <span class="tag-str">"hello"</span> <span class="tag-comment"># asdf
+<span class="t-dotName">var</span> = <span class="t-str">"hello"</span> <span class="t-comment"># asdf
 </span>      ^       ^
 </pre>
 
@@ -565,10 +568,10 @@ func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 
 <p>Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">fn</span>( <span class="tag-num">1</span> )
+<span class="t-dotName">a</span> = <span class="t-funcCall">fn</span>( <span class="t-num">1</span> )
         ^ ^
           ^^
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">fn</span>( <span class="tag-num">1</span> , <span class="tag-num">2</span> )
+<span class="t-dotName">a</span> = <span class="t-funcCall">fn</span>( <span class="t-num">1</span> , <span class="t-num">2</span> )
         ^ ^
 </pre>
 
@@ -584,9 +587,9 @@ func skipArgument(statement: Statement; startPos: Natural): PosOr
 </p><p>This handles the three parameter form with an assignment.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">if</span>(<span class="tag-dotName">cond</span>, <span class="tag-dotName">then</span>, <span class="tag-dotName">else</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">cond</span>, <span class="t-dotName">then</span>, <span class="t-dotName">else</span>)
        ^                ^
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">if</span>(<span class="tag-dotName">cond</span>, <span class="tag-dotName">then</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">cond</span>, <span class="t-dotName">then</span>)
        ^          ^
 </pre>
 
@@ -603,9 +606,9 @@ proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
 <p>Handle the bare if/if0. Return the resulting value and the position in the statement after the if.
 
 </p><pre class="desc-code">
-<span class="tag-funcCall">if</span>(<span class="tag-dotName">cond</span>, <span class="tag-funcCall">return</span>(<span class="tag-str">"stop"</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">cond</span>, <span class="t-funcCall">return</span>(<span class="t-str">"stop"</span>))
    ^                    ^
-<span class="tag-funcCall">if</span>(<span class="tag-dotName">c</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"c is true"</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">"c is true"</span>))
    ^                    ^
 </pre>
 
@@ -631,9 +634,9 @@ proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
 
 <p>Get the function arguments and the position of each. If an argument has a side effect, the return value and pos and side effect is returned, else a 0 value and seNone is returned.
 </p><pre class="desc-code">
-<span class="tag-dotName">newList</span> = <span class="tag-funcCall">listLoop</span>(<span class="tag-dotName">list</span>, <span class="tag-dotName">callback</span>, <span class="tag-dotName">state</span>)  <span class="tag-comment"># comment
+<span class="t-dotName">newList</span> = <span class="t-funcCall">listLoop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)  <span class="t-comment"># comment
 </span>                   ^                       ^
-<span class="tag-dotName">newList</span> = <span class="tag-funcCall">listLoop</span>(<span class="tag-funcCall">return</span>(<span class="tag-num">3</span>), <span class="tag-dotName">callback</span>, <span class="tag-dotName">state</span>)  <span class="tag-comment"># comment
+<span class="t-dotName">newList</span> = <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">return</span>(<span class="t-num">3</span>), <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)  <span class="t-comment"># comment
 </span>                          ^ ^
 </pre>
 
@@ -650,9 +653,9 @@ proc getArguments(env: var Env; statement: Statement; start: Natural;
 <p>Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">get</span>(<span class="tag-dotName">b</span>, <span class="tag-num">2</span>, <span class="tag-dotName">c</span>) <span class="tag-comment"># condition
+<span class="t-dotName">a</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">b</span>, <span class="t-num">2</span>, <span class="t-dotName">c</span>) <span class="t-comment"># condition
 </span>        ^        ^
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">get</span>(<span class="tag-dotName">b</span>, <span class="tag-funcCall">len</span>(<span class="tag-str">"hi"</span>), <span class="tag-dotName">c</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">b</span>, <span class="t-funcCall">len</span>(<span class="t-str">"hi"</span>), <span class="t-dotName">c</span>)
                ^    ^
 </pre>
 
@@ -686,7 +689,7 @@ func runCompareOp(left: Value; op: string; right: Value): Value
 <p>Return the bool value of the condition expression and the position after it.  The start index points at the ( left parentheses. The position includes the trailing whitespace after the ending ).
 
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = (<span class="tag-num">5</span> < <span class="tag-num">3</span>) <span class="tag-comment"># condition
+<span class="t-dotName">a</span> = (<span class="t-num">5</span> < <span class="t-num">3</span>) <span class="t-comment"># condition
 </span>    ^       ^
 </pre>
 
@@ -702,9 +705,9 @@ proc getCondition(env: var Env; statement: Statement; start: Natural;
 <p>Return the value of the bracketed variable and the position after the trailing whitespace.. Start points at the the first argument.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = <span class="tag-dotName">list</span>[ <span class="tag-num">4</span> ]
+<span class="t-dotName">a</span> = <span class="t-dotName">list</span>[ <span class="t-num">4</span> ]
           ^  ^
-<span class="tag-dotName">a</span> = <span class="tag-dotName">dict</span>[ <span class="tag-str">"abc"</span> ]
+<span class="t-dotName">a</span> = <span class="t-dotName">dict</span>[ <span class="t-str">"abc"</span> ]
           ^      ^
 </pre>
 
@@ -725,7 +728,7 @@ includes the trailing whitespace after the ending right
 parentheses.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">stopped</span> = <span class="tag-funcCall">listLoop</span>(<span class="tag-dotName">list</span>, <span class="tag-dotName">new</span>, <span class="tag-dotName">callback</span>, <span class="tag-dotName">state</span>)
+<span class="t-dotName">stopped</span> = <span class="t-funcCall">listLoop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">new</span>, <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)
                    ^                          ^
 </pre>
 
@@ -741,11 +744,11 @@ proc listLoop(env: var Env; specialFunction: SpecialFunction;
 <p>Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.  The position returned includes the trailing whitespace after the item. The ending position is pointing at the end of the statement, or at the first non-whitespace character after the argument. A true topLevel parameter means the item pointed to by start is the first item after the equal sign (not an argument).
 
 </p><pre class="desc-code">
-<span class="tag-dotName">a</span> = <span class="tag-str">"tea"</span> <span class="tag-comment"># string
+<span class="t-dotName">a</span> = <span class="t-str">"tea"</span> <span class="t-comment"># string
 </span>    ^     ^
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">cmp</span>(<span class="tag-dotName">b</span>, <span class="tag-dotName">c</span>) <span class="tag-comment"># calling variable
+<span class="t-dotName">a</span> = <span class="t-funcCall">cmp</span>(<span class="t-dotName">b</span>, <span class="t-dotName">c</span>) <span class="t-comment"># calling variable
 </span>    ^         ^
-<span class="tag-dotName">a</span> = <span class="tag-funcCall">if</span>( <span class="tag-funcCall">bool</span>(<span class="tag-funcCall">len</span>(<span class="tag-dotName">b</span>)), <span class="tag-dotName">d</span>, <span class="tag-dotName">e</span>) <span class="tag-comment"># if
+<span class="t-dotName">a</span> = <span class="t-funcCall">if</span>( <span class="t-funcCall">bool</span>(<span class="t-funcCall">len</span>(<span class="t-dotName">b</span>)), <span class="t-dotName">d</span>, <span class="t-dotName">e</span>) <span class="t-comment"># if
 </span>        ^             ^
 </pre>
 
@@ -761,9 +764,9 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 <p>Handle bare function: if, if0, return, warn, log and listLoop. A bare function does not assign a variable.
 
 </p><pre class="desc-code">
-<span class="tag-funcCall">if</span>( <span class="tag-dotName">true</span>, <span class="tag-funcCall">warn</span>(<span class="tag-str">"tea time"</span>)) <span class="tag-comment"># test
+<span class="t-funcCall">if</span>( <span class="t-dotName">true</span>, <span class="t-funcCall">warn</span>(<span class="t-str">"tea time"</span>)) <span class="t-comment"># test
 </span>^                           ^
-<span class="tag-funcCall">return</span>(<span class="tag-num">5</span>)
+<span class="t-funcCall">return</span>(<span class="t-num">5</span>)
 ^        ^
 </pre>
 
@@ -779,12 +782,12 @@ proc runBareFunction(env: var Env; statement: Statement; start: Natural;
 <p>Convert var[key] to a dot name.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">key</span> = <span class="tag-str">"hello"</span>
-<span class="tag-dotName">name</span>[<span class="tag-dotName">key</span>] = <span class="tag-num">20</span>
+<span class="t-dotName">key</span> = <span class="t-str">"hello"</span>
+<span class="t-dotName">name</span>[<span class="t-dotName">key</span>] = <span class="t-num">20</span>
 ^         ^
-=> <span class="tag-dotName">name.hello</span>, <span class="tag-dotName">pos</span>
+=> <span class="t-dotName">name.hello</span>, <span class="t-dotName">pos</span>
 
-<span class="tag-dotName">name</span>[<span class="tag-str">"hello"</span>] = <span class="tag-num">20</span>
+<span class="t-dotName">name</span>[<span class="t-str">"hello"</span>] = <span class="t-num">20</span>
 ^             ^
 </pre>
 
@@ -839,7 +842,7 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 <p>Parse the signature and return the list of parameters or a message.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">cmp</span> = <span class="tag-funcCall">func</span>(<span class="tag-param">numStr</span>1: <span class="tag-type">string</span>, <span class="tag-param">numStr</span>2: <span class="tag-type">string</span>) <span class="tag-type">int</span>
+<span class="t-dotName">cmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">numStr1</span>: <span class="t-type">string</span>, <span class="t-param">numStr2</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
            ^
 </pre>
 

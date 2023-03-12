@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -65,23 +68,23 @@ pre {
 
 </p><p>Example:
 </p><pre class="desc-code">
-<span class="tag-dotName">var</span> <span class="tag-dotName">tempFileO</span> = <span class="tag-funcCall">openTempFile</span>()
-<span class="tag-dotName">require</span> <span class="tag-dotName">tempFileO.isSome</span>
-<span class="tag-dotName">var</span> <span class="tag-dotName">tempFile</span> = <span class="tag-funcCall">tempFileO.get</span>()
+<span class="t-dotName">var</span> <span class="t-dotName">tempFileO</span> = <span class="t-funcCall">openTempFile</span>()
+<span class="t-dotName">require</span> <span class="t-dotName">tempFileO.isSome</span>
+<span class="t-dotName">var</span> <span class="t-dotName">tempFile</span> = <span class="t-funcCall">tempFileO.get</span>()
 
-<span class="tag-funcCall">tempFile.file.write</span>(<span class="tag-str">"this is a test\n"</span>)
-<span class="tag-funcCall">tempFile.file.write</span>(<span class="tag-str">"line 2\n"</span>)
-<span class="tag-funcCall">tempFile.file.close</span>()
+<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">"this is a test\n"</span>)
+<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">"line 2\n"</span>)
+<span class="t-funcCall">tempFile.file.close</span>()
 
-<span class="tag-dotName">var</span> <span class="tag-dotName">fh</span> = <span class="tag-funcCall">open</span>(<span class="tag-dotName">tempFile.filename</span>, <span class="tag-dotName">fmRead</span>)
-<span class="tag-dotName">let</span> <span class="tag-dotName">line</span>1 = <span class="tag-funcCall">readline</span>(<span class="tag-dotName">fh</span>)
-<span class="tag-dotName">let</span> <span class="tag-dotName">line</span>2 = <span class="tag-funcCall">readline</span>(<span class="tag-dotName">fh</span>)
-<span class="tag-funcCall">fh.close</span>()
+<span class="t-dotName">var</span> <span class="t-dotName">fh</span> = <span class="t-funcCall">open</span>(<span class="t-dotName">tempFile.filename</span>, <span class="t-dotName">fmRead</span>)
+<span class="t-dotName">let</span> <span class="t-dotName">line1</span> = <span class="t-funcCall">readline</span>(<span class="t-dotName">fh</span>)
+<span class="t-dotName">let</span> <span class="t-dotName">line2</span> = <span class="t-funcCall">readline</span>(<span class="t-dotName">fh</span>)
+<span class="t-funcCall">fh.close</span>()
 
-<span class="tag-dotName">discard</span> <span class="tag-funcCall">tryRemoveFile</span>(<span class="tag-dotName">tempFile.filename</span>)
+<span class="t-dotName">discard</span> <span class="t-funcCall">tryRemoveFile</span>(<span class="t-dotName">tempFile.filename</span>)
 
-<span class="tag-dotName">check</span> <span class="tag-dotName">line</span>1 == <span class="tag-str">"this is a test"</span>
-<span class="tag-dotName">check</span> <span class="tag-dotName">line</span>2 == <span class="tag-str">"line 2"</span>
+<span class="t-dotName">check</span> <span class="t-dotName">line1</span> == <span class="t-str">"this is a test"</span>
+<span class="t-dotName">check</span> <span class="t-dotName">line2</span> == <span class="t-str">"line 2"</span>
 </pre>
 
 

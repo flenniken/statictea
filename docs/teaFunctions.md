@@ -1,4 +1,3 @@
-$$ ## Create the functions documentation from the f dictionary.
 # Statictea Functions
 
 [![teapot](logo/teapotlogo.svg)](#)
@@ -91,7 +90,7 @@ variable or pass to another function.
 Add two floats. A warning is generated on overflow.
 
 ~~~
-add(a: float, b: float) float
+add = func(a: float, b: float) float
 ~~~
 
 Examples:
@@ -107,7 +106,7 @@ add(3.2, -2.2) => 1.0
 Add two integers. A warning is generated on overflow.
 
 ~~~
-add(a: int, b: int) int
+add = func(a: int, b: int) int
 ~~~
 
 Examples:
@@ -124,7 +123,7 @@ add(-2, -5) => -7
 Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
 
 ~~~
-anchors(names: list, type: string) list
+anchors = func(names: list, type: string) list
 ~~~
 
 type:
@@ -146,7 +145,7 @@ anchores(list, "github") =>
 Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
 
 ~~~
-and(a: bool, b: bool) bool
+and = func(a: bool, b: bool) bool
 ~~~
 
 Examples:
@@ -165,7 +164,7 @@ and(false, warn("not hit")) => false
 Create an bool from a value.
 
 ~~~
-bool(value: Value) bool
+bool = func(value: Value) bool
 ~~~
 
 False values by variable types:
@@ -210,7 +209,7 @@ generated.  The conditions must be integers. The return values
 can be any type.
 
 ~~~
-case(condition: int, pairs: list, default: optional any) any
+case = case(condition: int, pairs: list, default: optional any) any
 ~~~
 
 Examples:
@@ -240,7 +239,7 @@ generated.  The conditions must be strings. The return values
 can be any type.
 
 ~~~
-case(condition: string, pairs: list, default: optional any) any
+case = func(condition: string, pairs: list, default: optional any) any
 ~~~
 
 Examples:
@@ -259,7 +258,7 @@ case("bunch", cases, "other") => "other"
 Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
-cmp(a: float, b: float) int
+cmp = func(a: float, b: float) int
 ~~~
 
 Examples:
@@ -276,7 +275,7 @@ cmp(9.3, 2.2) => 1
 Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
-cmp(a: int, b: int) int
+cmp = func(a: int, b: int) int
 ~~~
 
 Examples:
@@ -296,7 +295,7 @@ You have the option to compare case insensitive. Case sensitive
 is the default.
 
 ~~~
-cmp(a: string, b: string, insensitive: optional bool) int
+cmp = func(a: string, b: string, insensitive: optional bool) int
 ~~~
 
 Examples:
@@ -315,7 +314,7 @@ cmp("Tea", "tea", false) => 0
 Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
 
 ~~~
-cmpVersion(versionA: string, versionB: string) int
+cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
 StaticTea uses [[https://semver.org/][Semantic Versioning]]
@@ -336,7 +335,7 @@ cmpVersion("1.2.5", "1.2.5") => 0
 Concatenate two strings. See the join function for more that two arguments.
 
 ~~~
-concat(a: string, b: string) string
+concat = func(a: string, b: string) string
 ~~~
 
 Examples:
@@ -352,7 +351,7 @@ concat("a", "b") => "ab"
 Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
 
 ~~~
-dict(pairs: optional list) dict
+dict = func(pairs: optional list) dict
 ~~~
 
 Examples:
@@ -370,7 +369,7 @@ dict(["a", 5, "b", 33, "c", 0]) =>
 Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
 
 ~~~
-dup(pattern: string, count: int) string
+dup = func(pattern: string, count: int) string
 ~~~
 
 Examples:
@@ -405,7 +404,7 @@ eq(1.2, 3.2) => false
 Return true when the two ints are equal.
 
 ~~~
-eq(a: int, b: int) bool
+eq = func(a: int, b: int) bool
 ~~~
 
 Examples:
@@ -421,7 +420,7 @@ eq(2, 3) => false
 Return true when two strings are equal.  See cmp function for case insensitive compare.
 
 ~~~
-eq(a: string, b: string) bool
+eq = func(a: string, b: string) bool
 ~~~
 
 Examples:
@@ -437,7 +436,7 @@ eq("1.2", "3.2") => false
 Determine whether a key exists in a dictionary. Return true when it exists, else false.
 
 ~~~
-exists(dictionary: dict, key: string) bool
+exists = func(dictionary: dict, key: string) bool
 ~~~
 
 Examples:
@@ -454,7 +453,7 @@ exists(d, "coffee") => false
 Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
 
 ~~~
-find(str: string, substring: string, default: optional any) any
+find = func(str: string, substring: string, default: optional any) any
 ~~~
 
 Examples:
@@ -476,7 +475,7 @@ find(msg, "party", 0) = 0
 Create a float from an int.
 
 ~~~
-float(num: int) float
+float = func(num: int) float
 ~~~
 
 Examples:
@@ -492,7 +491,7 @@ float(-33) => -33.0
 Create a float from a number string. If the string is not a number, return the default.
 
 ~~~
-float(numString: string, default: optional any) any
+float = func(numString: string, default: optional any) any
 ~~~
 
 Examples:
@@ -508,7 +507,7 @@ float("notnum", "nan") => nan
 Create a float from a number string.
 
 ~~~
-float(numString: string) float
+float = func(numString: string) float
 ~~~
 
 Examples:
@@ -525,7 +524,7 @@ float("33") => 33.0
 Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
 
 ~~~
-format(str: string) string
+format = func(str: string) string
 ~~~
 
 Example:
@@ -552,7 +551,7 @@ str => "use two { to get one"
 Define a function.
 
 ~~~
-func(signature: string) func
+func = func(signature: string) func
 ~~~
 
 Example:
@@ -572,7 +571,7 @@ mycmp = func(numStr1: string, numStr2: string) int
 Return the function details in a dictionary.
 
 ~~~
-functionDetails(funcVar: func) dict
+functionDetails = func(funcVar: func) dict
 ~~~
 
 The following example defines a simple function then gets its
@@ -605,7 +604,7 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
 
 ~~~
-get(dictionary: dict, key: string, default: optional any) any
+get = func(dictionary: dict, key: string, default: optional any) any
 ~~~
 
 Note: For dictionary lookup you can use dot notation. It's the
@@ -631,7 +630,7 @@ d.tea => "Earl Grey"
 Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
 
 ~~~
-get(list: list, index: int, default: optional any) any
+get = func(list: list, index: int, default: optional any) any
 ~~~
 
 Examples:
@@ -660,7 +659,7 @@ a = teas[0]
 Return true when one float is greater than another float.
 
 ~~~
-gt(a: float, b: float) bool
+gt = func(a: float, b: float) bool
 ~~~
 
 Examples:
@@ -676,7 +675,7 @@ gt(3.1, 2.5) => true
 Return true when an int is greater then another int.
 
 ~~~
-gt(a: int, b: int) bool
+gt = func(a: int, b: int) bool
 ~~~
 
 Examples:
@@ -692,7 +691,7 @@ gt(3, 2) => true
 Return true when a float is greater than or equal to another float.
 
 ~~~
-gte(a: float, b: float) bool
+gte = func(a: float, b: float) bool
 ~~~
 
 Examples:
@@ -708,7 +707,7 @@ gte(3.1, 3.1) => true
 Return true when an int is greater then or equal to another int.
 
 ~~~
-gte(a: int, b: int) bool
+gte = func(a: int, b: int) bool
 ~~~
 
 Examples:
@@ -724,7 +723,7 @@ gte(3, 3) => true
 Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
 
 ~~~
-highlight(code: string) list
+highlight = func(code: string) list
 ~~~
 
 Tags:
@@ -770,7 +769,7 @@ The IF functions are special in a couple of ways, see
 the If Functions section.
 
 ~~~
-if0(condition: any, then: any, else: optional any) any
+if0 = func(condition: any, then: any, else: optional any) any
 ~~~
 
 Examples:
@@ -787,7 +786,6 @@ a = if0(dict(), "tea", "beer") => tea
 a = if0(dict("a",1), "tea", "beer") => beer
 a = if0(false, "tea", "beer") => tea
 a = if0(true, "tea", "beer") => beer
-
 a = if0(true, "tea")
 a = if0(false, "tea")
 ~~~
@@ -811,7 +809,7 @@ expressions for the condition, see:
 the Boolean Expressions section.
 
 ~~~
-if(condition: bool, then: any, else: optional any) any
+if = func(condition: bool, then: any, else: optional any) any
 ~~~
 
 Examples:
@@ -838,7 +836,7 @@ if(c, return("skip"))
 Create an int from a float.
 
 ~~~
-int(num: float, roundOption: optional string) int
+int = func(num: float, roundOption: optional string) int
 ~~~
 
 Round options:
@@ -870,7 +868,7 @@ int(-6.3456, "truncate") => -6
 Create an int from a number string.
 
 ~~~
-int(numString: string, roundOption: optional string) int
+int = func(numString: string, roundOption: optional string) int
 ~~~
 
 Round options:
@@ -902,7 +900,7 @@ int("-6.3456", "truncate") => -6
 Create an int from a number string. If the string is not a number, return the default value.
 
 ~~~
-int(numString: string, roundOption: string, default: optional any) any
+int = func(numString: string, roundOption: string, default: optional any) any
 ~~~
 
 Round options:
@@ -925,7 +923,7 @@ int("notnum", "round", "nan") => nan
 Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
 
 ~~~
-join(strs: list, sep: string, skipEmpty: optional bool) string
+join = func(strs: list, sep: string, skipEmpty: optional bool) string
 ~~~
 
 Examples:
@@ -956,7 +954,7 @@ is not added. If a component is "", the platform separator is
 used for it.
 
 ~~~
-joinPath(components: list, separator: optional string) string
+joinPath = func(components: list, separator: optional string) string
 ~~~
 
 Examples:
@@ -987,7 +985,7 @@ joinPath(["/", "tea"]) =>
 Create a list from the keys in a dictionary.
 
 ~~~
-keys(dictionary: dict) list
+keys = func(dictionary: dict) list
 ~~~
 
 Examples:
@@ -1004,7 +1002,7 @@ values(d) => [1, 2, 3]
 Number of elements in a dictionary.
 
 ~~~
-len(dictionary: dict) int
+len = func(dictionary: dict) int
 ~~~
 
 Examples:
@@ -1021,7 +1019,7 @@ len(dict("a", 4, "b", 3)) => 2
 Number of elements in a list.
 
 ~~~
-len(list: list) int
+len = func(list: list) int
 ~~~
 
 Examples:
@@ -1038,7 +1036,7 @@ len(list(4, 5)) => 2
 Number of unicode characters in a string.
 
 ~~~
-len(str: string) int
+len = func(str: string) int
 ~~~
 
 Examples:
@@ -1054,7 +1052,7 @@ len("añyóng") => 6
 Create a list of variables. You can also create a list with brackets.
 
 ~~~
-list(...) list
+list = func(...) list
 ~~~
 
 Examples:
@@ -1081,7 +1079,7 @@ returns whether the callback stopped early or not and you can
 ignore it using a bare form..
 
 ~~~
-listLoop(a: list, container: any, listCallback: func, state: optional any) bool
+listLoop = func(a: list, container: any, listCallback: func, state: optional any) bool
 ~~~
 
 The callback gets passed the index to the item, its value, the
@@ -1090,7 +1088,7 @@ information and adds to the container when appropriate. The
 callback returns true to stop iterating.
 
 ~~~
-listCallback(ix: int, item: any, container: any, state: optional any) bool
+listCallback = func(ix: int, item: any, container: any, state: optional any) bool
 ~~~
 
 The following example makes a new list [6, 8] from the list
@@ -1118,7 +1116,7 @@ b5 = func(ix: int, value: int, container: list) bool
 Log a message to the log file.  You can call the log function without an assignment.
 
 ~~~
-log(message: string) string
+log = func(message: string) string
 ~~~
 
 You can log conditionally in a bare if statement:
@@ -1139,7 +1137,7 @@ log("always log")
 Lowercase a string.
 
 ~~~
-lower(str: string) string
+lower = func(str: string) string
 ~~~
 
 Examples:
@@ -1156,7 +1154,7 @@ lower("TEĀ") => "teā"
 Return true when a float is less then another float.
 
 ~~~
-lt(a: float, b: float) bool
+lt = func(a: float, b: float) bool
 ~~~
 
 Examples:
@@ -1172,7 +1170,7 @@ lt(3.1, 2.5) => false
 Return true when an int is less than another int.
 
 ~~~
-lt(a: int, b: int) bool
+lt = func(a: int, b: int) bool
 ~~~
 
 Examples:
@@ -1188,7 +1186,7 @@ gt(3, 2) => false
 Return true when a float is less than or equal to another float.
 
 ~~~
-lte(a: float, b: float) bool
+lte = func(a: float, b: float) bool
 ~~~
 
 Examples:
@@ -1205,7 +1203,7 @@ lte(4.0, 3.0) => false
 Return true when an int is less than or equal to another int.
 
 ~~~
-lte(a: int, b: int) bool
+lte = func(a: int, b: int) bool
 ~~~
 
 Examples:
@@ -1222,7 +1220,7 @@ lte(4, 3) => false
 Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
 
 ~~~
-markdownList(mdText: string) list
+markdownList = func(mdText: string) list
 ~~~
 
 list elements:
@@ -1254,7 +1252,7 @@ elements => [
 Return true when two floats are not equal.
 
 ~~~
-ne(a: float, b: float) bool
+ne = func(a: float, b: float) bool
 ~~~
 
 Examples:
@@ -1270,7 +1268,7 @@ ne(1.2, 3.2) => true
 Return true when two ints are not equal.
 
 ~~~
-ne(a: int, b: int) bool
+ne = func(a: int, b: int) bool
 ~~~
 
 Examples:
@@ -1302,7 +1300,7 @@ ne("earl", "grey") => true
 Boolean not.
 
 ~~~
-not(value: bool) bool
+not = func(value: bool) bool
 ~~~
 
 Examples:
@@ -1318,7 +1316,7 @@ not(false) => true
 Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
 
 ~~~
-or(a: bool, b: bool) bool
+or = func(a: bool, b: bool) bool
 ~~~
 
 Examples:
@@ -1341,7 +1339,7 @@ slash or or backslash. When no separator, the current
 system separator is used.
 
 ~~~
-path(filename: string, separator: optional string) dict
+path = func(filename: string, separator: optional string) dict
 ~~~
 
 Examples:
@@ -1368,7 +1366,7 @@ path("src\functions.nim", "\") => {
 Convert a JSON string to a variable.
 
 ~~~
-readJson(json: string) any
+readJson = func(json: string) any
 ~~~
 
 Examples:
@@ -1387,7 +1385,7 @@ d = readJson("{"a":1, "b": 2}")
 Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
 
 ~~~
-replace(str: string, start: int, length: int, replacement: string) string
+replace = func(str: string, start: int, length: int, replacement: string) string
 ~~~
 
 * str: string
@@ -1449,7 +1447,7 @@ You specify one or more pairs of regex patterns and their string
 replacements.
 
 ~~~
-replaceRe(str: string, pairs: list) string
+replaceRe = func(str: string, pairs: list) string
 ~~~
 
 Examples:
@@ -1467,6 +1465,10 @@ website: https://regex101.com/
 # return
 
 Return is a special function that returns the value passed in and has has side effects.
+
+~~~
+return = func(value: any) any
+~~~
 
 In a function, the return completes the function and returns
 the value of it.
@@ -1516,7 +1518,7 @@ Extract a substring from a string by its position and length. You pass the strin
 The start index and length are by unicode characters not bytes.
 
 ~~~
-slice(str: string, start: int, length: optional int) string
+slice = func(str: string, start: int, length: optional int) string
 ~~~
 
 Examples:
@@ -1538,7 +1540,7 @@ You have the option of sorting strings case "insensitive". Case
 "sensitive" is the default.
 
 ~~~
-sort(values: list, order: string, insensitive: optional string) list
+sort = func(values: list, order: string, insensitive: optional string) list
 ~~~
 
 Examples:
@@ -1573,7 +1575,7 @@ must exist in each list, be the same type and be an int, float,
 or string.
 
 ~~~
-sort(lists: list, order: string, case: string, index: int) list
+sort = func(lists: list, order: string, case: string, index: int) list
 ~~~
 
 Examples:
@@ -1601,7 +1603,7 @@ each dictionary, be the same type and be an int, float or
 string.
 
 ~~~
-sort(dicts: list, order: string, case: string, key: string) list
+sort = func(dicts: list, order: string, case: string, key: string) list
 ~~~
 
 Examples:
@@ -1620,7 +1622,7 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 Check whether a strings starts with the given prefix. Return true when it does, else false.
 
 ~~~
-startsWith(str: string, str: prefix) bool
+startsWith = func(str: string, str: prefix) bool
 ~~~
 
 Examples:
@@ -1639,7 +1641,7 @@ b => false
 Convert a variable to a string. You specify the variable and optionally the type of output you want.
 
 ~~~
-string(var: any, stype: optional string) string
+string = func(var: any, stype: optional string) string
 ~~~
 
 The default stype is "rb" which is used for replacement blocks.
@@ -1714,7 +1716,7 @@ a =>
 Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
 
 ~~~
-string(dictName: string: d: dict) string
+string = func(dictName: string: d: dict) string
 ~~~
 
 Example:
@@ -1734,7 +1736,7 @@ teas.z.a = 8
 Subtract two floats. A warning is generated on overflow.
 
 ~~~
-sub(a: float, b: float) float
+sub = func(a: float, b: float) float
 ~~~
 
 Examples:
@@ -1750,7 +1752,7 @@ sub(1.0, 2.2) => -1.2
 Subtract two integers. A warning is generated on overflow.
 
 ~~~
-sub(a: int, b: int) int
+sub = func(a: int, b: int) int
 ~~~
 
 Examples:
@@ -1767,7 +1769,7 @@ add(1, 5) => -4
 Return the argument type, one of: int, float, string, list, dict, bool or func.
 
 ~~~
-type(variable: any) string
+type = func(variable: any) string
 ~~~
 
 Examples:
@@ -1788,7 +1790,7 @@ type(f.cmp[0]) => "func"
 Create a list out of the values in the specified dictionary.
 
 ~~~
-values(dictionary: dict) list
+values = func(dictionary: dict) list
 ~~~
 
 Examples:
@@ -1805,7 +1807,7 @@ values(d) => ["apple", 2, 3]
 Return a warning message and skip the current statement. You can call the warn function without an assignment.
 
 ~~~
-warn(message: string) string
+warn = func(message: string) string
 ~~~
 
 You can warn conditionally in a bare if statement:

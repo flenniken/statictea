@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -469,10 +472,10 @@ SideEffect = enum
 </p><p>Example:
 
 </p><pre class="desc-code">
-<span class="tag-num">0123456789</span> <span class="tag-num">123456789</span>
-<span class="tag-dotName">var</span> = <span class="tag-num">567</span> <span class="tag-comment"># test
-</span>      ^ <span class="tag-dotName">start</span>
-          ^ <span class="tag-dotName">end</span> <span class="tag-dotName">position</span>
+<span class="t-num">0123456789</span> <span class="t-num">123456789</span>
+<span class="t-dotName">var</span> = <span class="t-num">567</span> <span class="t-comment"># test
+</span>      ^ <span class="t-dotName">start</span>
+          ^ <span class="t-dotName">end</span> <span class="t-dotName">position</span>
 </pre>
 
 
@@ -644,9 +647,9 @@ proc newValue(value: Value): Value
 </p><p>Examples:
 
 </p><pre class="desc-code">
-<span class="tag-dotName">let</span> <span class="tag-dotName">listValue</span> = <span class="tag-funcCall">newValue</span>([<span class="tag-num">1</span>, <span class="tag-num">2</span>, <span class="tag-num">3</span>])
-<span class="tag-dotName">let</span> <span class="tag-dotName">listValue</span> = <span class="tag-funcCall">newValue</span>([<span class="tag-str">"a"</span>, <span class="tag-str">"b"</span>, <span class="tag-str">"c"</span>])
-<span class="tag-dotName">let</span> <span class="tag-dotName">listValue</span> = <span class="tag-funcCall">newValue</span>([<span class="tag-funcCall">newValue</span>(<span class="tag-num">1</span>), <span class="tag-funcCall">newValue</span>(<span class="tag-str">"b"</span>)])
+<span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>])
+<span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-str">"a"</span>, <span class="t-str">"b"</span>, <span class="t-str">"c"</span>])
+<span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-funcCall">newValue</span>(<span class="t-num">1</span>), <span class="t-funcCall">newValue</span>(<span class="t-str">"b"</span>)])
 </pre>
 
 
@@ -661,9 +664,9 @@ proc newValue[T](list: openArray[T]; mutable = Mutable.immutable): Value
 </p><p>Examples:
 
 </p><pre class="desc-code">
- <span class="tag-dotName">let</span> <span class="tag-dotName">dictValue</span> = <span class="tag-funcCall">newValue</span>([(<span class="tag-str">"a"</span>, <span class="tag-num">1</span>), (<span class="tag-str">"b"</span>, <span class="tag-num">2</span>), (<span class="tag-str">"c"</span>, <span class="tag-num">3</span>)])
- <span class="tag-dotName">let</span> <span class="tag-dotName">dictValue</span> = <span class="tag-funcCall">newValue</span>([(<span class="tag-str">"a"</span>, <span class="tag-num">1.1</span>), (<span class="tag-str">"b"</span>, <span class="tag-num">2.2</span>), (<span class="tag-str">"c"</span>, <span class="tag-num">3.3</span>)])
- <span class="tag-dotName">let</span> <span class="tag-dotName">dictValue</span> = <span class="tag-funcCall">newValue</span>([(<span class="tag-str">"a"</span>, <span class="tag-funcCall">newValue</span>(<span class="tag-num">1.1</span>)), (<span class="tag-str">"b"</span>, <span class="tag-funcCall">newValue</span>(<span class="tag-str">"a"</span>))])
+ <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">"a"</span>, <span class="t-num">1</span>), (<span class="t-str">"b"</span>, <span class="t-num">2</span>), (<span class="t-str">"c"</span>, <span class="t-num">3</span>)])
+ <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">"a"</span>, <span class="t-num">1.1</span>), (<span class="t-str">"b"</span>, <span class="t-num">2.2</span>), (<span class="t-str">"c"</span>, <span class="t-num">3.3</span>)])
+ <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">"a"</span>, <span class="t-funcCall">newValue</span>(<span class="t-num">1.1</span>)), (<span class="t-str">"b"</span>, <span class="t-funcCall">newValue</span>(<span class="t-str">"a"</span>))])
 </pre>
 
 
@@ -1000,10 +1003,10 @@ proc shortName(index: Natural): string
 </p><p>Example:
 
 </p><pre class="desc-code">
-<span class="tag-dotName">var</span> <span class="tag-dotName">signatureO</span> = <span class="tag-funcCall">newSignatureO</span>(<span class="tag-str">"myname"</span>, <span class="tag-str">"ifss"</span>)
-<span class="tag-dotName">echo</span> $<span class="tag-funcCall">signatureO.get</span>()
+<span class="t-dotName">var</span> <span class="t-dotName">signatureO</span> = <span class="t-funcCall">newSignatureO</span>(<span class="t-str">"myname"</span>, <span class="t-str">"ifss"</span>)
+<span class="t-dotName">echo</span> $<span class="t-funcCall">signatureO.get</span>()
 =>
-<span class="tag-funcCall">myname</span>(<span class="tag-dotName">a</span>: <span class="tag-dotName">int</span>, <span class="tag-dotName">b</span>: <span class="tag-dotName">float</span>, <span class="tag-dotName">c</span>: <span class="tag-dotName">string</span>) <span class="tag-dotName">string</span>
+<span class="t-funcCall">myname</span>(<span class="t-dotName">a</span>: <span class="t-dotName">int</span>, <span class="t-dotName">b</span>: <span class="t-dotName">float</span>, <span class="t-dotName">c</span>: <span class="t-dotName">string</span>) <span class="t-dotName">string</span>
 </pre>
 
 

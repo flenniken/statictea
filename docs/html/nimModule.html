@@ -62,7 +62,7 @@ pre {
 //.t-param {
 //    color: red;
 //}
-.t-type {v
+.t-type {
     color: #D7381E;
 }
 
@@ -104,7 +104,7 @@ pre {
 </span>  <span class="t-dotName">tag</span> = <span class="t-dotName">fragment</span>[<span class="t-num">0</span>]
   <span class="t-dotName">str</span> = <span class="t-dotName">fragment</span>[<span class="t-num">1</span>]
   <span class="t-dotName">frags</span> &= <span class="t-funcCall">if</span>((<span class="t-dotName">tag</span> == <span class="t-str">"other"</span>), <span class="t-dotName">str</span>, +
-    <span class="t-funcCall">format</span>(<span class="t-str">"<span class=\"tag-{tag}\">{str}</span>"</span>))
+    <span class="t-funcCall">format</span>(<span class="t-str">"<span class=\"t-{tag}\">{str}</span>"</span>))
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-dotName">u.html-code</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
@@ -112,8 +112,6 @@ pre {
 </span>  <span class="t-dotName">lines</span> = []
   <span class="t-dotName">lines</span> &= <span class="t-str">"<pre class=\"desc-code\">\n"</span>
   <span class="t-comment"># todo: look at the ~~~ line and only highlight statictea code.
-</span>  <span class="t-comment"># todo: shorten the class names tvar, tstr, tdoc, etc.
-</span>  <span class="t-comment"># Syntax highlight the code.
 </span>  <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">highlight</span>(<span class="t-dotName">item</span>[<span class="t-num">1</span>]), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-fragment</span>)
   <span class="t-dotName">lines</span> &= <span class="t-str">"</pre>\n"</span>
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">""</span>))

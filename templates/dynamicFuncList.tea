@@ -18,7 +18,7 @@ get-starts = func(ix: int, entry: dict, starts: dict, entries: list) bool
 
 # Make a dictionary mapping a function's start line to its number of lines.
 starts = dict()
-dummy = listLoop(s.entries, starts, get-starts, s.entries)
+listLoop(s.entries, starts, get-starts, s.entries)
 
 get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Add the Statictea functions to the new list.
@@ -62,7 +62,7 @@ state = dict()
 state.patterns = patterns
 state.starts = starts
 entries = []
-stopped = listLoop(s.entries, entries, get-entry, state)
+listLoop(s.entries, entries, get-entry, state)
 
 # Sort the entries by function name. Use insensitive compare so
 # function cmp_ comes before cmpV.

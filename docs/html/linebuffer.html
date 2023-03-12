@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -66,11 +69,11 @@ pre {
 </p><p>Example:
 
 </p><pre class="desc-code">
-<span class="tag-dotName">let</span> <span class="tag-dotName">lbO</span> = <span class="tag-funcCall">newLineBuffer</span>(<span class="tag-dotName">stream</span>)
-<span class="tag-dotName">check</span> <span class="tag-dotName">lbO.isSome</span> == <span class="tag-dotName">true</span>
-<span class="tag-dotName">var</span> <span class="tag-dotName">lb</span> = <span class="tag-funcCall">lbO.get</span>()
-<span class="tag-dotName">while</span> <span class="tag-dotName">line</span> = <span class="tag-funcCall">lb.readLine</span>():
-  <span class="tag-funcCall">processLine</span>(<span class="tag-dotName">line</span>)
+<span class="t-dotName">let</span> <span class="t-dotName">lbO</span> = <span class="t-funcCall">newLineBuffer</span>(<span class="t-dotName">stream</span>)
+<span class="t-dotName">check</span> <span class="t-dotName">lbO.isSome</span> == <span class="t-dotName">true</span>
+<span class="t-dotName">var</span> <span class="t-dotName">lb</span> = <span class="t-funcCall">lbO.get</span>()
+<span class="t-dotName">while</span> <span class="t-dotName">line</span> = <span class="t-funcCall">lb.readLine</span>():
+  <span class="t-funcCall">processLine</span>(<span class="t-dotName">line</span>)
 </pre>
 
 

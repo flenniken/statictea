@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -87,13 +90,13 @@ Nim source code: <a href="../../src/parseCmdLine.nim">parseCmdLine.nim</a>
 <p>LineParts holds parsed components of a line.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">prefix</span> <span class="tag-dotName">command</span>  [<span class="tag-dotName">code</span>]   [<span class="tag-dotName">comment</span>] [<span class="tag-dotName">continuation</span>]
-|      |        |        |         |[<span class="tag-dotName">postfix</span>]
-|      |        |        |         ||  [<span class="tag-dotName">ending</span>]
+<span class="t-dotName">prefix</span> <span class="t-dotName">command</span>  [<span class="t-dotName">code</span>]   [<span class="t-dotName">comment</span>] [<span class="t-dotName">continuation</span>]
+|      |        |        |         |[<span class="t-dotName">postfix</span>]
+|      |        |        |         ||  [<span class="t-dotName">ending</span>]
 |      |        |        |         ||  |
-<!<span class="tag-num">-</span>-$  <span class="tag-dotName">nextline</span> <span class="tag-dotName">var</span> = <span class="tag-num">5</span>  <span class="tag-comment"># comment +-->n
+<!<span class="t-num">-</span>-$  <span class="t-dotName">nextline</span> <span class="t-dotName">var</span> = <span class="t-num">5</span>  <span class="t-comment"># comment +-->n
 </span>     |
-     <span class="tag-dotName">optional</span> <span class="tag-dotName">spaces</span>
+     <span class="t-dotName">optional</span> <span class="t-dotName">spaces</span>
 </pre>
 <p>
 Whitespace must follow a command except on the last line of the file.

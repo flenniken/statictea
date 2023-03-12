@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -219,7 +222,7 @@ the bracket.
 </p><p>A replacement variable is inside brackets.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">text</span> <span class="tag-dotName">on</span> <span class="tag-dotName">the</span> <span class="tag-dotName">line</span> {<span class="tag-dotName">variable</span>} <span class="tag-dotName">more</span> <span class="tag-dotName">text</span> {<span class="tag-dotName">variable</span>2} <span class="tag-dotName">asdf</span>
+<span class="t-dotName">text</span> <span class="t-dotName">on</span> <span class="t-dotName">the</span> <span class="t-dotName">line</span> {<span class="t-dotName">variable</span>} <span class="t-dotName">more</span> <span class="t-dotName">text</span> {<span class="t-dotName">variable2</span>} <span class="t-dotName">asdf</span>
                   ^
 </pre>
 
@@ -274,7 +277,7 @@ length returned includes the optional trailing whitespace.
 </p><p>Example call:
 
 </p><pre class="desc-code">
-<span class="tag-dotName">let</span> (_, <span class="tag-dotName">dotNameStr</span>, <span class="tag-dotName">leftParenBrack</span>, <span class="tag-dotName">dotNameLen</span>) = <span class="tag-dotName">matchesO.get</span>3<span class="tag-funcCall">GroupsLen</span>()
+<span class="t-dotName">let</span> (_, <span class="t-dotName">dotNameStr</span>, <span class="t-dotName">leftParenBrack</span>, <span class="t-dotName">dotNameLen</span>) = <span class="t-funcCall">matchesO.get3GroupsLen</span>()
 </pre>
 
 

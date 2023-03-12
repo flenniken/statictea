@@ -62,7 +62,7 @@ pre {
 //.t-param {
 //    color: red;
 //}
-.t-type {v
+.t-type {
     color: #D7381E;
 }
 
@@ -94,7 +94,7 @@ pre {
 
 <span class="t-comment"># Make a dictionary mapping a function's start line to its number of lines.
 </span><span class="t-dotName">starts</span> = <span class="t-funcCall">dict</span>()
-<span class="t-dotName">dummy</span> = <span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
+<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
 
 <span class="t-dotName">get-entry</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>, <span class="t-param">state</span>: <span class="t-type">dict</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Add the Statictea functions to the new list.
@@ -138,7 +138,7 @@ pre {
 <span class="t-dotName">state.patterns</span> = <span class="t-dotName">patterns</span>
 <span class="t-dotName">state.starts</span> = <span class="t-dotName">starts</span>
 <span class="t-dotName">entries</span> = []
-<span class="t-dotName">stopped</span> = <span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">get-entry</span>, <span class="t-dotName">state</span>)
+<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">get-entry</span>, <span class="t-dotName">state</span>)
 
 <span class="t-comment"># Sort the entries by function name. Use insensitive compare so
 </span><span class="t-comment"># function cmp_ comes before cmpV.

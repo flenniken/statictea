@@ -30,25 +30,28 @@ pre {
     white-space: pre-wrap;
 }
 
-.tag-func {
+.t-funcCall {
     color: #5F34FF;
 }
-//.tag-var {
-//    color: #CE7923;
-//}
-.tag-type {
-    color: #34A227;
-}
-//.tag-num {
+//.t-num {
 //    color: IndianRed;
 //}
-//.tag-string {
-//    color: #B03B84;
-//}
-.tag-doc {
+.t-str {
+    color: #34A227;
+}
+.t-multiline {
+    color: green;
+}
+.t-doc {
     color: #B03B84;
 }
-.tag-comment {
+.t-comment {
+    color: #D7381E;
+}
+//.t-param {
+//    color: red;
+//}
+.t-type {
     color: #D7381E;
 }
 
@@ -354,7 +357,7 @@ func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
 <p>Return a formatted warning line. For example:
 
 </p><pre class="desc-code">
-<span class="tag-funcCall">filename</span>(<span class="tag-dotName">line</span>): <span class="tag-dotName">wId</span>: <span class="tag-dotName">message.</span>
+<span class="t-funcCall">filename</span>(<span class="t-dotName">line</span>): <span class="t-dotName">wId</span>: <span class="t-dotName">message.</span>
 </pre>
 
 
@@ -368,7 +371,7 @@ func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = "")
 <p>Return a formatted warning line. For example:
 
 </p><pre class="desc-code">
-<span class="tag-funcCall">filename</span>(<span class="tag-dotName">line</span>): <span class="tag-dotName">wId</span>: <span class="tag-dotName">message.</span>
+<span class="t-funcCall">filename</span>(<span class="t-dotName">line</span>): <span class="t-dotName">wId</span>: <span class="t-dotName">message.</span>
 </pre>
 
 
@@ -389,8 +392,8 @@ func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 <p>Return a string representation of WarningData.
 
 </p><pre class="desc-code">
-<span class="tag-dotName">let</span> <span class="tag-dotName">warning</span> = <span class="tag-funcCall">newWarningData</span>(<span class="tag-dotName">wUnknownArg</span>, <span class="tag-str">"p1"</span>, <span class="tag-num">5</span>)
-<span class="tag-dotName">check</span> $<span class="tag-dotName">warning</span> == <span class="tag-str">"wUnknownArg(p1):5"</span>
+<span class="t-dotName">let</span> <span class="t-dotName">warning</span> = <span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>, <span class="t-str">"p1"</span>, <span class="t-num">5</span>)
+<span class="t-dotName">check</span> $<span class="t-dotName">warning</span> == <span class="t-str">"wUnknownArg(p1):5"</span>
 </pre>
 
 

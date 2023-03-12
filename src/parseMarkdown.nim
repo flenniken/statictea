@@ -335,7 +335,7 @@ func highlightCode*(codeText: string): seq[Fragment] =
 
     of dotName:
       case ch
-      of 'a'..'z', 'A'..'Z', '.', '_', '-':
+      of 'a'..'z', 'A'..'Z', '0'..'9', '.', '_', '-':
         discard
       of '(':
         # Function call.
@@ -369,7 +369,7 @@ func highlightCode*(codeText: string): seq[Fragment] =
 
     of param:
       case ch
-      of 'a'..'z', 'A'..'Z', '_', '-':
+      of 'a'..'z', 'A'..'Z', '0'..'9', '_', '-':
         discard
       else:
         addFrag(hlParamName)

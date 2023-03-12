@@ -333,7 +333,7 @@ func fun_cmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## greater than.
   ## @:
   ## @:~~~
-  ## @:cmp(a: int, b: int) int
+  ## @:cmp = func(a: int, b: int) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -354,7 +354,7 @@ func fun_cmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## greater than.
   ## @:
   ## @:~~~
-  ## @:cmp(a: float, b: float) int
+  ## @:cmp = func(a: float, b: float) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -378,7 +378,7 @@ func fun_cmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:is the default.
   ## @:
   ## @:~~~
-  ## @:cmp(a: string, b: string, insensitive: optional bool) int
+  ## @:cmp = func(a: string, b: string, insensitive: optional bool) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -407,7 +407,7 @@ func fun_concat_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Concatenate two strings. See the join function for more that two arguments.
   ## @:
   ## @:~~~
-  ## @:concat(a: string, b: string) string
+  ## @:concat = func(a: string, b: string) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -426,7 +426,7 @@ func fun_len_si*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of unicode characters in a string.
   ## @:
   ## @:~~~
-  ## @:len(str: string) int
+  ## @:len = func(str: string) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -444,7 +444,7 @@ func fun_len_li*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of elements in a list.
   ## @:
   ## @:~~~
-  ## @:len(list: list) int
+  ## @:len = func(list: list) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -463,7 +463,7 @@ func fun_len_di*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of elements in a dictionary.
   ## @:
   ## @:~~~
-  ## @:len(dictionary: dict) int
+  ## @:len = func(dictionary: dict) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -486,7 +486,7 @@ func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## etc.
   ## @:
   ## @:~~~
-  ## @:get(list: list, index: int, default: optional any) any
+  ## @:get = func(list: list, index: int, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -532,7 +532,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## generated.
   ## @:
   ## @:~~~
-  ## @:get(dictionary: dict, key: string, default: optional any) any
+  ## @:get = func(dictionary: dict, key: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Note: For dictionary lookup you can use dot notation. It's the
@@ -584,7 +584,7 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:the If Functions section.
   ## @:
   ## @:~~~
-  ## @:if0(condition: any, then: any, else: optional any) any
+  ## @:if0 = func(condition: any, then: any, else: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -601,7 +601,6 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:a = if0(dict("a",1), "tea", "beer") => beer
   ## @:a = if0(false, "tea", "beer") => tea
   ## @:a = if0(true, "tea", "beer") => beer
-  ## @:
   ## @:a = if0(true, "tea")
   ## @:a = if0(false, "tea")
   ## @:~~~~
@@ -632,7 +631,7 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:the Boolean Expressions section.
   ## @:
   ## @:~~~
-  ## @:if(condition: bool, then: any, else: optional any) any
+  ## @:if = func(condition: bool, then: any, else: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -665,7 +664,7 @@ func fun_add_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Add two integers. A warning is generated on overflow.
   ## @:
   ## @:~~~
-  ## @:add(a: int, b: int) int
+  ## @:add = func(a: int, b: int) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -689,7 +688,7 @@ func fun_add_fff*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Add two floats. A warning is generated on overflow.
   ## @:
   ## @:~~~
-  ## @:add(a: float, b: float) float
+  ## @:add = func(a: float, b: float) float
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -712,7 +711,7 @@ func fun_sub_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Subtract two integers. A warning is generated on overflow.
   ## @:
   ## @:~~~
-  ## @:sub(a: int, b: int) int
+  ## @:sub = func(a: int, b: int) int
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -736,7 +735,7 @@ func fun_sub_fff*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Subtract two floats. A warning is generated on overflow.
   ## @:
   ## @:~~~
-  ## @:sub(a: float, b: float) float
+  ## @:sub = func(a: float, b: float) float
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -762,7 +761,7 @@ func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## exists, else false.
   ## @:
   ## @:~~~
-  ## @:exists(dictionary: dict, key: string) bool
+  ## @:exists = func(dictionary: dict, key: string) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -795,7 +794,7 @@ func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:can be any type.
   ## @:
   ## @:~~~
-  ## @:case(condition: int, pairs: list, default: optional any) any
+  ## @:case = case(condition: int, pairs: list, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -828,7 +827,7 @@ func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:can be any type.
   ## @:
   ## @:~~~
-  ## @:case(condition: string, pairs: list, default: optional any) any
+  ## @:case = func(condition: string, pairs: list, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -861,7 +860,7 @@ func fun_cmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult
   ## equal and 1 for greater than.
   ## @:
   ## @:~~~
-  ## @:cmpVersion(versionA: string, versionB: string) int
+  ## @:cmpVersion = func(versionA: string, versionB: string) int
   ## @:~~~~
   ## @:
   ## @:StaticTea uses @{@{https@@://semver.org/]@{Semantic Versioning]]
@@ -904,7 +903,7 @@ func fun_float_if*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from an int.
   ## @:
   ## @:~~~
-  ## @:float(num: int) float
+  ## @:float = func(num: int) float
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -921,7 +920,7 @@ func fun_float_sf*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from a number string.
   ## @:
   ## @:~~~
-  ## @:float(numString: string) float
+  ## @:float = func(numString: string) float
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -948,7 +947,7 @@ func fun_float_saa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## number, return the default.
   ## @:
   ## @:~~~
-  ## @:float(numString: string, default: optional any) any
+  ## @:float = func(numString: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -974,7 +973,7 @@ func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a float.
   ## @:
   ## @:~~~
-  ## @:int(num: float, roundOption: optional string) int
+  ## @:int = func(num: float, roundOption: optional string) int
   ## @:~~~~
   ## @:
   ## @:Round options:
@@ -1009,7 +1008,7 @@ func fun_int_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a number string.
   ## @:
   ## @:~~~
-  ## @:int(numString: string, roundOption: optional string) int
+  ## @:int = func(numString: string, roundOption: optional string) int
   ## @:~~~~
   ## @:
   ## @:Round options:
@@ -1052,7 +1051,7 @@ func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## return the default value.
   ## @:
   ## @:~~~
-  ## @:int(numString: string, roundOption: string, default: optional any) any
+  ## @:int = func(numString: string, roundOption: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Round options:
@@ -1110,7 +1109,7 @@ func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an bool from a value.
   ## @:
   ## @:~~~
-  ## @:bool(value: Value) bool
+  ## @:bool = func(value: Value) bool
   ## @:~~~~
   ## @:
   ## @:False values by variable types:
@@ -1150,7 +1149,7 @@ func fun_find_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## default value.
   ## @:
   ## @:~~~
-  ## @:find(str: string, substring: string, default: optional any) any
+  ## @:find = func(str: string, substring: string, default: optional any) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1190,7 +1189,7 @@ func fun_slice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:The start index and length are by unicode characters not bytes.
   ## @:
   ## @:~~~
-  ## @:slice(str: string, start: int, length: optional int) string
+  ## @:slice = func(str: string, start: int, length: optional int) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1221,7 +1220,7 @@ func fun_dup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
   ## concatenating the string to itself the specified number of times.
   ## @:
   ## @:~~~
-  ## @:dup(pattern: string, count: int) string
+  ## @:dup = func(pattern: string, count: int) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1260,7 +1259,7 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
   ## must be strings and the values can be any type.
   ## @:
   ## @:~~~
-  ## @:dict(pairs: optional list) dict
+  ## @:dict = func(pairs: optional list) dict
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1296,7 +1295,7 @@ func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list of variables. You can also create a list with brackets.
   ## @:
   ## @:~~~
-  ## @:list(...) list
+  ## @:list = func(...) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1324,7 +1323,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   ## @:ignore it using a bare form..
   ## @:
   ## @:~~~
-  ## @:listLoop(a: list, container: any, listCallback: func, state: optional any) bool
+  ## @:listLoop = func(a: list, container: any, listCallback: func, state: optional any) bool
   ## @:~~~~
   ## @:
   ## @:The callback gets passed the index to the item, its value, the
@@ -1333,7 +1332,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   ## @:callback returns true to stop iterating.
   ## @:
   ## @:~~~
-  ## @:listCallback(ix: int, item: any, container: any, state: optional any) bool
+  ## @:listCallback = func(ix: int, item: any, container: any, state: optional any) bool
   ## @:~~~~
   ## @:
   ## @:The following example makes a new list [6, 8] from the list
@@ -1367,7 +1366,7 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## a string as well.
   ## @:
   ## @:~~~
-  ## @:replace(str: string, start: int, length: int, replacement: string) string
+  ## @:replace = func(str: string, start: int, length: int, replacement: string) string
   ## @:~~~~
   ## @:
   ## @:* str: string
@@ -1478,7 +1477,7 @@ func fun_replaceRe_sls*(variables: Variables, arguments: seq[Value]): FunResult 
   ## @:replacements.
   ## @:
   ## @:~~~
-  ## @:replaceRe(str: string, pairs: list) string
+  ## @:replaceRe = func(str: string, pairs: list) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1539,7 +1538,7 @@ func fun_path_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:system separator is used.
   ## @:
   ## @:~~~
-  ## @:path(filename: string, separator: optional string) dict
+  ## @:path = func(filename: string, separator: optional string) dict
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1589,7 +1588,7 @@ func fun_lower_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Lowercase a string.
   ## @:
   ## @:~~~
-  ## @:lower(str: string) string
+  ## @:lower = func(str: string) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1608,7 +1607,7 @@ func fun_keys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list from the keys in a dictionary.
   ## @:
   ## @:~~~
-  ## @:keys(dictionary: dict) list
+  ## @:keys = func(dictionary: dict) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1632,7 +1631,7 @@ func fun_values_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list out of the values in the specified dictionary.
   ## @:
   ## @:~~~
-  ## @:values(dictionary: dict) list
+  ## @:values = func(dictionary: dict) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1761,7 +1760,7 @@ func fun_sort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:"sensitive" is the default.
   ## @:
   ## @:~~~
-  ## @:sort(values: list, order: string, insensitive: optional string) list
+  ## @:sort = func(values: list, order: string, insensitive: optional string) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1797,7 +1796,7 @@ func fun_sort_lssil*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:or string.
   ## @:
   ## @:~~~
-  ## @:sort(lists: list, order: string, case: string, index: int) list
+  ## @:sort = func(lists: list, order: string, case: string, index: int) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1826,7 +1825,7 @@ func fun_sort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## @:string.
   ## @:
   ## @:~~~
-  ## @:sort(dicts: list, order: string, case: string, key: string) list
+  ## @:sort = func(dicts: list, order: string, case: string, key: string) list
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1848,7 +1847,7 @@ func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## heading names.
   ## @:
   ## @:~~~
-  ## @:anchors(names: list, type: string) list
+  ## @:anchors = func(names: list, type: string) list
   ## @:~~~~
   ## @:
   ## @:type:
@@ -1885,7 +1884,7 @@ func fun_type_as*(variables: Variables, arguments: seq[Value]): FunResult =
   ## dict, bool or func.
   ## @:
   ## @:~~~
-  ## @:type(variable: any) string
+  ## @:type = func(variable: any) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1946,7 +1945,7 @@ func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## @:used for it.
   ## @:
   ## @:~~~
-  ## @:joinPath(components: list, separator: optional string) string
+  ## @:joinPath = func(components: list, separator: optional string) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -1980,7 +1979,7 @@ func fun_join_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
   ## empty separator to concatenate the arguments.
   ## @:
   ## @:~~~
-  ## @:join(strs: list, sep: string, skipEmpty: optional bool) string
+  ## @:join = func(strs: list, sep: string, skipEmpty: optional bool) string
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2024,7 +2023,7 @@ func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## You can call the warn function without an assignment.
   ## @:
   ## @:~~~
-  ## @:warn(message: string) string
+  ## @:warn = func(message: string) string
   ## @:~~~~
   ## @:
   ## @:You can warn conditionally in a bare if statement:
@@ -2049,7 +2048,7 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## without an assignment.
   ## @:
   ## @:~~~
-  ## @:log(message: string) string
+  ## @:log = func(message: string) string
   ## @:~~~~
   ## @:
   ## @:You can log conditionally in a bare if statement:
@@ -2071,6 +2070,10 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return is a special function that returns the value passed in and
   ## has has side effects.
+  ## @:
+  ## @:~~~
+  ## @:return = func(value: any) any
+  ## @:~~~~
   ## @:
   ## @:In a function, the return completes the function and returns
   ## @:the value of it.
@@ -2130,7 +2133,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## optionally the type of output you want.
   ## @:
   ## @:~~~
-  ## @:string(var: any, stype: optional string) string
+  ## @:string = func(var: any, stype: optional string) string
   ## @:~~~~
   ## @:
   ## @:The default stype is "rb" which is used for replacement blocks.
@@ -2234,7 +2237,7 @@ func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
   ## name of the dictionary and the dict variable.
   ## @:
   ## @:~~~
-  ## @:string(dictName: string: d: dict) string
+  ## @:string = func(dictName: string: d: dict) string
   ## @:~~~~
   ## @:
   ## @:Example:
@@ -2258,7 +2261,7 @@ func fun_format_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## replacement block. To enter a left bracket use two in a row.
   ## @:
   ## @:~~~
-  ## @:format(str: string) string
+  ## @:format = func(str: string) string
   ## @:~~~~
   ## @:
   ## @:Example:
@@ -2291,7 +2294,7 @@ func fun_func_sp*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Define a function.
   ## @:
   ## @:~~~
-  ## @:func(signature: string) func
+  ## @:func = func(signature: string) func
   ## @:~~~~
   ## @:
   ## @:Example:
@@ -2312,7 +2315,7 @@ func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRe
   ## Return the function details in a dictionary.
   ## @:
   ## @:~~~
-  ## @:functionDetails(funcVar: func) dict
+  ## @:functionDetails = func(funcVar: func) dict
   ## @:~~~~
   ## @:
   ## @:The following example defines a simple function then gets its
@@ -2348,7 +2351,7 @@ func fun_startsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult
   ## when it does, else false.
   ## @:
   ## @:~~~
-  ## @:startsWith(str: string, str: prefix) bool
+  ## @:startsWith = func(str: string, str: prefix) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2370,7 +2373,7 @@ func fun_not_bb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean not.
   ## @:
   ## @:~~~
-  ## @:not(value: bool) bool
+  ## @:not = func(value: bool) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2389,7 +2392,7 @@ func fun_and_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## the second argument is not evaluated.
   ## @:
   ## @:~~~
-  ## @:and(a: bool, b: bool) bool
+  ## @:and = func(a: bool, b: bool) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2412,7 +2415,7 @@ func fun_or_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## the second argument is not evaluated.
   ## @:
   ## @:~~~
-  ## @:or(a: bool, b: bool) bool
+  ## @:or = func(a: bool, b: bool) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2434,7 +2437,7 @@ func fun_eq_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when the two ints are equal.
   ## @:
   ## @:~~~
-  ## @:eq(a: int, b: int) bool
+  ## @:eq = func(a: int, b: int) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2473,7 +2476,7 @@ func fun_eq_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## insensitive compare.
   ## @:
   ## @:~~~
-  ## @:eq(a: string, b: string) bool
+  ## @:eq = func(a: string, b: string) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2492,7 +2495,7 @@ func fun_ne_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two ints are not equal.
   ## @:
   ## @:~~~
-  ## @:ne(a: int, b: int) bool
+  ## @:ne = func(a: int, b: int) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2511,7 +2514,7 @@ func fun_ne_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two floats are not equal.
   ## @:
   ## @:~~~
-  ## @:ne(a: float, b: float) bool
+  ## @:ne = func(a: float, b: float) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2549,7 +2552,7 @@ func fun_gt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is greater then another int.
   ## @:
   ## @:~~~
-  ## @:gt(a: int, b: int) bool
+  ## @:gt = func(a: int, b: int) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2568,7 +2571,7 @@ func fun_gt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when one float is greater than another float.
   ## @:
   ## @:~~~
-  ## @:gt(a: float, b: float) bool
+  ## @:gt = func(a: float, b: float) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2587,7 +2590,7 @@ func fun_gte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is greater then or equal to another int.
   ## @:
   ## @:~~~
-  ## @:gte(a: int, b: int) bool
+  ## @:gte = func(a: int, b: int) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2606,7 +2609,7 @@ func fun_gte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when a float is greater than or equal to another float.
   ## @:
   ## @:~~~
-  ## @:gte(a: float, b: float) bool
+  ## @:gte = func(a: float, b: float) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2625,7 +2628,7 @@ func fun_lt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is less than another int.
   ## @:
   ## @:~~~
-  ## @:lt(a: int, b: int) bool
+  ## @:lt = func(a: int, b: int) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2644,7 +2647,7 @@ func fun_lt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when a float is less then another float.
   ## @:
   ## @:~~~
-  ## @:lt(a: float, b: float) bool
+  ## @:lt = func(a: float, b: float) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2663,7 +2666,7 @@ func fun_lte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when an int is less than or equal to another int.
   ## @:
   ## @:~~~
-  ## @:lte(a: int, b: int) bool
+  ## @:lte = func(a: int, b: int) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2683,7 +2686,7 @@ func fun_lte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when a float is less than or equal to another float.
   ## @:
   ## @:~~~
-  ## @:lte(a: float, b: float) bool
+  ## @:lte = func(a: float, b: float) bool
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2703,7 +2706,7 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a JSON string to a variable.
   ## @:
   ## @:~~~
-  ## @:readJson(json: string) any
+  ## @:readJson = func(json: string) any
   ## @:~~~~
   ## @:
   ## @:Examples:
@@ -2728,7 +2731,7 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
   ## StaticTea functions. Return a list of lists.
   ## @:
   ## @:~~~
-  ## @:markdownList(mdText: string) list
+  ## @:markdownList = func(mdText: string) list
   ## @:~~~~
   ## @:
   ## @:list elements:
@@ -2771,7 +2774,7 @@ func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## syntax highlighting.  Return a list of tagged fragments.
   ## @:
   ## @:~~~
-  ## @:highlight(code: string) list
+  ## @:highlight = func(code: string) list
   ## @:~~~~
   ## @:
   ## @:Tags:
