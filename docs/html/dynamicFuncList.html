@@ -65,10 +65,7 @@ pre {
 .t-type {
     color: #D7381E;
 }
-
 </style>
-
-
 </head>
 <body>
 <h1>templates/dynamicFuncList.tea</h1>
@@ -83,7 +80,7 @@ pre {
   <span class="t-comment"># Calculate the number of lines by the difference between the
 </span>  <span class="t-comment"># current start line and the next one.
 </span>  <span class="t-dotName">next-entry</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entries</span>, <span class="t-funcCall">add</span>(<span class="t-dotName">ix</span>,<span class="t-num">1</span>), <span class="t-funcCall">dict</span>())
-  <span class="t-dotName">next</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">next-entry</span>, <span class="t-str">"line"</span>, <span class="t-num">100</span>)
+  <span class="t-dotName">next</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">next-entry</span>, <span class="t-str">"line"</span>, <span class="t-dotName">start</span>)
   <span class="t-dotName">numLines</span> = <span class="t-funcCall">sub</span>(<span class="t-dotName">next</span>, <span class="t-dotName">start</span>)
 
   <span class="t-dotName">key</span> = <span class="t-funcCall">concat</span>(<span class="t-str">"k"</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">start</span>))

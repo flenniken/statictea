@@ -1744,7 +1744,7 @@ o.x = a + 6
 You can use the listLoop function to loop over a list and build lists
 and dictionaries. It’s the looping method you use in code files.
 
-A error reading a statement stops processing the code file, for
+An error reading a statement stops processing the code file, for
 example an error in a multi-line string or an error with a + line
 continuation.
 
@@ -1906,7 +1906,7 @@ and types and the return type. For the example above the
 signature string is:
 
 #+BEGIN_SRC
-u.mycmp(numStr1: string, numStr2: string) int
+u.mycmp = func(numStr1: string, numStr2: string) int
 #+END_SRC
 
 You can specify an optional last parameter and a parameter can
@@ -1914,7 +1914,7 @@ use "any" when it accepts any type. The built-in get function
 is an example of optional and any.
 
 #+BEGIN_SRC
-get(dictionary: dict, key: string, default: optional any) any
+get = func(dictionary: dict, key: string, default: optional any) any
 #+END_SRC
 
 *Return Statement:*
@@ -1926,13 +1926,15 @@ the function.
 
 *Function Local Variables:*
 
-The function‘s local variables and its arguments are stored in
-the l dictionary which exists while the function runs. It
-contains the parameters and their argument values and local
+The function‘s local variables and its arguments are stored in a
+the function’s own l dictionary which exists while the function
+runs and is separate from the tea code local variables.
+
+It contains the parameters and their argument values and local
 variables used in the function.
 
-You have access to f dictionary inside the function. To access
-other external variables, you need to pass them in.
+You have access to f and u dictionaries inside the function. To
+access other external variables, you need to pass them in.
 
 [[#contents][茶]]
 
@@ -2458,7 +2460,7 @@ the *docs2* task builds one or more HTML modules docs.
 
 The Statictea language functions doc was created from
 statictea's embedded docs by looping over the f dictionary and
-fetching each function's docComment. The *funcdocs* nimble task
+fetching each function's docComment. The nimble *funcdocs* task
 builds the template.
 
 - [[docs/teaFunctions.md][Functions]]
@@ -2467,13 +2469,15 @@ builds the template.
 
 *Built-in Docs*
 
-Statictea function documentation is built in to the program, for
-example you can display help on a function with the ph REPL
-command.
+Statictea function documentation is built in to the program. The
+documentation is extracted from the nim functions.nim module
+which is the "source of truth".
 
-This documentation is extracted from the nim module functions.nim
-by the nimble task *dyfuncs*. The template creates a nim source file
-that’s compiled in.
+The nimble **dyfuncs** task extracts the docs and creates the nim
+source file dynamicFunctions.nim which gets complied into statictea.
+
+Since the function documentation is built in you can display it using
+the ph REPL command.
 
 - [[src/dynamicFuncList.nim][src/dynamicFuncList.nim]]
 - [[templates/dynamicFuncList.nim][dynamicFuncList.nim]]
@@ -2488,6 +2492,17 @@ each stf file and makes an index from that with a template.
 
 - [[testfiles/stf-index.md][StaticTea Stf Files]]
 - [[templates/stf-index.md][stf-index.md]] (view raw)
+
+*Highlighted Tea Code*
+
+You can view the tea code files found in the templates folder
+syntax highlighted.  The nimble *tea2html* task runs a statictea
+template that creates colorful HTML files. They are designed for
+viewing locally on your machine and for testing the syntax
+highlighter.
+
+- [[templates/tea2html.html][tea2html.html]] -- HTML template
+- [[templates/tea2html.tea][tea2html.tea]] -- tea code file for the template
 
 [[#contents][茶]]
 
@@ -2601,7 +2616,7 @@ The stf files are designed to look good in markdown readers.  The
 testfiles folder contains [[testfiles/stf-index.md][StaticTea Stf Files]].
 
 See the runner help message for more information about stf
-files. The runhelp nimble task shows the stf help with glow.
+files. The nimble *runhelp* task shows the stf help with glow.
 
 [[#contents][茶]]
 
@@ -2610,7 +2625,7 @@ files. The runhelp nimble task shows the stf help with glow.
    :CUSTOM_ID: repl-environment
    :END:
 
-You can run static tea interactively with a prompt. You run
+You can run statictea code interactively with a prompt. You run
 statements at the prompt and print variables with commands.
 
 The -x option starts the Read Eval Print Loop (REPL).
@@ -2688,7 +2703,7 @@ git clone git@github.com:flenniken/statictea.git .
 
 *Start Docker Environment*
 
-You start the docker statictea environment with the nimble drun
+You start the docker statictea environment with the nimble *drun*
 command. The first time you run it, it builds the docker image
 and stops so you can check for errors. You run it again to start
 the env.
@@ -2700,7 +2715,7 @@ nimble drun
 *Build*
 
 You build the statictea executable in the environment using the
-nimble release command.  It runs all the tests and builds the exe
+nimble *release* command.  It runs all the tests and builds the exe
 and docs.
 
 #+BEGIN_SRC
@@ -2759,8 +2774,9 @@ brew install graphviz
 
 *Build*
 
-Then you build the statictea executable using the nimble release
-command.  It runs all the tests and builds the exe and docs.
+Then you build the statictea executable using the nimble
+*release* command.  It runs all the tests and builds the exe and
+docs.
 
 #+BEGIN_SRC
 cd -/code/statictea

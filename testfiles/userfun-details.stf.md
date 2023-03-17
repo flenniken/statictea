@@ -25,13 +25,15 @@ $$ : d1 = string(fd, "dn")
 $$ : d2 = functionDetails(o.fn1)
 $$ : p1n = d2.signature.paramNames[0]
 $$ : p1t = d2.signature.paramTypes[0]
+$$ : p2n = d2.signature.paramNames[1]
+$$ : p2t = d2.signature.paramTypes[1]
 $$ : rt = d2.signature.returnType
 $$ : docComment = d2.docComment
 $$ : # todo: add a stripEnding function?
 $$ : statements = join(d2.statements, "\n")
 {d1}
 
-a = func({p1n}: {p1t}) {rt}
+a = func({p1n}: {p1t}, {p2n}: {p2t}) {rt}
 {docComment}{statements}
 
 $$ endblock
@@ -71,7 +73,7 @@ lineNum = 1
 numLines = 3
 statements = ["  dict = dict(\"one\", num, \"two\", str)","  return(dict)"]
 
-a = func(num: int) dict
+a = func(num: int, str: string) dict
   ## Simple function that returns a dictionary.
   dict = dict("one", num, "two", str)
   return(dict)

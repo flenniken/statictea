@@ -20,7 +20,7 @@ import unicodes
 import functions
 
 func showVariables(variables: Variables): string =
-  ## Show repl command.
+  ## Show the number of variables in the one letter dictionaries.
   var first = true
   for key, d in variables.pairs():
     if not first:

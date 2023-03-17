@@ -922,7 +922,7 @@ proc taskTea2Html(teaBasename: string) =
 
   rmFile(server)
 
-proc taskTea2HtmlLoop(namePart: string) = 
+proc taskTea2HtmlLoop(namePart: string) =
   let filenames = get_dir_filenames("templates", ".tea")
   for basename in filenames:
     if (namePart.toLower in basename.toLower) or namePart == "tea2html":

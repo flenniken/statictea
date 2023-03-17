@@ -8,7 +8,7 @@ StaticTea nim source code documentation.
 * [cmdline.nim](cmdline.md) &mdash; Parse the command line.
 * [comparelines.nim](comparelines.md) &mdash; Compare lines of text.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
-* [functions.nim](functions.md) &mdash; This module contains the StaticTea functions and supporting types.
+* [functions.nim](functions.md) &mdash; StaticTea functions and supporting types.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line
 length.

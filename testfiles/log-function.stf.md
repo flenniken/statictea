@@ -69,13 +69,7 @@ shared.tea(3); hello
 tmpl.txt(2); test log message
 ~~~
 
-### File log.txt.expected
-
-~~~
-~~~
-
 ### Expected result == result.expected
 ### Expected stdout == stdout.expected
 ### Expected stderr == stderr.expected
-Expected log.txt == log.txt.expected
 ### Expected log.filtered == log.filtered.expected

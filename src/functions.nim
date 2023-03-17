@@ -1,7 +1,6 @@
-## This module contains the StaticTea functions and supporting types.
-## The StaticTea language functions start with "fun", for example, the
-## "fun_cmp_ffi" function implements on of the StaticTea "cmp"
-## functions.
+## StaticTea functions and supporting types. The StaticTea language
+## functions start with "fun_", for example, the "fun_cmp_ffi"
+## function implements the "cmp" function for floats.
 
 import std/options
 import std/tables
@@ -2766,8 +2765,6 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
     sublist.listv.list.add(newValue(element.content))
     elementList.listv.list.add(sublist)
   result = newFunResult(elementList)
-
-# todo: match multiline strings for highlighting.
 
 func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Divide a string of StaticTea code into fragments useful for

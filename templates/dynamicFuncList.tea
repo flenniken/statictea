@@ -7,7 +7,7 @@ get-starts = func(ix: int, entry: dict, starts: dict, entries: list) bool
   # Calculate the number of lines by the difference between the
   # current start line and the next one.
   next-entry = get(entries, add(ix,1), dict())
-  next = get(next-entry, "line", 100)
+  next = get(next-entry, "line", start)
   numLines = sub(next, start)
 
   key = concat("k", string(start))
