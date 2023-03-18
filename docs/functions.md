@@ -93,6 +93,9 @@ StaticTea functions and supporting types. The StaticTea language functions start
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
 * [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
 * [fun_highlight_sl](#fun_highlight_sl) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
+* [escapeHtmlBody](#escapehtmlbody) &mdash; Excape text for placing in body html.
+* [escapeHtmlAttribute](#escapehtmlattribute) &mdash; Excape text for placing in an html attribute.
+* [fun_html_sss](#fun_html_sss) &mdash; Escape text for placing it in an html page.
 * [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
@@ -2253,6 +2256,48 @@ frags => [
 
 ```nim
 func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
+```
+
+# escapeHtmlBody
+
+Excape text for placing in body html.
+
+```nim
+proc escapeHtmlBody(text: string): string 
+```
+
+# escapeHtmlAttribute
+
+Excape text for placing in an html attribute.
+
+```nim
+proc escapeHtmlAttribute(text: string): string 
+```
+
+# fun_html_sss
+
+Escape text for placing it in an html page.
+
+~~~
+html = func(text: string, place: string) string
+~~~
+
+places:
+
+* body -- in the html body
+* attribute -- in an html attribute
+
+~~~
+name = html("Mad <Hatter>", "body")
+  => "Mad &lt;Hatter&gt;"
+~~~
+
+For more information about how to escape and what is safe see:
+[[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]
+
+```nim
+func fun_html_sss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ```
 

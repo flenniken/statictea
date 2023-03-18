@@ -72,8 +72,8 @@ pre {
 <span class="t-dotName">require</span> <span class="t-dotName">tempFileO.isSome</span>
 <span class="t-dotName">var</span> <span class="t-dotName">tempFile</span> = <span class="t-funcCall">tempFileO.get</span>()
 
-<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">"this is a test\n"</span>)
-<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">"line 2\n"</span>)
+<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">&quot;this is a test\n&quot;</span>)
+<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">&quot;line 2\n&quot;</span>)
 <span class="t-funcCall">tempFile.file.close</span>()
 
 <span class="t-dotName">var</span> <span class="t-dotName">fh</span> = <span class="t-funcCall">open</span>(<span class="t-dotName">tempFile.filename</span>, <span class="t-dotName">fmRead</span>)
@@ -83,8 +83,8 @@ pre {
 
 <span class="t-dotName">discard</span> <span class="t-funcCall">tryRemoveFile</span>(<span class="t-dotName">tempFile.filename</span>)
 
-<span class="t-dotName">check</span> <span class="t-dotName">line1</span> == <span class="t-str">"this is a test"</span>
-<span class="t-dotName">check</span> <span class="t-dotName">line2</span> == <span class="t-str">"line 2"</span>
+<span class="t-dotName">check</span> <span class="t-dotName">line1</span> == <span class="t-str">&quot;this is a test&quot;</span>
+<span class="t-dotName">check</span> <span class="t-dotName">line2</span> == <span class="t-str">&quot;line 2&quot;</span>
 </pre>
 
 

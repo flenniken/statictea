@@ -90,7 +90,7 @@ MessageId = enum
   wVarStartsWithLetter, wVarContainsChars, wVarEndsWith, wVarMaximumLength,
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
-  wInvalidAnchorType, wUserFunction
+  wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace
 ```
 
 # Messages
@@ -258,7 +258,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The index value is not a string.",
     "A two parameter IF function cannot be used as an argument.",
     "Invalid anchor type, expected html or github.",
-    "You can only assign a user function variable to the u dictionary."]
+    "You can only assign a user function variable to the u dictionary.",
+    """Invalid html place, expected "body", or "attribute"."""]
 ```
 
 # WarningData

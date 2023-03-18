@@ -73,8 +73,8 @@ pre {
 
 <span class="t-comment"># Define the supported options.
 </span><span class="t-dotName">var</span> <span class="t-dotName">options</span> = <span class="t-dotName">newSeq</span>[<span class="t-dotName">CmlOption</span>]()
-<span class="t-funcCall">options.add</span>(<span class="t-funcCall">newCmlOption</span>(<span class="t-str">"help"</span>, '<span class="t-dotName">h</span>', <span class="t-dotName">cmlStopArgument</span>))
-<span class="t-funcCall">options.add</span>(<span class="t-funcCall">newCmlOption</span>(<span class="t-str">"log"</span>, '<span class="t-dotName">l</span>', <span class="t-dotName">cmlOptionalArgument</span>))
+<span class="t-funcCall">options.add</span>(<span class="t-funcCall">newCmlOption</span>(<span class="t-str">&quot;help&quot;</span>, &#x27;<span class="t-dotName">h</span>&#x27;, <span class="t-dotName">cmlStopArgument</span>))
+<span class="t-funcCall">options.add</span>(<span class="t-funcCall">newCmlOption</span>(<span class="t-str">&quot;log&quot;</span>, &#x27;<span class="t-dotName">l</span>&#x27;, <span class="t-dotName">cmlOptionalArgument</span>))
 ...
 
 <span class="t-comment"># Parse the command line.
@@ -248,7 +248,7 @@ proc commandLineEcho() {.raises: [ValueError], tags: [ReadIOEffect].}
 
 <h3 id="collectArgs">collectArgs</h3>
 
-<p>Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.</p>
+<p>Get the command line arguments from the system and return a list. Don&#x27;t return the first one which is the app name. This is the list that cmdLine expects.</p>
 
 <pre class="nim-code">
 proc collectArgs(): seq[string] {.raises: [], tags: [ReadIOEffect].}
@@ -256,7 +256,7 @@ proc collectArgs(): seq[string] {.raises: [], tags: [ReadIOEffect].}
 
 <h3 id="cmdLine">cmdLine</h3>
 
-<p>Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".</p>
+<p>Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses &quot;arg value&quot; not &quot;arg=value&quot;.</p>
 
 <pre class="nim-code">
 func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage {.

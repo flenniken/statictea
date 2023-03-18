@@ -88,7 +88,7 @@ proc decode(state: var uint32; codep: var uint32; sByte: char)
 
 <h3 id="yieldUtf8Chars">yieldUtf8Chars</h3>
 
-<p>Iterate through the string's UTF-8 character byte sequences.
+<p>Iterate through the string&#x27;s UTF-8 character byte sequences.
 For each character set ixStartSeq, ixEndSeq, and codePoint.
 Return true when the bytes sequence is valid else return false.
 
@@ -120,7 +120,7 @@ func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 
 <h3 id="utf8CharString">utf8CharString</h3>
 
-<p>Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.</p>
+<p>Get the unicode character at pos.  Return a one character string. Return &quot;&quot; when not a UTF-8 character.</p>
 
 <pre class="nim-code">
 func utf8CharString(str: string; pos: Natural): string 

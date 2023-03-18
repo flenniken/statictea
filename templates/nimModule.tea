@@ -14,19 +14,19 @@ patterns = list( +
   "&lt;", "<", +
   "&amp;", "&")
 
-u.handle-bullet = func(ix: int, bullet: string, lines: list) bool
+u.handle-html-bullet = func(ix: int, bullet: string, lines: list) bool
   ## Make the bullet text into an html bullet and add it to lines.
-  lines &= join(["<li>", bullet, "</li>"], "")
+  lines &= join(["<li>", html(bullet, "body"), "</li>"], "")
   return(false)
 
 u.html-paragraph = func(item: list) string
   ## Return html given a "p" element md list.
-  return(join(["<p>", item[0], "</p>"], ""))
+  return(join(["<p>", html(item[0], "body"), "</p>"], ""))
 
-u.handle-fragment = func(ix: int, fragment: list, frags: list) bool
+u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
   ## Make the html highlight the fragment and add it to frags.
   tag = fragment[0]
-  str = fragment[1]
+  str = html(fragment[1], "body")
   frags &= if((tag == "other"), str, +
     format("<span class=\"t-{tag}\">{str}</span>"))
   return(false)
@@ -36,7 +36,7 @@ u.html-code = func(item: list) string
   lines = []
   lines &= "<pre class=\"desc-code\">\n"
   # todo: look at the ~~~ line and only highlight statictea code.
-  listLoop(highlight(item[1]), lines, u.handle-fragment)
+  listLoop(highlight(item[1]), lines, u.handle-html-fragment)
   lines &= "</pre>\n"
   return(join(lines, ""))
 
@@ -44,11 +44,11 @@ u.html-bullets = func(item: list) string
   ## Return html given a "bullets" md element list.
   lines = []
   lines &= "<ul>\n"
-  listLoop(item, lines, u.handle-bullet)
+  listLoop(item, lines, u.handle-html-bullet)
   lines &= "</ul>\n"
   return(join(lines, ""))
 
-u.handle-element = func(ix: int, element: list, lines: list) bool
+u.handle-html-element = func(ix: int, element: list, lines: list) bool
   ## Make the description md element into html and add it to lines.
   l.fn = case(element[0], [ +
     "p", u.html-paragraph, +
@@ -63,7 +63,7 @@ u.get-html-description = func(mdDescription: string) string
   ## bullet lists and code blocks.
   elements = markdownLite(mdDescription)
   lines = []
-  listLoop(elements, lines, u.handle-element)
+  listLoop(elements, lines, u.handle-html-element)
   return(join(lines, ""))
 
 u.get-name = func(ix: int, entry: dict, newList: list) bool

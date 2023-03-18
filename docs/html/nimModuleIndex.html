@@ -80,21 +80,21 @@ pre {
   <span class="t-dotName">entry</span> = <span class="t-funcCall">dict</span>()
 
   <span class="t-comment"># Name is the basename without an extension.
-</span>  <span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">module</span>[<span class="t-str">"filename"</span>], <span class="t-str">"/"</span>)
+</span>  <span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">module</span>[<span class="t-str">&quot;filename&quot;</span>], <span class="t-str">&quot;/&quot;</span>)
   <span class="t-dotName">entry.name</span> = <span class="t-dotName">path.basename</span>
 
   <span class="t-comment"># Use the first sentence for the short description.
-</span>  <span class="t-dotName">description</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">module</span>, <span class="t-str">"description"</span>, <span class="t-str">""</span>)
-  <span class="t-dotName">entry.shortDesc</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">description</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">description</span>, <span class="t-str">"."</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
+</span>  <span class="t-dotName">description</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">module</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
+  <span class="t-dotName">entry.shortDesc</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">description</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">description</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
 
-  <span class="t-dotName">entries</span> &= <span class="t-dotName">entry</span>
+  <span class="t-dotName">entries</span> &amp;= <span class="t-dotName">entry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-dotName">entries</span> = []
 <span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.modules</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">make-entry</span>)
 
 <span class="t-comment"># Sort the list of entries by name.
-</span><span class="t-dotName">o.entries</span> = <span class="t-funcCall">sort</span>(<span class="t-dotName">entries</span>, <span class="t-str">"ascending"</span>, <span class="t-str">"sensitive"</span>, <span class="t-str">"name"</span>)
+</span><span class="t-dotName">o.entries</span> = <span class="t-funcCall">sort</span>(<span class="t-dotName">entries</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-str">&quot;name&quot;</span>)
 
 </pre>
 

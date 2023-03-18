@@ -637,6 +637,27 @@ frags => [
 ~~~
 """
 
+  dc_fun_html_sss = """
+Escape text for placing it in an html page.
+
+~~~
+html = func(text: string, place: string) string
+~~~
+
+places:
+
+* body -- in the html body
+* attribute -- in an html attribute
+
+~~~
+name = html("Mad <Hatter>", "body")
+  => "Mad &lt;Hatter&gt;"
+~~~
+
+For more information about how to escape and what is safe see:
+[[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]
+"""
+
   dc_fun_if0_iaoaa = """
 If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
 
@@ -1701,6 +1722,7 @@ warn("always warn")
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
     info("fun_gte_iib", dc_fun_gte_iib, 19),
     info("fun_highlight_sl", dc_fun_highlight_sl, 45),
+    info("fun_html_sss", dc_fun_html_sss, 34),
     info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 57),
     info("fun_if_baoaa", dc_fun_if_baoaa, 39),
     info("fun_int_fosi", dc_fun_int_fosi, 35),
@@ -1784,6 +1806,7 @@ warn("always warn")
     2607,
     2588,
     2769,
+    2845,
     566,
     623,
     971,

@@ -74,43 +74,43 @@ pre {
 <span class="t-doc">## Statictea code file for the functionsList.nim template.
 </span>
 <span class="t-dotName">get-starts</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">starts</span>: <span class="t-type">dict</span>, <span class="t-param">entries</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
-  <span class="t-doc">## Collect the a function's start line and number of lines.
+  <span class="t-doc">## Collect the a function&#x27;s start line and number of lines.
 </span>  <span class="t-dotName">start</span> = <span class="t-dotName">entry.line</span>
 
   <span class="t-comment"># Calculate the number of lines by the difference between the
 </span>  <span class="t-comment"># current start line and the next one.
 </span>  <span class="t-dotName">next-entry</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entries</span>, <span class="t-funcCall">add</span>(<span class="t-dotName">ix</span>,<span class="t-num">1</span>), <span class="t-funcCall">dict</span>())
-  <span class="t-dotName">next</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">next-entry</span>, <span class="t-str">"line"</span>, <span class="t-dotName">start</span>)
+  <span class="t-dotName">next</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">next-entry</span>, <span class="t-str">&quot;line&quot;</span>, <span class="t-dotName">start</span>)
   <span class="t-dotName">numLines</span> = <span class="t-funcCall">sub</span>(<span class="t-dotName">next</span>, <span class="t-dotName">start</span>)
 
-  <span class="t-dotName">key</span> = <span class="t-funcCall">concat</span>(<span class="t-str">"k"</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">start</span>))
+  <span class="t-dotName">key</span> = <span class="t-funcCall">concat</span>(<span class="t-str">&quot;k&quot;</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">start</span>))
   <span class="t-comment"># Skip dups that can happen in the included code.
 </span>  <span class="t-funcCall">if</span>(<span class="t-funcCall">exists</span>(<span class="t-dotName">starts</span>, <span class="t-dotName">key</span>), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
   <span class="t-dotName">starts</span>[<span class="t-dotName">key</span>] = <span class="t-dotName">numLines</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
-<span class="t-comment"># Make a dictionary mapping a function's start line to its number of lines.
+<span class="t-comment"># Make a dictionary mapping a function&#x27;s start line to its number of lines.
 </span><span class="t-dotName">starts</span> = <span class="t-funcCall">dict</span>()
 <span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
 
 <span class="t-dotName">get-entry</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>, <span class="t-param">state</span>: <span class="t-type">dict</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Add the Statictea functions to the new list.
 </span>
-  <span class="t-comment"># Add entries that are functions that begin with "fun_", skip the
+  <span class="t-comment"># Add entries that are functions that begin with &quot;fun_&quot;, skip the
 </span>  <span class="t-comment"># others.
-</span>  <span class="t-funcCall">if</span>((<span class="t-dotName">entry.type</span> != <span class="t-str">"skFunc"</span>), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
-  <span class="t-funcCall">if</span>(<span class="t-funcCall">not</span>(<span class="t-funcCall">startsWith</span>(<span class="t-dotName">entry.name</span>, <span class="t-str">"fun_"</span>)), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
+</span>  <span class="t-funcCall">if</span>((<span class="t-dotName">entry.type</span> != <span class="t-str">&quot;skFunc&quot;</span>), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
+  <span class="t-funcCall">if</span>(<span class="t-funcCall">not</span>(<span class="t-funcCall">startsWith</span>(<span class="t-dotName">entry.name</span>, <span class="t-str">&quot;fun_&quot;</span>)), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
 
   <span class="t-dotName">newEntry</span> = <span class="t-funcCall">dict</span>()
   <span class="t-dotName">newEntry.funcName</span> = <span class="t-dotName">entry.name</span>
 
   <span class="t-comment"># Remove the formatting from the description.
-</span>  <span class="t-dotName">desc</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">"description"</span>, <span class="t-str">""</span>)
+</span>  <span class="t-dotName">desc</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
   <span class="t-dotName">newEntry.docComment</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">desc</span>, <span class="t-dotName">state.patterns</span>)
 
   <span class="t-dotName">newEntry.lineNum</span> = <span class="t-dotName">entry.line</span>
-  <span class="t-dotName">newEntry.numLines</span> = <span class="t-dotName">state.starts</span>[<span class="t-funcCall">concat</span>(<span class="t-str">"k"</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">entry.line</span>))]
-  <span class="t-dotName">newList</span> &= <span class="t-dotName">newEntry</span>
+  <span class="t-dotName">newEntry.numLines</span> = <span class="t-dotName">state.starts</span>[<span class="t-funcCall">concat</span>(<span class="t-str">&quot;k&quot;</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">entry.line</span>))]
+  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">newEntry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 
@@ -118,17 +118,17 @@ pre {
 </span><span class="t-comment"># comments (descriptions).
 </span>
 <span class="t-dotName">patterns</span> = <span class="t-funcCall">list</span>( +
-  <span class="t-str">"~~~~"</span>, <span class="t-str">"~~~"</span>, +
-  <span class="t-str">"@@"</span>, <span class="t-str">""</span>, +
-  <span class="t-str">"@{"</span>, <span class="t-str">"["</span>, +
-  <span class="t-str">"}@"</span>, <span class="t-str">"]"</span>, +
-  <span class="t-str">"@!"</span>, <span class="t-str">"|"</span>, +
-  <span class="t-str">"[ ]*@:"</span>, <span class="t-str">"\n"</span>, +
-  <span class="t-str">"@\\."</span>, <span class="t-str">"*"</span>, +
-  <span class="t-str">"&quot;"</span>, <span class="t-str">"\""</span>, +
-  <span class="t-str">"&gt;"</span>, <span class="t-str">">"</span>, +
-  <span class="t-str">"&lt;"</span>, <span class="t-str">"<"</span>, +
-  <span class="t-str">"&amp;"</span>, <span class="t-str">"&"</span>)
+  <span class="t-str">&quot;~~~~&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>, +
+  <span class="t-str">&quot;@@&quot;</span>, <span class="t-str">&quot;&quot;</span>, +
+  <span class="t-str">&quot;@{&quot;</span>, <span class="t-str">&quot;[&quot;</span>, +
+  <span class="t-str">&quot;}@&quot;</span>, <span class="t-str">&quot;]&quot;</span>, +
+  <span class="t-str">&quot;@!&quot;</span>, <span class="t-str">&quot;|&quot;</span>, +
+  <span class="t-str">&quot;[ ]*@:&quot;</span>, <span class="t-str">&quot;\n&quot;</span>, +
+  <span class="t-str">&quot;@\\.&quot;</span>, <span class="t-str">&quot;*&quot;</span>, +
+  <span class="t-str">&quot;&amp;quot;&quot;</span>, <span class="t-str">&quot;\&quot;&quot;</span>, +
+  <span class="t-str">&quot;&amp;gt;&quot;</span>, <span class="t-str">&quot;&gt;&quot;</span>, +
+  <span class="t-str">&quot;&amp;lt;&quot;</span>, <span class="t-str">&quot;&lt;&quot;</span>, +
+  <span class="t-str">&quot;&amp;amp;&quot;</span>, <span class="t-str">&quot;&amp;&quot;</span>)
 
 <span class="t-comment"># Create a list of the statictea functions.
 </span><span class="t-dotName">state</span> = <span class="t-funcCall">dict</span>()
@@ -139,7 +139,7 @@ pre {
 
 <span class="t-comment"># Sort the entries by function name. Use insensitive compare so
 </span><span class="t-comment"># function cmp_ comes before cmpV.
-</span><span class="t-dotName">o.entries</span> = <span class="t-funcCall">sort</span>(<span class="t-dotName">entries</span>, <span class="t-str">"ascending"</span>, <span class="t-str">"insensitive"</span>, <span class="t-str">"funcName"</span>)
+</span><span class="t-dotName">o.entries</span> = <span class="t-funcCall">sort</span>(<span class="t-dotName">entries</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;insensitive&quot;</span>, <span class="t-str">&quot;funcName&quot;</span>)
 
 </pre>
 

@@ -464,7 +464,8 @@ ratio=.5;
   writeFile(dotDotFilename, dotText)
   # echo "Generated $1" % dotDotFilename
   exec "dot -Tsvg src/dot.dot -o docs/staticteadep.svg"
-  echo "Generated docs/staticteadep.svg"
+
+  echo fmt"Generated: http://localhost:6419/docs/staticteadep.svg"
   rmFile(dotDotFilename)
   rmFile(staticteaDot)
 
@@ -477,7 +478,7 @@ proc createDependencyGraph2() =
   let statictea2Dot = "src/statictea.dot"
   exec "nim --hints:off genDepend src/statictea.nim"
 
-  echo fmt"Generated {statictea2Dot}"
+  # echo fmt"Generated {statictea2Dot}"
   rmFile("src/statictea.png")
   rmFile("statictea.deps")
 
@@ -540,7 +541,8 @@ proc createDependencyGraph2() =
   # echo fmt"Generated {src_dot2_dot}"
   let staticteadep2_svg = "docs/staticteadep2.svg"
   exec fmt"dot -Tsvg {src_dot2_dot} -o {staticteadep2_svg}"
-  echo fmt"Generated {staticteadep2_svg}"
+
+  echo fmt"Generated: http://localhost:6419/docs/staticteadep2.svg"
   rmFile(src_dot2_dot)
   rmFile(statictea2Dot)
 
@@ -560,7 +562,7 @@ proc taskDocsIx() =
   var teaFile = "templates/nimModuleIndex.tea"
   var jsonFile = "docs/index.json"
 
-  echo "Create the index json file."
+  # echo "Create the index json file."
   var json = sourceIndexJson()
   writeFile(jsonFile, json)
 
@@ -569,7 +571,7 @@ proc taskDocsIx() =
   exec cmd
 
   rmFile(jsonFile)
-  echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
+  echo fmt"Generated: http://localhost:6419/{resultFile}"
 
 proc taskDocsIx2() =
   ## Create the index html file.
@@ -579,7 +581,7 @@ proc taskDocsIx2() =
   var teaFile = "templates/nimModuleIndex.tea"
   var jsonFile = "docs/index.json"
 
-  echo "Create the index json file."
+  # echo "Create the index json file."
   var json = sourceIndexJson()
   writeFile(jsonFile, json)
 
@@ -588,13 +590,13 @@ proc taskDocsIx2() =
   exec cmd
 
   rmFile(jsonFile)
-  echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
+  echo fmt"Generated: file:///{getCurrentDir()}/{resultFile}"
 
 proc taskTestfilesReadme() =
   ## Create a testfiles folder readme containing an index to the stf
   ## test files.
 
-  echo "Create a json file with the name of all the stf tests and their descriptions."
+  # echo "Create a json file with the name of all the stf tests and their descriptions."
   var jsonFilename = "testfiles.index.json"
   var json = testfilesIndexJson()
   writeFile(jsonFilename, json)
@@ -602,10 +604,10 @@ proc taskTestfilesReadme() =
   # Create the stf index file in the testfiles folder.
   let templateName = "templates/stf-index.md"
   let resultFilename = "testfiles/stf-index.md"
-  echo fmt"Create the {resultFilename} file"
   let cmd = fmt"bin/{dirName}/statictea -s {jsonFilename} -t {templateName} -r {resultFilename}"
   exec cmd
 
+  echo fmt"Generated: http://localhost:6419/{resultFilename}"
   rmFile(jsonFilename)
 
 proc myFileNewer(a: string, b: string): bool =
@@ -651,10 +653,10 @@ proc taskDocs(namePart: string, forceRebuild = false) =
     let jsonFile = fmt"docs/{name}.json"
 
     # Create json doc comments from the source file.
-    echo fmt"Create {jsonFile} from nim json doc comments."
+    # echo fmt"Create {jsonFile} from nim json doc comments."
     let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
     var cmd = fmt"nim {hintsOff} jsonDoc --out:{jsonFile} {srcFile}"
-    echo cmd
+    # echo cmd
     exec cmd
 
     # Create the markdown file.
@@ -662,13 +664,14 @@ proc taskDocs(namePart: string, forceRebuild = false) =
     let templateFile = "templates/nimModule.md"
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
-    echo cmd
+    # echo cmd
     let output = staticExec(cmd)
     if len(output) > 0:
-      echo output
+      # echo output
       exec fmt"rm {resultFile}"
     else:
-      echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
+      echo fmt"http://localhost:6419/{resultFile}"
+      # echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)
 
 proc taskDocs2(namePart: string, forceRebuild = false) =
@@ -691,10 +694,10 @@ proc taskDocs2(namePart: string, forceRebuild = false) =
     let jsonFile = fmt"docs/{name}.json"
 
     # Create json doc comments from the source file.
-    echo fmt"Create {jsonFile} from nim json doc comments."
+    # echo fmt"Create {jsonFile} from nim json doc comments."
     let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
     var cmd = fmt"nim {hintsOff} jsonDoc --out:{jsonFile} {srcFile}"
-    echo cmd
+    # echo cmd
     exec cmd
 
     # Create the html file.
@@ -702,13 +705,13 @@ proc taskDocs2(namePart: string, forceRebuild = false) =
     let templateFile = "templates/nimModule2.html"
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
-    echo cmd
+    # echo cmd
     let output = staticExec(cmd)
     if len(output) > 0:
       echo output
       exec fmt"rm {resultFile}"
     else:
-      echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
+      echo fmt"file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)
 
 proc taskFuncDocs() =
@@ -720,10 +723,11 @@ proc taskFuncDocs() =
   let result = "docs/teaFunctions.md"
 
   # Build the docs/teaFunctions.md file.
-  echo fmt"make {result}"
+  # echo fmt"make {result}"
   let cmd = fmt"{statictea} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
-  echoGrip()
+  # echoGrip()
+  echo fmt"Generated: http://localhost:6419/{result}"
 
 proc buildRunner() =
   let part1 = "nim c --hint[Performance]:off "
@@ -916,10 +920,10 @@ proc taskTea2Html(teaBasename: string) =
   writeFile(server, jsonStr)
 
   # Build the html file.
-  echo fmt"open: file:///{getCurrentDir()}/{result}"
   let cmd = fmt"{statictea} -s {server} -t {templateFile} -o {teaFile} -r {result}"
   exec cmd
 
+  echo fmt"Generated: file:///{getCurrentDir()}/{result}"
   rmFile(server)
 
 proc taskTea2HtmlLoop(namePart: string) =

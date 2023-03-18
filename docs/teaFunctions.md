@@ -42,6 +42,7 @@ variable or pass to another function.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
 * [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
 * [highlight](#highlight) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
+* [html](#html) &mdash; Escape text for placing it in an html page.
 * [if0](#if0) &mdash; If the condition is 0, return the second argument, else return the third argument.
 * [if](#if) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [int](#int) &mdash; Create an int from a float.
@@ -749,6 +750,28 @@ frags => [
   ["num", "5"],
 ]
 ~~~
+
+
+# html
+
+Escape text for placing it in an html page.
+
+~~~
+html = func(text: string, place: string) string
+~~~
+
+places:
+
+* body -- in the html body
+* attribute -- in an html attribute
+
+~~~
+name = html("Mad <Hatter>", "body")
+  => "Mad &lt;Hatter&gt;"
+~~~
+
+For more information about how to escape and what is safe see:
+[[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]
 
 
 # if0

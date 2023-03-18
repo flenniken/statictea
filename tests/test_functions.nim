@@ -2114,3 +2114,27 @@ len = len("tea")
 11: ["comment","# testing\n"]
 """
     check testHighlight(text, expected)
+
+  test "escapeHtmlBody":
+    check escapeHtmlBody("") == ""
+    check escapeHtmlBody("<") == "&lt;"
+    check escapeHtmlBody(">") == "&gt;"
+    check escapeHtmlBody("\"") == "&quot;"
+    check escapeHtmlBody("&") == "&amp;"
+    check escapeHtmlBody("'") == "&#x27;"
+    check escapeHtmlBody("abc") == "abc"
+    check escapeHtmlBody("a < 5") == "a &lt; 5"
+    check escapeHtmlBody("a > 5") == "a &gt; 5"
+    check escapeHtmlBody("""a = "5" """) == "a = &quot;5&quot; "
+    check escapeHtmlBody("""a = '5' """) == "a = &#x27;5&#x27; "
+    
+  test "escapeHtmlAttribute":
+    check escapeHtmlAttribute("") == ""
+    check escapeHtmlAttribute("abCD12") == "abCD12"
+    check escapeHtmlAttribute(" ") == "&#x20;"
+    check escapeHtmlAttribute("a b") == "a&#x20;b"
+    check escapeHtmlAttribute("\n") == "&#x0A;"
+    check escapeHtmlAttribute("~") == "&#x7E;"
+    let str = "Zwölf Boxkämpfer"
+    let expected = "Zw&#xC3;&#xB6;lf&#x20;Boxk&#xC3;&#xA4;mpfer"
+    check escapeHtmlAttribute(str) == expected

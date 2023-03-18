@@ -3,7 +3,7 @@
 u.handle-fragment = func(ix: int, fragment: list, frags: list) bool
   ## Highlight the fragment for html and add it to frags.
   tag = fragment[0]
-  str = fragment[1]
+  str = html(fragment[1], "body")
   frags &= if((tag == "other"), str, +
     format("<span class=\"t-{tag}\">{str}</span>"))
   return(false)

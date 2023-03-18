@@ -2811,6 +2811,71 @@ func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
     fragList.listv.list.add(sublist)
   result = newFunResult(fragList)
 
+proc escapeHtmlBody*(text: string): string =
+  ## Excape text for placing in body html.
+  for ch in text:
+    case ch:
+    of '&':
+      result.add("&amp;")
+    of '<':
+      result.add("&lt;")
+    of '>':
+      result.add("&gt;")
+    of '"':
+      result.add("&quot;")
+    of '\'':
+      result.add("&#x27;")
+    else:
+      result.add(ch)
+
+proc escapeHtmlAttribute*(text: string): string =
+  ## Excape text for placing in an html attribute.
+
+  # Except for alphanumeric characters, encode all characters with the
+  # HTML Entity &#xHH; format, including spaces. (HH = Hex Value)
+  for ch in text:
+    case ch:
+    of 'a'..'z', 'A'..'Z', '0'..'9':
+      result.add(ch)
+    else:
+      result.add("&#x")
+      result.add(toHex(ord(ch), 2))
+      result.add(";")
+
+func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Escape text for placing it in an html page.
+  ## @:
+  ## @:~~~
+  ## @:html = func(text: string, place: string) string
+  ## @:~~~~
+  ## @:
+  ## @:places:
+  ## @:
+  ## @:* body -- in the html body
+  ## @:* attribute -- in an html attribute
+  ## @:
+  ## @:~~~
+  ## @:name = html("Mad <Hatter>", "body")
+  ## @:  => "Mad &lt;Hatter&gt;"
+  ## @:~~~~
+  ## @:
+  ## @:For more information about how to escape and what is safe see:
+  ## @:@{@{https@@://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts]@{XSS]]
+
+  tMapParameters("html", "sss")
+  let text = map["a"].stringv
+  let place = map["b"].stringv
+  var str: string
+  case place
+  of "body":
+    str = escapeHtmlBody(text)
+  of "attribute":
+    str = escapeHtmlAttribute(text)
+  else:
+    # Invalid html place.
+    return newFunResultWarn(wInvalidHtmlPlace, 1)
+  result = newFunResult(newValue(str))
+
 var functionsDict* = newTable[string, FunctionPtr]()
   ## Maps a built-in function name to a function pointer you can call.
 functionsDict["fun_add_fff"] = fun_add_fff
@@ -2845,6 +2910,7 @@ functionsDict["fun_gt_iib"] = fun_gt_iib
 functionsDict["fun_gte_ffb"] = fun_gte_ffb
 functionsDict["fun_gte_iib"] = fun_gte_iib
 functionsDict["fun_highlight_sl"] = fun_highlight_sl
+functionsDict["fun_html_sss"] = fun_html_sss
 functionsDict["fun_if_baoaa"] = fun_if_baoaa
 functionsDict["fun_if0_iaoaa"] = fun_if0_iaoaa
 functionsDict["fun_int_fosi"] = fun_int_fosi

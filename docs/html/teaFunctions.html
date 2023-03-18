@@ -77,7 +77,7 @@ pre {
 </span>
 <span class="t-dotName">u.add-func-var</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">funcVar</span>: <span class="t-type">func</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Add the function variable to the list.
-</span>  <span class="t-dotName">newList</span> &= <span class="t-dotName">funcVar</span>
+</span>  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">funcVar</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-dotName">add-vars</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">key</span>: <span class="t-type">string</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
@@ -94,12 +94,12 @@ pre {
 <span class="t-dotName">get-name</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">funcVar</span>: <span class="t-type">func</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Add the function name to the new list.
 </span>  <span class="t-dotName">fd</span> = <span class="t-funcCall">functionDetails</span>(<span class="t-dotName">funcVar</span>)
-  <span class="t-dotName">newList</span> &= <span class="t-dotName">fd.signature.name</span>
+  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">fd.signature.name</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-comment"># Get the anchor type based on the template type.
 </span><span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">t.args.resultFilename</span>)
-<span class="t-dotName">type</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">path.ext</span> == <span class="t-str">".md"</span>), <span class="t-str">"github"</span>, <span class="t-str">"html"</span>)
+<span class="t-dotName">type</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">path.ext</span> == <span class="t-str">&quot;.md&quot;</span>), <span class="t-str">&quot;github&quot;</span>, <span class="t-str">&quot;html&quot;</span>)
 
 <span class="t-comment"># Get a list of all the function names then make that into anchor
 </span><span class="t-comment"># names.
@@ -115,13 +115,13 @@ pre {
 </span>  <span class="t-dotName">fd</span> = <span class="t-funcCall">functionDetails</span>(<span class="t-dotName">funcVar</span>)
 
   <span class="t-comment"># Make a dictionary containing the function name, its doc comments
-</span>  <span class="t-comment"># and its doc comment's first sentence.
+</span>  <span class="t-comment"># and its doc comment&#x27;s first sentence.
 </span>  <span class="t-dotName">entry</span> = <span class="t-funcCall">dict</span>()
   <span class="t-dotName">entry.name</span> = <span class="t-dotName">fd.signature.name</span>
   <span class="t-dotName">entry.docComment</span> = <span class="t-dotName">fd.docComment</span>
-  <span class="t-dotName">entry.sentence</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">fd.docComment</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">fd.docComment</span>, <span class="t-str">"."</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
+  <span class="t-dotName">entry.sentence</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">fd.docComment</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">fd.docComment</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
   <span class="t-dotName">entry.anchorName</span> = <span class="t-dotName">anchors</span>[<span class="t-dotName">ix</span>]
-  <span class="t-dotName">newList</span> &= <span class="t-dotName">entry</span>
+  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">entry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-comment"># Create a list of dictionaries, one dictionary for each function

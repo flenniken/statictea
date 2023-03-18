@@ -280,7 +280,7 @@ ValueKind = enum
 
 <h3 id="Value">Value</h3>
 
-<p>A variable's value reference.</p>
+<p>A variable&#x27;s value reference.</p>
 
 <pre class="nim-code">
 Value = ref ValueObj
@@ -323,7 +323,7 @@ FunctionPtr = proc (variables: Variables; parameters: seq[Value]): FunResult {.
 
 <h3 id="ParamCode">ParamCode</h3>
 
-<p>Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.</p>
+<p>Parameter type, one character of &quot;ifsldpa&quot; corresponding to int, float, string, list, dict, func, any.</p>
 
 <pre class="nim-code">
 ParamCode = char
@@ -331,7 +331,7 @@ ParamCode = char
 
 <h3 id="ParamType">ParamType</h3>
 
-<p>The statictea parameter types. The same as the variable types ValueKind with an extra for "any".
+<p>The statictea parameter types. The same as the variable types ValueKind with an extra for &quot;any&quot;.
 </p><ul>
 <li>ptString -- string parameter type
 </li><li>ptInt -- integer
@@ -648,8 +648,8 @@ proc newValue(value: Value): Value
 
 </p><pre class="desc-code">
 <span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>])
-<span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-str">"a"</span>, <span class="t-str">"b"</span>, <span class="t-str">"c"</span>])
-<span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-funcCall">newValue</span>(<span class="t-num">1</span>), <span class="t-funcCall">newValue</span>(<span class="t-str">"b"</span>)])
+<span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-str">&quot;c&quot;</span>])
+<span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-funcCall">newValue</span>(<span class="t-num">1</span>), <span class="t-funcCall">newValue</span>(<span class="t-str">&quot;b&quot;</span>)])
 </pre>
 
 
@@ -664,9 +664,9 @@ proc newValue[T](list: openArray[T]; mutable = Mutable.immutable): Value
 </p><p>Examples:
 
 </p><pre class="desc-code">
- <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">"a"</span>, <span class="t-num">1</span>), (<span class="t-str">"b"</span>, <span class="t-num">2</span>), (<span class="t-str">"c"</span>, <span class="t-num">3</span>)])
- <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">"a"</span>, <span class="t-num">1.1</span>), (<span class="t-str">"b"</span>, <span class="t-num">2.2</span>), (<span class="t-str">"c"</span>, <span class="t-num">3.3</span>)])
- <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">"a"</span>, <span class="t-funcCall">newValue</span>(<span class="t-num">1.1</span>)), (<span class="t-str">"b"</span>, <span class="t-funcCall">newValue</span>(<span class="t-str">"a"</span>))])
+ <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1</span>), (<span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>), (<span class="t-str">&quot;c&quot;</span>, <span class="t-num">3</span>)])
+ <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1.1</span>), (<span class="t-str">&quot;b&quot;</span>, <span class="t-num">2.2</span>), (<span class="t-str">&quot;c&quot;</span>, <span class="t-num">3.3</span>)])
+ <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">&quot;a&quot;</span>, <span class="t-funcCall">newValue</span>(<span class="t-num">1.1</span>)), (<span class="t-str">&quot;b&quot;</span>, <span class="t-funcCall">newValue</span>(<span class="t-str">&quot;a&quot;</span>))])
 </pre>
 
 
@@ -982,7 +982,7 @@ func codeToParamType(code: ParamCode): ParamType
 
 <h3 id="strToParamType">strToParamType</h3>
 
-<p>Return the parameter type for the given string, e.g. "int" to ptInt.</p>
+<p>Return the parameter type for the given string, e.g. &quot;int&quot; to ptInt.</p>
 
 <pre class="nim-code">
 func strToParamType(str: string): ParamType 
@@ -998,14 +998,14 @@ proc shortName(index: Natural): string
 
 <h3 id="newSignatureO">newSignatureO</h3>
 
-<p>Return a new signature for the function name and signature code. The parameter names come from the shortName function for letters a through z in order. The last letter in the code is the function's return type.
+<p>Return a new signature for the function name and signature code. The parameter names come from the shortName function for letters a through z in order. The last letter in the code is the function&#x27;s return type.
 
 </p><p>Example:
 
 </p><pre class="desc-code">
-<span class="t-dotName">var</span> <span class="t-dotName">signatureO</span> = <span class="t-funcCall">newSignatureO</span>(<span class="t-str">"myname"</span>, <span class="t-str">"ifss"</span>)
+<span class="t-dotName">var</span> <span class="t-dotName">signatureO</span> = <span class="t-funcCall">newSignatureO</span>(<span class="t-str">&quot;myname&quot;</span>, <span class="t-str">&quot;ifss&quot;</span>)
 <span class="t-dotName">echo</span> $<span class="t-funcCall">signatureO.get</span>()
-=>
+=&gt;
 <span class="t-funcCall">myname</span>(<span class="t-dotName">a</span>: <span class="t-dotName">int</span>, <span class="t-dotName">b</span>: <span class="t-dotName">float</span>, <span class="t-dotName">c</span>: <span class="t-dotName">string</span>) <span class="t-dotName">string</span>
 </pre>
 

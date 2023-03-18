@@ -64,7 +64,7 @@ pre {
 <body>
 <h1>functions.nim</h1>
 
-<p>StaticTea functions and supporting types. The StaticTea language functions start with "<a class="reference external" href="#fun">fun</a>", for example, the "fun_cmp_ffi" function implements the "cmp" function for floats.</p>
+<p>StaticTea functions and supporting types. The StaticTea language functions start with &quot;&lt;a class=&quot;reference external&quot; href=&quot;#fun&quot;&gt;fun&lt;/a&gt;&quot;, for example, the &quot;fun_cmp_ffi&quot; function implements the &quot;cmp&quot; function for floats.</p>
 
 Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 
@@ -159,6 +159,9 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_readJson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
 <li> <a href="#fun_markdownLite_sl">fun_markdownLite_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.</li>
 <li> <a href="#fun_highlight_sl">fun_highlight_sl</a> &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.</li>
+<li> <a href="#escapeHtmlBody">escapeHtmlBody</a> &mdash; Excape text for placing in body html.</li>
+<li> <a href="#escapeHtmlAttribute">escapeHtmlAttribute</a> &mdash; Excape text for placing in an html attribute.</li>
+<li> <a href="#fun_html_sss">fun_html_sss</a> &mdash; Escape text for placing it in an html page.</li>
 <li> <a href="#functionsDict">functionsDict</a> &mdash; Maps a built-in function name to a function pointer you can call.</li>
 <li>type:  <a href="#BuiltInInfo">BuiltInInfo</a> &mdash; The built-in function information.</li>
 <li> <a href="#newBuiltInInfo">newBuiltInInfo</a> &mdash; Return a BuiltInInfo object.</li>
@@ -254,18 +257,18 @@ func parseNumber(line: string; start: Natural): ValuePosSiOr
 
 <h3 id="formatString">formatString</h3>
 
-<p>Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
+<p>Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn&#x27;t exist. No space around the bracketed variables.
 
 </p><pre class="desc-code">
-<span class="t-dotName">let</span> <span class="t-dotName">first</span> = <span class="t-str">"Earl"</span>
-<span class="t-dotName">let</span> <span class="t-dotName">last</span> = <span class="t-str">"Grey"</span>
-<span class="t-str">"name: {first} {last}"</span> => <span class="t-str">"name: Earl Grey"</span>
+<span class="t-dotName">let</span> <span class="t-dotName">first</span> = <span class="t-str">&quot;Earl&quot;</span>
+<span class="t-dotName">let</span> <span class="t-dotName">last</span> = <span class="t-str">&quot;Grey&quot;</span>
+<span class="t-str">&quot;name: {first} {last}&quot;</span> =&gt; <span class="t-str">&quot;name: Earl Grey&quot;</span>
 </pre>
 <p>
 To enter a left bracket use two in a row.
 
 </p><pre class="desc-code">
-<span class="t-str">"{{"</span> => <span class="t-str">"{"</span>
+<span class="t-str">&quot;{{&quot;</span> =&gt; <span class="t-str">&quot;{&quot;</span>
 </pre>
 
 
@@ -285,9 +288,9 @@ proc formatString(variables: Variables; text: string): StringOr {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">cmp</span>(<span class="t-num">7</span>, <span class="t-num">9</span>) => <span class="t-num">-1</span>
-<span class="t-funcCall">cmp</span>(<span class="t-num">8</span>, <span class="t-num">8</span>) => <span class="t-num">0</span>
-<span class="t-funcCall">cmp</span>(<span class="t-num">9</span>, <span class="t-num">2</span>) => <span class="t-num">1</span>
+<span class="t-funcCall">cmp</span>(<span class="t-num">7</span>, <span class="t-num">9</span>) =&gt; <span class="t-num">-1</span>
+<span class="t-funcCall">cmp</span>(<span class="t-num">8</span>, <span class="t-num">8</span>) =&gt; <span class="t-num">0</span>
+<span class="t-funcCall">cmp</span>(<span class="t-num">9</span>, <span class="t-num">2</span>) =&gt; <span class="t-num">1</span>
 </pre>
 
 
@@ -307,9 +310,9 @@ func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">cmp</span>(<span class="t-num">7.8</span>, <span class="t-num">9.1</span>) => <span class="t-num">-1</span>
-<span class="t-funcCall">cmp</span>(<span class="t-num">8.4</span>, <span class="t-num">8.4</span>) => <span class="t-num">0</span>
-<span class="t-funcCall">cmp</span>(<span class="t-num">9.3</span>, <span class="t-num">2.2</span>) => <span class="t-num">1</span>
+<span class="t-funcCall">cmp</span>(<span class="t-num">7.8</span>, <span class="t-num">9.1</span>) =&gt; <span class="t-num">-1</span>
+<span class="t-funcCall">cmp</span>(<span class="t-num">8.4</span>, <span class="t-num">8.4</span>) =&gt; <span class="t-num">0</span>
+<span class="t-funcCall">cmp</span>(<span class="t-num">9.3</span>, <span class="t-num">2.2</span>) =&gt; <span class="t-num">1</span>
 </pre>
 
 
@@ -332,11 +335,11 @@ is the default.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">cmp</span>(<span class="t-str">"coffee"</span>, <span class="t-str">"tea"</span>) => <span class="t-num">-1</span>
-<span class="t-funcCall">cmp</span>(<span class="t-str">"tea"</span>, <span class="t-str">"tea"</span>) => <span class="t-num">0</span>
-<span class="t-funcCall">cmp</span>(<span class="t-str">"Tea"</span>, <span class="t-str">"tea"</span>) => <span class="t-num">1</span>
-<span class="t-funcCall">cmp</span>(<span class="t-str">"Tea"</span>, <span class="t-str">"tea"</span>, <span class="t-dotName">true</span>) => <span class="t-num">1</span>
-<span class="t-funcCall">cmp</span>(<span class="t-str">"Tea"</span>, <span class="t-str">"tea"</span>, <span class="t-dotName">false</span>) => <span class="t-num">0</span>
+<span class="t-funcCall">cmp</span>(<span class="t-str">&quot;coffee&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-num">-1</span>
+<span class="t-funcCall">cmp</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-num">0</span>
+<span class="t-funcCall">cmp</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-num">1</span>
+<span class="t-funcCall">cmp</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">true</span>) =&gt; <span class="t-num">1</span>
+<span class="t-funcCall">cmp</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">false</span>) =&gt; <span class="t-num">0</span>
 </pre>
 
 
@@ -356,8 +359,8 @@ func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">concat</span>(<span class="t-str">"tea"</span>, <span class="t-str">" time"</span>) => <span class="t-str">"tea time"</span>
-<span class="t-funcCall">concat</span>(<span class="t-str">"a"</span>, <span class="t-str">"b"</span>) => <span class="t-str">"ab"</span>
+<span class="t-funcCall">concat</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot; time&quot;</span>) =&gt; <span class="t-str">&quot;tea time&quot;</span>
+<span class="t-funcCall">concat</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>) =&gt; <span class="t-str">&quot;ab&quot;</span>
 </pre>
 
 
@@ -377,8 +380,8 @@ func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">len</span>(<span class="t-str">"tea"</span>) => <span class="t-num">3</span>
-<span class="t-funcCall">len</span>(<span class="t-str">"añyóng"</span>) => <span class="t-num">6</span>
+<span class="t-funcCall">len</span>(<span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-num">3</span>
+<span class="t-funcCall">len</span>(<span class="t-str">&quot;añyóng&quot;</span>) =&gt; <span class="t-num">6</span>
 </pre>
 
 
@@ -398,9 +401,9 @@ func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>()) => <span class="t-num">0</span>
-<span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>(<span class="t-num">1</span>)) => <span class="t-num">1</span>
-<span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-num">5</span>)) => <span class="t-num">2</span>
+<span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>()) =&gt; <span class="t-num">0</span>
+<span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>(<span class="t-num">1</span>)) =&gt; <span class="t-num">1</span>
+<span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-num">5</span>)) =&gt; <span class="t-num">2</span>
 </pre>
 
 
@@ -420,9 +423,9 @@ func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>()) => <span class="t-num">0</span>
-<span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>(<span class="t-str">"a"</span>, <span class="t-num">4</span>)) => <span class="t-num">1</span>
-<span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>(<span class="t-str">"a"</span>, <span class="t-num">4</span>, <span class="t-str">"b"</span>, <span class="t-num">3</span>)) => <span class="t-num">2</span>
+<span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>()) =&gt; <span class="t-num">0</span>
+<span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>)) =&gt; <span class="t-num">1</span>
+<span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">3</span>)) =&gt; <span class="t-num">2</span>
 </pre>
 
 
@@ -442,15 +445,15 @@ func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-str">"a"</span>, <span class="t-num">10</span>)
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">0</span>) => <span class="t-num">4</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">1</span>) => <span class="t-str">"a"</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">2</span>) => <span class="t-num">10</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">3</span>, <span class="t-num">99</span>) => <span class="t-num">99</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-1</span>) => <span class="t-num">10</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-2</span>) => <span class="t-str">"a"</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-3</span>) => <span class="t-num">4</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-4</span>, <span class="t-num">11</span>) => <span class="t-num">11</span>
+<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-str">&quot;a&quot;</span>, <span class="t-num">10</span>)
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">0</span>) =&gt; <span class="t-num">4</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">1</span>) =&gt; <span class="t-str">&quot;a&quot;</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">2</span>) =&gt; <span class="t-num">10</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">3</span>, <span class="t-num">99</span>) =&gt; <span class="t-num">99</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-1</span>) =&gt; <span class="t-num">10</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-2</span>) =&gt; <span class="t-str">&quot;a&quot;</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-3</span>) =&gt; <span class="t-num">4</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-4</span>, <span class="t-num">11</span>) =&gt; <span class="t-num">11</span>
 </pre>
 <p>
 You can also use bracket notation to access list items.
@@ -467,27 +470,27 @@ func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_get_dsoaa">fun_get_dsoaa</h3>
 
-<p>Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
+<p>Get a dictionary value by its key.  If the key doesn&#x27;t exist, the default value is returned if specified, else a warning is generated.
 
 </p><pre class="desc-code">
 <span class="t-dotName">get</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>, <span class="t-param">key</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
 </pre>
 <p>
-Note: For dictionary lookup you can use dot notation. It's the
+Note: For dictionary lookup you can use dot notation. It&#x27;s the
 same as get without the default.
 
 </p><p>Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">"tea"</span>, <span class="t-str">"Earl Grey"</span>)
-<span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">"tea"</span>) => <span class="t-str">"Earl Grey"</span>
-<span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">"coffee"</span>, <span class="t-str">"Tea"</span>) => <span class="t-str">"Tea"</span>
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>)
+<span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-str">&quot;Earl Grey&quot;</span>
+<span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;coffee&quot;</span>, <span class="t-str">&quot;Tea&quot;</span>) =&gt; <span class="t-str">&quot;Tea&quot;</span>
 </pre>
 <p>
 Using dot notation:
 </p><pre class="desc-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">"tea"</span>, <span class="t-str">"Earl Grey"</span>)
-<span class="t-dotName">d.tea</span> => <span class="t-str">"Earl Grey"</span>
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>)
+<span class="t-dotName">d.tea</span> =&gt; <span class="t-str">&quot;Earl Grey&quot;</span>
 </pre>
 
 
@@ -522,27 +525,27 @@ the If Functions section.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">0</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">tea</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">1</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">beer</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">4</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">beer</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-str">""</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">tea</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-str">"abc"</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">beer</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>([], <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">tea</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>([<span class="t-num">1</span>,<span class="t-num">2</span>], <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">beer</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-funcCall">dict</span>(), <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">tea</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-funcCall">dict</span>(<span class="t-str">"a"</span>,<span class="t-num">1</span>), <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">beer</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">false</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">tea</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">true</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) => <span class="t-dotName">beer</span>
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">true</span>, <span class="t-str">"tea"</span>)
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">false</span>, <span class="t-str">"tea"</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">0</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">tea</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">1</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">beer</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">4</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">beer</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">tea</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">beer</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>([], <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">tea</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>([<span class="t-num">1</span>,<span class="t-num">2</span>], <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">beer</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-funcCall">dict</span>(), <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">tea</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>,<span class="t-num">1</span>), <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">beer</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">false</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">tea</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">true</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) =&gt; <span class="t-dotName">beer</span>
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">true</span>, <span class="t-str">&quot;tea&quot;</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">false</span>, <span class="t-str">&quot;tea&quot;</span>)
 </pre>
 <p>
-You don't have to assign the result of an if0 function which is
+You don&#x27;t have to assign the result of an if0 function which is
 useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
 </p><pre class="desc-code">
-<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">"got zero value"</span>))
+<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;got zero value&quot;</span>))
 </pre>
 
 
@@ -566,19 +569,19 @@ the Boolean Expressions section.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">a</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">true</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) <span class="t-comment"># => tea
-</span><span class="t-dotName">b</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">false</span>, <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>) <span class="t-comment"># => beer
-</span><span class="t-dotName">c</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">v</span> < <span class="t-num">5</span>), <span class="t-str">"tea"</span>, <span class="t-str">"beer"</span>)
-<span class="t-dotName">d</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">v</span> < <span class="t-num">5</span>), <span class="t-str">"tea"</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">true</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># =&gt; tea
+</span><span class="t-dotName">b</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">false</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># =&gt; beer
+</span><span class="t-dotName">c</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">v</span> &lt; <span class="t-num">5</span>), <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>)
+<span class="t-dotName">d</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">v</span> &lt; <span class="t-num">5</span>), <span class="t-str">&quot;tea&quot;</span>)
 </pre>
 <p>
-You don't have to assign the result of an if function which is
+You don&#x27;t have to assign the result of an if function which is
 useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
 </p><pre class="desc-code">
-<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">"c is true"</span>))
-<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">"skip"</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;c is true&quot;</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">&quot;skip&quot;</span>))
 </pre>
 
 
@@ -597,9 +600,9 @@ func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">add</span>(<span class="t-num">1</span>, <span class="t-num">2</span>) => <span class="t-num">3</span>
-<span class="t-funcCall">add</span>(<span class="t-num">3</span>, <span class="t-num">-2</span>) => <span class="t-num">1</span>
-<span class="t-funcCall">add</span>(<span class="t-num">-2</span>, <span class="t-num">-5</span>) => <span class="t-num">-7</span>
+<span class="t-funcCall">add</span>(<span class="t-num">1</span>, <span class="t-num">2</span>) =&gt; <span class="t-num">3</span>
+<span class="t-funcCall">add</span>(<span class="t-num">3</span>, <span class="t-num">-2</span>) =&gt; <span class="t-num">1</span>
+<span class="t-funcCall">add</span>(<span class="t-num">-2</span>, <span class="t-num">-5</span>) =&gt; <span class="t-num">-7</span>
 </pre>
 
 
@@ -619,8 +622,8 @@ func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">add</span>(<span class="t-num">1.5</span>, <span class="t-num">2.3</span>) => <span class="t-num">3.8</span>
-<span class="t-funcCall">add</span>(<span class="t-num">3.2</span>, <span class="t-num">-2.2</span>) => <span class="t-num">1.0</span>
+<span class="t-funcCall">add</span>(<span class="t-num">1.5</span>, <span class="t-num">2.3</span>) =&gt; <span class="t-num">3.8</span>
+<span class="t-funcCall">add</span>(<span class="t-num">3.2</span>, <span class="t-num">-2.2</span>) =&gt; <span class="t-num">1.0</span>
 </pre>
 
 
@@ -640,9 +643,9 @@ func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">sub</span>(<span class="t-num">3</span>, <span class="t-num">1</span>) => <span class="t-num">2</span>
-<span class="t-funcCall">add</span>(<span class="t-num">3</span>, <span class="t-num">-2</span>) => <span class="t-num">5</span>
-<span class="t-funcCall">add</span>(<span class="t-num">1</span>, <span class="t-num">5</span>) => <span class="t-num">-4</span>
+<span class="t-funcCall">sub</span>(<span class="t-num">3</span>, <span class="t-num">1</span>) =&gt; <span class="t-num">2</span>
+<span class="t-funcCall">add</span>(<span class="t-num">3</span>, <span class="t-num">-2</span>) =&gt; <span class="t-num">5</span>
+<span class="t-funcCall">add</span>(<span class="t-num">1</span>, <span class="t-num">5</span>) =&gt; <span class="t-num">-4</span>
 </pre>
 
 
@@ -662,8 +665,8 @@ func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">sub</span>(<span class="t-num">4.5</span>, <span class="t-num">2.3</span>) => <span class="t-num">2.2</span>
-<span class="t-funcCall">sub</span>(<span class="t-num">1.0</span>, <span class="t-num">2.2</span>) => <span class="t-num">-1.2</span>
+<span class="t-funcCall">sub</span>(<span class="t-num">4.5</span>, <span class="t-num">2.3</span>) =&gt; <span class="t-num">2.2</span>
+<span class="t-funcCall">sub</span>(<span class="t-num">1.0</span>, <span class="t-num">2.2</span>) =&gt; <span class="t-num">-1.2</span>
 </pre>
 
 
@@ -683,9 +686,9 @@ func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">"tea"</span>, <span class="t-str">"Earl"</span>)
-<span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">"tea"</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">"coffee"</span>) => <span class="t-dotName">false</span>
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl&quot;</span>)
+<span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;coffee&quot;</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -715,12 +718,12 @@ can be any type.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">cases</span> = <span class="t-funcCall">list</span>(<span class="t-num">0</span>, <span class="t-str">"tea"</span>, <span class="t-num">1</span>, <span class="t-str">"water"</span>, <span class="t-num">2</span>, <span class="t-str">"beer"</span>)
-<span class="t-funcCall">case</span>(<span class="t-num">0</span>, <span class="t-dotName">cases</span>) => <span class="t-str">"tea"</span>
-<span class="t-funcCall">case</span>(<span class="t-num">1</span>, <span class="t-dotName">cases</span>) => <span class="t-str">"water"</span>
-<span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>) => <span class="t-str">"beer"</span>
-<span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>, <span class="t-str">"wine"</span>) => <span class="t-str">"beer"</span>
-<span class="t-funcCall">case</span>(<span class="t-num">3</span>, <span class="t-dotName">cases</span>, <span class="t-str">"wine"</span>) => <span class="t-str">"wine"</span>
+<span class="t-dotName">cases</span> = <span class="t-funcCall">list</span>(<span class="t-num">0</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-num">1</span>, <span class="t-str">&quot;water&quot;</span>, <span class="t-num">2</span>, <span class="t-str">&quot;beer&quot;</span>)
+<span class="t-funcCall">case</span>(<span class="t-num">0</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-str">&quot;tea&quot;</span>
+<span class="t-funcCall">case</span>(<span class="t-num">1</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-str">&quot;water&quot;</span>
+<span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-str">&quot;beer&quot;</span>
+<span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;wine&quot;</span>) =&gt; <span class="t-str">&quot;beer&quot;</span>
+<span class="t-funcCall">case</span>(<span class="t-num">3</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;wine&quot;</span>) =&gt; <span class="t-str">&quot;wine&quot;</span>
 </pre>
 
 
@@ -750,11 +753,11 @@ can be any type.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">cases</span> = <span class="t-funcCall">list</span>(<span class="t-str">"tea"</span>, <span class="t-num">15</span>, <span class="t-str">"water"</span>, <span class="t-num">2.3</span>, <span class="t-str">"beer"</span>, <span class="t-str">"cold"</span>)
-<span class="t-funcCall">case</span>(<span class="t-str">"tea"</span>, <span class="t-dotName">cases</span>) => <span class="t-num">15</span>
-<span class="t-funcCall">case</span>(<span class="t-str">"water"</span>, <span class="t-dotName">cases</span>) => <span class="t-num">2.3</span>
-<span class="t-funcCall">case</span>(<span class="t-str">"beer"</span>, <span class="t-dotName">cases</span>) => <span class="t-str">"cold"</span>
-<span class="t-funcCall">case</span>(<span class="t-str">"bunch"</span>, <span class="t-dotName">cases</span>, <span class="t-str">"other"</span>) => <span class="t-str">"other"</span>
+<span class="t-dotName">cases</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">15</span>, <span class="t-str">&quot;water&quot;</span>, <span class="t-num">2.3</span>, <span class="t-str">&quot;beer&quot;</span>, <span class="t-str">&quot;cold&quot;</span>)
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-num">15</span>
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;water&quot;</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-num">2.3</span>
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;beer&quot;</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-str">&quot;cold&quot;</span>
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;bunch&quot;</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;other&quot;</span>) =&gt; <span class="t-str">&quot;other&quot;</span>
 </pre>
 
 
@@ -786,9 +789,9 @@ to three digits (no letters).
 </p><p>Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">cmpVersion</span>(<span class="t-str">"1.2.5"</span>, <span class="t-str">"1.1.8"</span>) => <span class="t-num">1</span>
-<span class="t-funcCall">cmpVersion</span>(<span class="t-str">"1.2.5"</span>, <span class="t-str">"1.3.0"</span>) => <span class="t-num">-1</span>
-<span class="t-funcCall">cmpVersion</span>(<span class="t-str">"1.2.5"</span>, <span class="t-str">"1.2.5"</span>) => <span class="t-num">0</span>
+<span class="t-funcCall">cmpVersion</span>(<span class="t-str">&quot;1.2.5&quot;</span>, <span class="t-str">&quot;1.1.8&quot;</span>) =&gt; <span class="t-num">1</span>
+<span class="t-funcCall">cmpVersion</span>(<span class="t-str">&quot;1.2.5&quot;</span>, <span class="t-str">&quot;1.3.0&quot;</span>) =&gt; <span class="t-num">-1</span>
+<span class="t-funcCall">cmpVersion</span>(<span class="t-str">&quot;1.2.5&quot;</span>, <span class="t-str">&quot;1.2.5&quot;</span>) =&gt; <span class="t-num">0</span>
 </pre>
 
 
@@ -808,8 +811,8 @@ func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult 
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">float</span>(<span class="t-num">2</span>) => <span class="t-num">2.0</span>
-<span class="t-funcCall">float</span>(<span class="t-num">-33</span>) => <span class="t-num">-33.0</span>
+<span class="t-funcCall">float</span>(<span class="t-num">2</span>) =&gt; <span class="t-num">2.0</span>
+<span class="t-funcCall">float</span>(<span class="t-num">-33</span>) =&gt; <span class="t-num">-33.0</span>
 </pre>
 
 
@@ -829,9 +832,9 @@ func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">float</span>(<span class="t-str">"2"</span>) => <span class="t-num">2.0</span>
-<span class="t-funcCall">float</span>(<span class="t-str">"2.4"</span>) => <span class="t-num">2.4</span>
-<span class="t-funcCall">float</span>(<span class="t-str">"33"</span>) => <span class="t-num">33.0</span>
+<span class="t-funcCall">float</span>(<span class="t-str">&quot;2&quot;</span>) =&gt; <span class="t-num">2.0</span>
+<span class="t-funcCall">float</span>(<span class="t-str">&quot;2.4&quot;</span>) =&gt; <span class="t-num">2.4</span>
+<span class="t-funcCall">float</span>(<span class="t-str">&quot;33&quot;</span>) =&gt; <span class="t-num">33.0</span>
 </pre>
 
 
@@ -851,8 +854,8 @@ func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">float</span>(<span class="t-str">"2"</span>) => <span class="t-num">2.0</span>
-<span class="t-funcCall">float</span>(<span class="t-str">"notnum"</span>, <span class="t-str">"nan"</span>) => <span class="t-dotName">nan</span>
+<span class="t-funcCall">float</span>(<span class="t-str">&quot;2&quot;</span>) =&gt; <span class="t-num">2.0</span>
+<span class="t-funcCall">float</span>(<span class="t-str">&quot;notnum&quot;</span>, <span class="t-str">&quot;nan&quot;</span>) =&gt; <span class="t-dotName">nan</span>
 </pre>
 
 
@@ -872,26 +875,26 @@ func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
 Round options:
 
 </p><ul>
-<li>"round" - nearest integer, the default.
-</li><li>"floor" - integer below (to the left on number line)
-</li><li>"ceiling" - integer above (to the right on number line)
-</li><li>"truncate" - remove decimals
+<li>&quot;round&quot; - nearest integer, the default.
+</li><li>&quot;floor&quot; - integer below (to the left on number line)
+</li><li>&quot;ceiling&quot; - integer above (to the right on number line)
+</li><li>&quot;truncate&quot; - remove decimals
 
 </li></ul>
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">int</span>(<span class="t-num">2.34</span>) => <span class="t-num">2</span>
-<span class="t-funcCall">int</span>(<span class="t-num">2.34</span>, <span class="t-str">"round"</span>) => <span class="t-num">2</span>
-<span class="t-funcCall">int</span>(<span class="t-num">-2.34</span>, <span class="t-str">"round"</span>) => <span class="t-num">-2</span>
-<span class="t-funcCall">int</span>(<span class="t-num">6.5</span>, <span class="t-str">"round"</span>) => <span class="t-num">7</span>
-<span class="t-funcCall">int</span>(<span class="t-num">-6.5</span>, <span class="t-str">"round"</span>) => <span class="t-num">-7</span>
-<span class="t-funcCall">int</span>(<span class="t-num">4.57</span>, <span class="t-str">"floor"</span>) => <span class="t-num">4</span>
-<span class="t-funcCall">int</span>(<span class="t-num">-4.57</span>, <span class="t-str">"floor"</span>) => <span class="t-num">-5</span>
-<span class="t-funcCall">int</span>(<span class="t-num">6.3</span>, <span class="t-str">"ceiling"</span>) => <span class="t-num">7</span>
-<span class="t-funcCall">int</span>(<span class="t-num">-6.3</span>, <span class="t-str">"ceiling"</span>) => <span class="t-num">-6</span>
-<span class="t-funcCall">int</span>(<span class="t-num">6.3456</span>, <span class="t-str">"truncate"</span>) => <span class="t-num">6</span>
-<span class="t-funcCall">int</span>(<span class="t-num">-6.3456</span>, <span class="t-str">"truncate"</span>) => <span class="t-num">-6</span>
+<span class="t-funcCall">int</span>(<span class="t-num">2.34</span>) =&gt; <span class="t-num">2</span>
+<span class="t-funcCall">int</span>(<span class="t-num">2.34</span>, <span class="t-str">&quot;round&quot;</span>) =&gt; <span class="t-num">2</span>
+<span class="t-funcCall">int</span>(<span class="t-num">-2.34</span>, <span class="t-str">&quot;round&quot;</span>) =&gt; <span class="t-num">-2</span>
+<span class="t-funcCall">int</span>(<span class="t-num">6.5</span>, <span class="t-str">&quot;round&quot;</span>) =&gt; <span class="t-num">7</span>
+<span class="t-funcCall">int</span>(<span class="t-num">-6.5</span>, <span class="t-str">&quot;round&quot;</span>) =&gt; <span class="t-num">-7</span>
+<span class="t-funcCall">int</span>(<span class="t-num">4.57</span>, <span class="t-str">&quot;floor&quot;</span>) =&gt; <span class="t-num">4</span>
+<span class="t-funcCall">int</span>(<span class="t-num">-4.57</span>, <span class="t-str">&quot;floor&quot;</span>) =&gt; <span class="t-num">-5</span>
+<span class="t-funcCall">int</span>(<span class="t-num">6.3</span>, <span class="t-str">&quot;ceiling&quot;</span>) =&gt; <span class="t-num">7</span>
+<span class="t-funcCall">int</span>(<span class="t-num">-6.3</span>, <span class="t-str">&quot;ceiling&quot;</span>) =&gt; <span class="t-num">-6</span>
+<span class="t-funcCall">int</span>(<span class="t-num">6.3456</span>, <span class="t-str">&quot;truncate&quot;</span>) =&gt; <span class="t-num">6</span>
+<span class="t-funcCall">int</span>(<span class="t-num">-6.3456</span>, <span class="t-str">&quot;truncate&quot;</span>) =&gt; <span class="t-num">-6</span>
 </pre>
 
 
@@ -911,26 +914,26 @@ func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
 Round options:
 
 </p><ul>
-<li>"round" - nearest integer, the default
-</li><li>"floor" - integer below (to the left on number line)
-</li><li>"ceiling" - integer above (to the right on number line)
-</li><li>"truncate" - remove decimals
+<li>&quot;round&quot; - nearest integer, the default
+</li><li>&quot;floor&quot; - integer below (to the left on number line)
+</li><li>&quot;ceiling&quot; - integer above (to the right on number line)
+</li><li>&quot;truncate&quot; - remove decimals
 
 </li></ul>
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">int</span>(<span class="t-str">"2"</span>) => <span class="t-num">2</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"2.34"</span>) => <span class="t-num">2</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"-2.34"</span>, <span class="t-str">"round"</span>) => <span class="t-num">-2</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"6.5"</span>, <span class="t-str">"round"</span>) => <span class="t-num">7</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"-6.5"</span>, <span class="t-str">"round"</span>) => <span class="t-num">-7</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"4.57"</span>, <span class="t-str">"floor"</span>) => <span class="t-num">4</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"-4.57"</span>, <span class="t-str">"floor"</span>) => <span class="t-num">-5</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"6.3"</span>, <span class="t-str">"ceiling"</span>) => <span class="t-num">7</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"-6.3"</span>, <span class="t-str">"ceiling"</span>) => <span class="t-num">-6</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"6.3456"</span>, <span class="t-str">"truncate"</span>) => <span class="t-num">6</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"-6.3456"</span>, <span class="t-str">"truncate"</span>) => <span class="t-num">-6</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;2&quot;</span>) =&gt; <span class="t-num">2</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;2.34&quot;</span>) =&gt; <span class="t-num">2</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;-2.34&quot;</span>, <span class="t-str">&quot;round&quot;</span>) =&gt; <span class="t-num">-2</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;6.5&quot;</span>, <span class="t-str">&quot;round&quot;</span>) =&gt; <span class="t-num">7</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;-6.5&quot;</span>, <span class="t-str">&quot;round&quot;</span>) =&gt; <span class="t-num">-7</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;4.57&quot;</span>, <span class="t-str">&quot;floor&quot;</span>) =&gt; <span class="t-num">4</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;-4.57&quot;</span>, <span class="t-str">&quot;floor&quot;</span>) =&gt; <span class="t-num">-5</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;6.3&quot;</span>, <span class="t-str">&quot;ceiling&quot;</span>) =&gt; <span class="t-num">7</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;-6.3&quot;</span>, <span class="t-str">&quot;ceiling&quot;</span>) =&gt; <span class="t-num">-6</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;6.3456&quot;</span>, <span class="t-str">&quot;truncate&quot;</span>) =&gt; <span class="t-num">6</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;-6.3456&quot;</span>, <span class="t-str">&quot;truncate&quot;</span>) =&gt; <span class="t-num">-6</span>
 </pre>
 
 
@@ -950,17 +953,17 @@ func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
 Round options:
 
 </p><ul>
-<li>"round" - nearest integer, the default
-</li><li>"floor" - integer below (to the left on number line)
-</li><li>"ceiling" - integer above (to the right on number line)
-</li><li>"truncate" - remove decimals
+<li>&quot;round&quot; - nearest integer, the default
+</li><li>&quot;floor&quot; - integer below (to the left on number line)
+</li><li>&quot;ceiling&quot; - integer above (to the right on number line)
+</li><li>&quot;truncate&quot; - remove decimals
 
 </li></ul>
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">int</span>(<span class="t-str">"2"</span>, <span class="t-str">"round"</span>, <span class="t-str">"nan"</span>) => <span class="t-num">2</span>
-<span class="t-funcCall">int</span>(<span class="t-str">"notnum"</span>, <span class="t-str">"round"</span>, <span class="t-str">"nan"</span>) => <span class="t-dotName">nan</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;2&quot;</span>, <span class="t-str">&quot;round&quot;</span>, <span class="t-str">&quot;nan&quot;</span>) =&gt; <span class="t-num">2</span>
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;notnum&quot;</span>, <span class="t-str">&quot;round&quot;</span>, <span class="t-str">&quot;nan&quot;</span>) =&gt; <span class="t-dotName">nan</span>
 </pre>
 
 
@@ -1000,17 +1003,17 @@ False values by variable types:
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">bool</span>(<span class="t-num">0</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">bool</span>(<span class="t-num">0.0</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">bool</span>([]) => <span class="t-dotName">false</span>
-<span class="t-funcCall">bool</span>(<span class="t-str">""</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>()) => <span class="t-dotName">false</span>
+<span class="t-funcCall">bool</span>(<span class="t-num">0</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">bool</span>(<span class="t-num">0.0</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">bool</span>([]) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">bool</span>(<span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>()) =&gt; <span class="t-dotName">false</span>
 
-<span class="t-funcCall">bool</span>(<span class="t-num">5</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">bool</span>(<span class="t-num">3.3</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">bool</span>([<span class="t-num">8</span>]) => <span class="t-dotName">true</span>
-<span class="t-funcCall">bool</span>(<span class="t-str">"tea"</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>(<span class="t-str">"tea"</span>, <span class="t-num">2</span>)) => <span class="t-dotName">true</span>
+<span class="t-funcCall">bool</span>(<span class="t-num">5</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">bool</span>(<span class="t-num">3.3</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">bool</span>([<span class="t-num">8</span>]) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">bool</span>(<span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">2</span>)) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -1021,7 +1024,7 @@ func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_find_ssoaa">fun_find_ssoaa</h3>
 
-<p>Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
+<p>Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don&#x27;t specify a default value.
 
 </p><pre class="desc-code">
 <span class="t-dotName">find</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">substring</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -1031,13 +1034,13 @@ Examples:
 
 </p><pre class="desc-code">
        <span class="t-num">0123456789</span> <span class="t-num">1234567</span>
-<span class="t-dotName">msg</span> = <span class="t-str">"Tea time at 3:30."</span>
-<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">"Tea"</span>) = <span class="t-num">0</span>
-<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">"time"</span>) = <span class="t-num">4</span>
-<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">"me"</span>) = <span class="t-num">6</span>
-<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">"party"</span>, <span class="t-num">-1</span>) = <span class="t-num">-1</span>
-<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">"party"</span>, <span class="t-funcCall">len</span>(<span class="t-dotName">msg</span>)) = <span class="t-num">17</span>
-<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">"party"</span>, <span class="t-num">0</span>) = <span class="t-num">0</span>
+<span class="t-dotName">msg</span> = <span class="t-str">&quot;Tea time at 3:30.&quot;</span>
+<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;Tea&quot;</span>) = <span class="t-num">0</span>
+<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;time&quot;</span>) = <span class="t-num">4</span>
+<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;me&quot;</span>) = <span class="t-num">6</span>
+<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;party&quot;</span>, <span class="t-num">-1</span>) = <span class="t-num">-1</span>
+<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;party&quot;</span>, <span class="t-funcCall">len</span>(<span class="t-dotName">msg</span>)) = <span class="t-num">17</span>
+<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;party&quot;</span>, <span class="t-num">0</span>) = <span class="t-num">0</span>
 </pre>
 
 
@@ -1048,7 +1051,7 @@ func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_slice_siois">fun_slice_siois</h3>
 
-<p>Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
+<p>Extract a substring from a string by its position and length. You pass the string, the substring&#x27;s start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
 
 </p><p>The start index and length are by unicode characters not bytes.
 
@@ -1059,9 +1062,9 @@ func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">slice</span>(<span class="t-str">"Earl Grey"</span>, <span class="t-num">1</span>, <span class="t-num">3</span>) => <span class="t-str">"arl"</span>
-<span class="t-funcCall">slice</span>(<span class="t-str">"Earl Grey"</span>, <span class="t-num">6</span>) => <span class="t-str">"rey"</span>
-<span class="t-funcCall">slice</span>(<span class="t-str">"añyóng"</span>, <span class="t-num">0</span>, <span class="t-num">3</span>) => <span class="t-str">"añy"</span>
+<span class="t-funcCall">slice</span>(<span class="t-str">&quot;Earl Grey&quot;</span>, <span class="t-num">1</span>, <span class="t-num">3</span>) =&gt; <span class="t-str">&quot;arl&quot;</span>
+<span class="t-funcCall">slice</span>(<span class="t-str">&quot;Earl Grey&quot;</span>, <span class="t-num">6</span>) =&gt; <span class="t-str">&quot;rey&quot;</span>
+<span class="t-funcCall">slice</span>(<span class="t-str">&quot;añyóng&quot;</span>, <span class="t-num">0</span>, <span class="t-num">3</span>) =&gt; <span class="t-str">&quot;añy&quot;</span>
 </pre>
 
 
@@ -1081,11 +1084,11 @@ func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">dup</span>(<span class="t-str">"="</span>, <span class="t-num">3</span>) => <span class="t-str">"==="</span>
-<span class="t-funcCall">dup</span>(<span class="t-str">"abc"</span>, <span class="t-num">0</span>) => <span class="t-str">""</span>
-<span class="t-funcCall">dup</span>(<span class="t-str">"abc"</span>, <span class="t-num">1</span>) => <span class="t-str">"abc"</span>
-<span class="t-funcCall">dup</span>(<span class="t-str">"abc"</span>, <span class="t-num">2</span>) => <span class="t-str">"abcabc"</span>
-<span class="t-funcCall">dup</span>(<span class="t-str">""</span>, <span class="t-num">3</span>) => <span class="t-str">""</span>
+<span class="t-funcCall">dup</span>(<span class="t-str">&quot;=&quot;</span>, <span class="t-num">3</span>) =&gt; <span class="t-str">&quot;===&quot;</span>
+<span class="t-funcCall">dup</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-num">0</span>) =&gt; <span class="t-str">&quot;&quot;</span>
+<span class="t-funcCall">dup</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-num">1</span>) =&gt; <span class="t-str">&quot;abc&quot;</span>
+<span class="t-funcCall">dup</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-num">2</span>) =&gt; <span class="t-str">&quot;abcabc&quot;</span>
+<span class="t-funcCall">dup</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">3</span>) =&gt; <span class="t-str">&quot;&quot;</span>
 </pre>
 
 
@@ -1105,10 +1108,10 @@ func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">dict</span>() => {}
-<span class="t-funcCall">dict</span>([<span class="t-str">"a"</span>, <span class="t-num">5</span>]) => {<span class="t-str">"a"</span>: <span class="t-num">5</span>}
-<span class="t-funcCall">dict</span>([<span class="t-str">"a"</span>, <span class="t-num">5</span>, <span class="t-str">"b"</span>, <span class="t-num">33</span>, <span class="t-str">"c"</span>, <span class="t-num">0</span>]) =>
-  {<span class="t-str">"a"</span>: <span class="t-num">5</span>, <span class="t-str">"b"</span>: <span class="t-num">33</span>, <span class="t-str">"c"</span>: <span class="t-num">0</span>}
+<span class="t-funcCall">dict</span>() =&gt; {}
+<span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>]) =&gt; {<span class="t-str">&quot;a&quot;</span>: <span class="t-num">5</span>}
+<span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">33</span>, <span class="t-str">&quot;c&quot;</span>, <span class="t-num">0</span>]) =&gt;
+  {<span class="t-str">&quot;a&quot;</span>: <span class="t-num">5</span>, <span class="t-str">&quot;b&quot;</span>: <span class="t-num">33</span>, <span class="t-str">&quot;c&quot;</span>: <span class="t-num">0</span>}
 </pre>
 
 
@@ -1131,11 +1134,11 @@ Examples:
 <span class="t-dotName">a</span> = <span class="t-funcCall">list</span>()
 <span class="t-dotName">a</span> = <span class="t-funcCall">list</span>(<span class="t-num">1</span>)
 <span class="t-dotName">a</span> = <span class="t-funcCall">list</span>(<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>)
-<span class="t-dotName">a</span> = <span class="t-funcCall">list</span>(<span class="t-str">"a"</span>, <span class="t-num">5</span>, <span class="t-str">"b"</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>, <span class="t-str">&quot;b&quot;</span>)
 <span class="t-dotName">a</span> = []
 <span class="t-dotName">a</span> = [<span class="t-num">1</span>]
 <span class="t-dotName">a</span> = [<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
-<span class="t-dotName">a</span> = [<span class="t-str">"a"</span>, <span class="t-num">5</span>, <span class="t-str">"b"</span>]
+<span class="t-dotName">a</span> = [<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>, <span class="t-str">&quot;b&quot;</span>]
 </pre>
 
 
@@ -1172,7 +1175,7 @@ The following example makes a new list [6, 8] from the list
 <span class="t-dotName">o.container</span> = []
 <span class="t-dotName">list</span> = [<span class="t-num">2</span>,<span class="t-num">4</span>,<span class="t-num">6</span>,<span class="t-num">8</span>]
 <span class="t-funcCall">listLoop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">o.container</span>, <span class="t-dotName">b5</span>)
-<span class="t-comment"># o.container => [6, 8]
+<span class="t-comment"># o.container =&gt; [6, 8]
 </span></pre>
 <p>
 Below is the definition of the b5 callback function.
@@ -1180,7 +1183,7 @@ Below is the definition of the b5 callback function.
 </p><pre class="desc-code">
 <span class="t-dotName">b5</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">value</span>: <span class="t-type">int</span>, <span class="t-param">container</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Collect values greater than 5.
-</span>  <span class="t-dotName">container</span> &= <span class="t-funcCall">if</span>( (<span class="t-dotName">value</span> > <span class="t-num">5</span>), <span class="t-dotName">value</span>)
+</span>  <span class="t-dotName">container</span> &amp;= <span class="t-funcCall">if</span>( (<span class="t-dotName">value</span> &gt; <span class="t-num">5</span>), <span class="t-dotName">value</span>)
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 </pre>
 
@@ -1208,45 +1211,45 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 
 </p><p>Replace:
 </p><pre class="desc-code">
-<span class="t-funcCall">replace</span>(<span class="t-str">"Earl Grey"</span>, <span class="t-num">5</span>, <span class="t-num">4</span>, <span class="t-str">"of Sandwich"</span>)
-  => <span class="t-str">"Earl of Sandwich"</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">0</span>, <span class="t-num">1</span>, <span class="t-str">"abcd"</span>) => <span class="t-dotName">abcd23</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">0</span>, <span class="t-num">2</span>, <span class="t-str">"abcd"</span>) => <span class="t-dotName">abcd3</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;Earl Grey&quot;</span>, <span class="t-num">5</span>, <span class="t-num">4</span>, <span class="t-str">&quot;of Sandwich&quot;</span>)
+  =&gt; <span class="t-str">&quot;Earl of Sandwich&quot;</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">1</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-dotName">abcd23</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">2</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-dotName">abcd3</span>
 
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">1</span>, <span class="t-num">1</span>, <span class="t-str">"abcd"</span>) => <span class="t-num">1</span>a<span class="t-dotName">bcd3</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-str">"abcd"</span>) => <span class="t-num">1</span>a<span class="t-dotName">bcd</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">1</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-num">1</span>a<span class="t-dotName">bcd3</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-num">1</span>a<span class="t-dotName">bcd</span>
 
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">2</span>, <span class="t-num">1</span>, <span class="t-str">"abcd"</span>) => <span class="t-num">12</span>a<span class="t-dotName">bcd</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">2</span>, <span class="t-num">1</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-num">12</span>a<span class="t-dotName">bcd</span>
 </pre>
 <p>Insert:
 </p><pre class="desc-code">
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">"abcd"</span>) => <span class="t-dotName">abcd123</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">1</span>, <span class="t-num">0</span>, <span class="t-str">"abcd"</span>) => <span class="t-num">1</span>a<span class="t-dotName">bcd23</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">2</span>, <span class="t-num">0</span>, <span class="t-str">"abcd"</span>) => <span class="t-num">12</span>a<span class="t-dotName">bcd3</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">3</span>, <span class="t-num">0</span>, <span class="t-str">"abcd"</span>) => <span class="t-num">123</span>a<span class="t-dotName">bcd</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-dotName">abcd123</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-num">1</span>a<span class="t-dotName">bcd23</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">2</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-num">12</span>a<span class="t-dotName">bcd3</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">3</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-num">123</span>a<span class="t-dotName">bcd</span>
 </pre>
 <p>Append:
 </p><pre class="desc-code">
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">3</span>, <span class="t-num">0</span>, <span class="t-str">"abcd"</span>) => <span class="t-num">123</span>a<span class="t-dotName">bcd</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">3</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-num">123</span>a<span class="t-dotName">bcd</span>
 </pre>
 <p>Delete:
 </p><pre class="desc-code">
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">0</span>, <span class="t-num">1</span>, <span class="t-str">""</span>) => <span class="t-num">23</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">0</span>, <span class="t-num">2</span>, <span class="t-str">""</span>) => <span class="t-num">3</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">0</span>, <span class="t-num">3</span>, <span class="t-str">""</span>) => <span class="t-str">""</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">1</span>, <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-num">23</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">2</span>, <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-num">3</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">3</span>, <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-str">&quot;&quot;</span>
 
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">1</span>, <span class="t-num">1</span>, <span class="t-str">""</span>) => <span class="t-num">13</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-str">""</span>) => <span class="t-num">1</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">1</span>, <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-num">13</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-num">1</span>
 
-<span class="t-funcCall">replace</span>(<span class="t-str">"123"</span>, <span class="t-num">2</span>, <span class="t-num">1</span>, <span class="t-str">""</span>) => <span class="t-num">12</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">2</span>, <span class="t-num">1</span>, <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-num">12</span>
 </pre>
 <p>Edge Cases:
 </p><pre class="desc-code">
-<span class="t-funcCall">replace</span>(<span class="t-str">""</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">""</span>) =>
-<span class="t-funcCall">replace</span>(<span class="t-str">""</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">"a"</span>) => <span class="t-dotName">a</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">""</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">"ab"</span>) => <span class="t-dotName">ab</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">""</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">"abc"</span>) => <span class="t-dotName">abc</span>
-<span class="t-funcCall">replace</span>(<span class="t-str">""</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">"abcd"</span>) => <span class="t-dotName">abcd</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;&quot;</span>) =&gt;
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;a&quot;</span>) =&gt; <span class="t-dotName">a</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;ab&quot;</span>) =&gt; <span class="t-dotName">ab</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abc&quot;</span>) =&gt; <span class="t-dotName">abc</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) =&gt; <span class="t-dotName">abcd</span>
 </pre>
 
 
@@ -1269,9 +1272,9 @@ replacements.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-str">"abc"</span>, <span class="t-str">"456"</span>, <span class="t-str">"def"</span>, <span class="t-str">""</span>)
-<span class="t-funcCall">replaceRe</span>(<span class="t-str">"abcdefabc"</span>, <span class="t-dotName">list</span>))
-  => <span class="t-str">"456456"</span>
+<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-str">&quot;456&quot;</span>, <span class="t-str">&quot;def&quot;</span>, <span class="t-str">&quot;&quot;</span>)
+<span class="t-funcCall">replaceRe</span>(<span class="t-str">&quot;abcdefabc&quot;</span>, <span class="t-dotName">list</span>))
+  =&gt; <span class="t-str">&quot;456456&quot;</span>
 </pre>
 <p>
 For developing and debugging regular expressions see the
@@ -1305,18 +1308,18 @@ system separator is used.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">path</span>(<span class="t-str">"src/functions.nim"</span>) => {
-  <span class="t-str">"filename"</span>: <span class="t-str">"functions.nim"</span>,
-  <span class="t-str">"basename"</span>: <span class="t-str">"functions"</span>,
-  <span class="t-str">"ext"</span>: <span class="t-str">".nim"</span>,
-  <span class="t-str">"dir"</span>: <span class="t-str">"src/"</span>,
+<span class="t-funcCall">path</span>(<span class="t-str">&quot;src/functions.nim&quot;</span>) =&gt; {
+  <span class="t-str">&quot;filename&quot;</span>: <span class="t-str">&quot;functions.nim&quot;</span>,
+  <span class="t-str">&quot;basename&quot;</span>: <span class="t-str">&quot;functions&quot;</span>,
+  <span class="t-str">&quot;ext&quot;</span>: <span class="t-str">&quot;.nim&quot;</span>,
+  <span class="t-str">&quot;dir&quot;</span>: <span class="t-str">&quot;src/&quot;</span>,
 }
 
-<span class="t-funcCall">path</span>(<span class="t-str">"src\functions.nim"</span>, <span class="t-str">"\") => {
-  "</span>f<span class="t-dotName">ilename</span>": <span class="t-str">"functions.nim"</span>,
-  <span class="t-str">"basename"</span>: <span class="t-str">"functions"</span>,
-  <span class="t-str">"ext"</span>: <span class="t-str">".nim"</span>,
-  <span class="t-str">"dir"</span>: "src\",
+<span class="t-funcCall">path</span>(<span class="t-str">&quot;src\functions.nim&quot;</span>, <span class="t-str">&quot;\&quot;) =&gt; {
+  &quot;</span>f<span class="t-dotName">ilename</span>&quot;: <span class="t-str">&quot;functions.nim&quot;</span>,
+  <span class="t-str">&quot;basename&quot;</span>: <span class="t-str">&quot;functions&quot;</span>,
+  <span class="t-str">&quot;ext&quot;</span>: <span class="t-str">&quot;.nim&quot;</span>,
+  <span class="t-str">&quot;dir&quot;</span>: &quot;src\&quot;,
 }
 </pre>
 
@@ -1337,9 +1340,9 @@ func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">lower</span>(<span class="t-str">"Tea"</span>) => <span class="t-str">"tea"</span>
-<span class="t-funcCall">lower</span>(<span class="t-str">"TEA"</span>) => <span class="t-str">"tea"</span>
-<span class="t-funcCall">lower</span>(<span class="t-str">"TEĀ"</span>) => <span class="t-str">"teā"</span>
+<span class="t-funcCall">lower</span>(<span class="t-str">&quot;Tea&quot;</span>) =&gt; <span class="t-str">&quot;tea&quot;</span>
+<span class="t-funcCall">lower</span>(<span class="t-str">&quot;TEA&quot;</span>) =&gt; <span class="t-str">&quot;tea&quot;</span>
+<span class="t-funcCall">lower</span>(<span class="t-str">&quot;TEĀ&quot;</span>) =&gt; <span class="t-str">&quot;teā&quot;</span>
 </pre>
 
 
@@ -1359,9 +1362,9 @@ func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">"a"</span>, <span class="t-num">1</span>, <span class="t-str">"b"</span>, <span class="t-num">2</span>, <span class="t-str">"c"</span>, <span class="t-num">3</span>)
-<span class="t-funcCall">keys</span>(<span class="t-dotName">d</span>) => [<span class="t-str">"a"</span>, <span class="t-str">"b"</span>, <span class="t-str">"c"</span>]
-<span class="t-funcCall">values</span>(<span class="t-dotName">d</span>) => [<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>, <span class="t-str">&quot;c&quot;</span>, <span class="t-num">3</span>)
+<span class="t-funcCall">keys</span>(<span class="t-dotName">d</span>) =&gt; [<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-str">&quot;c&quot;</span>]
+<span class="t-funcCall">values</span>(<span class="t-dotName">d</span>) =&gt; [<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
 </pre>
 
 
@@ -1381,9 +1384,9 @@ func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">"a"</span>, <span class="t-str">"apple"</span>, <span class="t-str">"b"</span>, <span class="t-num">2</span>, <span class="t-str">"c"</span>, <span class="t-num">3</span>)
-<span class="t-funcCall">keys</span>(<span class="t-dotName">d</span>) => [<span class="t-str">"a"</span>, <span class="t-str">"b"</span>, <span class="t-str">"c"</span>]
-<span class="t-funcCall">values</span>(<span class="t-dotName">d</span>) => [<span class="t-str">"apple"</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;apple&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>, <span class="t-str">&quot;c&quot;</span>, <span class="t-num">3</span>)
+<span class="t-funcCall">keys</span>(<span class="t-dotName">d</span>) =&gt; [<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-str">&quot;c&quot;</span>]
+<span class="t-funcCall">values</span>(<span class="t-dotName">d</span>) =&gt; [<span class="t-str">&quot;apple&quot;</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
 </pre>
 
 
@@ -1396,10 +1399,10 @@ func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Sort a list of values of the same type.  The values are ints, floats, or strings.
 
-</p><p>You specify the sort order, "ascending" or "descending".
+</p><p>You specify the sort order, &quot;ascending&quot; or &quot;descending&quot;.
 
-</p><p>You have the option of sorting strings case "insensitive". Case
-"sensitive" is the default.
+</p><p>You have the option of sorting strings case &quot;insensitive&quot;. Case
+&quot;sensitive&quot; is the default.
 
 </p><pre class="desc-code">
 <span class="t-dotName">sort</span> = <span class="t-funcCall">func</span>(<span class="t-param">values</span>: <span class="t-type">list</span>, <span class="t-param">order</span>: <span class="t-type">string</span>, <span class="t-param">insensitive</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">list</span>
@@ -1409,17 +1412,17 @@ Examples:
 
 </p><pre class="desc-code">
 <span class="t-dotName">ints</span> = <span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-num">3</span>, <span class="t-num">5</span>, <span class="t-num">5</span>, <span class="t-num">2</span>, <span class="t-num">4</span>)
-<span class="t-funcCall">sort</span>(<span class="t-dotName">list</span>, <span class="t-str">"ascending"</span>) => [<span class="t-num">2</span>, <span class="t-num">3</span>, <span class="t-num">4</span>, <span class="t-num">4</span>, <span class="t-num">5</span>, <span class="t-num">5</span>]
-<span class="t-funcCall">sort</span>(<span class="t-dotName">list</span>, <span class="t-str">"descending"</span>) => [<span class="t-num">5</span>, <span class="t-num">5</span>, <span class="t-num">4</span>, <span class="t-num">4</span>, <span class="t-num">3</span>, <span class="t-num">2</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">list</span>, <span class="t-str">&quot;ascending&quot;</span>) =&gt; [<span class="t-num">2</span>, <span class="t-num">3</span>, <span class="t-num">4</span>, <span class="t-num">4</span>, <span class="t-num">5</span>, <span class="t-num">5</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">list</span>, <span class="t-str">&quot;descending&quot;</span>) =&gt; [<span class="t-num">5</span>, <span class="t-num">5</span>, <span class="t-num">4</span>, <span class="t-num">4</span>, <span class="t-num">3</span>, <span class="t-num">2</span>]
 
 <span class="t-dotName">floats</span> = <span class="t-funcCall">list</span>(<span class="t-num">4.4</span>, <span class="t-num">3.1</span>, <span class="t-num">5.9</span>)
-<span class="t-funcCall">sort</span>(<span class="t-dotName">floats</span>, <span class="t-str">"ascending"</span>) => [<span class="t-num">3.1</span>, <span class="t-num">4.4</span>, <span class="t-num">5.9</span>]
-<span class="t-funcCall">sort</span>(<span class="t-dotName">floats</span>, <span class="t-str">"descending"</span>) => [<span class="t-num">5.9</span>, <span class="t-num">4.4</span>, <span class="t-num">3.1</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">floats</span>, <span class="t-str">&quot;ascending&quot;</span>) =&gt; [<span class="t-num">3.1</span>, <span class="t-num">4.4</span>, <span class="t-num">5.9</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">floats</span>, <span class="t-str">&quot;descending&quot;</span>) =&gt; [<span class="t-num">5.9</span>, <span class="t-num">4.4</span>, <span class="t-num">3.1</span>]
 
-<span class="t-dotName">strs</span> = <span class="t-funcCall">list</span>(<span class="t-str">"T"</span>, <span class="t-str">"e"</span>, <span class="t-str">"a"</span>)
-<span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">"ascending"</span>) => [<span class="t-str">"T"</span>, <span class="t-str">"a"</span>, <span class="t-str">"e"</span>]
-<span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">"ascending"</span>, <span class="t-str">"sensitive"</span>) => [<span class="t-str">"T"</span>, <span class="t-str">"a"</span>, <span class="t-str">"e"</span>]
-<span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">"ascending"</span>, <span class="t-str">"insensitive"</span>) => [<span class="t-str">"a"</span>, <span class="t-str">"e"</span>, <span class="t-str">"T"</span>]
+<span class="t-dotName">strs</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;T&quot;</span>, <span class="t-str">&quot;e&quot;</span>, <span class="t-str">&quot;a&quot;</span>)
+<span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">&quot;ascending&quot;</span>) =&gt; [<span class="t-str">&quot;T&quot;</span>, <span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;e&quot;</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>) =&gt; [<span class="t-str">&quot;T&quot;</span>, <span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;e&quot;</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;insensitive&quot;</span>) =&gt; [<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;e&quot;</span>, <span class="t-str">&quot;T&quot;</span>]
 </pre>
 
 
@@ -1432,10 +1435,10 @@ func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Sort a list of lists.
 
-</p><p>You specify the sort order, "ascending" or "descending".
+</p><p>You specify the sort order, &quot;ascending&quot; or &quot;descending&quot;.
 
-</p><p>You specify how to sort strings either case "sensitive" or
-"insensitive".
+</p><p>You specify how to sort strings either case &quot;sensitive&quot; or
+&quot;insensitive&quot;.
 
 </p><p>You specify which index to compare by.  The compare index value
 must exist in each list, be the same type and be an int, float,
@@ -1451,8 +1454,8 @@ Examples:
 <span class="t-dotName">l1</span> = <span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-num">3</span>, <span class="t-num">1</span>)
 <span class="t-dotName">l2</span> = <span class="t-funcCall">list</span>(<span class="t-num">2</span>, <span class="t-num">3</span>, <span class="t-num">4</span>)
 <span class="t-dotName">listOfLists</span> = <span class="t-funcCall">list</span>(<span class="t-dotName">l1</span>, <span class="t-dotName">l2</span>)
-<span class="t-funcCall">sort</span>(<span class="t-dotName">listOfLists</span>, <span class="t-str">"ascending"</span>, <span class="t-str">"sensitive"</span>, <span class="t-num">0</span>) => [<span class="t-dotName">l2</span>, <span class="t-dotName">l1</span>]
-<span class="t-funcCall">sort</span>(<span class="t-dotName">listOfLists</span>, <span class="t-str">"ascending"</span>, <span class="t-str">"sensitive"</span>, <span class="t-num">2</span>) => [<span class="t-dotName">l1</span>, <span class="t-dotName">l2</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">listOfLists</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-num">0</span>) =&gt; [<span class="t-dotName">l2</span>, <span class="t-dotName">l1</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">listOfLists</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-num">2</span>) =&gt; [<span class="t-dotName">l1</span>, <span class="t-dotName">l2</span>]
 </pre>
 
 
@@ -1465,10 +1468,10 @@ func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Sort a list of dictionaries.
 
-</p><p>You specify the sort order, "ascending" or "descending".
+</p><p>You specify the sort order, &quot;ascending&quot; or &quot;descending&quot;.
 
-</p><p>You specify how to sort strings either case "sensitive" or
-"insensitive".
+</p><p>You specify how to sort strings either case &quot;sensitive&quot; or
+&quot;insensitive&quot;.
 
 </p><p>You specify the compare key.  The key value must exist in
 each dictionary, be the same type and be an int, float or
@@ -1481,11 +1484,11 @@ string.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">d1</span> = <span class="t-funcCall">dict</span>(<span class="t-str">"name"</span>, <span class="t-str">"Earl Gray"</span>, <span class="t-str">"weight"</span>, <span class="t-num">1.2</span>)
-<span class="t-dotName">d2</span> = <span class="t-funcCall">dict</span>(<span class="t-str">"name"</span>, <span class="t-str">"Tea Pot"</span>, <span class="t-str">"weight"</span>, <span class="t-num">3.5</span>)
+<span class="t-dotName">d1</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;name&quot;</span>, <span class="t-str">&quot;Earl Gray&quot;</span>, <span class="t-str">&quot;weight&quot;</span>, <span class="t-num">1.2</span>)
+<span class="t-dotName">d2</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;name&quot;</span>, <span class="t-str">&quot;Tea Pot&quot;</span>, <span class="t-str">&quot;weight&quot;</span>, <span class="t-num">3.5</span>)
 <span class="t-dotName">dicts</span> = <span class="t-funcCall">list</span>(<span class="t-dotName">d1</span>, <span class="t-dotName">d2</span>)
-<span class="t-funcCall">sort</span>(<span class="t-dotName">dicts</span>, <span class="t-str">"ascending"</span>, <span class="t-str">"sensitive"</span>, <span class="t-str">"weight"</span>) => [<span class="t-dotName">d1</span>, <span class="t-dotName">d2</span>]
-<span class="t-funcCall">sort</span>(<span class="t-dotName">dicts</span>, <span class="t-str">"descending"</span>, <span class="t-str">"sensitive"</span>, <span class="t-str">"name"</span>) => [<span class="t-dotName">d2</span>, <span class="t-dotName">d1</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">dicts</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-str">&quot;weight&quot;</span>) =&gt; [<span class="t-dotName">d1</span>, <span class="t-dotName">d2</span>]
+<span class="t-funcCall">sort</span>(<span class="t-dotName">dicts</span>, <span class="t-str">&quot;descending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-str">&quot;name&quot;</span>) =&gt; [<span class="t-dotName">d2</span>, <span class="t-dotName">d1</span>]
 </pre>
 
 
@@ -1512,9 +1515,9 @@ type:
 <p>Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-str">"Tea"</span>, <span class="t-str">"Water"</span>, <span class="t-str">"Tea"</span>)
-<span class="t-funcCall">anchores</span>(<span class="t-dotName">list</span>, <span class="t-str">"github"</span>) =>
-  [<span class="t-str">"tea"</span>, <span class="t-str">"water"</span>, <span class="t-str">"tea-1"</span>]
+<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;Water&quot;</span>, <span class="t-str">&quot;Tea&quot;</span>)
+<span class="t-funcCall">anchores</span>(<span class="t-dotName">list</span>, <span class="t-str">&quot;github&quot;</span>) =&gt;
+  [<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;water&quot;</span>, <span class="t-str">&quot;tea-1&quot;</span>]
 </pre>
 
 
@@ -1534,13 +1537,13 @@ func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">type</span>(<span class="t-num">2</span>) => <span class="t-str">"int"</span>
-<span class="t-funcCall">type</span>(<span class="t-num">3.14159</span>) => <span class="t-str">"float"</span>
-<span class="t-funcCall">type</span>(<span class="t-str">"Tea"</span>) => <span class="t-str">"string"</span>
-<span class="t-funcCall">type</span>(<span class="t-funcCall">list</span>(<span class="t-num">1</span>,<span class="t-num">2</span>)) => <span class="t-str">"list"</span>
-<span class="t-funcCall">type</span>(<span class="t-funcCall">dict</span>(<span class="t-str">"a"</span>, <span class="t-num">1</span>)) => <span class="t-str">"dict"</span>
-<span class="t-funcCall">type</span>(<span class="t-dotName">true</span>) => <span class="t-str">"bool"</span>
-<span class="t-funcCall">type</span>(<span class="t-dotName">f.cmp</span>[<span class="t-num">0</span>]) => <span class="t-str">"func"</span>
+<span class="t-funcCall">type</span>(<span class="t-num">2</span>) =&gt; <span class="t-str">&quot;int&quot;</span>
+<span class="t-funcCall">type</span>(<span class="t-num">3.14159</span>) =&gt; <span class="t-str">&quot;float&quot;</span>
+<span class="t-funcCall">type</span>(<span class="t-str">&quot;Tea&quot;</span>) =&gt; <span class="t-str">&quot;string&quot;</span>
+<span class="t-funcCall">type</span>(<span class="t-funcCall">list</span>(<span class="t-num">1</span>,<span class="t-num">2</span>)) =&gt; <span class="t-str">&quot;list&quot;</span>
+<span class="t-funcCall">type</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1</span>)) =&gt; <span class="t-str">&quot;dict&quot;</span>
+<span class="t-funcCall">type</span>(<span class="t-dotName">true</span>) =&gt; <span class="t-str">&quot;bool&quot;</span>
+<span class="t-funcCall">type</span>(<span class="t-dotName">f.cmp</span>[<span class="t-num">0</span>]) =&gt; <span class="t-str">&quot;func&quot;</span>
 </pre>
 
 
@@ -1554,12 +1557,12 @@ func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Join the path components with a path separator.
 
 </p><p>You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either "/", "" or
-"". If you specify "" or leave off the parameter, the current
+parameter you specify the separator to use, either &quot;/&quot;, &quot;&quot; or
+&quot;&quot;. If you specify &quot;&quot; or leave off the parameter, the current
 platform separator is used.
 
 </p><p>If the separator already exists between components, a new one
-is not added. If a component is "", the platform separator is
+is not added. If a component is &quot;&quot;, the platform separator is
 used for it.
 
 </p><pre class="desc-code">
@@ -1569,23 +1572,23 @@ used for it.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">joinPath</span>([<span class="t-str">"images"</span>, <span class="t-str">"tea"</span>]) =>
-  <span class="t-str">"images/tea"</span>
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) =&gt;
+  <span class="t-str">&quot;images/tea&quot;</span>
 
-<span class="t-funcCall">joinPath</span>([<span class="t-str">"images"</span>, <span class="t-str">"tea"</span>], <span class="t-str">"/"</span>) =>
-  <span class="t-str">"images/tea"</span>
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images&quot;</span>, <span class="t-str">&quot;tea&quot;</span>], <span class="t-str">&quot;/&quot;</span>) =&gt;
+  <span class="t-str">&quot;images/tea&quot;</span>
 
-<span class="t-funcCall">joinPath</span>([<span class="t-str">"images"</span>, <span class="t-str">"tea"</span>], <span class="t-str">"\") =>
-  "</span>i<span class="t-dotName">mages</span>\<span class="t-dotName">tea</span>"
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images&quot;</span>, <span class="t-str">&quot;tea&quot;</span>], <span class="t-str">&quot;\&quot;) =&gt;
+  &quot;</span>i<span class="t-dotName">mages</span>\<span class="t-dotName">tea</span>&quot;
 
-<span class="t-funcCall">joinPath</span>([<span class="t-str">"images/"</span>, <span class="t-str">"tea"</span>]) =>
-  <span class="t-str">"images/tea"</span>
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images/&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) =&gt;
+  <span class="t-str">&quot;images/tea&quot;</span>
 
-<span class="t-funcCall">joinPath</span>([<span class="t-str">""</span>, <span class="t-str">"tea"</span>]) =>
-  <span class="t-str">"/tea"</span>
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) =&gt;
+  <span class="t-str">&quot;/tea&quot;</span>
 
-<span class="t-funcCall">joinPath</span>([<span class="t-str">"/"</span>, <span class="t-str">"tea"</span>]) =>
-  <span class="t-str">"/tea"</span>
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;/&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) =&gt;
+  <span class="t-str">&quot;/tea&quot;</span>
 </pre>
 
 
@@ -1605,14 +1608,14 @@ func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">join</span>([<span class="t-str">"a"</span>, <span class="t-str">"b"</span>], <span class="t-str">", "</span>) => <span class="t-str">"a, b"</span>
-<span class="t-funcCall">join</span>([<span class="t-str">"a"</span>, <span class="t-str">"b"</span>], <span class="t-str">""</span>) => <span class="t-str">"ab"</span>
-<span class="t-funcCall">join</span>([<span class="t-str">"a"</span>, <span class="t-str">"b"</span>, <span class="t-str">"c"</span>], <span class="t-str">""</span>) => <span class="t-str">"abc"</span>
-<span class="t-funcCall">join</span>([<span class="t-str">"a"</span>], <span class="t-str">", "</span>) => <span class="t-str">"a"</span>
-<span class="t-funcCall">join</span>([<span class="t-str">""</span>], <span class="t-str">", "</span>) => <span class="t-str">""</span>
-<span class="t-funcCall">join</span>([<span class="t-str">"a"</span>, <span class="t-str">"b"</span>], <span class="t-str">""</span>) => <span class="t-str">"ab"</span>
-<span class="t-funcCall">join</span>([<span class="t-str">"a"</span>, <span class="t-str">""</span>, <span class="t-str">"c"</span>], <span class="t-str">"|"</span>) => <span class="t-str">"a||c"</span>
-<span class="t-funcCall">join</span>([<span class="t-str">"a"</span>, <span class="t-str">""</span>, <span class="t-str">"c"</span>], <span class="t-str">"|"</span>, <span class="t-dotName">true</span>) => <span class="t-str">"a|c"</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;, &quot;</span>) =&gt; <span class="t-str">&quot;a, b&quot;</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-str">&quot;ab&quot;</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-str">&quot;abc&quot;</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>], <span class="t-str">&quot;, &quot;</span>) =&gt; <span class="t-str">&quot;a&quot;</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;&quot;</span>], <span class="t-str">&quot;, &quot;</span>) =&gt; <span class="t-str">&quot;&quot;</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;&quot;</span>) =&gt; <span class="t-str">&quot;ab&quot;</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;|&quot;</span>) =&gt; <span class="t-str">&quot;a||c&quot;</span>
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;|&quot;</span>, <span class="t-dotName">true</span>) =&gt; <span class="t-str">&quot;a|c&quot;</span>
 </pre>
 
 
@@ -1632,13 +1635,13 @@ func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
 You can warn conditionally in a bare if statement:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">"message is 0"</span>))
+<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;message is 0&quot;</span>))
 </pre>
 <p>
 You can warn unconditionally using a bare warn statement:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">warn</span>(<span class="t-str">"always warn"</span>)
+<span class="t-funcCall">warn</span>(<span class="t-str">&quot;always warn&quot;</span>)
 </pre>
 
 
@@ -1658,13 +1661,13 @@ func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 You can log conditionally in a bare if statement:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">log</span>(<span class="t-str">"log this message when c is 0"</span>))
+<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">log</span>(<span class="t-str">&quot;log this message when c is 0&quot;</span>))
 </pre>
 <p>
 You can log unconditionally using a bare log statement:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">log</span>(<span class="t-str">"always log"</span>)
+<span class="t-funcCall">log</span>(<span class="t-str">&quot;always log&quot;</span>)
 </pre>
 
 
@@ -1699,8 +1702,8 @@ In a template command a return controls the replacement block
 looping by returning “skip” and “stop”.
 
 </p><pre class="desc-code">
-<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">"stop"</span>))
-<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">"skip"</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">&quot;stop&quot;</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">&quot;skip&quot;</span>))
 </pre>
 <p>
 </p><ul>
@@ -1736,7 +1739,7 @@ func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 <span class="t-dotName">string</span> = <span class="t-funcCall">func</span>(<span class="t-param">var</span>: <span class="t-type">any</span>, <span class="t-param">stype</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">string</span>
 </pre>
 <p>
-The default stype is "rb" which is used for replacement blocks.
+The default stype is &quot;rb&quot; which is used for replacement blocks.
 
 </p><p>stype:
 
@@ -1745,19 +1748,19 @@ The default stype is "rb" which is used for replacement blocks.
 </li><li>rb — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
 </li><li>dn -- dot name (dn) returns JSON except dictionary elements
-are printed one per line as "key = value". See string(dotName, string).
+are printed one per line as &quot;key = value&quot;. See string(dotName, string).
 </li><li>vl -- vertical list (vl) returns JSON except list elements
-are printed one per line as "ix: value".
+are printed one per line as &quot;ix: value&quot;.
 
 </li></ul>
 <p>Examples variables:
 
 </p><pre class="desc-code">
-<span class="t-dotName">str</span> = <span class="t-str">"Earl Grey"</span>
+<span class="t-dotName">str</span> = <span class="t-str">&quot;Earl Grey&quot;</span>
 <span class="t-dotName">pi</span> = <span class="t-num">3.14159</span>
 <span class="t-dotName">one</span> = <span class="t-num">1</span>
-<span class="t-dotName">a</span> = [<span class="t-str">"red"</span>, <span class="t-str">"green"</span>, <span class="t-str">"blue"</span>]
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">"x"</span>, <span class="t-num">1</span>, <span class="t-str">"y"</span>, <span class="t-num">2</span>])
+<span class="t-dotName">a</span> = [<span class="t-str">&quot;red&quot;</span>, <span class="t-str">&quot;green&quot;</span>, <span class="t-str">&quot;blue&quot;</span>]
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;x&quot;</span>, <span class="t-num">1</span>, <span class="t-str">&quot;y&quot;</span>, <span class="t-num">2</span>])
 <span class="t-dotName">fn</span> = <span class="t-dotName">cmp</span>[<span class="t-num">0</span>]
 <span class="t-dotName">found</span> = <span class="t-dotName">true</span>
 </pre>
@@ -1765,13 +1768,13 @@ are printed one per line as "ix: value".
 json:
 
 </p><pre class="desc-code">
-<span class="t-dotName">str</span> => <span class="t-str">"Earl Grey"</span>
-<span class="t-dotName">pi</span> => <span class="t-num">3.14159</span>
-<span class="t-dotName">one</span> => <span class="t-num">1</span>
-<span class="t-dotName">a</span> => [<span class="t-str">"red"</span>,<span class="t-str">"green"</span>,<span class="t-str">"blue"</span>]
-<span class="t-dotName">d</span> => {<span class="t-str">"x"</span>:<span class="t-num">1</span>,<span class="t-str">"y"</span>:<span class="t-num">2</span>}
-<span class="t-dotName">fn</span> => <span class="t-str">"cmp"</span>
-<span class="t-dotName">found</span> => <span class="t-dotName">true</span>
+<span class="t-dotName">str</span> =&gt; <span class="t-str">&quot;Earl Grey&quot;</span>
+<span class="t-dotName">pi</span> =&gt; <span class="t-num">3.14159</span>
+<span class="t-dotName">one</span> =&gt; <span class="t-num">1</span>
+<span class="t-dotName">a</span> =&gt; [<span class="t-str">&quot;red&quot;</span>,<span class="t-str">&quot;green&quot;</span>,<span class="t-str">&quot;blue&quot;</span>]
+<span class="t-dotName">d</span> =&gt; {<span class="t-str">&quot;x&quot;</span>:<span class="t-num">1</span>,<span class="t-str">&quot;y&quot;</span>:<span class="t-num">2</span>}
+<span class="t-dotName">fn</span> =&gt; <span class="t-str">&quot;cmp&quot;</span>
+<span class="t-dotName">found</span> =&gt; <span class="t-dotName">true</span>
 </pre>
 <p>
 rb:
@@ -1779,8 +1782,8 @@ rb:
 </p><p>Same as JSON except the following.
 
 </p><pre class="desc-code">
-<span class="t-dotName">str</span> => <span class="t-dotName">Earl</span> <span class="t-dotName">Grey</span>
-<span class="t-dotName">fn</span> => <span class="t-dotName">cmp</span>
+<span class="t-dotName">str</span> =&gt; <span class="t-dotName">Earl</span> <span class="t-dotName">Grey</span>
+<span class="t-dotName">fn</span> =&gt; <span class="t-dotName">cmp</span>
 </pre>
 <p>
 dn:
@@ -1788,7 +1791,7 @@ dn:
 </p><p>Same as JSON except the following.
 
 </p><pre class="desc-code">
-<span class="t-dotName">d</span> =>
+<span class="t-dotName">d</span> =&gt;
 <span class="t-dotName">x</span> = <span class="t-num">1</span>
 <span class="t-dotName">y</span> = <span class="t-num">2</span>
 </pre>
@@ -1798,10 +1801,10 @@ vl:
 </p><p>Same as JSON except the following.
 
 </p><pre class="desc-code">
-<span class="t-dotName">a</span> =>
-<span class="t-num">0</span>: <span class="t-str">"red"</span>
-<span class="t-num">1</span>: <span class="t-str">"green"</span>
-<span class="t-num">2</span>: <span class="t-str">"blue"</span>
+<span class="t-dotName">a</span> =&gt;
+<span class="t-num">0</span>: <span class="t-str">&quot;red&quot;</span>
+<span class="t-num">1</span>: <span class="t-str">&quot;green&quot;</span>
+<span class="t-num">2</span>: <span class="t-str">&quot;blue&quot;</span>
 </pre>
 
 
@@ -1821,11 +1824,11 @@ func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
 Example:
 
 </p><pre class="desc-code">
-<span class="t-dotName">d</span> = {<span class="t-str">"x"</span>,<span class="t-num">1</span>, <span class="t-str">"y"</span>:<span class="t-str">"tea"</span>, <span class="t-str">"z"</span>:{<span class="t-str">"a"</span>:<span class="t-num">8</span>}}
-<span class="t-funcCall">string</span>(<span class="t-str">"teas"</span>, <span class="t-dotName">d</span>) =>
+<span class="t-dotName">d</span> = {<span class="t-str">&quot;x&quot;</span>,<span class="t-num">1</span>, <span class="t-str">&quot;y&quot;</span>:<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;z&quot;</span>:{<span class="t-str">&quot;a&quot;</span>:<span class="t-num">8</span>}}
+<span class="t-funcCall">string</span>(<span class="t-str">&quot;teas&quot;</span>, <span class="t-dotName">d</span>) =&gt;
 
 <span class="t-dotName">teas.x</span> = <span class="t-num">1</span>
-<span class="t-dotName">teas.y</span> = <span class="t-str">"tea"</span>
+<span class="t-dotName">teas.y</span> = <span class="t-str">&quot;tea&quot;</span>
 <span class="t-dotName">teas.z.a</span> = <span class="t-num">8</span>
 </pre>
 
@@ -1846,19 +1849,19 @@ func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
 Example:
 
 </p><pre class="desc-code">
-<span class="t-dotName">let</span> <span class="t-dotName">first</span> = <span class="t-str">"Earl"</span>
-<span class="t-dotName">let</span> <span class="t-dotName">last</span> = <span class="t-str">"Grey"</span>
-<span class="t-dotName">str</span> = <span class="t-funcCall">format</span>(<span class="t-str">"name: {first} {last}"</span>)
+<span class="t-dotName">let</span> <span class="t-dotName">first</span> = <span class="t-str">&quot;Earl&quot;</span>
+<span class="t-dotName">let</span> <span class="t-dotName">last</span> = <span class="t-str">&quot;Grey&quot;</span>
+<span class="t-dotName">str</span> = <span class="t-funcCall">format</span>(<span class="t-str">&quot;name: {first} {last}&quot;</span>)
 
-<span class="t-dotName">str</span> => <span class="t-str">"name: Earl Grey"</span>
+<span class="t-dotName">str</span> =&gt; <span class="t-str">&quot;name: Earl Grey&quot;</span>
 </pre>
 <p>
 To enter a left bracket use two in a row.
 
 </p><pre class="desc-code">
-<span class="t-dotName">str</span> = <span class="t-funcCall">format</span>(<span class="t-str">"use two {{ to get one"</span>)
+<span class="t-dotName">str</span> = <span class="t-funcCall">format</span>(<span class="t-str">&quot;use two {{ to get one&quot;</span>)
 
-<span class="t-dotName">str</span> => <span class="t-str">"use two { to get one"</span>
+<span class="t-dotName">str</span> =&gt; <span class="t-str">&quot;use two { to get one&quot;</span>
 </pre>
 
 
@@ -1909,18 +1912,18 @@ function details.
 
 <span class="t-dotName">fd</span> = <span class="t-funcCall">functionDetails</span>(<span class="t-dotName">mycmp</span>)
 
-<span class="t-dotName">fd</span> =>
+<span class="t-dotName">fd</span> =&gt;
 <span class="t-dotName">fd.builtIn</span> = <span class="t-dotName">false</span>
 <span class="t-dotName">fd.signature.optional</span> = <span class="t-dotName">false</span>
-<span class="t-dotName">fd.signature.name</span> = <span class="t-str">"strNumCmp"</span>
-<span class="t-dotName">fd.signature.paramNames</span> = [<span class="t-str">"numStr1"</span>,<span class="t-str">"numStr2"</span>]
-<span class="t-dotName">fd.signature.paramTypes</span> = [<span class="t-str">"string"</span>,<span class="t-str">"string"</span>]
-<span class="t-dotName">fd.signature.returnType</span> = <span class="t-str">"int"</span>
-<span class="t-dotName">fd.docComment</span> = <span class="t-str">"  ## Compare two number strings and return 1, 0, or -1.\n"</span>
-<span class="t-dotName">fd.filename</span> = <span class="t-str">"testcode.tea"</span>
+<span class="t-dotName">fd.signature.name</span> = <span class="t-str">&quot;strNumCmp&quot;</span>
+<span class="t-dotName">fd.signature.paramNames</span> = [<span class="t-str">&quot;numStr1&quot;</span>,<span class="t-str">&quot;numStr2&quot;</span>]
+<span class="t-dotName">fd.signature.paramTypes</span> = [<span class="t-str">&quot;string&quot;</span>,<span class="t-str">&quot;string&quot;</span>]
+<span class="t-dotName">fd.signature.returnType</span> = <span class="t-str">&quot;int&quot;</span>
+<span class="t-dotName">fd.docComment</span> = <span class="t-str">&quot;  ## Compare two number strings and return 1, 0, or -1.\n&quot;</span>
+<span class="t-dotName">fd.filename</span> = <span class="t-str">&quot;testcode.tea&quot;</span>
 <span class="t-dotName">fd.lineNum</span> = <span class="t-num">3</span>
 <span class="t-dotName">fd.numLines</span> = <span class="t-num">2</span>
-<span class="t-dotName">fd.statements</span> = [<span class="t-str">"  return(cmp(int(numStr1), int(numStr2)))"</span>]
+<span class="t-dotName">fd.statements</span> = [<span class="t-str">&quot;  return(cmp(int(numStr1), int(numStr2)))&quot;</span>]
 </pre>
 
 
@@ -1940,11 +1943,11 @@ func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunRes
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">a</span> = <span class="t-funcCall">startsWith</span>(<span class="t-str">"abcdef"</span>, <span class="t-str">"abc"</span>)
-<span class="t-dotName">b</span> = <span class="t-funcCall">startsWith</span>(<span class="t-str">"abcdef"</span>, <span class="t-str">"abf"</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">startsWith</span>(<span class="t-str">&quot;abcdef&quot;</span>, <span class="t-str">&quot;abc&quot;</span>)
+<span class="t-dotName">b</span> = <span class="t-funcCall">startsWith</span>(<span class="t-str">&quot;abcdef&quot;</span>, <span class="t-str">&quot;abf&quot;</span>)
 
-<span class="t-dotName">a</span> => <span class="t-dotName">true</span>
-<span class="t-dotName">b</span> => <span class="t-dotName">false</span>
+<span class="t-dotName">a</span> =&gt; <span class="t-dotName">true</span>
+<span class="t-dotName">b</span> =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -1964,8 +1967,8 @@ func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult 
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">not</span>(<span class="t-dotName">true</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">not</span>(<span class="t-dotName">false</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">not</span>(<span class="t-dotName">true</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">not</span>(<span class="t-dotName">false</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -1985,11 +1988,11 @@ func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">and</span>(<span class="t-dotName">true</span>, <span class="t-dotName">true</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">and</span>(<span class="t-dotName">false</span>, <span class="t-dotName">true</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">and</span>(<span class="t-dotName">true</span>, <span class="t-dotName">false</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">and</span>(<span class="t-dotName">false</span>, <span class="t-dotName">false</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">and</span>(<span class="t-dotName">false</span>, <span class="t-funcCall">warn</span>(<span class="t-str">"not hit"</span>)) => <span class="t-dotName">false</span>
+<span class="t-funcCall">and</span>(<span class="t-dotName">true</span>, <span class="t-dotName">true</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">and</span>(<span class="t-dotName">false</span>, <span class="t-dotName">true</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">and</span>(<span class="t-dotName">true</span>, <span class="t-dotName">false</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">and</span>(<span class="t-dotName">false</span>, <span class="t-dotName">false</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">and</span>(<span class="t-dotName">false</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>)) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2008,11 +2011,11 @@ func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">or</span>(<span class="t-dotName">true</span>, <span class="t-dotName">true</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">or</span>(<span class="t-dotName">false</span>, <span class="t-dotName">true</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">or</span>(<span class="t-dotName">true</span>, <span class="t-dotName">false</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">or</span>(<span class="t-dotName">false</span>, <span class="t-dotName">false</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">or</span>(<span class="t-dotName">true</span>, <span class="t-funcCall">warn</span>(<span class="t-str">"not hit"</span>)) => <span class="t-dotName">true</span>
+<span class="t-funcCall">or</span>(<span class="t-dotName">true</span>, <span class="t-dotName">true</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">or</span>(<span class="t-dotName">false</span>, <span class="t-dotName">true</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">or</span>(<span class="t-dotName">true</span>, <span class="t-dotName">false</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">or</span>(<span class="t-dotName">false</span>, <span class="t-dotName">false</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">or</span>(<span class="t-dotName">true</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>)) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2031,8 +2034,8 @@ func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">eq</span>(<span class="t-num">1</span>, <span class="t-num">1</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">eq</span>(<span class="t-num">2</span>, <span class="t-num">3</span>) => <span class="t-dotName">false</span>
+<span class="t-funcCall">eq</span>(<span class="t-num">1</span>, <span class="t-num">1</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">eq</span>(<span class="t-num">2</span>, <span class="t-num">3</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2052,8 +2055,8 @@ func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">eq</span>(<span class="t-num">1.2</span>, <span class="t-num">1.2</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">eq</span>(<span class="t-num">1.2</span>, <span class="t-num">3.2</span>) => <span class="t-dotName">false</span>
+<span class="t-funcCall">eq</span>(<span class="t-num">1.2</span>, <span class="t-num">1.2</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">eq</span>(<span class="t-num">1.2</span>, <span class="t-num">3.2</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2073,8 +2076,8 @@ func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">eq</span>(<span class="t-str">"tea"</span>, <span class="t-str">"tea"</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">eq</span>(<span class="t-str">"1.2"</span>, <span class="t-str">"3.2"</span>) => <span class="t-dotName">false</span>
+<span class="t-funcCall">eq</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">eq</span>(<span class="t-str">&quot;1.2&quot;</span>, <span class="t-str">&quot;3.2&quot;</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2094,8 +2097,8 @@ func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">ne</span>(<span class="t-num">1</span>, <span class="t-num">1</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">ne</span>(<span class="t-num">2</span>, <span class="t-num">3</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">ne</span>(<span class="t-num">1</span>, <span class="t-num">1</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">ne</span>(<span class="t-num">2</span>, <span class="t-num">3</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2115,8 +2118,8 @@ func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">ne</span>(<span class="t-num">1.2</span>, <span class="t-num">1.2</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">ne</span>(<span class="t-num">1.2</span>, <span class="t-num">3.2</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">ne</span>(<span class="t-num">1.2</span>, <span class="t-num">1.2</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">ne</span>(<span class="t-num">1.2</span>, <span class="t-num">3.2</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2136,8 +2139,8 @@ func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">ne</span>(<span class="t-str">"tea"</span>, <span class="t-str">"tea"</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">ne</span>(<span class="t-str">"earl"</span>, <span class="t-str">"grey"</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">ne</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">ne</span>(<span class="t-str">&quot;earl&quot;</span>, <span class="t-str">&quot;grey&quot;</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2157,8 +2160,8 @@ func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">gt</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">gt</span>(<span class="t-num">3</span>, <span class="t-num">2</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">gt</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">gt</span>(<span class="t-num">3</span>, <span class="t-num">2</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2178,8 +2181,8 @@ func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">gt</span>(<span class="t-num">2.8</span>, <span class="t-num">4.3</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">gt</span>(<span class="t-num">3.1</span>, <span class="t-num">2.5</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">gt</span>(<span class="t-num">2.8</span>, <span class="t-num">4.3</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">gt</span>(<span class="t-num">3.1</span>, <span class="t-num">2.5</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2199,8 +2202,8 @@ func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">gte</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">gte</span>(<span class="t-num">3</span>, <span class="t-num">3</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">gte</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">gte</span>(<span class="t-num">3</span>, <span class="t-num">3</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2220,8 +2223,8 @@ func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">gte</span>(<span class="t-num">2.8</span>, <span class="t-num">4.3</span>) => <span class="t-dotName">false</span>
-<span class="t-funcCall">gte</span>(<span class="t-num">3.1</span>, <span class="t-num">3.1</span>) => <span class="t-dotName">true</span>
+<span class="t-funcCall">gte</span>(<span class="t-num">2.8</span>, <span class="t-num">4.3</span>) =&gt; <span class="t-dotName">false</span>
+<span class="t-funcCall">gte</span>(<span class="t-num">3.1</span>, <span class="t-num">3.1</span>) =&gt; <span class="t-dotName">true</span>
 </pre>
 
 
@@ -2241,8 +2244,8 @@ func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">gt</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">gt</span>(<span class="t-num">3</span>, <span class="t-num">2</span>) => <span class="t-dotName">false</span>
+<span class="t-funcCall">gt</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">gt</span>(<span class="t-num">3</span>, <span class="t-num">2</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2262,8 +2265,8 @@ func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">lt</span>(<span class="t-num">2.8</span>, <span class="t-num">4.3</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">lt</span>(<span class="t-num">3.1</span>, <span class="t-num">2.5</span>) => <span class="t-dotName">false</span>
+<span class="t-funcCall">lt</span>(<span class="t-num">2.8</span>, <span class="t-num">4.3</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">lt</span>(<span class="t-num">3.1</span>, <span class="t-num">2.5</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2283,9 +2286,9 @@ func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">lte</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">lte</span>(<span class="t-num">3</span>, <span class="t-num">3</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">lte</span>(<span class="t-num">4</span>, <span class="t-num">3</span>) => <span class="t-dotName">false</span>
+<span class="t-funcCall">lte</span>(<span class="t-num">2</span>, <span class="t-num">4</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">lte</span>(<span class="t-num">3</span>, <span class="t-num">3</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">lte</span>(<span class="t-num">4</span>, <span class="t-num">3</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2305,9 +2308,9 @@ func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-funcCall">lte</span>(<span class="t-num">2.3</span>, <span class="t-num">4.4</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">lte</span>(<span class="t-num">3.0</span>, <span class="t-num">3.0</span>) => <span class="t-dotName">true</span>
-<span class="t-funcCall">lte</span>(<span class="t-num">4.0</span>, <span class="t-num">3.0</span>) => <span class="t-dotName">false</span>
+<span class="t-funcCall">lte</span>(<span class="t-num">2.3</span>, <span class="t-num">4.4</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">lte</span>(<span class="t-num">3.0</span>, <span class="t-num">3.0</span>) =&gt; <span class="t-dotName">true</span>
+<span class="t-funcCall">lte</span>(<span class="t-num">4.0</span>, <span class="t-num">3.0</span>) =&gt; <span class="t-dotName">false</span>
 </pre>
 
 
@@ -2327,11 +2330,11 @@ func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">a</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">""</span>t<span class="t-dotName">ea</span>"<span class="t-str">") => "</span>t<span class="t-dotName">ea</span>"
-<span class="t-dotName">b</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">"4.5"</span>) => <span class="t-num">4.5</span>
-<span class="t-dotName">c</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">"[1,2,3]"</span>) => [<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
-<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">"{"</span>a<span class="t-str">":1, "</span>b<span class="t-str">": 2}"</span>)
-  => {<span class="t-str">"a"</span>: <span class="t-num">1</span>, <span class="t-str">"b"</span>, <span class="t-num">2</span>}
+<span class="t-dotName">a</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;&quot;</span>t<span class="t-dotName">ea</span>&quot;<span class="t-str">&quot;) =&gt; &quot;</span>t<span class="t-dotName">ea</span>&quot;
+<span class="t-dotName">b</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;4.5&quot;</span>) =&gt; <span class="t-num">4.5</span>
+<span class="t-dotName">c</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;[1,2,3]&quot;</span>) =&gt; [<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
+<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;{&quot;</span>a<span class="t-str">&quot;:1, &quot;</span>b<span class="t-str">&quot;: 2}&quot;</span>)
+  =&gt; {<span class="t-str">&quot;a&quot;</span>: <span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>}
 </pre>
 
 
@@ -2370,10 +2373,10 @@ string.
 </li></ul>
 <pre class="desc-code">
 <span class="t-dotName">elements</span> = <span class="t-funcCall">markdownLite</span>(<span class="t-dotName">description</span>)
-<span class="t-dotName">elements</span> => [
-  [<span class="t-str">"p"</span>, [<span class="t-str">"the paragraph which may contain newlines"</span>]]
-  [<span class="t-str">"code"</span>, [<span class="t-str">"~~~"</span>, <span class="t-str">"code text with newlines"</span>, <span class="t-str">"~~~"</span>]]
-  [<span class="t-str">"bullets"</span>, [<span class="t-str">"bullet (newlines) 1"</span>, <span class="t-str">"point 2"</span>, <span class="t-str">"3"</span>, ...]
+<span class="t-dotName">elements</span> =&gt; [
+  [<span class="t-str">&quot;p&quot;</span>, [<span class="t-str">&quot;the paragraph which may contain newlines&quot;</span>]]
+  [<span class="t-str">&quot;code&quot;</span>, [<span class="t-str">&quot;~~~&quot;</span>, <span class="t-str">&quot;code text with newlines&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>]]
+  [<span class="t-str">&quot;bullets&quot;</span>, [<span class="t-str">&quot;bullet (newlines) 1&quot;</span>, <span class="t-str">&quot;point 2&quot;</span>, <span class="t-str">&quot;3&quot;</span>, ...]
 ]
 </pre>
 
@@ -2409,17 +2412,61 @@ Tags:
 <p>Example:
 
 </p><pre class="desc-code">
-<span class="t-dotName">frags</span> = <span class="t-funcCall">highlight</span>(<span class="t-str">"a = 5"</span>)
-<span class="t-dotName">frags</span> => [
-  [<span class="t-str">"dotName"</span>, <span class="t-str">"a"</span>],
-  [<span class="t-str">"other"</span>, <span class="t-str">" = "</span>],
-  [<span class="t-str">"num"</span>, <span class="t-str">"5"</span>],
+<span class="t-dotName">frags</span> = <span class="t-funcCall">highlight</span>(<span class="t-str">&quot;a = 5&quot;</span>)
+<span class="t-dotName">frags</span> =&gt; [
+  [<span class="t-str">&quot;dotName&quot;</span>, <span class="t-str">&quot;a&quot;</span>],
+  [<span class="t-str">&quot;other&quot;</span>, <span class="t-str">&quot; = &quot;</span>],
+  [<span class="t-str">&quot;num&quot;</span>, <span class="t-str">&quot;5&quot;</span>],
 ]
 </pre>
 
 
 <pre class="nim-code">
 func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
+</pre>
+
+<h3 id="escapeHtmlBody">escapeHtmlBody</h3>
+
+<p>Excape text for placing in body html.</p>
+
+<pre class="nim-code">
+proc escapeHtmlBody(text: string): string 
+</pre>
+
+<h3 id="escapeHtmlAttribute">escapeHtmlAttribute</h3>
+
+<p>Excape text for placing in an html attribute.</p>
+
+<pre class="nim-code">
+proc escapeHtmlAttribute(text: string): string 
+</pre>
+
+<h3 id="fun_html_sss">fun_html_sss</h3>
+
+<p>Escape text for placing it in an html page.
+
+</p><pre class="desc-code">
+<span class="t-dotName">html</span> = <span class="t-funcCall">func</span>(<span class="t-param">text</span>: <span class="t-type">string</span>, <span class="t-param">place</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+places:
+
+</p><ul>
+<li>body -- in the html body
+</li><li>attribute -- in an html attribute
+
+</li></ul>
+<pre class="desc-code">
+<span class="t-dotName">name</span> = <span class="t-funcCall">html</span>(<span class="t-str">&quot;Mad &lt;Hatter&gt;&quot;</span>, <span class="t-str">&quot;body&quot;</span>)
+  =&gt; <span class="t-str">&quot;Mad &amp;lt;Hatter&amp;gt;&quot;</span>
+</pre>
+<p>
+For more information about how to escape and what is safe see:
+[[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]</p>
+
+<pre class="nim-code">
+func fun_html_sss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 </pre>
 
@@ -2466,7 +2513,7 @@ proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 
 <h3 id="splitFuncName">splitFuncName</h3>
 
-<p>Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".</p>
+<p>Split a funcName like &quot;fun_cmp_ffi&quot; to its name and signature like: &quot;cmp&quot; and &quot;ffi&quot;.</p>
 
 <pre class="nim-code">
 func splitFuncName(funcName: string): (string, string) 

@@ -135,7 +135,7 @@ ArgsOr = OpResultWarn[Args]
 
 <h3 id="makeUserPrepostTable">makeUserPrepostTable</h3>
 
-<p>Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.</p>
+<p>Return the user&#x27;s ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.</p>
 
 <pre class="nim-code">
 proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable 
@@ -203,12 +203,12 @@ func `$`(prepostList: seq[Prepost]): string {.raises: [ValueError], tags: [].}
 
 </p><ul>
 <li>$$ -- Default when no comment like Markdown
-</li><li>&lt;!--$ and --&gt; -- HTML
+</li><li>&amp;lt;!--$ and --&amp;gt; -- HTML
 </li><li>#$ -- Bash, python, etc.
 </li><li>;$ -- Config files, Lisp
 </li><li>//$ -- C++
 </li><li>/*$ and */ -- C, C++
-</li><li>&amp;lt;!--$ and --&amp;gt; -- HTML inside a textarea element
+</li><li>&amp;amp;lt;!--$ and --&amp;amp;gt; -- HTML inside a textarea element
 </li><li># $ -- Org Mode</li></ul>
 
 

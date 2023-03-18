@@ -64,7 +64,7 @@ pre {
 <body>
 <h1>opresult.nim</h1>
 
-<p>OpResult holds either a value or a message.  It's similar to
+<p>OpResult holds either a value or a message.  It&#x27;s similar to
 the Option type but instead of returning nothing, you return a
 message that tells why you cannot return the value.
 
@@ -137,7 +137,7 @@ func `$`(opResult: OpResult): string
 
 <h3 id="OpResultWarn">OpResultWarn</h3>
 
-<p>OpResultWarn holds either a value or warning data.  It's similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
+<p>OpResultWarn holds either a value or warning data.  It&#x27;s similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
 
 </p><p>Example Usage:
 
@@ -148,13 +148,13 @@ func `$`(opResult: OpResult): string
   <span class="t-dotName">if</span> <span class="t-dotName">problem</span>:
     <span class="t-dotName">result</span> = <span class="t-dotName">opMessage</span>[<span class="t-dotName">string</span>](<span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>))
   <span class="t-dotName">else</span>:
-    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">"string of char"</span>)
+    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">&quot;string of char&quot;</span>)
 
 <span class="t-dotName">let</span> <span class="t-dotName">strOr</span> = <span class="t-funcCall">get_string</span>()
 <span class="t-dotName">if</span> <span class="t-dotName">strOr.isMessage</span>:
   <span class="t-dotName">echo</span> <span class="t-funcCall">show_message</span>(<span class="t-dotName">strOr.message</span>)
 <span class="t-dotName">else</span>:
-  <span class="t-dotName">echo</span> <span class="t-str">"value = "</span> & $<span class="t-dotName">strOr.value</span>
+  <span class="t-dotName">echo</span> <span class="t-str">&quot;value = &quot;</span> &amp; $<span class="t-dotName">strOr.value</span>
 </pre>
 
 
@@ -180,7 +180,7 @@ func opMessageW[T](message: WarningData): OpResultWarn[T]
 
 <h3 id="OpResultId">OpResultId</h3>
 
-<p>OpResultId holds either a value or a message id.  It's similar to
+<p>OpResultId holds either a value or a message id.  It&#x27;s similar to
 the Option type but instead of returning nothing, you return a
 message id that tells why you cannot return the value.
 
@@ -193,13 +193,13 @@ message id that tells why you cannot return the value.
   <span class="t-dotName">if</span> <span class="t-dotName">problem</span>:
     <span class="t-dotName">result</span> = <span class="t-dotName">opMessage</span>[<span class="t-dotName">string</span>](<span class="t-dotName">wUnknownArg</span>)
   <span class="t-dotName">else</span>:
-    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">"string of char"</span>)
+    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">&quot;string of char&quot;</span>)
 
 <span class="t-dotName">let</span> <span class="t-dotName">strOr</span> = <span class="t-funcCall">get_string</span>()
 <span class="t-dotName">if</span> <span class="t-dotName">strOr.isMessage</span>:
   <span class="t-dotName">echo</span> <span class="t-funcCall">show_message</span>(<span class="t-dotName">strOr.message</span>)
 <span class="t-dotName">else</span>:
-  <span class="t-dotName">echo</span> <span class="t-str">"value = "</span> & $<span class="t-dotName">strOr.value</span>
+  <span class="t-dotName">echo</span> <span class="t-str">&quot;value = &quot;</span> &amp; $<span class="t-dotName">strOr.value</span>
 </pre>
 
 

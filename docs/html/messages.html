@@ -157,7 +157,7 @@ MessageId = enum
   wVarStartsWithLetter, wVarContainsChars, wVarEndsWith, wVarMaximumLength,
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
-  wInvalidAnchorType, wUserFunction
+  wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace
 </pre>
 
 <h3 id="Messages">Messages</h3>
@@ -325,15 +325,16 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The index value is not a string.",
     "A two parameter IF function cannot be used as an argument.",
     "Invalid anchor type, expected html or github.",
-    "You can only assign a user function variable to the u dictionary."]
+    "You can only assign a user function variable to the u dictionary.",
+    """Invalid html place, expected "body", or "attribute"."""]
 </pre>
 
 <h3 id="WarningData">WarningData</h3>
 
-<p>Warning data.<ul class="simple"><li>messageId -- the message id</li>
-<li>p1 -- the optional string substituted for the message's $1.</li>
-<li>pos -- the index in the statement where the warning was detected.</li>
-</ul>
+<p>Warning data.&lt;ul class=&quot;simple&quot;&gt;&lt;li&gt;messageId -- the message id&lt;/li&gt;
+&lt;li&gt;p1 -- the optional string substituted for the message&#x27;s $1.&lt;/li&gt;
+&lt;li&gt;pos -- the index in the statement where the warning was detected.&lt;/li&gt;
+&lt;/ul&gt;
 </p>
 
 <pre class="nim-code">
@@ -392,8 +393,8 @@ func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 <p>Return a string representation of WarningData.
 
 </p><pre class="desc-code">
-<span class="t-dotName">let</span> <span class="t-dotName">warning</span> = <span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>, <span class="t-str">"p1"</span>, <span class="t-num">5</span>)
-<span class="t-dotName">check</span> $<span class="t-dotName">warning</span> == <span class="t-str">"wUnknownArg(p1):5"</span>
+<span class="t-dotName">let</span> <span class="t-dotName">warning</span> = <span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>, <span class="t-str">&quot;p1&quot;</span>, <span class="t-num">5</span>)
+<span class="t-dotName">check</span> $<span class="t-dotName">warning</span> == <span class="t-str">&quot;wUnknownArg(p1):5&quot;</span>
 </pre>
 
 
