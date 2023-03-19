@@ -203,32 +203,43 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     runningPos += spaceMatchO.get().length
 
   # Read the variable for the command.
-  let varNameOr = getVariableName(line, runningPos)
-  if varNameOr.isMessage:
-    # Expected a variable or a dot name.
-    errorAndColumn(env, wExpectedDotname, line, runningPos)
-    return false
-  let varName = varNameOr.value
+  var haveVarName = false
+  var variableName: VariableName
+  var value: Value
+  let variableNameOr = getVariableName(line, runningPos)
+  if variableNameOr.isValue and variableNameOr.value.kind == vnkNormal:
+    haveVarName = true
+    variableName = variableNameOr.value
 
-  case varName.kind:
-  of vnkFunction, vnkGet:
-    # Expected variable name not function call.
-    errorAndColumn(env, wInvalidDotname, line, runningPos+varName.dotName.len)
-    return false
-  of vnkNormal:
-    discard
-  if varName.pos != line.len:
-    # Invalid REPL command syntax, unexpected text.
-    errorAndColumn(env, wInvalidReplSyntax, line, varName.pos)
-    return false
+    # Read the dot name's value.
+    let valueOr = getVariable(variables, variableName.dotName, npLocal)
+    if valueOr.isMessage:
+      # The variable '$1' does not exist.", ## wVariableMissing
+      errorAndColumn(env, wVariableMissing, line, runningPos, variableName.dotName)
+      return
+    value = valueOr.value
 
-  # Read the dot name's value.
-  let valueOr = getVariable(variables, varName.dotName, npLocal)
-  if valueOr.isMessage:
-    # The variable '$1' does not exist.", ## wVariableMissing
-    errorAndColumn(env, wVariableMissing, line, runningPos, varName.dotName)
-    return false
-  let value = valueOr.value
+  if not haveVarName:
+    # Get the right hand side value and match the following whitespace.
+    let statement = newStatement(line, 1)
+    # echo "statement: " & $statement
+    # echo "runningPos: " & $runningPos
+    let vlOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
+    # echo "vlOr: " & $vlOr
+
+    if vlOr.isMessage:
+      errorAndColumn(env, vlOr.message.messageId, statement.text, runningPos, vlOr.message.p1)
+      return false
+
+    # Check that there is not any unprocessed text following the value.
+    if vlOr.value.pos != statement.text.len:
+      # Check for a trailing comment.
+      if statement.text[vlOr.value.pos] != '#':
+        # Unused text at the end of the statement.
+        errorAndColumn(env, wTextAfterValue, statement.text, vlOr.value.pos)
+        return false
+
+    value = vlOr.value.value
 
   # The print options mirror the string function.
   case replCmd:
@@ -240,7 +251,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
   of "pj": # string json
     env.writeOut(valueToString(value))
   of "ph": # print doc comment
-    if varName.dotName == "f":
+    if haveVarName and variableName.dotName == "f":
       var width = terminalWidth()
       if width > 60:
         width = 60

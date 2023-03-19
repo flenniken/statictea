@@ -128,21 +128,31 @@ statement: a = 5 asdf
 """
     check testHandleReplLine("a = 5 asdf", false, eErr = eErr)
 
-  test "p len(a)":
-    let eErr = """
-p len(a)
-     ^
-Expected variable name not function call.
+  test """p len("a")""":
+    let eOut = """
+1
 """
-    check testHandleReplLine("p len(a)", false, eErr = eErr)
+    check testHandleReplLine("""p len("a")""", false, eOut = eOut)
+
+  test """p f.cmp[0]""":
+    let eOut = """
+"cmp"
+"""
+    check testHandleReplLine("""p f.cmp[0]""", false, eOut = eOut)
+
+  test """p f.cmp""":
+    let eOut = """
+["cmp","cmp","cmp"]
+"""
+    check testHandleReplLine("""p f.cmp""", false, eOut = eOut)
 
   test "p len  abc":
     let eErr = """
-p len  abc
-       ^
-Invalid REPL command syntax, unexpected text.
+p len("a")  abc
+            ^
+Unused text at the end of the statement.
 """
-    check testHandleReplLine("p len  abc", false, eErr = eErr)
+    check testHandleReplLine("""p len("a")  abc""", false, eErr = eErr)
 
   test "p missing":
     let eErr = """
