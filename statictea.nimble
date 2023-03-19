@@ -554,7 +554,7 @@ The grip app is good for viewing github markdown locally.
   http://localhost:6419/docs/teaFunctions.md
   http://localhost:6419/testfiles/stf-index.md"""
 
-proc taskDocsIx() =
+proc taskDocmix() =
   ## Create the index html file.
 
   var resultFile = "docs/index.md"
@@ -573,7 +573,7 @@ proc taskDocsIx() =
   rmFile(jsonFile)
   echo fmt"Generated: http://localhost:6419/{resultFile}"
 
-proc taskDocsIx2() =
+proc taskDochix() =
   ## Create the index html file.
 
   var resultFile = "docs/html/index.html"
@@ -616,7 +616,7 @@ proc myFileNewer(a: string, b: string): bool =
   # result = getLastModificationTime(a) > getLastModificationTime(b)
   for filename in [a, b]:
     if not fileExists(filename):
-      echo "file doesn't exist: " & filename
+      # echo "file doesn't exist: " & filename
       return false
 
   let cmd = "echo $(($(date -r " & a & " +%s)-$(date -r " & b & " +%s)))"
@@ -634,12 +634,12 @@ func removeExt(filename: string): string =
   let (dir, name, ext) = splitFile(filename)
   result = name
 
-proc taskDocs(namePart: string, forceRebuild = false) =
+proc taskDocm(namePart: string, forceRebuild = false) =
   ## Create one or more markdown docs; specify part of the name.":
   let filenames = get_source_filenames()
   for basename in filenames:
 
-    if not (namePart.toLower in basename.toLower) and namePart != "docs":
+    if not (namePart.toLower in basename.toLower) and namePart != "docm":
       continue
 
     let name = removeExt(basename)
@@ -674,13 +674,13 @@ proc taskDocs(namePart: string, forceRebuild = false) =
       # echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)
 
-proc taskDocs2(namePart: string, forceRebuild = false) =
+proc taskDoch(namePart: string, forceRebuild = false) =
   ## Create one or more html docs; specify part of the name.":
   ## namePart is part of a source file name, or "docs" when not specified.
   let filenames = get_source_filenames()
   for basename in filenames:
 
-    if not (namePart.toLower in basename.toLower) and namePart != "docs2":
+    if not (namePart.toLower in basename.toLower) and namePart != "doch":
       continue
 
     let name = removeExt(basename)
@@ -945,17 +945,17 @@ task other, "\tRun stf tests, build release exe and other tests.":
   otherTests()
 
 proc taskDocsAll() =
-  taskDocsIx()
-  taskDocsIx2()
-  taskDocs("")
-  taskDocs2("")
+  taskDocmix()
+  taskDochix()
+  taskDocm("")
+  taskDoch("")
   taskFuncDocs()
   taskTestfilesReadme()
   taskTea2HtmlLoop("tea2html")
   createDependencyGraph()
   createDependencyGraph2()
 
-task docsall, "\tCreate all the docs, docsix, teafuncs, stfix, dot, dot2.":
+task docsall, "\tCreate all the docs.":
   taskDocsAll()
 
 task release, "\tRun tests and update docs; test, other, docsall.":
@@ -966,23 +966,22 @@ task release, "\tRun tests and update docs; test, other, docsall.":
 task b, "\tBuild the statictea release exe (bin/x/statictea).":
   buildRelease()
 
-task docsix, "\tCreate markdown docs index (docs/index.md).":
-  taskDocsIx()
-
-task docsix2, "\tCreate html docs index (docs/html/index.html).":
-  taskDocsIx2()
-
-task docs, "\tCreate one or more markdown docs; specify part of the name.":
+task docm, "\tCreate one or more markdown docs; specify part of the name.":
   let namePart = get_last_argument()
-  taskDocs(namePart, true)
+  taskDocm(namePart, true)
 
-task docs2, "\tCreate one or more html docs; specify part of the name.":
+task doch, "\tCreate one or more html docs; specify part of the name.":
   let namePart = get_last_argument()
-  taskDocs2(namePart, true)
+  taskDoch(namePart, true)
 
-task jsonix, "\tDisplay markdown docs index json.":
+task docmix, "\tCreate markdown docs index (docs/index.md).":
+  taskDocmix()
+
+task dochix, "\tCreate html docs index (docs/html/index.html).":
+  taskDochix()
+
+task jsonix, "\tDisplay docs index json.":
   var json = sourceIndexJson()
-  # writeFile("docs/index.json", json)
   for line in json.splitLines():
     echo line
 
@@ -1033,20 +1032,11 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
   let cmd2 = get_test_module_cmd(functionsFile, force = true)
   exec cmd2
 
-
-task dot, "\tCreate source module dependency graph (docs/staticteadep.svg).":
+task dotsrc, "\tCreate source module dependency graph (docs/staticteadep.svg).":
   createDependencyGraph()
-  echo """
-View the svg file in your browser:
-  http://localhost:6419/docs/staticteadep.svg
-"""
 
-task dot2, "\tCreate system modules dependency graph (docs/staticteadep2.svg).":
+task dotsys, "\tCreate system modules dependency graph (docs/staticteadep2.svg).":
   createDependencyGraph2()
-  echo """
-View the svg file in your browser:
-  http://localhost:6419/docs/staticteadep2.svg
-"""
 
 task tt, "\tCompile and run t.nim.":
   let cmd = fmt"nim c -r --outdir:bin/{dirName}/tests/ src/t.nim"
@@ -1214,6 +1204,6 @@ task replace, "\tShow pattern for text search and replace in all the nim source 
   let cmd = r"find . -name \*.nim -type f | xargs -n 1 gsed -i 's/stateVariables/startVariables/g'"
   echo cmd
 
-task tea2html, "Convert a tea file to html.":
+task tea2html, "Create one or more html docs from the templates dir; specify part of the name.":
   let namePart = get_last_argument()
   taskTea2HtmlLoop(namePart)

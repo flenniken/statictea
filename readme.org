@@ -2568,17 +2568,19 @@ Nimble Tasks:
 - *n*:  Show available tasks.
 - *test*:  Run one or more tests; specify part of the name.
 - *other*:  Run stf tests, build release exe and other tests.
-- *docsall*:  Create all the docs, docsix, teafuncs, stfix, dot, dot2.
+- *docsall*:  Create all the docs.
 - *release*:  Run tests and update docs; test, other, docsall.
 - *b*:  Build the statictea release exe (bin/x/statictea).
-- *docsix*:  Create markdown docs index (docs/index.md).
-- *docs*:  Create one or more markdown docs; specify part of the name.
-- *jsonix*:  Display markdown docs index json.
+- *docm*:  Create one or more markdown docs; specify part of the name.
+- *doch*:  Create one or more html docs; specify part of the name.
+- *docmix*:  Create markdown docs index (docs/index.md).
+- *dochix*:  Create html docs index (docs/html/index.html).
+- *jsonix*:  Display docs index json.
 - *json*:  Display one or more source file's json doc comments; specify part of the name.
 - *teafuncs*:  Create the function docs (docs/teaFunctions.md).
 - *dyfuncs*:  Create the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).
-- *dot*:  Create source module dependency graph (docs/staticteadep.svg).
-- *dot2*:  Create system modules dependency graph (docs/staticteadep2.svg).
+- *dotsrc*:  Create source module dependency graph (docs/staticteadep.svg).
+- *dotsys*:  Create system modules dependency graph (docs/staticteadep2.svg).
 - *tt*:  Compile and run t.nim.
 - *tree*:  Show the project directory tree.
 - *args*:  Show command line arguments.
@@ -2596,6 +2598,7 @@ Nimble Tasks:
 - *dlist*:  List the docker image and container.
 - *clean*:  Remove all the binaries so everything gets built next time.
 - *replace*:  Show pattern for text search and replace in all the nim source files.
+- *tea2html*:  Create one or more html docs from the templates dir; specify part of the name.
 
 [[#contents][茶]]
 
