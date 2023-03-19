@@ -56,58 +56,81 @@ func getDocComment(funcVar: Value): string =
   let functionSpec = funcVar.funcv
   result = functionSpec.docComment
 
-proc listInColumns*(names: seq[string], width: Natural): string =
-  ## Output the names in columns and return result as a string.  Width
-  ## is the width of a row.
 
-  let pad = 2
-  # echo "pad between columns: " & $pad
+func getRows(numNames: Natural, columns: Natural): Natural =
+  ## Determine the number of rows from the number of columns and the
+  ## number of names.
+  result = numNames div columns
+  if numNames mod columns != 0:
+    inc(result)
 
-  if names.len == 0:
-    return
-  # echo "Number of names: " & $names.len
-  # echo "Width: " & $width
+proc getColumnWidths(names: seq[string], width: Natural, pad: Natural): seq[Natural] =
+  ## Return a list of the column widths to fit in the given width. The
+  ## column widths do not include the pad, padding is between columns.
 
-  # Find the longest item.
+  # Find the widest item.
   var maxWidth = 0
   for name in names:
     if name.len > maxWidth:
       maxWidth = name.len
 
-  # echo "Longest name: " & $maxWidth
-
-  # Determine the number of columns and their widths based on the longest.
+  # Determine the starting number of columns and their widths based on
+  # the longest.
   var columns = width div (maxWidth + pad)
-  if columns < 1:
-    for name in names:
+
+  if columns == 0:
+    return @[width]
+
+  var colWidths = newSeq[Natural]()
+  var lastTotalWidth = 0
+
+  while true:
+    let rows = getRows(names.len, columns)
+
+    # Determine the width of each column.
+    var nextColWidths = newSeq[Natural](columns)
+    for rowIx in countUp(0, rows-1):
+      for colIx in countUp(0, columns-1):
+        let ix =  colIx * rows + rowIx
+        if ix < names.len:
+          let nameWidth = names[ix].len
+          if nameWidth > nextColWidths[colIx]:
+            nextColWidths[colIx] = nameWidth
+
+    var totalWidth = 0
+    for w in nextColWidths:
+      totalWidth += w
+
+    if totalWidth <= lastTotalWidth or totalWidth > width:
+      break
+
+    colWidths = nextColWidths
+    lastTotalWidth = totalWidth
+    inc(columns)
+
+  result = colWidths
+
+proc listColumns(names: seq[string], width: Natural, pad: Natural, colWidths: seq[Natural]): string =
+  ## Display the names as columns.
+
+  # Handle one column.
+  if colWidths.len <= 1:
+    for ix, name in names:
+      if ix != 0:
+        result.add("\n")
       result.add(name)
-      result.add("\n")
     return
-  # echo "Number of columns: " & $columns
 
-  # Determine the number of rows from the number of columns and the
-  # number of names.
-  var rows = names.len div columns
-  if names.len mod columns != 0:
-    inc(rows)
-  # echo "Number of rows: " & $rows
-
-  # Determine the width of each column.
-  var colWidths = newSeq[Natural](columns)
-  for rowIx in countUp(0, rows-1):
-    for colIx in countUp(0, columns-1):
-      let ix =  colIx * rows + rowIx
-      if ix < names.len:
-        let width = names[ix].len
-        if width > colWidths[colIx]:
-          colWidths[colIx] = width
-  # echo "Width of each column: " & $colWidths
-
-  var spaces = newStringOfCap(maxWidth+pad)
-  for ix in countUp(1, int(maxWidth+pad)):
+  # Generate spaces for use as padding.
+  var spaces = newStringOfCap(width)
+  for _ in countUp(0, width-1):
     spaces.add(" ")
 
-  # Display the rows.
+  # Get the number of rows and columns.
+  let rows = getRows(names.len, colWidths.len)
+  let columns = colWidths.len
+
+  # Display the names.
   for rowIx in countUp(0, rows-1):
     var row = ""
     for colIx in countUp(0, columns-1):
@@ -115,12 +138,26 @@ proc listInColumns*(names: seq[string], width: Natural): string =
       if ix < names.len:
         let name = names[ix]
         row.add(name)
-        var padding = colWidths[colIx] - name.len + pad
+        let colWidth = colWidths[colIx]
+        var padding = colWidth - name.len + pad
+        assert(name.len <= colWidth)
+        assert(padding >= pad)
         row.add(spaces[0 .. padding - 1])
     row = row.strip(trailing = true)
     if row != "":
+      if rowIx != 0:
+        result.add("\n")
       result.add(row)
-      result.add("\n")
+
+proc listInColumns*(names: seq[string], width: Natural): string =
+  ## Generate a string of the names in columns.  Width is the width of
+  ## a row. The names are left justified and the columns are separated
+  ## by 2 spaces.
+  if names.len == 0:
+    return
+  let pad = 2
+  let colWidths = getColumnWidths(names, width, pad)
+  result = listColumns(names, width, pad, colWidths)
 
 proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool =
   ## Handle the REPL line. Return true to end the loop.
@@ -204,7 +241,9 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     env.writeOut(valueToString(value))
   of "ph": # print doc comment
     if varName.dotName == "f":
-      let width = terminalWidth()
+      var width = terminalWidth()
+      if width > 60:
+        width = 60
       # echo "terminal width = " & $width
       var list: seq[string]
       for key, value in variables["f"].dictv.dict.pairs():

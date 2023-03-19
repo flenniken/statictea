@@ -39,6 +39,8 @@ proc testListInColumns(names: seq[string], width: Natural, expected: string): bo
   for line in names:
     echo line
   if expected == "":
+    echo "width = " & $width
+    echo "123456789 123456789 123456789"
     echo "---got:"
     for gotLine in splitNewLines(got):
       echo visibleControl(gotLine, spacesToo = true)
@@ -168,10 +170,8 @@ fives
 sevenn"""
 
     let expected = """
-o    four
-tw   fives
-thr  sevenn
-"""
+o   thr   fives
+tw  four  sevenn"""
     check testListInColumns(names, 16, expected)
 
   test "listInColumns empty":
@@ -182,23 +182,21 @@ thr  sevenn
 
   test "listInColumns o":
     let names = @["o"]
-    let expected = "o\n"
+    let expected = "o"
     check testListInColumns(names, 16, expected)
 
   test "listInColumns 1 2":
     let names = @["1", "2"]
-    let expected = "1  2\n"
+    let expected = "1  2"
     check testListInColumns(names, 16, expected)
 
   test "listInColumns longername":
     let names = @["longername", "2"]
     let expected = """
-longername
-2
-"""
+longername  2"""
     check testListInColumns(names, 16, expected)
 
-  test "listInColumns aasdf":
+  test "listInColumns 4 items":
     let names = splitLines"""
 o
 abc
@@ -206,10 +204,8 @@ de
 r
 t"""
     let expected = """
-o    r
-abc  t
-de
-"""
+o    de  t
+abc  r"""
     check testListInColumns(names, 12, expected)
 
   test "listInColumns 4":
@@ -226,6 +222,41 @@ abc
 de
 123456789 12
 r
-t
-"""
+t"""
     check testListInColumns(names, 12, expected)
+
+  test "twocolumns":
+    let names = splitLines"""
+longnamehere
+asdfasfdfa
+column1
+foasdf
+fives
+ab
+cd
+ef
+gh
+i
+j
+k"""
+
+    let expected = """
+longnamehere  cd
+asdfasfdfa    ef
+column1       gh
+foasdf        i
+fives         j
+ab            k"""
+    check testListInColumns(names, 16, expected)
+
+  test "one column":
+    let names = splitLines"""
+123456789
+asdfasfdfa
+column1dd"""
+
+    let expected = """
+123456789
+asdfasfdfa
+column1dd"""
+    check testListInColumns(names, 6, expected)

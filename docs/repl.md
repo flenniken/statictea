@@ -5,13 +5,13 @@ Run commands at a prompt. Run evaluate print loop (REPL).
 * [repl.nim](../src/repl.nim) &mdash; Nim source code.
 # Index
 
-* [listInColumns](#listincolumns) &mdash; Output the names in columns and return result as a string.
+* [listInColumns](#listincolumns) &mdash; Generate a string of the names in columns.
 * [handleReplLine](#handlereplline) &mdash; Handle the REPL line.
 * [runEvaluatePrintLoop](#runevaluateprintloop) &mdash; Run commands at a prompt.
 
 # listInColumns
 
-Output the names in columns and return result as a string.  Width is the width of a row.
+Generate a string of the names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.
 
 ```nim
 proc listInColumns(names: seq[string]; width: Natural): string 

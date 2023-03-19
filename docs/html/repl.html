@@ -71,14 +71,14 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li> <a href="#listInColumns">listInColumns</a> &mdash; Output the names in columns and return result as a string.</li>
+<li> <a href="#listInColumns">listInColumns</a> &mdash; Generate a string of the names in columns.</li>
 <li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
 <li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
 </ul>
 
 <h3 id="listInColumns">listInColumns</h3>
 
-<p>Output the names in columns and return result as a string.  Width is the width of a row.</p>
+<p>Generate a string of the names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.</p>
 
 <pre class="nim-code">
 proc listInColumns(names: seq[string]; width: Natural): string 
