@@ -39,7 +39,7 @@ proc readFileContent(filename: string): OpResultStr[string] =
   except:
     result = opMessageStr[string](getCurrentExceptionMsg())
 
-proc linesSideBySide*(gotContent: string, expectedContent: string): string =
+proc linesSideBySide*(gotContent: string, expectedContent: string, spacesToo=false): string =
   ## Show the two sets of lines side by side (above and below).
 
   if gotContent == "" and expectedContent == "":
@@ -47,8 +47,6 @@ proc linesSideBySide*(gotContent: string, expectedContent: string): string =
 
   let got = splitNewLines(gotContent)
   let expected = splitNewLines(expectedContent)
-
-  var show = visibleControl
 
   var lines: seq[string]
   for ix in countUp(0, max(got.len, expected.len)-1):
@@ -62,10 +60,10 @@ proc linesSideBySide*(gotContent: string, expectedContent: string): string =
 
     var lineNum = $(ix+1)
     if eLine == gLine:
-      lines.add("$1     same: $2" % [$lineNum, show(eLine)])
+      lines.add("$1     same: $2" % [$lineNum, visibleControl(eLine, spacesToo)])
     else:
-      lines.add("$1      got: $2" % [lineNum, show(gLine)])
-      lines.add("$1 expected: $2" % [lineNum, show(eLine)])
+      lines.add("$1      got: $2" % [lineNum, visibleControl(gLine, spacesToo)])
+      lines.add("$1 expected: $2" % [lineNum, visibleControl(eLine, spacesToo)])
 
   result = lines.join("\n")
 

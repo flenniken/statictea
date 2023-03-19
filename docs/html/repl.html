@@ -71,9 +71,18 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 <h1>Index</h1>
 
 <ul>
+<li> <a href="#listInColumns">listInColumns</a> &mdash; Output the names in columns and return result as a string.</li>
 <li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
 <li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
 </ul>
+
+<h3 id="listInColumns">listInColumns</h3>
+
+<p>Output the names in columns and return result as a string.  Width is the width of a row.</p>
+
+<pre class="nim-code">
+proc listInColumns(names: seq[string]; width: Natural): string 
+</pre>
 
 <h3 id="handleReplLine">handleReplLine</h3>
 
@@ -82,7 +91,7 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 <pre class="nim-code">
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect].}
+    tags: [RootEffect, WriteIOEffect, TimeEffect, ReadEnvEffect].}
 </pre>
 
 <h3 id="runEvaluatePrintLoop">runEvaluatePrintLoop</h3>
@@ -91,8 +100,9 @@ proc handleReplLine(env: var Env; variables: var Variables; line: string): bool 
 
 <pre class="nim-code">
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.
-    raises: [ValueError, IOError, OSError, Exception, KeyError],
-    tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
+    raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
+    TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect,
+    ReadEnvEffect].}
 </pre>
 
 

@@ -7,6 +7,7 @@ import sharedtestcode
 import functions
 import version
 import comparelines
+import unicodes
 
 proc testHandleReplLine(
     line: string,
@@ -31,6 +32,24 @@ proc testHandleReplLine(
   if not gotExpected($stop, $eStop):
     result = false
 
+proc testListInColumns(names: seq[string], width: Natural, expected: string): bool =
+  let got = listInColumns(names, width)
+  if got == expected:
+    return true
+  for line in names:
+    echo line
+  if expected == "":
+    echo "---got:"
+    for gotLine in splitNewLines(got):
+      echo visibleControl(gotLine, spacesToo = true)
+    echo "---"
+    echo "---got2:"
+    echo got
+    echo "---"
+  else:
+    echo linesSideBySide(got, expected, spacesToo = true)
+  return false
+
 suite "repl.nim":
 
   test "handle repl line":
@@ -47,10 +66,10 @@ You enter statements or commands at the prompt.
 
 Available commands:
 * h — this help text
-* p variable — print a variable as dot names
-* ph func variable — print function's doc comment
-* pj variable — print a variable as json
-* pr variable — print a variable like in a replacement block
+* p dotname — print a variable as dot names
+* ph dotname — print function's doc comment
+* pj dotname — print a variable as json
+* pr dotname — print a variable like in a replacement block
 * v — show the number of top variables in the top level dictionaries
 * q — quit
 """
@@ -131,13 +150,6 @@ The variable 'missing' does not exist.
 """
     check testHandleReplLine("p missing", false, eErr = eErr)
 
-  test "ph f ":
-    let eOut = """
-The f dictionary contains XX functions and XX names.
-"""
-    # compareLogLine
-    check testHandleReplLine("ph f", eOut = eOut)
-
   test "ph f.cmp":
     let eOut = """
 f.cmp[0] -- cmp(a: float, b: float) int
@@ -145,3 +157,75 @@ f.cmp[1] -- cmp(a: int, b: int) int
 f.cmp[2] -- cmp(a: string, b: string, c: optional bool) int
 """
     check testHandleReplLine("ph f.cmp", eOut = eOut)
+
+  test "listInColumns":
+    let names = splitLines"""
+o
+tw
+thr
+four
+fives
+sevenn"""
+
+    let expected = """
+o    four
+tw   fives
+thr  sevenn
+"""
+    check testListInColumns(names, 16, expected)
+
+  test "listInColumns empty":
+    let abc = splitLines("")
+    check abc.len == 1
+
+    check testListInColumns(newSeq[string](), 16, "")
+
+  test "listInColumns o":
+    let names = @["o"]
+    let expected = "o\n"
+    check testListInColumns(names, 16, expected)
+
+  test "listInColumns 1 2":
+    let names = @["1", "2"]
+    let expected = "1  2\n"
+    check testListInColumns(names, 16, expected)
+
+  test "listInColumns longername":
+    let names = @["longername", "2"]
+    let expected = """
+longername
+2
+"""
+    check testListInColumns(names, 16, expected)
+
+  test "listInColumns aasdf":
+    let names = splitLines"""
+o
+abc
+de
+r
+t"""
+    let expected = """
+o    r
+abc  t
+de
+"""
+    check testListInColumns(names, 12, expected)
+
+  test "listInColumns 4":
+    let names = splitLines"""
+o
+abc
+de
+123456789 12
+r
+t"""
+    let expected = """
+o
+abc
+de
+123456789 12
+r
+t
+"""
+    check testListInColumns(names, 12, expected)

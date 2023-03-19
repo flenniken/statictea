@@ -6,6 +6,7 @@ import std/tables
 import std/options
 import std/strutils
 import std/strformat
+import std/terminal
 import messages
 import env
 import vartypes
@@ -17,7 +18,6 @@ import regexes
 import runCommand
 import variables
 import unicodes
-import functions
 
 func showVariables(variables: Variables): string =
   ## Show the number of variables in the one letter dictionaries.
@@ -37,10 +37,10 @@ You enter statements or commands at the prompt.
 
 Available commands:
 * h — this help text
-* p variable — print a variable as dot names
-* ph func variable — print function's doc comment
-* pj variable — print a variable as json
-* pr variable — print a variable like in a replacement block
+* p dotname — print a variable as dot names
+* ph dotname — print function's doc comment
+* pj dotname — print a variable as json
+* pr dotname — print a variable like in a replacement block
 * v — show the number of top variables in the top level dictionaries
 * q — quit"""
 
@@ -55,6 +55,72 @@ func getDocComment(funcVar: Value): string =
   assert funcVar.kind == vkFunc
   let functionSpec = funcVar.funcv
   result = functionSpec.docComment
+
+proc listInColumns*(names: seq[string], width: Natural): string =
+  ## Output the names in columns and return result as a string.  Width
+  ## is the width of a row.
+
+  let pad = 2
+  # echo "pad between columns: " & $pad
+
+  if names.len == 0:
+    return
+  # echo "Number of names: " & $names.len
+  # echo "Width: " & $width
+
+  # Find the longest item.
+  var maxWidth = 0
+  for name in names:
+    if name.len > maxWidth:
+      maxWidth = name.len
+
+  # echo "Longest name: " & $maxWidth
+
+  # Determine the number of columns and their widths based on the longest.
+  var columns = width div (maxWidth + pad)
+  if columns < 1:
+    for name in names:
+      result.add(name)
+      result.add("\n")
+    return
+  # echo "Number of columns: " & $columns
+
+  # Determine the number of rows from the number of columns and the
+  # number of names.
+  var rows = names.len div columns
+  if names.len mod columns != 0:
+    inc(rows)
+  # echo "Number of rows: " & $rows
+
+  # Determine the width of each column.
+  var colWidths = newSeq[Natural](columns)
+  for rowIx in countUp(0, rows-1):
+    for colIx in countUp(0, columns-1):
+      let ix =  colIx * rows + rowIx
+      if ix < names.len:
+        let width = names[ix].len
+        if width > colWidths[colIx]:
+          colWidths[colIx] = width
+  # echo "Width of each column: " & $colWidths
+
+  var spaces = newStringOfCap(maxWidth+pad)
+  for ix in countUp(1, int(maxWidth+pad)):
+    spaces.add(" ")
+
+  # Display the rows.
+  for rowIx in countUp(0, rows-1):
+    var row = ""
+    for colIx in countUp(0, columns-1):
+      let ix =  colIx * rows + rowIx
+      if ix < names.len:
+        let name = names[ix]
+        row.add(name)
+        var padding = colWidths[colIx] - name.len + pad
+        row.add(spaces[0 .. padding - 1])
+    row = row.strip(trailing = true)
+    if row != "":
+      result.add(row)
+      result.add("\n")
 
 proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool =
   ## Handle the REPL line. Return true to end the loop.
@@ -138,8 +204,15 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     env.writeOut(valueToString(value))
   of "ph": # print doc comment
     if varName.dotName == "f":
-      let count = variables["f"].dictv.dict.len
-      env.writeOut(fmt"The f dictionary contains {functionsDict.len} functions and {count} names.")
+      let width = terminalWidth()
+      # echo "terminal width = " & $width
+      var list: seq[string]
+      for key, value in variables["f"].dictv.dict.pairs():
+        list.add(key)
+      env.writeOut(listInColumns(list, width))
+
+      # todo: register this as a quit proc with exitprocs.addExitProc(resetAttributes)
+
     elif value.kind == vkList:
       for ix, funcVar in value.listv.list:
         env.writeOut(fmt"{varName.dotName}[{ix}] -- {funcVar.funcv.signature}")

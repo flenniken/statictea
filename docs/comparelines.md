@@ -50,8 +50,8 @@ func splitNewLines(content: string): seq[string]
 Show the two sets of lines side by side (above and below).
 
 ```nim
-proc linesSideBySide(gotContent: string; expectedContent: string): string {.
-    raises: [ValueError], tags: [].}
+proc linesSideBySide(gotContent: string; expectedContent: string;
+                     spacesToo = false): string {.raises: [ValueError], tags: [].}
 ```
 
 # testLinesSideBySide

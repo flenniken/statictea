@@ -344,7 +344,7 @@ when defined(test):
       result = false
     if not expectedItems("errLines", errLines, eErrLines):
       result = false
-    if not compareLogLines(outLines, eOutLines):
+    if not expectedItems("outLines", outLines, eOutLines):
       result = false
     if not expectedItems("resultLines", resultLines, eResultLines):
       result = false
