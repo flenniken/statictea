@@ -404,7 +404,7 @@ y = 2"""
     let signature = newSignature(false, "zero", params, ptInt)
     check not signature.optional
     check signature.name == "zero"
-    check $signature == "zero() int"
+    check $signature == "zero = func() int"
 
   test "signature one":
     var params = newSeq[Param]()
@@ -412,18 +412,18 @@ y = 2"""
     let signature = newSignature(false, "one", params, ptInt)
     check not signature.optional
     check signature.name == "one"
-    check $signature == "one(p1: string) int"
+    check $signature == "one = func(p1: string) int"
 
   test "newSignatureO":
-    check testNewSignatureO("s", "name() string")
-    check testNewSignatureO("ss", "name(a: string) string")
-    check testNewSignatureO("sss", "name(a: string, b: string) string")
-    check testNewSignatureO("soss", "name(a: string, b: optional string) string")
+    check testNewSignatureO("s", "name = func() string")
+    check testNewSignatureO("ss", "name = func(a: string) string")
+    check testNewSignatureO("sss", "name = func(a: string, b: string) string")
+    check testNewSignatureO("soss", "name = func(a: string, b: optional string) string")
     check testNewSignatureO("lsosl",
-      "name(a: list, b: string, c: optional string) list")
+      "name = func(a: list, b: string, c: optional string) list")
 
   test "newSignatureO all":
-    let e = "name(a: int, b: string, c: float, d: optional list) int"
+    let e = "name = func(a: int, b: string, c: float, d: optional list) int"
     check testNewSignatureO("isfoli", e)
 
   test "shortName":

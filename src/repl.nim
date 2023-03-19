@@ -254,7 +254,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
     elif value.kind == vkList:
       for ix, funcVar in value.listv.list:
-        env.writeOut(fmt"{varName.dotName}[{ix}] -- {funcVar.funcv.signature}")
+        env.writeOut(fmt"{ix}:  {funcVar.funcv.signature}")
     elif value.kind == vkFunc:
       env.writeOut(getDocComment(value))
     else:

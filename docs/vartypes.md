@@ -634,7 +634,7 @@ func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
 
 # `$`
 
-Return a string representation of a signature.
+Return a string representation of a signature. name = func(p1: type, p2: type, ...) type
 
 ```nim
 func `$`(signature: Signature): string 

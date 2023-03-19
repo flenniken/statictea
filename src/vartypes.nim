@@ -406,8 +406,9 @@ func newStatement*(text: string, lineNum: Natural = 1, ending = "\n"): Statement
 
 func `$`*(signature: Signature): string =
   ## Return a string representation of a signature.
+  ## name = func(p1: type, p2: type, ...) type
   result.add(signature.name)
-  result.add("(")
+  result.add(" = func(")
   for ix, param in signature.params:
     if ix > 0:
       result.add(", ")

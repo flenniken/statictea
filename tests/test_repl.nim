@@ -154,9 +154,9 @@ The variable 'missing' does not exist.
 
   test "ph f.cmp":
     let eOut = """
-f.cmp[0] -- cmp(a: float, b: float) int
-f.cmp[1] -- cmp(a: int, b: int) int
-f.cmp[2] -- cmp(a: string, b: string, c: optional bool) int
+0:  cmp = func(a: float, b: float) int
+1:  cmp = func(a: int, b: int) int
+2:  cmp = func(a: string, b: string, c: optional bool) int
 """
     check testHandleReplLine("ph f.cmp", eOut = eOut)
 

@@ -198,10 +198,10 @@ suite "signatures.nim":
   test "newSignatureO":
     var signatureO = newSignatureO("myname", "ifss")
     check signatureO.isSome
-    check $signatureO.get() == "myname(a: int, b: float, c: string) string"
+    check $signatureO.get() == "myname = func(a: int, b: float, c: string) string"
 
   test "newSignatureO listLoop":
     let signatureO = newSignatureO("listLoop", "llpoab")
     check signatureO.isSome
-    let expected = "listLoop(a: list, b: list, c: func, d: optional any) bool"
+    let expected = "listLoop = func(a: list, b: list, c: func, d: optional any) bool"
     check gotExpected($signatureO.get(), expected)
