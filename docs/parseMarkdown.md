@@ -6,7 +6,7 @@ Parse the simple markdown used in the function descriptions and highlight static
 # Index
 
 * type: [ElementTag](#elementtag) &mdash; 
-* type: [Element](#element) &mdash; 
+* type: [Element](#element) &mdash; Parse markdown elements (parseMarkdown).
 * type: [FragmentType](#fragmenttype) &mdash; Hightlight fragments.
 * type: [Fragment](#fragment) &mdash; A fragment of a string.
 * [newElement](#newelement) &mdash; Create an Element object.
@@ -32,7 +32,7 @@ ElementTag = enum
 
 # Element
 
-
+Parse markdown elements (parseMarkdown).
 
 ```nim
 Element = object
@@ -174,7 +174,7 @@ func lineEnd(str: string; start: Natural): int
 
 # highlightCode
 
-Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. It doesn't validate but it works for valid code.
+Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. HighlightCode doesn't validate the code but it works for valid code.
 
 ```nim
 func highlightCode(codeText: string): seq[Fragment] 

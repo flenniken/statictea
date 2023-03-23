@@ -12,6 +12,7 @@ type
     bullets,
 
   Element* = object
+    ## Parse markdown elements (parseMarkdown).
     tag*: ElementTag
     content*: seq[string]
 
@@ -232,12 +233,9 @@ func lineEnd*(str: string, start: Natural): int =
 func highlightCode*(codeText: string): seq[Fragment] =
   ## Identify all the fragments in the StaticTea code to
   ## highlight. Return a list of fragments that cover all the
-  ## code. Unlighted areas are in "other" fragments. It doesn't
-  ## validate but it works for valid code.
+  ## code. Unlighted areas are in "other" fragments. HighlightCode
+  ## doesn't validate the code but it works for valid code.
 
-  # debugEcho "---"
-  # debugEcho codeText
-  # debugEcho "---"
   type
     State = enum
       ## Parsing states.

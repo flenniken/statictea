@@ -1,12 +1,14 @@
 ## Run commands at a prompt.
 ## Run evaluate print loop (REPL).
 
+import std/os
 import std/rdstdin
 import std/tables
 import std/options
 import std/strutils
 import std/strformat
 import std/terminal
+import std/exitprocs
 import messages
 import env
 import vartypes
@@ -18,6 +20,8 @@ import regexes
 import runCommand
 import variables
 import unicodes
+import parseMarkdown
+import tempFile
 
 func showVariables(variables: Variables): string =
   ## Show the number of variables in the one letter dictionaries.
@@ -50,12 +54,65 @@ proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
   env.writeErr(startColumn(line, runningPos))
   env.writeErr(getWarning(messageId, p1))
 
-func getDocComment(funcVar: Value): string =
+# fgBlack
+# fgRed
+# fgGreen
+# fgYellow
+# fgBlue
+# fgMagenta
+# fgCyan
+# fgWhite
+
+proc colorFragments(codeString: string, fragments: seq[Fragment]): string =
+  ## Return a string with ansi color coded fragments.
+
+  var tempFileO = openTempFile()
+  if not tempFileO.isSome:
+    return
+  var tempFile = tempFileO.get()
+
+  for fragment in fragments:
+    var color: ForegroundColor
+    case fragment.fragmentType
+    of hlOther, hlNumber, hlParamName, hlDotName:
+      color = fgBlack
+    of hlParamType, hlDocComment:
+      color = fgRed
+    of hlMultiline, hlStringType:
+      color = fgGreen
+    of hlFuncCall:
+      color = fgBlue
+    of hlComment:
+      color = fgMagenta
+
+    let msg = codeString[fragment.start .. fragment.fEnd-1]
+    tempFile.file.styledWrite(color, msg)
+  tempFile.file.close
+
+  result = readFile(tempFile.filename)
+  discard tryRemoveFile(tempFile.filename)
+
+proc getDocComment(funcVar: Value): string =
   ## Get the function's doc comment.
   assert funcVar.kind == vkFunc
   let functionSpec = funcVar.funcv
-  result = functionSpec.docComment
-
+  var elements = parseMarkdown(functionSpec.docComment)
+  for element in elements:
+    case element.tag
+    of ElementTag.nothing:
+      discard
+    of p:
+      result.add(element.content[0])
+    of code:
+      # result.add("---statictea\n")
+      let codeString = element.content[1]
+      let fragments = highlightCode(codeString)
+      result.add(colorFragments(codeString, fragments))
+      # result.add("---\n")
+    of bullets:
+      for nl_string in element.content:
+        result.add("* ")
+        result.add(nl_string)
 
 func getRows(numNames: Natural, columns: Natural): Natural =
   ## Determine the number of rows from the number of columns and the
@@ -261,7 +318,6 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
         list.add(key)
       env.writeOut(listInColumns(list, width))
 
-      # todo: register this as a quit proc with exitprocs.addExitProc(resetAttributes)
 
     elif value.kind == vkList:
       for ix, funcVar in value.listv.list:
@@ -279,6 +335,9 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
 proc runEvaluatePrintLoop*(env: var Env, args: Args) =
   ## Run commands at a prompt.
+  # Register a exit proc to remove any terminal attributes.
+  addExitProc(resetAttributes)
+
   var variables = getStartVariables(env, args)
   var line: string
   while true:

@@ -23,8 +23,9 @@ Handle the REPL line. Return true to end the loop.
 
 ```nim
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
-    raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect, ReadEnvEffect].}
+    raises: [KeyError, Exception, ValueError, IOError, OSError], tags: [
+    RootEffect, WriteIOEffect, TimeEffect, ReadEnvEffect, ReadIOEffect,
+    WriteDirEffect].}
 ```
 
 # runEvaluatePrintLoop
@@ -33,9 +34,9 @@ Run commands at a prompt.
 
 ```nim
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.
-    raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
-    TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect,
-    ReadEnvEffect].}
+    raises: [Exception, IOError, ValueError, OSError, KeyError], tags: [
+    RootEffect, WriteIOEffect, TimeEffect, ReadDirEffect, ReadIOEffect,
+    ReadEnvEffect, WriteDirEffect].}
 ```
 
 

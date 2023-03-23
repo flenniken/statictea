@@ -270,3 +270,8 @@ column1dd"""
 asdfasfdfa
 column1dd"""
     check testListInColumns(names, 6, expected)
+
+#   test """ph f.markdownLite[0]""":
+#     let eOut = """
+# """
+#     check testHandleReplLine("""ph f.markdownLite[0]""", false, eOut = eOut)

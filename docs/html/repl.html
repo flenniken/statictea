@@ -90,8 +90,9 @@ proc listInColumns(names: seq[string]; width: Natural): string
 
 <pre class="nim-code">
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
-    raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect, ReadEnvEffect].}
+    raises: [KeyError, Exception, ValueError, IOError, OSError], tags: [
+    RootEffect, WriteIOEffect, TimeEffect, ReadEnvEffect, ReadIOEffect,
+    WriteDirEffect].}
 </pre>
 
 <h3 id="runEvaluatePrintLoop">runEvaluatePrintLoop</h3>
@@ -100,9 +101,9 @@ proc handleReplLine(env: var Env; variables: var Variables; line: string): bool 
 
 <pre class="nim-code">
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.
-    raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
-    TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect,
-    ReadEnvEffect].}
+    raises: [Exception, IOError, ValueError, OSError, KeyError], tags: [
+    RootEffect, WriteIOEffect, TimeEffect, ReadDirEffect, ReadIOEffect,
+    ReadEnvEffect, WriteDirEffect].}
 </pre>
 
 

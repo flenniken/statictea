@@ -1252,10 +1252,10 @@ readJson = func(json: string) any
 Examples:
 
 ~~~
-a = readJson(""tea"") => "tea"
+a = readJson("\"tea\"") => "tea"
 b = readJson("4.5") => 4.5
 c = readJson("[1,2,3]") => [1, 2, 3]
-d = readJson("{"a":1, "b": 2}")
+d = readJson("{\"a\":1, \"b\": 2}")
   => {"a": 1, "b", 2}
 ~~~
 """

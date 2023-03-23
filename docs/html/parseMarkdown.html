@@ -72,7 +72,7 @@ Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 
 <ul>
 <li>type:  <a href="#ElementTag">ElementTag</a> &mdash; </li>
-<li>type:  <a href="#Element">Element</a> &mdash; </li>
+<li>type:  <a href="#Element">Element</a> &mdash; Parse markdown elements (parseMarkdown).</li>
 <li>type:  <a href="#FragmentType">FragmentType</a> &mdash; Hightlight fragments.</li>
 <li>type:  <a href="#Fragment">Fragment</a> &mdash; A fragment of a string.</li>
 <li> <a href="#newElement">newElement</a> &mdash; Create an Element object.</li>
@@ -99,7 +99,7 @@ ElementTag = enum
 
 <h3 id="Element">Element</h3>
 
-
+<p>Parse markdown elements (parseMarkdown).</p>
 
 <pre class="nim-code">
 Element = object
@@ -251,7 +251,7 @@ func lineEnd(str: string; start: Natural): int
 
 <h3 id="highlightCode">highlightCode</h3>
 
-<p>Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in &quot;other&quot; fragments. It doesn&#x27;t validate but it works for valid code.</p>
+<p>Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in &quot;other&quot; fragments. HighlightCode doesn&#x27;t validate the code but it works for valid code.</p>
 
 <pre class="nim-code">
 func highlightCode(codeText: string): seq[Fragment] 

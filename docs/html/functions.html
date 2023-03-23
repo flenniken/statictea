@@ -2330,10 +2330,10 @@ func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="desc-code">
-<span class="t-dotName">a</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;&quot;</span>t<span class="t-dotName">ea</span>&quot;<span class="t-str">&quot;) =&gt; &quot;</span>t<span class="t-dotName">ea</span>&quot;
+<span class="t-dotName">a</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;\&quot;tea\&quot;&quot;</span>) =&gt; <span class="t-str">&quot;tea&quot;</span>
 <span class="t-dotName">b</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;4.5&quot;</span>) =&gt; <span class="t-num">4.5</span>
 <span class="t-dotName">c</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;[1,2,3]&quot;</span>) =&gt; [<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
-<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;{&quot;</span>a<span class="t-str">&quot;:1, &quot;</span>b<span class="t-str">&quot;: 2}&quot;</span>)
+<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;{\&quot;a\&quot;:1, \&quot;b\&quot;: 2}&quot;</span>)
   =&gt; {<span class="t-str">&quot;a&quot;</span>: <span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>}
 </pre>
 
