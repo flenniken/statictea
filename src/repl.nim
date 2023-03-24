@@ -1,7 +1,6 @@
 ## Run commands at a prompt.
 ## Run evaluate print loop (REPL).
 
-import std/os
 import std/rdstdin
 import std/tables
 import std/options
@@ -21,7 +20,6 @@ import runCommand
 import variables
 import unicodes
 import parseMarkdown
-import tempFile
 
 func showVariables(variables: Variables): string =
   ## Show the number of variables in the one letter dictionaries.
@@ -62,20 +60,19 @@ proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
 # fgMagenta
 # fgCyan
 # fgWhite
+# fgDefault -- default terminal foreground color
 
-proc colorFragments(codeString: string, fragments: seq[Fragment]): string =
-  ## Return a string with ansi color coded fragments.
+proc echoColorFragments(codeString: string, fragments: seq[Fragment]) =
+  ## Write the fragment to standard out with the fragments colored.
 
-  var tempFileO = openTempFile()
-  if not tempFileO.isSome:
-    return
-  var tempFile = tempFileO.get()
+  # Note: this code outputs to stdout directly instead of returning a
+  # string with ansi codes so it works on Windows.
 
   for fragment in fragments:
     var color: ForegroundColor
     case fragment.fragmentType
     of hlOther, hlNumber, hlParamName, hlDotName:
-      color = fgBlack
+      color = fgDefault
     of hlParamType, hlDocComment:
       color = fgRed
     of hlMultiline, hlStringType:
@@ -86,14 +83,10 @@ proc colorFragments(codeString: string, fragments: seq[Fragment]): string =
       color = fgMagenta
 
     let msg = codeString[fragment.start .. fragment.fEnd-1]
-    tempFile.file.styledWrite(color, msg)
-  tempFile.file.close
+    stdout.styledWrite(color, msg)
 
-  result = readFile(tempFile.filename)
-  discard tryRemoveFile(tempFile.filename)
-
-proc getDocComment(funcVar: Value): string =
-  ## Get the function's doc comment.
+proc echoDocComment(funcVar: Value) =
+  ## Write the doc comment to standard out with syntax highlighting.
   assert funcVar.kind == vkFunc
   let functionSpec = funcVar.funcv
   var elements = parseMarkdown(functionSpec.docComment)
@@ -102,17 +95,15 @@ proc getDocComment(funcVar: Value): string =
     of ElementTag.nothing:
       discard
     of p:
-      result.add(element.content[0])
+      stdout.write(element.content[0])
     of code:
-      # result.add("---statictea\n")
       let codeString = element.content[1]
       let fragments = highlightCode(codeString)
-      result.add(colorFragments(codeString, fragments))
-      # result.add("---\n")
+      echoColorFragments(codeString, fragments)
     of bullets:
       for nl_string in element.content:
-        result.add("* ")
-        result.add(nl_string)
+        stdout.write("* ")
+        stdout.write(nl_string)
 
 func getRows(numNames: Natural, columns: Natural): Natural =
   ## Determine the number of rows from the number of columns and the
@@ -323,7 +314,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
       for ix, funcVar in value.listv.list:
         env.writeOut(fmt"{ix}:  {funcVar.funcv.signature}")
     elif value.kind == vkFunc:
-      env.writeOut(getDocComment(value))
+      echoDocComment(value)
     else:
       # The variable is not a function variable.
       errorAndColumn(env, wNotFuncVariable, line, runningPos)
