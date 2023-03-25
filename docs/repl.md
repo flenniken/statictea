@@ -5,9 +5,29 @@ Run commands at a prompt. Run evaluate print loop (REPL).
 * [repl.nim](../src/repl.nim) &mdash; Nim source code.
 # Index
 
+* type: [ReplCommand](#replcommand) &mdash; The REPL commands.
 * [listInColumns](#listincolumns) &mdash; Generate a string of the names in columns.
+* [stringToReplCommand](#stringtoreplcommand) &mdash; 
 * [handleReplLine](#handlereplline) &mdash; Handle the REPL line.
 * [runEvaluatePrintLoop](#runevaluateprintloop) &mdash; Run commands at a prompt.
+
+# ReplCommand
+
+The REPL commands.
+* not_cmd -- not a REPL command
+* h_cmd -- display help
+* p_cmd -- print variable
+* pd_cmd -- print dictionary
+* pf_cmd -- print f or function
+* plc_cmd -- print list in columns
+* plv_cmd -- print list one per line
+* v_cmd -- print number of variables in the one letter dictionaries
+* q_cmd -- quit (or Ctrl-d)
+
+```nim
+ReplCommand = enum
+  not_cmd, h_cmd, p_cmd, pd_cmd, pf_cmd, plc_cmd, plv_cmd, v_cmd, q_cmd
+```
 
 # listInColumns
 
@@ -17,15 +37,22 @@ Generate a string of the names in columns.  Width is the width of a row. The nam
 proc listInColumns(names: seq[string]; width: Natural): string 
 ```
 
+# stringToReplCommand
+
+
+
+```nim
+func stringToReplCommand(str: string): ReplCommand 
+```
+
 # handleReplLine
 
 Handle the REPL line. Return true to end the loop.
 
 ```nim
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
-    raises: [KeyError, Exception, ValueError, IOError, OSError], tags: [
-    RootEffect, WriteIOEffect, TimeEffect, ReadEnvEffect, ReadIOEffect,
-    WriteDirEffect].}
+    raises: [KeyError, IOError, OSError, ValueError, Exception],
+    tags: [WriteIOEffect, RootEffect, TimeEffect, ReadEnvEffect].}
 ```
 
 # runEvaluatePrintLoop
@@ -36,7 +63,7 @@ Run commands at a prompt.
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.
     raises: [Exception, IOError, ValueError, OSError, KeyError], tags: [
     RootEffect, WriteIOEffect, TimeEffect, ReadDirEffect, ReadIOEffect,
-    ReadEnvEffect, WriteDirEffect].}
+    ReadEnvEffect].}
 ```
 
 

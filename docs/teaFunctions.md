@@ -1094,12 +1094,14 @@ a = ["a", 5, "b"]
 
 # listLoop
 
-Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
+Loop over items in a list and fill in a container. A callback
+function is called for each item in the list and it decides what
+goes in the container.
 
 You pass a list to loop over, a container to fill in, a
 callback function, and an optional state variable. The function
 returns whether the callback stopped early or not and you can
-ignore it using a bare form..
+ignore it using a bare form.
 
 ~~~
 listLoop = func(a: list, container: any, listCallback: func, state: optional any) bool

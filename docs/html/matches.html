@@ -343,7 +343,7 @@ proc matchCompareOperator(line: string; start: Natural): Option[Matches] {.
 
 <h3 id="matchReplCmd">matchReplCmd</h3>
 
-<p>Match the REPL commands and the trailing optional whitespace.</p>
+<p>Match the REPL commands and the trailing optional whitespace. One space or end of line is required.</p>
 
 <pre class="nim-code">
 proc matchReplCmd(line: string; start: Natural): Option[Matches] {.

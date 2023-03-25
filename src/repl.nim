@@ -21,6 +21,31 @@ import variables
 import unicodes
 import parseMarkdown
 
+const
+  wrapColumn = 60
+
+type
+  ReplCommand* = enum
+    ## The REPL commands.
+    ## @:* not_cmd -- not a REPL command
+    ## @:* h_cmd -- display help
+    ## @:* p_cmd -- print variable
+    ## @:* pd_cmd -- print dictionary
+    ## @:* pf_cmd -- print f or function
+    ## @:* plc_cmd -- print list in columns
+    ## @:* plv_cmd -- print list one per line
+    ## @:* v_cmd -- print number of variables in the one letter dictionaries
+    ## @:* q_cmd -- quit (or Ctrl-d)
+    not_cmd
+    h_cmd
+    p_cmd
+    pd_cmd
+    pf_cmd
+    plc_cmd
+    plv_cmd
+    v_cmd
+    q_cmd
+
 func showVariables(variables: Variables): string =
   ## Show the number of variables in the one letter dictionaries.
   var first = true
@@ -35,16 +60,18 @@ func showVariables(variables: Variables): string =
 
 proc replHelp(): string =
   result = """
-You enter statements or commands at the prompt.
+Enter statements or commands at the prompt.
 
 Available commands:
+
 * h — this help text
-* p dotname — print a variable as dot names
-* ph dotname — print function's doc comment
-* pj dotname — print a variable as json
-* pr dotname — print a variable like in a replacement block
-* v — show the number of top variables in the top level dictionaries
-* q — quit"""
+* p — print a variable like in a replacement block
+* pd — print a dictionary as dot names
+* pf - print function names, signatures or docs, e.g. f, f.cmp, f.cmp[0]
+* plc - print a list in columns
+* plv - print a list vertical, one element per line
+* v — print the number of variables in the one letter dictionaries
+* q — quit (ctrl-d too)"""
 
 proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
     runningPos: Natural, p1 = "") =
@@ -52,14 +79,11 @@ proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
   env.writeErr(startColumn(line, runningPos))
   env.writeErr(getWarning(messageId, p1))
 
-# fgBlack
-# fgRed
-# fgGreen
-# fgYellow
-# fgBlue
-# fgMagenta
-# fgCyan
-# fgWhite
+# Available basic colors:
+#
+# fgBlack, fgRed, fgGreen
+# fgYellow, fgBlue, fgMagenta
+# fgCyan, fgWhite
 # fgDefault -- default terminal foreground color
 
 proc echoColorFragments(codeString: string, fragments: seq[Fragment]) =
@@ -207,6 +231,33 @@ proc listInColumns*(names: seq[string], width: Natural): string =
   let colWidths = getColumnWidths(names, width, pad)
   result = listColumns(names, width, pad, colWidths)
 
+func stringToReplCommand*(str: string): ReplCommand =
+  case str:
+  of "h":
+    result = h_cmd
+  of "p":
+    result = p_cmd
+  of "pd":
+    result = pd_cmd
+  of "pf":
+    result = pf_cmd
+  of "plc":
+    result = plc_cmd
+  of "plv":
+    result = plv_cmd
+  of "v":
+    result = vcmd
+  of "q":
+    result = q_cmd
+  else:
+    result = not_cmd
+
+proc getMaxWidth(): Natural =
+  ## Use the wrap column for the max unless the terminal width is less.
+  result = terminalWidth()
+  if result > wrapColumn:
+    result = wrapColumn
+
 proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool =
   ## Handle the REPL line. Return true to end the loop.
   if emptyOrSpaces(line, 0):
@@ -214,49 +265,50 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
   var runningPos = 0
   let replCmdO = matchReplCmd(line, runningPos)
-  if not replCmdO.isSome:
 
-    # Run the statement and add to the variables.
-    let statement = newStatement(line[runningPos .. ^1], 1)
+  var replCmd = not_cmd
+  if replCmdO.isSome:
+    let cmd = stringToReplCommand(replCmdO.getGroup())
+    runningPos += replCmdO.get().length
+    # q, h, v commands must be on a line by themself. If not, they are
+    # treated as a statement line.
+    case cmd
+    of q_cmd:
+      if runningPos == line.len:
+        return true
+    of h_cmd:
+      if runningPos == line.len:
+        env.writeOut(replHelp())
+        return false
+    of v_cmd:
+      if runningPos == line.len:
+        env.writeOut(showVariables(variables))
+        return false
+    of not_cmd:
+      discard
+    of p_cmd, pd_cmd, pf_cmd, plc_cmd, plv_cmd:
+      replCmd = cmd
 
+  # If not a REPL command, run the statement, add to the variables,
+  # then return.
+  if replCmd == not_cmd:
+    # Run the
+    let statement = newStatement(line, 1)
     let loopControl = runStatementAssignVar(env, statement, variables,
       "repl.tea")
     if loopControl == lcStop:
       return true
     return false
 
-  # We got a REPL command.
-
-  let replCmd = replCmdO.getGroup()
-  runningPos += replCmdO.get().length
-
-  if replCmd in ["q", "h", "v"]:
-    if runningPos != line.len:
-      # Invalid REPL command syntax, unexpected text.
-      errorAndColumn(env, wInvalidReplSyntax, line, runningPos)
-      return false
-    case replCmd
-    of "q":
-      return true
-    of "h":
-      env.writeOut(replHelp())
-      return false
-    of "v":
-      env.writeOut(showVariables(variables))
-      return false
-
-  # Skip whitespace, if any.
-  let spaceMatchO = matchTabSpace(line, runningPos)
-  if isSome(spaceMatchO):
-    runningPos += spaceMatchO.get().length
-
-  # Read the variable for the command.
-  var haveVarName = false
+  # Read the variable for the REPL command.
+  var haveDotName = false
   var variableName: VariableName
   var value: Value
+
+  # Read as if the argument is a dot name.
   let variableNameOr = getVariableName(line, runningPos)
   if variableNameOr.isValue and variableNameOr.value.kind == vnkNormal:
-    haveVarName = true
+    haveDotName = true
     variableName = variableNameOr.value
 
     # Read the dot name's value.
@@ -267,8 +319,8 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
       return
     value = valueOr.value
 
-  if not haveVarName:
-    # Get the right hand side value and match the following whitespace.
+  if not haveDotName:
+    # Not dotname variable.  Run the function to get its value.
     let statement = newStatement(line, 1)
     # echo "statement: " & $statement
     # echo "runningPos: " & $runningPos
@@ -276,7 +328,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     # echo "vlOr: " & $vlOr
 
     if vlOr.isMessage:
-      errorAndColumn(env, vlOr.message.messageId, statement.text, runningPos, vlOr.message.p1)
+      errorAndColumn(env, vlOr.message.messageId, statement.text, vlOr.message.pos, vlOr.message.p1)
       return false
 
     # Check that there is not any unprocessed text following the value.
@@ -289,40 +341,66 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
     value = vlOr.value.value
 
-  # The print options mirror the string function.
   case replCmd:
-  of "p": # string dn
-    if value.kind == vkDict:
-      env.writeOut(dotNameRep(value.dictv.dict))
+  of p_cmd:
+    # Print a variable like in a replacement block.
+    env.writeOut(valueToStringRB(value))
+
+  of pd_cmd:
+    # Print dictionary.
+    if value.kind != vkDict:
+      # The variable is not a dictionary.
+      errorAndColumn(env, wNotDictVariable, line, runningPos)
     else:
-      env.writeOut(valueToString(value))
-  of "pj": # string json
-    env.writeOut(valueToString(value))
-  of "ph": # print doc comment
-    if haveVarName and variableName.dotName == "f":
-      var width = terminalWidth()
-      if width > 60:
-        width = 60
+      if haveDotName:
+        env.writeOut(dotNameRep(value.dictv.dict, variableName.dotName))
+      else:
+        env.writeOut(dotNameRep(value.dictv.dict))
+
+  of plc_cmd:
+    if value.kind != vkList:
+      # The variable is not a list.
+      errorAndColumn(env, wNotListVariable, line, runningPos)
+    else:
+      # Print list in columns.
+      var list: seq[string]
+      for item in value.listv.list:
+        list.add(valueToString(item))
+      env.writeOut(listInColumns(list, getMaxWidth()))
+
+  of plv_cmd:
+    if value.kind != vkList:
+      # The variable is not a list.
+      errorAndColumn(env, wNotListVariable, line, runningPos)
+    else:
+      # Print list vertically, one item per line.
+      for value in value.listv.list:
+        env.writeOut(valueToString(value))
+
+  of pf_cmd:
+    # print function, f, f.cmp, f.cmp[0]
+    if haveDotName and variableName.dotName == "f":
       # echo "terminal width = " & $width
       var list: seq[string]
       for key, value in variables["f"].dictv.dict.pairs():
         list.add(key)
-      env.writeOut(listInColumns(list, width))
-
-
+      env.writeOut(listInColumns(list, getMaxWidth()))
     elif value.kind == vkList:
       for ix, funcVar in value.listv.list:
-        env.writeOut(fmt"{ix}:  {funcVar.funcv.signature}")
+        if funcVar.kind != vkFunc:
+          # The variable is not a function variable.
+          errorAndColumn(env, wNotFuncVariable, line, runningPos)
+          return false
+        else:
+          env.writeOut(fmt"{ix}:  {funcVar.funcv.signature}")
     elif value.kind == vkFunc:
       echoDocComment(value)
     else:
-      # The variable is not a function variable.
-      errorAndColumn(env, wNotFuncVariable, line, runningPos)
-  of "pr": # string rb
-    env.writeOut(valueToStringRB(value))
-  else:
+      # Specify f or a function variable.
+      errorAndColumn(env, wSpecifyF, line, runningPos)
+
+  of q_cmd, h_cmd, v_cmd, not_cmd:
     discard
-  result = false
 
 proc runEvaluatePrintLoop*(env: var Env, args: Args) =
   ## Run commands at a prompt.

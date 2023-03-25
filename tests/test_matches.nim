@@ -640,14 +640,23 @@ suite "matches.nim":
     check testMatchReplCmd("v", 0, some(newMatches(1, 0, "v")))
     check testMatchReplCmd("q", 0, some(newMatches(1, 0, "q")))
     check testMatchReplCmd("h", 0, some(newMatches(1, 0, "h")))
-    check testMatchReplCmd("v ", 0, some(newMatches(2, 0, "v")))
     check testMatchReplCmd("p", 0, some(newMatches(1, 0, "p")))
-    check testMatchReplCmd("p ", 0, some(newMatches(2, 0, "p")))
-    check testMatchReplCmd("pr ", 0, some(newMatches(3, 0, "pr")))
-    check testMatchReplCmd("pj ", 0, some(newMatches(3, 0, "pj")))
-    check testMatchReplCmd("ph ", 0, some(newMatches(3, 0, "ph")))
 
-  test "matchReplCmd":
+    check testMatchReplCmd("v ", 0, some(newMatches(2, 0, "v")))
+    check testMatchReplCmd("q ", 0, some(newMatches(2, 0, "q")))
+    check testMatchReplCmd("h ", 0, some(newMatches(2, 0, "h")))
+    check testMatchReplCmd("p ", 0, some(newMatches(2, 0, "p")))
+
+    check testMatchReplCmd("pd", 0, some(newMatches(2, 0, "pd")))
+    check testMatchReplCmd("pd ", 0, some(newMatches(3, 0, "pd")))
+    check testMatchReplCmd("pf", 0, some(newMatches(2, 0, "pf")))
+    check testMatchReplCmd("plc", 0, some(newMatches(3, 0, "plc")))
+    check testMatchReplCmd("plv", 0, some(newMatches(3, 0, "plv")))
+
+  test "matchReplCmd false":
+    check testMatchReplCmd("print", 0, none(Matches))
+
+  test "emptyOrSpaces":
     check testEmptyOrSpaces("", 0, true)
     check testEmptyOrSpaces(" ", 0, true)
     check testEmptyOrSpaces("  ", 0, true)

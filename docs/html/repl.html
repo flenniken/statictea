@@ -71,10 +71,32 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 <h1>Index</h1>
 
 <ul>
+<li>type:  <a href="#ReplCommand">ReplCommand</a> &mdash; The REPL commands.</li>
 <li> <a href="#listInColumns">listInColumns</a> &mdash; Generate a string of the names in columns.</li>
+<li> <a href="#stringToReplCommand">stringToReplCommand</a> &mdash; </li>
 <li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
 <li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
 </ul>
+
+<h3 id="ReplCommand">ReplCommand</h3>
+
+<p>The REPL commands.
+</p><ul>
+<li>not_cmd -- not a REPL command
+</li><li>h_cmd -- display help
+</li><li>p_cmd -- print variable
+</li><li>pd_cmd -- print dictionary
+</li><li>pf_cmd -- print f or function
+</li><li>plc_cmd -- print list in columns
+</li><li>plv_cmd -- print list one per line
+</li><li>v_cmd -- print number of variables in the one letter dictionaries
+</li><li>q_cmd -- quit (or Ctrl-d)</li></ul>
+
+
+<pre class="nim-code">
+ReplCommand = enum
+  not_cmd, h_cmd, p_cmd, pd_cmd, pf_cmd, plc_cmd, plv_cmd, v_cmd, q_cmd
+</pre>
 
 <h3 id="listInColumns">listInColumns</h3>
 
@@ -84,15 +106,22 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 proc listInColumns(names: seq[string]; width: Natural): string 
 </pre>
 
+<h3 id="stringToReplCommand">stringToReplCommand</h3>
+
+
+
+<pre class="nim-code">
+func stringToReplCommand(str: string): ReplCommand 
+</pre>
+
 <h3 id="handleReplLine">handleReplLine</h3>
 
 <p>Handle the REPL line. Return true to end the loop.</p>
 
 <pre class="nim-code">
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
-    raises: [KeyError, Exception, ValueError, IOError, OSError], tags: [
-    RootEffect, WriteIOEffect, TimeEffect, ReadEnvEffect, ReadIOEffect,
-    WriteDirEffect].}
+    raises: [KeyError, IOError, OSError, ValueError, Exception],
+    tags: [WriteIOEffect, RootEffect, TimeEffect, ReadEnvEffect].}
 </pre>
 
 <h3 id="runEvaluatePrintLoop">runEvaluatePrintLoop</h3>
@@ -103,7 +132,7 @@ proc handleReplLine(env: var Env; variables: var Variables; line: string): bool 
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.
     raises: [Exception, IOError, ValueError, OSError, KeyError], tags: [
     RootEffect, WriteIOEffect, TimeEffect, ReadDirEffect, ReadIOEffect,
-    ReadEnvEffect, WriteDirEffect].}
+    ReadEnvEffect].}
 </pre>
 
 

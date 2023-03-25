@@ -265,7 +265,8 @@ proc matchCompareOperator*(line: string, start: Natural): Option[Matches] =
 
 proc matchReplCmd*(line: string, start: Natural): Option[Matches] =
   ## Match the REPL commands and the trailing optional whitespace.
-  let pattern = r"(pr|pj|ph|h|v|q|p)\s*"
+  ## One space or end of line is required.
+  let pattern = r"(pd|pf|plc|plv|h|v|q|p)\b\s*"
   result = matchPatternCached(line, pattern, start, 1)
 
 proc matchParameterType*(line: string, start: Natural): Option[Matches] =

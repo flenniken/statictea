@@ -272,7 +272,7 @@ proc matchCompareOperator(line: string; start: Natural): Option[Matches] {.
 
 # matchReplCmd
 
-Match the REPL commands and the trailing optional whitespace.
+Match the REPL commands and the trailing optional whitespace. One space or end of line is required.
 
 ```nim
 proc matchReplCmd(line: string; start: Natural): Option[Matches] {.

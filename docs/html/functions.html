@@ -1148,12 +1148,14 @@ func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 
 <h3 id="fun_listLoop_lapoab">fun_listLoop_lapoab</h3>
 
-<p>Loop over items in a list and fill in a container. A callback function is called for each item in the list and it decides what goes in the container.
+<p>Loop over items in a list and fill in a container. A callback
+function is called for each item in the list and it decides what
+goes in the container.
 
 </p><p>You pass a list to loop over, a container to fill in, a
 callback function, and an optional state variable. The function
 returns whether the callback stopped early or not and you can
-ignore it using a bare form..
+ignore it using a bare form.
 
 </p><pre class="desc-code">
 <span class="t-dotName">listLoop</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">list</span>, <span class="t-param">container</span>: <span class="t-type">any</span>, <span class="t-param">listCallback</span>: <span class="t-type">func</span>, <span class="t-param">state</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">bool</span>
