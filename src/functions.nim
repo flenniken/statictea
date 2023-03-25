@@ -329,7 +329,7 @@ func convertFloatToInt(num: float, map: VarsDict): FunResult =
 
 func fun_cmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
-  ## greater than.
+  ## @:greater than.
   ## @:
   ## @:~~~
   ## @:cmp = func(a: int, b: int) int
@@ -350,7 +350,7 @@ func fun_cmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_cmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two floats. Returns -1 for less, 0 for equal and 1 for
-  ## greater than.
+  ## @:greater than.
   ## @:
   ## @:~~~
   ## @:cmp = func(a: float, b: float) int
@@ -371,7 +371,7 @@ func fun_cmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_cmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two strings. Returns -1 for less, 0 for equal and 1 for
-  ## greater than.
+  ## @:greater than.
   ## @:
   ## @:You have the option to compare case insensitive. Case sensitive
   ## @:is the default.
@@ -479,10 +479,10 @@ func fun_len_di*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Get a list value by its index.  If the index is invalid, the
-  ## default value is returned when specified, else a warning is
-  ## generated. You can use negative index values. Index -1 gets the
-  ## last element. It is short hand for len - 1. Index -2 is len - 2,
-  ## etc.
+  ## @:default value is returned when specified, else a warning is
+  ## @:generated. You can use negative index values. Index -1 gets the
+  ## @:last element. It is short hand for len - 1. Index -2 is len - 2,
+  ## @:etc.
   ## @:
   ## @:~~~
   ## @:get = func(list: list, index: int, default: optional any) any
@@ -527,8 +527,8 @@ func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Get a dictionary value by its key.  If the key doesn't exist, the
-  ## default value is returned if specified, else a warning is
-  ## generated.
+  ## @:default value is returned if specified, else a warning is
+  ## @:generated.
   ## @:
   ## @:~~~
   ## @:get = func(dictionary: dict, key: string, default: optional any) any
@@ -565,9 +565,9 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the condition is 0, return the second argument, else return
-  ## the third argument.  You can use any type for the condition.  The
-  ## condition is 0 for strings, lists and dictionaries when their
-  ## length is 0.
+  ## @:the third argument.  You can use any type for the condition.  The
+  ## @:condition is 0 for strings, lists and dictionaries when their
+  ## @:length is 0.
   ## @:
   ## @:The condition types and what is considered 0:
   ## @:
@@ -622,7 +622,7 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the condition is true, return the second argument, else return
-  ## the third argument.
+  ## @:the third argument.
   ## @:
   ## @:The IF functions are special in a couple of ways, see
   ## @:the If Functions section.  You usually use boolean infix
@@ -757,7 +757,7 @@ func fun_sub_fff*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Determine whether a key exists in a dictionary. Return true when it
-  ## exists, else false.
+  ## @:exists, else false.
   ## @:
   ## @:~~~
   ## @:exists = func(dictionary: dict, key: string) bool
@@ -779,8 +779,8 @@ func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare integer cases and return the matching value.  It takes a
-  ## main integer condition, a list of case pairs and an optional
-  ## value when none of the cases match.
+  ## @:main integer condition, a list of case pairs and an optional
+  ## @:value when none of the cases match.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
@@ -812,8 +812,8 @@ func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare string cases and return the matching value.  It takes a
-  ## main string condition, a list of case pairs and an optional
-  ## value when none of the cases match.
+  ## @:main string condition, a list of case pairs and an optional
+  ## @:value when none of the cases match.
   ## @:
   ## @:The first element of a case pair is the condition and the
   ## @:second is the return value when that condition matches the main
@@ -856,7 +856,7 @@ func parseVersion*(version: string): Option[(int, int, int)] =
 
 func fun_cmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
-  ## equal and 1 for greater than.
+  ## @:equal and 1 for greater than.
   ## @:
   ## @:~~~
   ## @:cmpVersion = func(versionA: string, versionB: string) int
@@ -943,7 +943,7 @@ func fun_float_sf*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_float_saa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from a number string. If the string is not a
-  ## number, return the default.
+  ## @:number, return the default.
   ## @:
   ## @:~~~
   ## @:float = func(numString: string, default: optional any) any
@@ -1047,7 +1047,7 @@ func fun_int_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a number string. If the string is not a number,
-  ## return the default value.
+  ## @:return the default value.
   ## @:
   ## @:~~~
   ## @:int = func(numString: string, roundOption: string, default: optional any) any
@@ -1143,9 +1143,9 @@ func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_find_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
-  ## is not found, return an optional default value.  A warning is
-  ## generated when the substring is missing and you don't specify a
-  ## default value.
+  ## @:is not found, return an optional default value.  A warning is
+  ## @:generated when the substring is missing and you don't specify a
+  ## @:default value.
   ## @:
   ## @:~~~
   ## @:find = func(str: string, substring: string, default: optional any) any
@@ -1181,9 +1181,9 @@ func fun_find_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_slice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Extract a substring from a string by its position and length. You
-  ## pass the string, the substring's start index and its length.  The
-  ## length is optional. When not specified, the slice returns the
-  ## characters from the start to the end of the string.
+  ## @:pass the string, the substring's start index and its length.  The
+  ## @:length is optional. When not specified, the slice returns the
+  ## @:characters from the start to the end of the string.
   ## @:
   ## @:The start index and length are by unicode characters not bytes.
   ## @:
@@ -1216,7 +1216,7 @@ func fun_slice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_dup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Duplicate a string x times.  The result is a new string built by
-  ## concatenating the string to itself the specified number of times.
+  ## @:concatenating the string to itself the specified number of times.
   ## @:
   ## @:~~~
   ## @:dup = func(pattern: string, count: int) string
@@ -1255,7 +1255,7 @@ func fun_dup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs.  The keys
-  ## must be strings and the values can be any type.
+  ## @:must be strings and the values can be any type.
   ## @:
   ## @:~~~
   ## @:dict = func(pairs: optional list) dict
@@ -1361,8 +1361,8 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
 
 func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Replace a substring specified by its position and length with
-  ## another string.  You can use the function to insert and append to
-  ## a string as well.
+  ## @:another string.  You can use the function to insert and append to
+  ## @:a string as well.
   ## @:
   ## @:~~~
   ## @:replace = func(str: string, start: int, length: int, replacement: string) string
@@ -1446,8 +1446,8 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
 
 func replaceReMap(map: VarsDict): FunResult =
   ## Replace multiple parts of a string using regular expressions.
-  ## The map parameteter has the target string in a and the pairs in
-  ## b.
+  ## @:The map parameteter has the target string in a and the pairs in
+  ## @:b.
 
   let str = map["a"].stringv
   let list = map["b"].listv.list
@@ -1530,7 +1530,7 @@ func parsePath*(path: string, separator='/'): PathComponents =
 
 func fun_path_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Split a file path into its component pieces. Return a dictionary
-  ## with the filename, basename, extension and directory.
+  ## @:with the filename, basename, extension and directory.
   ## @:
   ## @:You pass a path string and the optional path separator, forward
   ## @:slash or or backslash. When no separator, the current
@@ -1751,7 +1751,7 @@ func generalSort(map: VarsDict): FunResult =
 
 func fun_sort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Sort a list of values of the same type.  The values are ints,
-  ## floats, or strings.
+  ## @:floats, or strings.
   ## @:
   ## @:You specify the sort order, "ascending" or "descending".
   ## @:
@@ -1842,8 +1842,8 @@ func fun_sort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create anchor names from heading names. Use it for HTML class
-  ## names or Github markdown internal links. It handles duplicate
-  ## heading names.
+  ## @:names or Github markdown internal links. It handles duplicate
+  ## @:heading names.
   ## @:
   ## @:~~~
   ## @:anchors = func(names: list, type: string) list
@@ -1880,7 +1880,7 @@ func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_type_as*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return the argument type, one of: int, float, string, list,
-  ## dict, bool or func.
+  ## @:dict, bool or func.
   ## @:
   ## @:~~~
   ## @:type = func(variable: any) string
@@ -1974,8 +1974,8 @@ func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult 
 
 func fun_join_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Join a list of strings with a separator.  An optional parameter
-  ## determines whether you skip empty strings or not. You can use an
-  ## empty separator to concatenate the arguments.
+  ## @:determines whether you skip empty strings or not. You can use an
+  ## @:empty separator to concatenate the arguments.
   ## @:
   ## @:~~~
   ## @:join = func(strs: list, sep: string, skipEmpty: optional bool) string
@@ -2019,7 +2019,7 @@ func fun_join_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return a warning message and skip the current statement.
-  ## You can call the warn function without an assignment.
+  ## @:You can call the warn function without an assignment.
   ## @:
   ## @:~~~
   ## @:warn = func(message: string) string
@@ -2044,7 +2044,7 @@ func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Log a message to the log file.  You can call the log function
-  ## without an assignment.
+  ## @:without an assignment.
   ## @:
   ## @:~~~
   ## @:log = func(message: string) string
@@ -2068,7 +2068,7 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return is a special function that returns the value passed in and
-  ## has has side effects.
+  ## @:has has side effects.
   ## @:
   ## @:~~~
   ## @:return = func(value: any) any
@@ -2129,7 +2129,7 @@ func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a variable to a string. You specify the variable and
-  ## optionally the type of output you want.
+  ## @:optionally the type of output you want.
   ## @:
   ## @:~~~
   ## @:string = func(var: any, stype: optional string) string
@@ -2233,7 +2233,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert the dictionary variable to dot names. You specify the
-  ## name of the dictionary and the dict variable.
+  ## @:name of the dictionary and the dict variable.
   ## @:
   ## @:~~~
   ## @:string = func(dictName: string: d: dict) string
@@ -2257,7 +2257,7 @@ func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_format_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Format a string using replacement variables similar to a
-  ## replacement block. To enter a left bracket use two in a row.
+  ## @:replacement block. To enter a left bracket use two in a row.
   ## @:
   ## @:~~~
   ## @:format = func(str: string) string
@@ -2347,7 +2347,7 @@ func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRe
 
 func fun_startsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Check whether a strings starts with the given prefix. Return true
-  ## when it does, else false.
+  ## @:when it does, else false.
   ## @:
   ## @:~~~
   ## @:startsWith = func(str: string, str: prefix) bool
@@ -2388,7 +2388,7 @@ func fun_not_bb*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_and_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean AND with short circuit. If the first argument is false,
-  ## the second argument is not evaluated.
+  ## @:the second argument is not evaluated.
   ## @:
   ## @:~~~
   ## @:and = func(a: bool, b: bool) bool
@@ -2411,7 +2411,7 @@ func fun_and_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_or_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean OR with short circuit. If the first argument is true,
-  ## the second argument is not evaluated.
+  ## @:the second argument is not evaluated.
   ## @:
   ## @:~~~
   ## @:or = func(a: bool, b: bool) bool
@@ -2472,7 +2472,7 @@ func fun_eq_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_eq_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return true when two strings are equal.  See cmp function for case
-  ## insensitive compare.
+  ## @:insensitive compare.
   ## @:
   ## @:~~~
   ## @:eq = func(a: string, b: string) bool
@@ -2726,8 +2726,8 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Parse a simple subset of markdown which contains paragraphs,
-  ## bullets and code blocks. This subset is used to document all
-  ## StaticTea functions. Return a list of lists.
+  ## @:bullets and code blocks. This subset is used to document all
+  ## @:StaticTea functions. Return a list of lists.
   ## @:
   ## @:~~~
   ## @:markdownList = func(mdText: string) list
@@ -2768,7 +2768,7 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
 
 func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Divide a string of StaticTea code into fragments useful for
-  ## syntax highlighting.  Return a list of tagged fragments.
+  ## @:syntax highlighting.  Return a list of tagged fragments.
   ## @:
   ## @:~~~
   ## @:highlight = func(code: string) list

@@ -32,7 +32,8 @@ variable or pass to another function.
 * [float](#float) &mdash; Create a float from an int.
 * [float](#float-1) &mdash; Create a float from a number string.
 * [float](#float-2) &mdash; Create a float from a number string.
-* [format](#format) &mdash; Format a string using replacement variables similar to a replacement block.
+* [format](#format) &mdash; Format a string using replacement variables similar to a
+replacement block.
 * [func](#func) &mdash; Define a function.
 * [functionDetails](#functiondetails) &mdash; Return the function details in a dictionary.
 * [get](#get) &mdash; Get a dictionary value by its key.
@@ -41,10 +42,13 @@ variable or pass to another function.
 * [gt](#gt-1) &mdash; Return true when an int is greater then another int.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
 * [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
-* [highlight](#highlight) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
+* [highlight](#highlight) &mdash; Divide a string of StaticTea code into fragments useful for
+syntax highlighting.
 * [html](#html) &mdash; Escape text for placing it in an html page.
-* [if0](#if0) &mdash; If the condition is 0, return the second argument, else return the third argument.
-* [if](#if) &mdash; If the condition is true, return the second argument, else return the third argument.
+* [if0](#if0) &mdash; If the condition is 0, return the second argument, else return
+the third argument.
+* [if](#if) &mdash; If the condition is true, return the second argument, else return
+the third argument.
 * [int](#int) &mdash; Create an int from a float.
 * [int](#int-1) &mdash; Create an int from a number string.
 * [int](#int-2) &mdash; Create an int from a number string.
@@ -62,7 +66,8 @@ variable or pass to another function.
 * [lt](#lt-1) &mdash; Return true when an int is less than another int.
 * [lte](#lte) &mdash; Return true when a float is less than or equal to another float.
 * [lte](#lte-1) &mdash; Return true when an int is less than or equal to another int.
-* [markdownLite](#markdownlite) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
+* [markdownLite](#markdownlite) &mdash; Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks.
 * [ne](#ne) &mdash; Return true when two floats are not equal.
 * [ne](#ne-1) &mdash; Return true when two ints are not equal.
 * [ne](#ne-2) &mdash; Return true when two strings are not equal.
@@ -70,9 +75,11 @@ variable or pass to another function.
 * [or](#or) &mdash; Boolean OR with short circuit.
 * [path](#path) &mdash; Split a file path into its component pieces.
 * [readJson](#readjson) &mdash; Convert a JSON string to a variable.
-* [replace](#replace) &mdash; Replace a substring specified by its position and length with another string.
+* [replace](#replace) &mdash; Replace a substring specified by its position and length with
+another string.
 * [replaceRe](#replacere) &mdash; Replace multiple parts of a string using regular expressions.
-* [return](#return) &mdash; Return is a special function that returns the value passed in and has has side effects.
+* [return](#return) &mdash; Return is a special function that returns the value passed in and
+has has side effects.
 * [slice](#slice) &mdash; Extract a substring from a string by its position and length.
 * [sort](#sort) &mdash; Sort a list of values of the same type.
 * [sort](#sort-1) &mdash; Sort a list of lists.
@@ -82,7 +89,8 @@ variable or pass to another function.
 * [string](#string-1) &mdash; Convert the dictionary variable to dot names.
 * [sub](#sub) &mdash; Subtract two floats.
 * [sub](#sub-1) &mdash; Subtract two integers.
-* [type](#type) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
+* [type](#type) &mdash; Return the argument type, one of: int, float, string, list,
+dict, bool or func.
 * [values](#values) &mdash; Create a list out of the values in the specified dictionary.
 * [warn](#warn) &mdash; Return a warning message and skip the current statement.
 
@@ -121,7 +129,9 @@ add(-2, -5) => -7
 
 # anchors
 
-Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+Create anchor names from heading names. Use it for HTML class
+names or Github markdown internal links. It handles duplicate
+heading names.
 
 ~~~
 anchors = func(names: list, type: string) list
@@ -143,7 +153,8 @@ anchores(list, "github") =>
 
 # and
 
-Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+Boolean AND with short circuit. If the first argument is false,
+the second argument is not evaluated.
 
 ~~~
 and = func(a: bool, b: bool) bool
@@ -197,7 +208,9 @@ bool(dict("tea", 2)) => true
 
 # case
 
-Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+Compare integer cases and return the matching value.  It takes a
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -227,7 +240,9 @@ case(3, cases, "wine") => "wine"
 
 # case
 
-Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+Compare string cases and return the matching value.  It takes a
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -256,7 +271,8 @@ case("bunch", cases, "other") => "other"
 
 # cmp
 
-Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two floats. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 ~~~
 cmp = func(a: float, b: float) int
@@ -273,7 +289,8 @@ cmp(9.3, 2.2) => 1
 
 # cmp
 
-Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two ints. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 ~~~
 cmp = func(a: int, b: int) int
@@ -290,7 +307,8 @@ cmp(9, 2) => 1
 
 # cmp
 
-Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -312,7 +330,8 @@ cmp("Tea", "tea", false) => 0
 
 # cmpVersion
 
-Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two StaticTea version numbers. Returns -1 for less, 0 for
+equal and 1 for greater than.
 
 ~~~
 cmpVersion = func(versionA: string, versionB: string) int
@@ -349,7 +368,8 @@ concat("a", "b") => "ab"
 
 # dict
 
-Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+Create a dictionary from a list of key, value pairs.  The keys
+must be strings and the values can be any type.
 
 ~~~
 dict = func(pairs: optional list) dict
@@ -367,7 +387,8 @@ dict(["a", 5, "b", 33, "c", 0]) =>
 
 # dup
 
-Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
+Duplicate a string x times.  The result is a new string built by
+concatenating the string to itself the specified number of times.
 
 ~~~
 dup = func(pattern: string, count: int) string
@@ -418,7 +439,8 @@ eq(2, 3) => false
 
 # eq
 
-Return true when two strings are equal.  See cmp function for case insensitive compare.
+Return true when two strings are equal.  See cmp function for case
+insensitive compare.
 
 ~~~
 eq = func(a: string, b: string) bool
@@ -434,7 +456,8 @@ eq("1.2", "3.2") => false
 
 # exists
 
-Determine whether a key exists in a dictionary. Return true when it exists, else false.
+Determine whether a key exists in a dictionary. Return true when it
+exists, else false.
 
 ~~~
 exists = func(dictionary: dict, key: string) bool
@@ -451,7 +474,10 @@ exists(d, "coffee") => false
 
 # find
 
-Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
+Find the position of a substring in a string.  When the substring
+is not found, return an optional default value.  A warning is
+generated when the substring is missing and you don't specify a
+default value.
 
 ~~~
 find = func(str: string, substring: string, default: optional any) any
@@ -489,7 +515,8 @@ float(-33) => -33.0
 
 # float
 
-Create a float from a number string. If the string is not a number, return the default.
+Create a float from a number string. If the string is not a
+number, return the default.
 
 ~~~
 float = func(numString: string, default: optional any) any
@@ -522,7 +549,8 @@ float("33") => 33.0
 
 # format
 
-Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
+Format a string using replacement variables similar to a
+replacement block. To enter a left bracket use two in a row.
 
 ~~~
 format = func(str: string) string
@@ -602,7 +630,9 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 
 # get
 
-Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
+Get a dictionary value by its key.  If the key doesn't exist, the
+default value is returned if specified, else a warning is
+generated.
 
 ~~~
 get = func(dictionary: dict, key: string, default: optional any) any
@@ -628,7 +658,11 @@ d.tea => "Earl Grey"
 
 # get
 
-Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
+Get a list value by its index.  If the index is invalid, the
+default value is returned when specified, else a warning is
+generated. You can use negative index values. Index -1 gets the
+last element. It is short hand for len - 1. Index -2 is len - 2,
+etc.
 
 ~~~
 get = func(list: list, index: int, default: optional any) any
@@ -721,7 +755,8 @@ gte(3, 3) => true
 
 # highlight
 
-Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+Divide a string of StaticTea code into fragments useful for
+syntax highlighting.  Return a list of tagged fragments.
 
 ~~~
 highlight = func(code: string) list
@@ -776,7 +811,10 @@ For more information about how to escape and what is safe see:
 
 # if0
 
-If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
+If the condition is 0, return the second argument, else return
+the third argument.  You can use any type for the condition.  The
+condition is 0 for strings, lists and dictionaries when their
+length is 0.
 
 The condition types and what is considered 0:
 
@@ -824,7 +862,8 @@ if0(c, warn("got zero value"))
 
 # if
 
-If the condition is true, return the second argument, else return the third argument.
+If the condition is true, return the second argument, else return
+the third argument.
 
 The IF functions are special in a couple of ways, see
 the If Functions section.  You usually use boolean infix
@@ -920,7 +959,8 @@ int("-6.3456", "truncate") => -6
 
 # int
 
-Create an int from a number string. If the string is not a number, return the default value.
+Create an int from a number string. If the string is not a number,
+return the default value.
 
 ~~~
 int = func(numString: string, roundOption: string, default: optional any) any
@@ -943,7 +983,9 @@ int("notnum", "round", "nan") => nan
 
 # join
 
-Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
+Join a list of strings with a separator.  An optional parameter
+determines whether you skip empty strings or not. You can use an
+empty separator to concatenate the arguments.
 
 ~~~
 join = func(strs: list, sep: string, skipEmpty: optional bool) string
@@ -1138,7 +1180,8 @@ b5 = func(ix: int, value: int, container: list) bool
 
 # log
 
-Log a message to the log file.  You can call the log function without an assignment.
+Log a message to the log file.  You can call the log function
+without an assignment.
 
 ~~~
 log = func(message: string) string
@@ -1242,7 +1285,9 @@ lte(4, 3) => false
 
 # markdownLite
 
-Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks. This subset is used to document all
+StaticTea functions. Return a list of lists.
 
 ~~~
 markdownList = func(mdText: string) list
@@ -1338,7 +1383,8 @@ not(false) => true
 
 # or
 
-Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
+Boolean OR with short circuit. If the first argument is true,
+the second argument is not evaluated.
 
 ~~~
 or = func(a: bool, b: bool) bool
@@ -1357,7 +1403,8 @@ or(true, warn("not hit")) => true
 
 # path
 
-Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
+Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
 slash or or backslash. When no separator, the current
@@ -1407,7 +1454,9 @@ d = readJson("{\"a\":1, \"b\": 2}")
 
 # replace
 
-Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
+Replace a substring specified by its position and length with
+another string.  You can use the function to insert and append to
+a string as well.
 
 ~~~
 replace = func(str: string, start: int, length: int, replacement: string) string
@@ -1489,7 +1538,8 @@ website: https://regex101.com/
 
 # return
 
-Return is a special function that returns the value passed in and has has side effects.
+Return is a special function that returns the value passed in and
+has has side effects.
 
 ~~~
 return = func(value: any) any
@@ -1538,7 +1588,10 @@ output:
 
 # slice
 
-Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
+Extract a substring from a string by its position and length. You
+pass the string, the substring's start index and its length.  The
+length is optional. When not specified, the slice returns the
+characters from the start to the end of the string.
 
 The start index and length are by unicode characters not bytes.
 
@@ -1557,7 +1610,8 @@ slice("añyóng", 0, 3) => "añy"
 
 # sort
 
-Sort a list of values of the same type.  The values are ints, floats, or strings.
+Sort a list of values of the same type.  The values are ints,
+floats, or strings.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -1644,7 +1698,8 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 
 # startsWith
 
-Check whether a strings starts with the given prefix. Return true when it does, else false.
+Check whether a strings starts with the given prefix. Return true
+when it does, else false.
 
 ~~~
 startsWith = func(str: string, str: prefix) bool
@@ -1663,7 +1718,8 @@ b => false
 
 # string
 
-Convert a variable to a string. You specify the variable and optionally the type of output you want.
+Convert a variable to a string. You specify the variable and
+optionally the type of output you want.
 
 ~~~
 string = func(var: any, stype: optional string) string
@@ -1738,7 +1794,8 @@ a =>
 
 # string
 
-Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
+Convert the dictionary variable to dot names. You specify the
+name of the dictionary and the dict variable.
 
 ~~~
 string = func(dictName: string: d: dict) string
@@ -1791,7 +1848,8 @@ add(1, 5) => -4
 
 # type
 
-Return the argument type, one of: int, float, string, list, dict, bool or func.
+Return the argument type, one of: int, float, string, list,
+dict, bool or func.
 
 ~~~
 type = func(variable: any) string
@@ -1829,7 +1887,8 @@ values(d) => ["apple", 2, 3]
 
 # warn
 
-Return a warning message and skip the current statement. You can call the warn function without an assignment.
+Return a warning message and skip the current statement.
+You can call the warn function without an assignment.
 
 ~~~
 warn = func(message: string) string

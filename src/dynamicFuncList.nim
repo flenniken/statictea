@@ -35,7 +35,9 @@ add(-2, -5) => -7
 """
 
   dc_fun_anchors_lsl = """
-Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+Create anchor names from heading names. Use it for HTML class
+names or Github markdown internal links. It handles duplicate
+heading names.
 
 ~~~
 anchors = func(names: list, type: string) list
@@ -56,7 +58,8 @@ anchores(list, "github") =>
 """
 
   dc_fun_and_bbb = """
-Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+Boolean AND with short circuit. If the first argument is false,
+the second argument is not evaluated.
 
 ~~~
 and = func(a: bool, b: bool) bool
@@ -108,7 +111,9 @@ bool(dict("tea", 2)) => true
 """
 
   dc_fun_case_iloaa = """
-Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+Compare integer cases and return the matching value.  It takes a
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -137,7 +142,9 @@ case(3, cases, "wine") => "wine"
 """
 
   dc_fun_case_sloaa = """
-Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+Compare string cases and return the matching value.  It takes a
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -165,7 +172,8 @@ case("bunch", cases, "other") => "other"
 """
 
   dc_fun_cmp_ffi = """
-Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two floats. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 ~~~
 cmp = func(a: float, b: float) int
@@ -181,7 +189,8 @@ cmp(9.3, 2.2) => 1
 """
 
   dc_fun_cmp_iii = """
-Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two ints. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 ~~~
 cmp = func(a: int, b: int) int
@@ -197,7 +206,8 @@ cmp(9, 2) => 1
 """
 
   dc_fun_cmp_ssobi = """
-Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -218,7 +228,8 @@ cmp("Tea", "tea", false) => 0
 """
 
   dc_fun_cmpVersion_ssi = """
-Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two StaticTea version numbers. Returns -1 for less, 0 for
+equal and 1 for greater than.
 
 ~~~
 cmpVersion = func(versionA: string, versionB: string) int
@@ -253,7 +264,8 @@ concat("a", "b") => "ab"
 """
 
   dc_fun_dict_old = """
-Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+Create a dictionary from a list of key, value pairs.  The keys
+must be strings and the values can be any type.
 
 ~~~
 dict = func(pairs: optional list) dict
@@ -270,7 +282,8 @@ dict(["a", 5, "b", 33, "c", 0]) =>
 """
 
   dc_fun_dup_sis = """
-Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
+Duplicate a string x times.  The result is a new string built by
+concatenating the string to itself the specified number of times.
 
 ~~~
 dup = func(pattern: string, count: int) string
@@ -318,7 +331,8 @@ eq(2, 3) => false
 """
 
   dc_fun_eq_ssb = """
-Return true when two strings are equal.  See cmp function for case insensitive compare.
+Return true when two strings are equal.  See cmp function for case
+insensitive compare.
 
 ~~~
 eq = func(a: string, b: string) bool
@@ -333,7 +347,8 @@ eq("1.2", "3.2") => false
 """
 
   dc_fun_exists_dsb = """
-Determine whether a key exists in a dictionary. Return true when it exists, else false.
+Determine whether a key exists in a dictionary. Return true when it
+exists, else false.
 
 ~~~
 exists = func(dictionary: dict, key: string) bool
@@ -349,7 +364,10 @@ exists(d, "coffee") => false
 """
 
   dc_fun_find_ssoaa = """
-Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
+Find the position of a substring in a string.  When the substring
+is not found, return an optional default value.  A warning is
+generated when the substring is missing and you don't specify a
+default value.
 
 ~~~
 find = func(str: string, substring: string, default: optional any) any
@@ -385,7 +403,8 @@ float(-33) => -33.0
 """
 
   dc_fun_float_saa = """
-Create a float from a number string. If the string is not a number, return the default.
+Create a float from a number string. If the string is not a
+number, return the default.
 
 ~~~
 float = func(numString: string, default: optional any) any
@@ -416,7 +435,8 @@ float("33") => 33.0
 """
 
   dc_fun_format_ss = """
-Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
+Format a string using replacement variables similar to a
+replacement block. To enter a left bracket use two in a row.
 
 ~~~
 format = func(str: string) string
@@ -493,7 +513,9 @@ fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 """
 
   dc_fun_get_dsoaa = """
-Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
+Get a dictionary value by its key.  If the key doesn't exist, the
+default value is returned if specified, else a warning is
+generated.
 
 ~~~
 get = func(dictionary: dict, key: string, default: optional any) any
@@ -518,7 +540,11 @@ d.tea => "Earl Grey"
 """
 
   dc_fun_get_lioaa = """
-Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
+Get a list value by its index.  If the index is invalid, the
+default value is returned when specified, else a warning is
+generated. You can use negative index values. Index -1 gets the
+last element. It is short hand for len - 1. Index -2 is len - 2,
+etc.
 
 ~~~
 get = func(list: list, index: int, default: optional any) any
@@ -606,7 +632,8 @@ gte(3, 3) => true
 """
 
   dc_fun_highlight_sl = """
-Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+Divide a string of StaticTea code into fragments useful for
+syntax highlighting.  Return a list of tagged fragments.
 
 ~~~
 highlight = func(code: string) list
@@ -659,7 +686,10 @@ For more information about how to escape and what is safe see:
 """
 
   dc_fun_if0_iaoaa = """
-If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
+If the condition is 0, return the second argument, else return
+the third argument.  You can use any type for the condition.  The
+condition is 0 for strings, lists and dictionaries when their
+length is 0.
 
 The condition types and what is considered 0:
 
@@ -706,7 +736,8 @@ if0(c, warn("got zero value"))
 """
 
   dc_fun_if_baoaa = """
-If the condition is true, return the second argument, else return the third argument.
+If the condition is true, return the second argument, else return
+the third argument.
 
 The IF functions are special in a couple of ways, see
 the If Functions section.  You usually use boolean infix
@@ -799,7 +830,8 @@ int("-6.3456", "truncate") => -6
 """
 
   dc_fun_int_ssaa = """
-Create an int from a number string. If the string is not a number, return the default value.
+Create an int from a number string. If the string is not a number,
+return the default value.
 
 ~~~
 int = func(numString: string, roundOption: string, default: optional any) any
@@ -821,7 +853,9 @@ int("notnum", "round", "nan") => nan
 """
 
   dc_fun_join_lsois = """
-Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
+Join a list of strings with a separator.  An optional parameter
+determines whether you skip empty strings or not. You can use an
+empty separator to concatenate the arguments.
 
 ~~~
 join = func(strs: list, sep: string, skipEmpty: optional bool) string
@@ -1008,7 +1042,8 @@ b5 = func(ix: int, value: int, container: list) bool
 """
 
   dc_fun_log_ss = """
-Log a message to the log file.  You can call the log function without an assignment.
+Log a message to the log file.  You can call the log function
+without an assignment.
 
 ~~~
 log = func(message: string) string
@@ -1106,7 +1141,9 @@ lte(4, 3) => false
 """
 
   dc_fun_markdownLite_sl = """
-Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks. This subset is used to document all
+StaticTea functions. Return a list of lists.
 
 ~~~
 markdownList = func(mdText: string) list
@@ -1197,7 +1234,8 @@ not(false) => true
 """
 
   dc_fun_or_bbb = """
-Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
+Boolean OR with short circuit. If the first argument is true,
+the second argument is not evaluated.
 
 ~~~
 or = func(a: bool, b: bool) bool
@@ -1215,7 +1253,8 @@ or(true, warn("not hit")) => true
 """
 
   dc_fun_path_sosd = """
-Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
+Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
 slash or or backslash. When no separator, the current
@@ -1263,7 +1302,9 @@ d = readJson("{\"a\":1, \"b\": 2}")
 """
 
   dc_fun_replace_siiss = """
-Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
+Replace a substring specified by its position and length with
+another string.  You can use the function to insert and append to
+a string as well.
 
 ~~~
 replace = func(str: string, start: int, length: int, replacement: string) string
@@ -1343,7 +1384,8 @@ website: https://regex101.com/
 """
 
   dc_fun_return_aa = """
-Return is a special function that returns the value passed in and has has side effects.
+Return is a special function that returns the value passed in and
+has has side effects.
 
 ~~~
 return = func(value: any) any
@@ -1391,7 +1433,10 @@ output:
 """
 
   dc_fun_slice_siois = """
-Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
+Extract a substring from a string by its position and length. You
+pass the string, the substring's start index and its length.  The
+length is optional. When not specified, the slice returns the
+characters from the start to the end of the string.
 
 The start index and length are by unicode characters not bytes.
 
@@ -1409,7 +1454,8 @@ slice("añyóng", 0, 3) => "añy"
 """
 
   dc_fun_sort_lsosl = """
-Sort a list of values of the same type.  The values are ints, floats, or strings.
+Sort a list of values of the same type.  The values are ints,
+floats, or strings.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -1493,7 +1539,8 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 """
 
   dc_fun_startsWith_ssb = """
-Check whether a strings starts with the given prefix. Return true when it does, else false.
+Check whether a strings starts with the given prefix. Return true
+when it does, else false.
 
 ~~~
 startsWith = func(str: string, str: prefix) bool
@@ -1511,7 +1558,8 @@ b => false
 """
 
   dc_fun_string_aoss = """
-Convert a variable to a string. You specify the variable and optionally the type of output you want.
+Convert a variable to a string. You specify the variable and
+optionally the type of output you want.
 
 ~~~
 string = func(var: any, stype: optional string) string
@@ -1585,7 +1633,8 @@ a =>
 """
 
   dc_fun_string_sds = """
-Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
+Convert the dictionary variable to dot names. You specify the
+name of the dictionary and the dict variable.
 
 ~~~
 string = func(dictName: string: d: dict) string
@@ -1635,7 +1684,8 @@ add(1, 5) => -4
 """
 
   dc_fun_type_as = """
-Return the argument type, one of: int, float, string, list, dict, bool or func.
+Return the argument type, one of: int, float, string, list,
+dict, bool or func.
 
 ~~~
 type = func(variable: any) string
@@ -1671,7 +1721,8 @@ values(d) => ["apple", 2, 3]
 """
 
   dc_fun_warn_ss = """
-Return a warning message and skip the current statement. You can call the warn function without an assignment.
+Return a warning message and skip the current statement.
+You can call the warn function without an assignment.
 
 ~~~
 warn = func(message: string) string

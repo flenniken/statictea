@@ -25,8 +25,10 @@ StaticTea functions and supporting types. The StaticTea language functions start
 * [fun_len_di](#fun_len_di) &mdash; Number of elements in a dictionary.
 * [fun_get_lioaa](#fun_get_lioaa) &mdash; Get a list value by its index.
 * [fun_get_dsoaa](#fun_get_dsoaa) &mdash; Get a dictionary value by its key.
-* [fun_if0_iaoaa](#fun_if0_iaoaa) &mdash; If the condition is 0, return the second argument, else return the third argument.
-* [fun_if_baoaa](#fun_if_baoaa) &mdash; If the condition is true, return the second argument, else return the third argument.
+* [fun_if0_iaoaa](#fun_if0_iaoaa) &mdash; If the condition is 0, return the second argument, else return
+the third argument.
+* [fun_if_baoaa](#fun_if_baoaa) &mdash; If the condition is true, return the second argument, else return
+the third argument.
 * [fun_add_iii](#fun_add_iii) &mdash; Add two integers.
 * [fun_add_fff](#fun_add_fff) &mdash; Add two floats.
 * [fun_sub_iii](#fun_sub_iii) &mdash; Subtract two integers.
@@ -50,7 +52,8 @@ StaticTea functions and supporting types. The StaticTea language functions start
 * [fun_dict_old](#fun_dict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [fun_list_al](#fun_list_al) &mdash; Create a list of variables.
 * [fun_listLoop_lapoab](#fun_listloop_lapoab) &mdash; Loop over items in a list and fill in a container.
-* [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with another string.
+* [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with
+another string.
 * [fun_replaceRe_sls](#fun_replacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
 * [fun_path_sosd](#fun_path_sosd) &mdash; Split a file path into its component pieces.
@@ -61,15 +64,18 @@ StaticTea functions and supporting types. The StaticTea language functions start
 * [fun_sort_lssil](#fun_sort_lssil) &mdash; Sort a list of lists.
 * [fun_sort_lsssl](#fun_sort_lsssl) &mdash; Sort a list of dictionaries.
 * [fun_anchors_lsl](#fun_anchors_lsl) &mdash; Create anchor names from heading names.
-* [fun_type_as](#fun_type_as) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
+* [fun_type_as](#fun_type_as) &mdash; Return the argument type, one of: int, float, string, list,
+dict, bool or func.
 * [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
 * [fun_join_lsois](#fun_join_lsois) &mdash; Join a list of strings with a separator.
 * [fun_warn_ss](#fun_warn_ss) &mdash; Return a warning message and skip the current statement.
 * [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file.
-* [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has has side effects.
+* [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and
+has has side effects.
 * [fun_string_aoss](#fun_string_aoss) &mdash; Convert a variable to a string.
 * [fun_string_sds](#fun_string_sds) &mdash; Convert the dictionary variable to dot names.
-* [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a replacement block.
+* [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a
+replacement block.
 * [fun_func_sp](#fun_func_sp) &mdash; Define a function.
 * [fun_functionDetails_pd](#fun_functiondetails_pd) &mdash; Return the function details in a dictionary.
 * [fun_startsWith_ssb](#fun_startswith_ssb) &mdash; Check whether a strings starts with the given prefix.
@@ -91,8 +97,10 @@ StaticTea functions and supporting types. The StaticTea language functions start
 * [fun_lte_iib](#fun_lte_iib) &mdash; Return true when an int is less than or equal to another int.
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
-* [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
-* [fun_highlight_sl](#fun_highlight_sl) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
+* [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks.
+* [fun_highlight_sl](#fun_highlight_sl) &mdash; Divide a string of StaticTea code into fragments useful for
+syntax highlighting.
 * [escapeHtmlBody](#escapehtmlbody) &mdash; Excape text for placing in body html.
 * [escapeHtmlAttribute](#escapehtmlattribute) &mdash; Excape text for placing in an html attribute.
 * [fun_html_sss](#fun_html_sss) &mdash; Escape text for placing it in an html page.
@@ -211,7 +219,8 @@ proc formatString(variables: Variables; text: string): StringOr {.
 
 # fun_cmp_iii
 
-Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two ints. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 ~~~
 cmp = func(a: int, b: int) int
@@ -232,7 +241,8 @@ func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_cmp_ffi
 
-Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two floats. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 ~~~
 cmp = func(a: float, b: float) int
@@ -253,7 +263,8 @@ func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_cmp_ssobi
 
-Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -361,7 +372,11 @@ func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_get_lioaa
 
-Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
+Get a list value by its index.  If the index is invalid, the
+default value is returned when specified, else a warning is
+generated. You can use negative index values. Index -1 gets the
+last element. It is short hand for len - 1. Index -2 is len - 2,
+etc.
 
 ~~~
 get = func(list: list, index: int, default: optional any) any
@@ -394,7 +409,9 @@ func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_get_dsoaa
 
-Get a dictionary value by its key.  If the key doesn't exist, the default value is returned if specified, else a warning is generated.
+Get a dictionary value by its key.  If the key doesn't exist, the
+default value is returned if specified, else a warning is
+generated.
 
 ~~~
 get = func(dictionary: dict, key: string, default: optional any) any
@@ -424,7 +441,10 @@ func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_if0_iaoaa
 
-If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
+If the condition is 0, return the second argument, else return
+the third argument.  You can use any type for the condition.  The
+condition is 0 for strings, lists and dictionaries when their
+length is 0.
 
 The condition types and what is considered 0:
 
@@ -475,7 +495,8 @@ func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_if_baoaa
 
-If the condition is true, return the second argument, else return the third argument.
+If the condition is true, return the second argument, else return
+the third argument.
 
 The IF functions are special in a couple of ways, see
 the If Functions section.  You usually use boolean infix
@@ -592,7 +613,8 @@ func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_exists_dsb
 
-Determine whether a key exists in a dictionary. Return true when it exists, else false.
+Determine whether a key exists in a dictionary. Return true when it
+exists, else false.
 
 ~~~
 exists = func(dictionary: dict, key: string) bool
@@ -613,7 +635,9 @@ func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_case_iloaa
 
-Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+Compare integer cases and return the matching value.  It takes a
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -647,7 +671,9 @@ func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_case_sloaa
 
-Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+Compare string cases and return the matching value.  It takes a
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
 
 The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -688,7 +714,8 @@ func parseVersion(version: string): Option[(int, int, int)]
 
 # fun_cmpVersion_ssi
 
-Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+Compare two StaticTea version numbers. Returns -1 for less, 0 for
+equal and 1 for greater than.
 
 ~~~
 cmpVersion = func(versionA: string, versionB: string) int
@@ -754,7 +781,8 @@ func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_float_saa
 
-Create a float from a number string. If the string is not a number, return the default.
+Create a float from a number string. If the string is not a
+number, return the default.
 
 ~~~
 float = func(numString: string, default: optional any) any
@@ -846,7 +874,8 @@ func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_int_ssaa
 
-Create an int from a number string. If the string is not a number, return the default value.
+Create an int from a number string. If the string is not a number,
+return the default value.
 
 ~~~
 int = func(numString: string, roundOption: string, default: optional any) any
@@ -920,7 +949,10 @@ func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_find_ssoaa
 
-Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don't specify a default value.
+Find the position of a substring in a string.  When the substring
+is not found, return an optional default value.  A warning is
+generated when the substring is missing and you don't specify a
+default value.
 
 ~~~
 find = func(str: string, substring: string, default: optional any) any
@@ -946,7 +978,10 @@ func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_slice_siois
 
-Extract a substring from a string by its position and length. You pass the string, the substring's start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
+Extract a substring from a string by its position and length. You
+pass the string, the substring's start index and its length.  The
+length is optional. When not specified, the slice returns the
+characters from the start to the end of the string.
 
 The start index and length are by unicode characters not bytes.
 
@@ -969,7 +1004,8 @@ func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_dup_sis
 
-Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
+Duplicate a string x times.  The result is a new string built by
+concatenating the string to itself the specified number of times.
 
 ~~~
 dup = func(pattern: string, count: int) string
@@ -992,7 +1028,8 @@ func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_dict_old
 
-Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+Create a dictionary from a list of key, value pairs.  The keys
+must be strings and the values can be any type.
 
 ~~~
 dict = func(pairs: optional list) dict
@@ -1086,7 +1123,9 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_replace_siiss
 
-Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
+Replace a substring specified by its position and length with
+another string.  You can use the function to insert and append to
+a string as well.
 
 ~~~
 replace = func(str: string, start: int, length: int, replacement: string) string
@@ -1184,7 +1223,8 @@ func parsePath(path: string; separator = '/'): PathComponents
 
 # fun_path_sosd
 
-Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
+Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
 
 You pass a path string and the optional path separator, forward
 slash or or backslash. When no separator, the current
@@ -1282,7 +1322,8 @@ func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_sort_lsosl
 
-Sort a list of values of the same type.  The values are ints, floats, or strings.
+Sort a list of values of the same type.  The values are ints,
+floats, or strings.
 
 You specify the sort order, "ascending" or "descending".
 
@@ -1381,7 +1422,9 @@ func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_anchors_lsl
 
-Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+Create anchor names from heading names. Use it for HTML class
+names or Github markdown internal links. It handles duplicate
+heading names.
 
 ~~~
 anchors = func(names: list, type: string) list
@@ -1407,7 +1450,8 @@ func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_type_as
 
-Return the argument type, one of: int, float, string, list, dict, bool or func.
+Return the argument type, one of: int, float, string, list,
+dict, bool or func.
 
 ~~~
 type = func(variable: any) string
@@ -1476,7 +1520,9 @@ func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {
 
 # fun_join_lsois
 
-Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
+Join a list of strings with a separator.  An optional parameter
+determines whether you skip empty strings or not. You can use an
+empty separator to concatenate the arguments.
 
 ~~~
 join = func(strs: list, sep: string, skipEmpty: optional bool) string
@@ -1502,7 +1548,8 @@ func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_warn_ss
 
-Return a warning message and skip the current statement. You can call the warn function without an assignment.
+Return a warning message and skip the current statement.
+You can call the warn function without an assignment.
 
 ~~~
 warn = func(message: string) string
@@ -1527,7 +1574,8 @@ func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_log_ss
 
-Log a message to the log file.  You can call the log function without an assignment.
+Log a message to the log file.  You can call the log function
+without an assignment.
 
 ~~~
 log = func(message: string) string
@@ -1552,7 +1600,8 @@ func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_return_aa
 
-Return is a special function that returns the value passed in and has has side effects.
+Return is a special function that returns the value passed in and
+has has side effects.
 
 ~~~
 return = func(value: any) any
@@ -1604,7 +1653,8 @@ func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_string_aoss
 
-Convert a variable to a string. You specify the variable and optionally the type of output you want.
+Convert a variable to a string. You specify the variable and
+optionally the type of output you want.
 
 ~~~
 string = func(var: any, stype: optional string) string
@@ -1683,7 +1733,8 @@ func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_string_sds
 
-Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
+Convert the dictionary variable to dot names. You specify the
+name of the dictionary and the dict variable.
 
 ~~~
 string = func(dictName: string: d: dict) string
@@ -1707,7 +1758,8 @@ func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_format_ss
 
-Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
+Format a string using replacement variables similar to a
+replacement block. To enter a left bracket use two in a row.
 
 ~~~
 format = func(str: string) string
@@ -1798,7 +1850,8 @@ func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunRes
 
 # fun_startsWith_ssb
 
-Check whether a strings starts with the given prefix. Return true when it does, else false.
+Check whether a strings starts with the given prefix. Return true
+when it does, else false.
 
 ~~~
 startsWith = func(str: string, str: prefix) bool
@@ -1841,7 +1894,8 @@ func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_and_bbb
 
-Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+Boolean AND with short circuit. If the first argument is false,
+the second argument is not evaluated.
 
 ~~~
 and = func(a: bool, b: bool) bool
@@ -1863,7 +1917,8 @@ func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_or_bbb
 
-Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
+Boolean OR with short circuit. If the first argument is true,
+the second argument is not evaluated.
 
 ~~~
 or = func(a: bool, b: bool) bool
@@ -1925,7 +1980,8 @@ func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_eq_ssb
 
-Return true when two strings are equal.  See cmp function for case insensitive compare.
+Return true when two strings are equal.  See cmp function for case
+insensitive compare.
 
 ~~~
 eq = func(a: string, b: string) bool
@@ -2190,7 +2246,9 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_markdownLite_sl
 
-Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks. This subset is used to document all
+StaticTea functions. Return a list of lists.
 
 ~~~
 markdownList = func(mdText: string) list
@@ -2226,7 +2284,8 @@ func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
 
 # fun_highlight_sl
 
-Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+Divide a string of StaticTea code into fragments useful for
+syntax highlighting.  Return a list of tagged fragments.
 
 ~~~
 highlight = func(code: string) list

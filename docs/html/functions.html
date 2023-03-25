@@ -91,8 +91,10 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_len_di">fun_len_di</a> &mdash; Number of elements in a dictionary.</li>
 <li> <a href="#fun_get_lioaa">fun_get_lioaa</a> &mdash; Get a list value by its index.</li>
 <li> <a href="#fun_get_dsoaa">fun_get_dsoaa</a> &mdash; Get a dictionary value by its key.</li>
-<li> <a href="#fun_if0_iaoaa">fun_if0_iaoaa</a> &mdash; If the condition is 0, return the second argument, else return the third argument.</li>
-<li> <a href="#fun_if_baoaa">fun_if_baoaa</a> &mdash; If the condition is true, return the second argument, else return the third argument.</li>
+<li> <a href="#fun_if0_iaoaa">fun_if0_iaoaa</a> &mdash; If the condition is 0, return the second argument, else return
+the third argument.</li>
+<li> <a href="#fun_if_baoaa">fun_if_baoaa</a> &mdash; If the condition is true, return the second argument, else return
+the third argument.</li>
 <li> <a href="#fun_add_iii">fun_add_iii</a> &mdash; Add two integers.</li>
 <li> <a href="#fun_add_fff">fun_add_fff</a> &mdash; Add two floats.</li>
 <li> <a href="#fun_sub_iii">fun_sub_iii</a> &mdash; Subtract two integers.</li>
@@ -116,7 +118,8 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_dict_old">fun_dict_old</a> &mdash; Create a dictionary from a list of key, value pairs.</li>
 <li> <a href="#fun_list_al">fun_list_al</a> &mdash; Create a list of variables.</li>
 <li> <a href="#fun_listLoop_lapoab">fun_listLoop_lapoab</a> &mdash; Loop over items in a list and fill in a container.</li>
-<li> <a href="#fun_replace_siiss">fun_replace_siiss</a> &mdash; Replace a substring specified by its position and length with another string.</li>
+<li> <a href="#fun_replace_siiss">fun_replace_siiss</a> &mdash; Replace a substring specified by its position and length with
+another string.</li>
 <li> <a href="#fun_replaceRe_sls">fun_replaceRe_sls</a> &mdash; Replace multiple parts of a string using regular expressions.</li>
 <li> <a href="#parsePath">parsePath</a> &mdash; Parse the given file path into its component pieces.</li>
 <li> <a href="#fun_path_sosd">fun_path_sosd</a> &mdash; Split a file path into its component pieces.</li>
@@ -127,15 +130,18 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_sort_lssil">fun_sort_lssil</a> &mdash; Sort a list of lists.</li>
 <li> <a href="#fun_sort_lsssl">fun_sort_lsssl</a> &mdash; Sort a list of dictionaries.</li>
 <li> <a href="#fun_anchors_lsl">fun_anchors_lsl</a> &mdash; Create anchor names from heading names.</li>
-<li> <a href="#fun_type_as">fun_type_as</a> &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.</li>
+<li> <a href="#fun_type_as">fun_type_as</a> &mdash; Return the argument type, one of: int, float, string, list,
+dict, bool or func.</li>
 <li> <a href="#fun_joinPath_loss">fun_joinPath_loss</a> &mdash; Join the path components with a path separator.</li>
 <li> <a href="#fun_join_lsois">fun_join_lsois</a> &mdash; Join a list of strings with a separator.</li>
 <li> <a href="#fun_warn_ss">fun_warn_ss</a> &mdash; Return a warning message and skip the current statement.</li>
 <li> <a href="#fun_log_ss">fun_log_ss</a> &mdash; Log a message to the log file.</li>
-<li> <a href="#fun_return_aa">fun_return_aa</a> &mdash; Return is a special function that returns the value passed in and has has side effects.</li>
+<li> <a href="#fun_return_aa">fun_return_aa</a> &mdash; Return is a special function that returns the value passed in and
+has has side effects.</li>
 <li> <a href="#fun_string_aoss">fun_string_aoss</a> &mdash; Convert a variable to a string.</li>
 <li> <a href="#fun_string_sds">fun_string_sds</a> &mdash; Convert the dictionary variable to dot names.</li>
-<li> <a href="#fun_format_ss">fun_format_ss</a> &mdash; Format a string using replacement variables similar to a replacement block.</li>
+<li> <a href="#fun_format_ss">fun_format_ss</a> &mdash; Format a string using replacement variables similar to a
+replacement block.</li>
 <li> <a href="#fun_func_sp">fun_func_sp</a> &mdash; Define a function.</li>
 <li> <a href="#fun_functionDetails_pd">fun_functionDetails_pd</a> &mdash; Return the function details in a dictionary.</li>
 <li> <a href="#fun_startsWith_ssb">fun_startsWith_ssb</a> &mdash; Check whether a strings starts with the given prefix.</li>
@@ -157,8 +163,10 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_lte_iib">fun_lte_iib</a> &mdash; Return true when an int is less than or equal to another int.</li>
 <li> <a href="#fun_lte_ffb">fun_lte_ffb</a> &mdash; Return true when a float is less than or equal to another float.</li>
 <li> <a href="#fun_readJson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
-<li> <a href="#fun_markdownLite_sl">fun_markdownLite_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.</li>
-<li> <a href="#fun_highlight_sl">fun_highlight_sl</a> &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.</li>
+<li> <a href="#fun_markdownLite_sl">fun_markdownLite_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks.</li>
+<li> <a href="#fun_highlight_sl">fun_highlight_sl</a> &mdash; Divide a string of StaticTea code into fragments useful for
+syntax highlighting.</li>
 <li> <a href="#escapeHtmlBody">escapeHtmlBody</a> &mdash; Excape text for placing in body html.</li>
 <li> <a href="#escapeHtmlAttribute">escapeHtmlAttribute</a> &mdash; Excape text for placing in an html attribute.</li>
 <li> <a href="#fun_html_sss">fun_html_sss</a> &mdash; Escape text for placing it in an html page.</li>
@@ -279,7 +287,8 @@ proc formatString(variables: Variables; text: string): StringOr {.
 
 <h3 id="fun_cmp_iii">fun_cmp_iii</h3>
 
-<p>Compare two ints. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two ints. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 </p><pre class="desc-code">
 <span class="t-dotName">cmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">int</span>, <span class="t-param">b</span>: <span class="t-type">int</span>) <span class="t-type">int</span>
@@ -301,7 +310,8 @@ func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_cmp_ffi">fun_cmp_ffi</h3>
 
-<p>Compare two floats. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two floats. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 </p><pre class="desc-code">
 <span class="t-dotName">cmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">float</span>, <span class="t-param">b</span>: <span class="t-type">float</span>) <span class="t-type">int</span>
@@ -323,7 +333,8 @@ func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_cmp_ssobi">fun_cmp_ssobi</h3>
 
-<p>Compare two strings. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
 
 </p><p>You have the option to compare case insensitive. Case sensitive
 is the default.
@@ -436,7 +447,11 @@ func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_get_lioaa">fun_get_lioaa</h3>
 
-<p>Get a list value by its index.  If the index is invalid, the default value is returned when specified, else a warning is generated. You can use negative index values. Index -1 gets the last element. It is short hand for len - 1. Index -2 is len - 2, etc.
+<p>Get a list value by its index.  If the index is invalid, the
+default value is returned when specified, else a warning is
+generated. You can use negative index values. Index -1 gets the
+last element. It is short hand for len - 1. Index -2 is len - 2,
+etc.
 
 </p><pre class="desc-code">
 <span class="t-dotName">get</span> = <span class="t-funcCall">func</span>(<span class="t-param">list</span>: <span class="t-type">list</span>, <span class="t-param">index</span>: <span class="t-type">int</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -470,7 +485,9 @@ func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_get_dsoaa">fun_get_dsoaa</h3>
 
-<p>Get a dictionary value by its key.  If the key doesn&#x27;t exist, the default value is returned if specified, else a warning is generated.
+<p>Get a dictionary value by its key.  If the key doesn&#x27;t exist, the
+default value is returned if specified, else a warning is
+generated.
 
 </p><pre class="desc-code">
 <span class="t-dotName">get</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>, <span class="t-param">key</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -501,7 +518,10 @@ func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_if0_iaoaa">fun_if0_iaoaa</h3>
 
-<p>If the condition is 0, return the second argument, else return the third argument.  You can use any type for the condition.  The condition is 0 for strings, lists and dictionaries when their length is 0.
+<p>If the condition is 0, return the second argument, else return
+the third argument.  You can use any type for the condition.  The
+condition is 0 for strings, lists and dictionaries when their
+length is 0.
 
 </p><p>The condition types and what is considered 0:
 
@@ -555,7 +575,8 @@ func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 
 <h3 id="fun_if_baoaa">fun_if_baoaa</h3>
 
-<p>If the condition is true, return the second argument, else return the third argument.
+<p>If the condition is true, return the second argument, else return
+the third argument.
 
 </p><p>The IF functions are special in a couple of ways, see
 the If Functions section.  You usually use boolean infix
@@ -677,7 +698,8 @@ func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_exists_dsb">fun_exists_dsb</h3>
 
-<p>Determine whether a key exists in a dictionary. Return true when it exists, else false.
+<p>Determine whether a key exists in a dictionary. Return true when it
+exists, else false.
 
 </p><pre class="desc-code">
 <span class="t-dotName">exists</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>, <span class="t-param">key</span>: <span class="t-type">string</span>) <span class="t-type">bool</span>
@@ -699,7 +721,9 @@ func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_case_iloaa">fun_case_iloaa</h3>
 
-<p>Compare integer cases and return the matching value.  It takes a main integer condition, a list of case pairs and an optional value when none of the cases match.
+<p>Compare integer cases and return the matching value.  It takes a
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
 
 </p><p>The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -734,7 +758,9 @@ func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_case_sloaa">fun_case_sloaa</h3>
 
-<p>Compare string cases and return the matching value.  It takes a main string condition, a list of case pairs and an optional value when none of the cases match.
+<p>Compare string cases and return the matching value.  It takes a
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
 
 </p><p>The first element of a case pair is the condition and the
 second is the return value when that condition matches the main
@@ -776,7 +802,8 @@ func parseVersion(version: string): Option[(int, int, int)]
 
 <h3 id="fun_cmpVersion_ssi">fun_cmpVersion_ssi</h3>
 
-<p>Compare two StaticTea version numbers. Returns -1 for less, 0 for equal and 1 for greater than.
+<p>Compare two StaticTea version numbers. Returns -1 for less, 0 for
+equal and 1 for greater than.
 
 </p><pre class="desc-code">
 <span class="t-dotName">cmpVersion</span> = <span class="t-funcCall">func</span>(<span class="t-param">versionA</span>: <span class="t-type">string</span>, <span class="t-param">versionB</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
@@ -845,7 +872,8 @@ func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_float_saa">fun_float_saa</h3>
 
-<p>Create a float from a number string. If the string is not a number, return the default.
+<p>Create a float from a number string. If the string is not a
+number, return the default.
 
 </p><pre class="desc-code">
 <span class="t-dotName">float</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -944,7 +972,8 @@ func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_int_ssaa">fun_int_ssaa</h3>
 
-<p>Create an int from a number string. If the string is not a number, return the default value.
+<p>Create an int from a number string. If the string is not a number,
+return the default value.
 
 </p><pre class="desc-code">
 <span class="t-dotName">int</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>, <span class="t-param">roundOption</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -1024,7 +1053,10 @@ func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_find_ssoaa">fun_find_ssoaa</h3>
 
-<p>Find the position of a substring in a string.  When the substring is not found, return an optional default value.  A warning is generated when the substring is missing and you don&#x27;t specify a default value.
+<p>Find the position of a substring in a string.  When the substring
+is not found, return an optional default value.  A warning is
+generated when the substring is missing and you don&#x27;t specify a
+default value.
 
 </p><pre class="desc-code">
 <span class="t-dotName">find</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">substring</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -1051,7 +1083,10 @@ func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_slice_siois">fun_slice_siois</h3>
 
-<p>Extract a substring from a string by its position and length. You pass the string, the substring&#x27;s start index and its length.  The length is optional. When not specified, the slice returns the characters from the start to the end of the string.
+<p>Extract a substring from a string by its position and length. You
+pass the string, the substring&#x27;s start index and its length.  The
+length is optional. When not specified, the slice returns the
+characters from the start to the end of the string.
 
 </p><p>The start index and length are by unicode characters not bytes.
 
@@ -1075,7 +1110,8 @@ func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_dup_sis">fun_dup_sis</h3>
 
-<p>Duplicate a string x times.  The result is a new string built by concatenating the string to itself the specified number of times.
+<p>Duplicate a string x times.  The result is a new string built by
+concatenating the string to itself the specified number of times.
 
 </p><pre class="desc-code">
 <span class="t-dotName">dup</span> = <span class="t-funcCall">func</span>(<span class="t-param">pattern</span>: <span class="t-type">string</span>, <span class="t-param">count</span>: <span class="t-type">int</span>) <span class="t-type">string</span>
@@ -1099,7 +1135,8 @@ func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_dict_old">fun_dict_old</h3>
 
-<p>Create a dictionary from a list of key, value pairs.  The keys must be strings and the values can be any type.
+<p>Create a dictionary from a list of key, value pairs.  The keys
+must be strings and the values can be any type.
 
 </p><pre class="desc-code">
 <span class="t-dotName">dict</span> = <span class="t-funcCall">func</span>(<span class="t-param">pairs</span>: <span class="t-type">optional</span> <span class="t-type">list</span>) <span class="t-type">dict</span>
@@ -1196,7 +1233,9 @@ func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 
 <h3 id="fun_replace_siiss">fun_replace_siiss</h3>
 
-<p>Replace a substring specified by its position and length with another string.  You can use the function to insert and append to a string as well.
+<p>Replace a substring specified by its position and length with
+another string.  You can use the function to insert and append to
+a string as well.
 
 </p><pre class="desc-code">
 <span class="t-dotName">replace</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">start</span>: <span class="t-type">int</span>, <span class="t-param">length</span>: <span class="t-type">int</span>, <span class="t-param">replacement</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
@@ -1297,7 +1336,8 @@ func parsePath(path: string; separator = '/'): PathComponents
 
 <h3 id="fun_path_sosd">fun_path_sosd</h3>
 
-<p>Split a file path into its component pieces. Return a dictionary with the filename, basename, extension and directory.
+<p>Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
 
 </p><p>You pass a path string and the optional path separator, forward
 slash or or backslash. When no separator, the current
@@ -1399,7 +1439,8 @@ func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_sort_lsosl">fun_sort_lsosl</h3>
 
-<p>Sort a list of values of the same type.  The values are ints, floats, or strings.
+<p>Sort a list of values of the same type.  The values are ints,
+floats, or strings.
 
 </p><p>You specify the sort order, &quot;ascending&quot; or &quot;descending&quot;.
 
@@ -1501,7 +1542,9 @@ func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_anchors_lsl">fun_anchors_lsl</h3>
 
-<p>Create anchor names from heading names. Use it for HTML class names or Github markdown internal links. It handles duplicate heading names.
+<p>Create anchor names from heading names. Use it for HTML class
+names or Github markdown internal links. It handles duplicate
+heading names.
 
 </p><pre class="desc-code">
 <span class="t-dotName">anchors</span> = <span class="t-funcCall">func</span>(<span class="t-param">names</span>: <span class="t-type">list</span>, <span class="t-param">type</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
@@ -1530,7 +1573,8 @@ func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_type_as">fun_type_as</h3>
 
-<p>Return the argument type, one of: int, float, string, list, dict, bool or func.
+<p>Return the argument type, one of: int, float, string, list,
+dict, bool or func.
 
 </p><pre class="desc-code">
 <span class="t-dotName">type</span> = <span class="t-funcCall">func</span>(<span class="t-param">variable</span>: <span class="t-type">any</span>) <span class="t-type">string</span>
@@ -1601,7 +1645,9 @@ func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {
 
 <h3 id="fun_join_lsois">fun_join_lsois</h3>
 
-<p>Join a list of strings with a separator.  An optional parameter determines whether you skip empty strings or not. You can use an empty separator to concatenate the arguments.
+<p>Join a list of strings with a separator.  An optional parameter
+determines whether you skip empty strings or not. You can use an
+empty separator to concatenate the arguments.
 
 </p><pre class="desc-code">
 <span class="t-dotName">join</span> = <span class="t-funcCall">func</span>(<span class="t-param">strs</span>: <span class="t-type">list</span>, <span class="t-param">sep</span>: <span class="t-type">string</span>, <span class="t-param">skipEmpty</span>: <span class="t-type">optional</span> <span class="t-type">bool</span>) <span class="t-type">string</span>
@@ -1628,7 +1674,8 @@ func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_warn_ss">fun_warn_ss</h3>
 
-<p>Return a warning message and skip the current statement. You can call the warn function without an assignment.
+<p>Return a warning message and skip the current statement.
+You can call the warn function without an assignment.
 
 </p><pre class="desc-code">
 <span class="t-dotName">warn</span> = <span class="t-funcCall">func</span>(<span class="t-param">message</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
@@ -1654,7 +1701,8 @@ func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_log_ss">fun_log_ss</h3>
 
-<p>Log a message to the log file.  You can call the log function without an assignment.
+<p>Log a message to the log file.  You can call the log function
+without an assignment.
 
 </p><pre class="desc-code">
 <span class="t-dotName">log</span> = <span class="t-funcCall">func</span>(<span class="t-param">message</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
@@ -1680,7 +1728,8 @@ func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_return_aa">fun_return_aa</h3>
 
-<p>Return is a special function that returns the value passed in and has has side effects.
+<p>Return is a special function that returns the value passed in and
+has has side effects.
 
 </p><pre class="desc-code">
 <span class="t-dotName">return</span> = <span class="t-funcCall">func</span>(<span class="t-param">value</span>: <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -1735,7 +1784,8 @@ func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 
 <h3 id="fun_string_aoss">fun_string_aoss</h3>
 
-<p>Convert a variable to a string. You specify the variable and optionally the type of output you want.
+<p>Convert a variable to a string. You specify the variable and
+optionally the type of output you want.
 
 </p><pre class="desc-code">
 <span class="t-dotName">string</span> = <span class="t-funcCall">func</span>(<span class="t-param">var</span>: <span class="t-type">any</span>, <span class="t-param">stype</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">string</span>
@@ -1817,7 +1867,8 @@ func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_string_sds">fun_string_sds</h3>
 
-<p>Convert the dictionary variable to dot names. You specify the name of the dictionary and the dict variable.
+<p>Convert the dictionary variable to dot names. You specify the
+name of the dictionary and the dict variable.
 
 </p><pre class="desc-code">
 <span class="t-dotName">string</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictName</span>: <span class="t-type">string</span>: <span class="t-param">d</span>: <span class="t-type">dict</span>) <span class="t-type">string</span>
@@ -1842,7 +1893,8 @@ func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_format_ss">fun_format_ss</h3>
 
-<p>Format a string using replacement variables similar to a replacement block. To enter a left bracket use two in a row.
+<p>Format a string using replacement variables similar to a
+replacement block. To enter a left bracket use two in a row.
 
 </p><pre class="desc-code">
 <span class="t-dotName">format</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
@@ -1936,7 +1988,8 @@ func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunRes
 
 <h3 id="fun_startsWith_ssb">fun_startsWith_ssb</h3>
 
-<p>Check whether a strings starts with the given prefix. Return true when it does, else false.
+<p>Check whether a strings starts with the given prefix. Return true
+when it does, else false.
 
 </p><pre class="desc-code">
 <span class="t-dotName">startsWith</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">str</span>: <span class="t-type">prefix</span>) <span class="t-type">bool</span>
@@ -1981,7 +2034,8 @@ func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_and_bbb">fun_and_bbb</h3>
 
-<p>Boolean AND with short circuit. If the first argument is false, the second argument is not evaluated.
+<p>Boolean AND with short circuit. If the first argument is false,
+the second argument is not evaluated.
 
 </p><pre class="desc-code">
 <span class="t-dotName">and</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">bool</span>, <span class="t-param">b</span>: <span class="t-type">bool</span>) <span class="t-type">bool</span>
@@ -2004,7 +2058,8 @@ func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 
 <h3 id="fun_or_bbb">fun_or_bbb</h3>
 
-<p>Boolean OR with short circuit. If the first argument is true, the second argument is not evaluated.
+<p>Boolean OR with short circuit. If the first argument is true,
+the second argument is not evaluated.
 
 </p><pre class="desc-code">
 <span class="t-dotName">or</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">bool</span>, <span class="t-param">b</span>: <span class="t-type">bool</span>) <span class="t-type">bool</span>
@@ -2069,7 +2124,8 @@ func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_eq_ssb">fun_eq_ssb</h3>
 
-<p>Return true when two strings are equal.  See cmp function for case insensitive compare.
+<p>Return true when two strings are equal.  See cmp function for case
+insensitive compare.
 
 </p><pre class="desc-code">
 <span class="t-dotName">eq</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">string</span>, <span class="t-param">b</span>: <span class="t-type">string</span>) <span class="t-type">bool</span>
@@ -2347,7 +2403,9 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_markdownLite_sl">fun_markdownLite_sl</h3>
 
-<p>Parse a simple subset of markdown which contains paragraphs, bullets and code blocks. This subset is used to document all StaticTea functions. Return a list of lists.
+<p>Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks. This subset is used to document all
+StaticTea functions. Return a list of lists.
 
 </p><pre class="desc-code">
 <span class="t-dotName">markdownList</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdText</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
@@ -2390,7 +2448,8 @@ func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
 
 <h3 id="fun_highlight_sl">fun_highlight_sl</h3>
 
-<p>Divide a string of StaticTea code into fragments useful for syntax highlighting.  Return a list of tagged fragments.
+<p>Divide a string of StaticTea code into fragments useful for
+syntax highlighting.  Return a list of tagged fragments.
 
 </p><pre class="desc-code">
 <span class="t-dotName">highlight</span> = <span class="t-funcCall">func</span>(<span class="t-param">code</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
