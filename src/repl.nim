@@ -222,8 +222,8 @@ proc listColumns(names: seq[string], width: Natural, pad: Natural, colWidths: se
       result.add(row)
 
 proc listInColumns*(names: seq[string], width: Natural): string =
-  ## Generate a string of the names in columns.  Width is the width of
-  ## a row. The names are left justified and the columns are separated
+  ## Generate a string of names in columns.  Width is the width of a
+  ## row. The names are left justified and the columns are separated
   ## by 2 spaces.
   if names.len == 0:
     return

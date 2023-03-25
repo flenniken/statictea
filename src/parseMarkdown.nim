@@ -192,7 +192,8 @@ func parseMarkdown*(desc: string): seq[Element] =
     result.add(newElement(tag, content))
 
 func `$`*(element: Element): string =
-  ## Return a string representation of an Element.
+  ## Return a string representation of an Element. Each item in the
+  ## content list starts with a colon on a new line.
   result.add("---$1---\n" % $element.tag)
   for line in element.content:
     result.add(":$1" % line)

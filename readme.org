@@ -1530,8 +1530,7 @@ When you call a function variable without a prefix, statictea
 looks for it in the function dictionary.
 
 When none of the signatures match the first argument, you see a
-message as show below because there is no cmp function that
-compares dictionaries.
+message about that, for example:
 
 #+BEGIN_SRC
 shared.tea(1): w207: None of the 3 functions matched the first argument.
@@ -1539,8 +1538,9 @@ statement: o.a = cmp(l, f)
                      ^
 #+END_SRC
 
-In the next example you see different warning messages depending
-on the first argument.
+When the first argument matches one of the signatures, that
+signature determines the message you see when one of the other
+arguments do not match. For example:
 
 #+BEGIN_SRC
 o.b = cmp(1, 4.5)
@@ -2628,10 +2628,11 @@ files. The nimble *runhelp* task shows the stf help with glow.
    :CUSTOM_ID: repl-environment
    :END:
 
-You can run statictea code interactively with a prompt. You run
+You can run statictea code interactively at a prompt. You run
 statements at the prompt and print variables with commands.
 
-The -x option starts the Read Eval Print Loop (REPL).
+The -x option starts the Read Eval Print Loop (REPL) and tea is
+the prompt.
 
 #+BEGIN_SRC
 statictea -x
@@ -2661,15 +2662,77 @@ command (h) shows them.
 
 #+BEGIN_SRC
 tea> h
+Enter statements or commands at the prompt.
+
 Available commands:
+
   * h — this help text
-  * p dotname — print the value of a variable
-  * pd dotname — print a dictionary as dot names
-  * ph func variable — print function's doc comment
-  * pj dotname — print a variable as json
-  * v — show the number of variables in the top level dictionaries
-  * q — quit
+  * p — print a variable like in a replacement block
+  * pd — print a dictionary as dot names
+  * pf - print function names, signatures or docs, e.g. f, f.cmp, f.cmp[0]
+  * plc - print a list in columns
+  * plv - print a list vertical, one element per line
+  * v — print the number of variables in the one letter dictionaries
+  * q — quit (ctrl-d too)
 tea>
+#+END_SRC
+
+You can explore the built-in functions with the REPL commands. We
+show some examples using the v and pf commands below.
+
+You can view the number of variables in the one letter
+dictionaries with the v command. In the following example the f
+dictionary has 52 variables.
+
+#+BEGIN_SRC
+tea> v
+f={52} g={} l={} o={} s={} t={3} u={}
+#+END_SRC
+
+You can list all the built-in function names with the pf command
+specifying f as shown below.
+
+#+BEGIN_SRC
+tea> pf f
+add         exists           if0       lt            slice
+anchors     find             if        lte           sort
+and         float            int       markdownLite  startsWith
+bool        format           join      ne            string
+case        func             joinPath  not           sub
+cmp         functionDetails  keys      or            type
+cmpVersion  get              len       path          values
+concat      gt               list      readJson      warn
+dict        gte              listLoop  replace
+dup         highlight        log       replaceRe
+eq          html             lower     return
+#+END_SRC
+
+Each element in the f dictionary is a list of the function
+variables with the same name.  You can print a list to see each
+signature. For example there are three cmp functions:
+
+#+BEGIN_SRC
+tea> pf f.cmp
+0:  cmp = func(a: float, b: float) int
+1:  cmp = func(a: int, b: int) int
+2:  cmp = func(a: string, b: string, c: optional bool) int
+#+END_SRC
+
+You can print the documentation of a built-in function with the
+pf command by specifying the function variable:
+
+#+BEGIN_SRC
+tea> pf f.cmp[0]
+Compare two floats. Returns -1 for less, 0 for equal and 1 for
+greater than.
+
+cmp = func(a: float, b: float) int
+
+Examples:
+
+cmp(7.8, 9.1) => -1
+cmp(8.4, 8.4) => 0
+cmp(9.3, 2.2) => 1
 #+END_SRC
 
 [[#contents][茶]]
