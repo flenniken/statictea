@@ -22,20 +22,9 @@ body {
     white-space: pre-wrap;
 }
 
-pre {
-    border-left: 6px solid green;
-    padding: 16px;
-    background-color: #f6f8fa;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
 .t-funcCall {
     color: #5F34FF;
 }
-//.t-num {
-//    color: IndianRed;
-//}
 .t-str {
     color: #34A227;
 }
@@ -48,16 +37,27 @@ pre {
 .t-comment {
     color: #D7381E;
 }
-//.t-param {
-//    color: red;
-//}
 .t-type {
     color: #D7381E;
 }
 
-.desc-code {
-    border: 1px solid blue;
-    background-color: white;
+pre {
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.plain-code {
+    background-color: #f6f8fa;
+}
+
+.tea-code {
+    border-left: 6px solid green;
+}
+
+.nim-code {
+    border: 1px solid #D7381E;
+    background-color: #f6f8fa;
 }
 </style>
 </head>
@@ -70,7 +70,7 @@ pre {
 
 </p><p>Match a string with &quot;abc&quot; in it:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">let</span> <span class="t-dotName">line</span> = <span class="t-str">&quot;123abc456&quot;</span>
 <span class="t-dotName">let</span> <span class="t-dotName">pattern</span> = <span class="t-str">&quot;.*abc&quot;</span>
 <span class="t-dotName">let</span> <span class="t-dotName">matchesO</span> = <span class="t-funcCall">matchPattern</span>(<span class="t-dotName">line</span>, <span class="t-dotName">pattern</span>, <span class="t-dotName">start</span>=<span class="t-num">0</span>, <span class="t-dotName">numGroups</span>=<span class="t-num">0</span>)
@@ -81,7 +81,7 @@ pre {
 <p>
 Match a file and line number like: filename(234):
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">let</span> <span class="t-dotName">line</span> = <span class="t-str">&quot;template.html(87)&quot;</span>
 <span class="t-dotName">let</span> <span class="t-dotName">pattern</span> = <span class="t-dotName">r</span>&quot;^(.*)(([<span class="t-num">0</span>-<span class="t-num">9</span>]+))$<span class="t-str">&quot;
 let matchesO = matchPatternCached(line, pattern, 0, 2)
@@ -94,7 +94,7 @@ check filename == &quot;</span>t<span class="t-dotName">emplate.html</span>&quot
 <p>
 Replace the patterns in the string with their replacements:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">var</span> <span class="t-dotName">replacements</span>: <span class="t-dotName">seq</span>[<span class="t-dotName">Replacement</span>]
 <span class="t-funcCall">replacements.add</span>(<span class="t-funcCall">newReplacement</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-str">&quot;456&quot;</span>))
 <span class="t-funcCall">replacements.add</span>(<span class="t-funcCall">newReplacement</span>(<span class="t-str">&quot;def&quot;</span>, <span class="t-str">&quot;&quot;</span>))

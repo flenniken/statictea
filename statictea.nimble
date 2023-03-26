@@ -8,6 +8,25 @@ import std/algorithm
 include src/version
 include src/dot
 
+# todo: use runCmd everywhere
+
+proc runCmd(cmd: string) =
+  ## Run the command and if it fails, generate an expection and print
+  ## out debugging info.
+
+  let (result, rc) = gorgeEx(cmd)
+  if rc != 0:
+    echo "\n\n"
+    echo "------"
+    echo fmt"The following command failed with return code {rc}:"
+    echo ""
+    echo cmd
+    echo ""
+    echo result
+    echo "------"
+    echo ""
+    raise newException(IOError, "the command failed")
+
 proc get_last_argument(): string =
   ## Get the last argument specified on the command line. It is the
   ## nimble task name when no extra args are given.
@@ -664,14 +683,9 @@ proc taskDocm(namePart: string, forceRebuild = false) =
     let templateFile = "templates/nimModule.md"
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
-    # echo cmd
-    let output = staticExec(cmd)
-    if len(output) > 0:
-      # echo output
-      exec fmt"rm {resultFile}"
-    else:
-      echo fmt"http://localhost:6419/{resultFile}"
-      # echo fmt"open: file:///{getCurrentDir()}/{resultFile}"
+    runCmd(cmd)
+
+    echo fmt"http://localhost:6419/{resultFile}"
     rmFile(jsonFile)
 
 proc taskDoch(namePart: string, forceRebuild = false) =

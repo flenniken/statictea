@@ -26,20 +26,9 @@ body {
     white-space: pre-wrap;
 }
 
-pre {
-    border-left: 6px solid green;
-    padding: 16px;
-    background-color: #f6f8fa;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
 .t-funcCall {
     color: #5F34FF;
 }
-//.t-num {
-//    color: IndianRed;
-//}
 .t-str {
     color: #34A227;
 }
@@ -52,16 +41,27 @@ pre {
 .t-comment {
     color: #D7381E;
 }
-//.t-param {
-//    color: red;
-//}
 .t-type {
     color: #D7381E;
 }
 
-.desc-code {
-    border: 1px solid blue;
-    background-color: white;
+pre {
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.plain-code {
+    background-color: #f6f8fa;
+}
+
+.tea-code {
+    border-left: 6px solid green;
+}
+
+.nim-code {
+    border: 1px solid #D7381E;
+    background-color: #f6f8fa;
 }
 </style>
 </head>
@@ -94,7 +94,7 @@ Get a dictionary value by its key.  If the key doesn't exist, the
 default value is returned if specified, else a warning is
 generated.
 </p>
-<pre class="signature">
+<pre class="tea-code">
 get = func(dictionary: dict, key: string, default: optional any) any
 </pre>
 <p>
@@ -102,19 +102,27 @@ Note: For dictionary lookup you can use dot notation. It's the
 same as get without the default.
 </p>
 <p>
-Examples:
+StaticTea code block:
 </p>
-<pre class="statictea-code">
+<pre class="tea-code">
 d = dict("tea", "Earl Grey")
 get(d, "tea") => "Earl Grey"
 get(d, "coffee", "Tea") => "Tea"
 </pre>
-<p>
-Using dot notation:
-</p>
-<pre class="statictea-code">
+
+Plain code block:
+
+<pre class="plain-code">
 d = dict("tea", "Earl Grey")
-d.tea => "Earl Grey"
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
+</pre>
+
+<p>
+nim code block:
+</p>
+<pre class="nim-code">
+func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
 </pre>
 
 <!--$ endblock -->

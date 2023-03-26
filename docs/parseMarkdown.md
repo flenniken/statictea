@@ -142,7 +142,7 @@ func parseMarkdown(desc: string): seq[Element]
 
 # `$`
 
-Return a string representation of an Element.
+Return a string representation of an Element. Each item in the content list starts with a colon on a new line.
 
 ```nim
 func `$`(element: Element): string {.raises: [ValueError], tags: [].}

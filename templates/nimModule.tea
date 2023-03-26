@@ -34,8 +34,8 @@ u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
 u.html-code = func(item: list) string
   ## Return html given a "code" md element list.
   lines = []
-  lines &= "<pre class=\"desc-code\">\n"
-  # todo: look at the ~~~ line and only highlight statictea code.
+  class = if((item[0] == "~~~statictea\n"), "tea-code", "plain-code")
+  lines &= format("<pre class=\"{class}\">\n")
   listLoop(highlight(item[1]), lines, u.handle-html-fragment)
   lines &= "</pre>\n"
   return(join(lines, ""))
@@ -88,11 +88,13 @@ o.moduleName = orig-path.filename
 # markdown.
 mdDescription = replaceRe(s.moduleDescription, patterns)
 
-# For the html template convert the markdown to html, else use the
-# markdown as is.
+# For the html template convert the markdown to html. For the md
+# template replace the statictea code blocks with javascript so the
+# code is highlighted by github.
+
 o.moduleDescription = if((templateType == "html"), +
   u.get-html-description(mdDescription), +
-  mdDescription)
+  replaceRe(mdDescription, ["~~~statictea", "~~~javascript"]))
 
 u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Reformat the entry and add it to the new list.
@@ -112,10 +114,12 @@ u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   mdDescription = replaceRe(descr, state.patterns)
   newEntry.short = slice(mdDescription, 0, add(find(mdDescription, ".", -1), 1))
 
-  # Convert the markdown description to html for the html template.
+  # Convert the markdown description to html for the html
+  # template. For md switch statictea to javascript.
+
   newEntry.description = if((state.templateType == "html"), +
     u.get-html-description(mdDescription), +
-    mdDescription)
+    replaceRe(mdDescription, ["~~~statictea", "~~~javascript"]))
 
   # Simplify the code by removing some text.
   junk = "{.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[].}"

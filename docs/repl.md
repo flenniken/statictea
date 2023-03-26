@@ -6,7 +6,7 @@ Run commands at a prompt. Run evaluate print loop (REPL).
 # Index
 
 * type: [ReplCommand](#replcommand) &mdash; The REPL commands.
-* [listInColumns](#listincolumns) &mdash; Generate a string of the names in columns.
+* [listInColumns](#listincolumns) &mdash; Generate a string of names in columns.
 * [stringToReplCommand](#stringtoreplcommand) &mdash; 
 * [handleReplLine](#handlereplline) &mdash; Handle the REPL line.
 * [runEvaluatePrintLoop](#runevaluateprintloop) &mdash; Run commands at a prompt.
@@ -31,7 +31,7 @@ ReplCommand = enum
 
 # listInColumns
 
-Generate a string of the names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.
+Generate a string of names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.
 
 ```nim
 proc listInColumns(names: seq[string]; width: Natural): string 

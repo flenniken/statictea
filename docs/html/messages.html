@@ -22,20 +22,9 @@ body {
     white-space: pre-wrap;
 }
 
-pre {
-    border-left: 6px solid green;
-    padding: 16px;
-    background-color: #f6f8fa;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
 .t-funcCall {
     color: #5F34FF;
 }
-//.t-num {
-//    color: IndianRed;
-//}
 .t-str {
     color: #34A227;
 }
@@ -48,16 +37,27 @@ pre {
 .t-comment {
     color: #D7381E;
 }
-//.t-param {
-//    color: red;
-//}
 .t-type {
     color: #D7381E;
 }
 
-.desc-code {
-    border: 1px solid blue;
-    background-color: white;
+pre {
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.plain-code {
+    background-color: #f6f8fa;
+}
+
+.tea-code {
+    border-left: 6px solid green;
+}
+
+.nim-code {
+    border: 1px solid #D7381E;
+    background-color: #f6f8fa;
 }
 </style>
 </head>
@@ -360,7 +360,7 @@ func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
 
 <p>Return a formatted warning line. For example:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-funcCall">filename</span>(<span class="t-dotName">line</span>): <span class="t-dotName">wId</span>: <span class="t-dotName">message.</span>
 </pre>
 
@@ -374,7 +374,7 @@ func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = "")
 
 <p>Return a formatted warning line. For example:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-funcCall">filename</span>(<span class="t-dotName">line</span>): <span class="t-dotName">wId</span>: <span class="t-dotName">message.</span>
 </pre>
 
@@ -395,7 +395,7 @@ func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 
 <p>Return a string representation of WarningData.
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">let</span> <span class="t-dotName">warning</span> = <span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>, <span class="t-str">&quot;p1&quot;</span>, <span class="t-num">5</span>)
 <span class="t-dotName">check</span> $<span class="t-dotName">warning</span> == <span class="t-str">&quot;wUnknownArg(p1):5&quot;</span>
 </pre>

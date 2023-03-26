@@ -22,20 +22,9 @@ body {
     white-space: pre-wrap;
 }
 
-pre {
-    border-left: 6px solid green;
-    padding: 16px;
-    background-color: #f6f8fa;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
 .t-funcCall {
     color: #5F34FF;
 }
-//.t-num {
-//    color: IndianRed;
-//}
 .t-str {
     color: #34A227;
 }
@@ -48,16 +37,27 @@ pre {
 .t-comment {
     color: #D7381E;
 }
-//.t-param {
-//    color: red;
-//}
 .t-type {
     color: #D7381E;
 }
 
-.desc-code {
-    border: 1px solid blue;
-    background-color: white;
+pre {
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.plain-code {
+    background-color: #f6f8fa;
+}
+
+.tea-code {
+    border-left: 6px solid green;
+}
+
+.nim-code {
+    border: 1px solid #D7381E;
+    background-color: #f6f8fa;
 }
 </style>
 </head>
@@ -471,7 +471,7 @@ SideEffect = enum
 
 </p><p>Example:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-num">0123456789</span> <span class="t-num">123456789</span>
 <span class="t-dotName">var</span> = <span class="t-num">567</span> <span class="t-comment"># test
 </span>      ^ <span class="t-dotName">start</span>
@@ -646,7 +646,7 @@ proc newValue(value: Value): Value
 
 </p><p>Examples:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>])
 <span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-str">&quot;c&quot;</span>])
 <span class="t-dotName">let</span> <span class="t-dotName">listValue</span> = <span class="t-funcCall">newValue</span>([<span class="t-funcCall">newValue</span>(<span class="t-num">1</span>), <span class="t-funcCall">newValue</span>(<span class="t-str">&quot;b&quot;</span>)])
@@ -663,7 +663,7 @@ proc newValue[T](list: openArray[T]; mutable = Mutable.immutable): Value
 
 </p><p>Examples:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
  <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1</span>), (<span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>), (<span class="t-str">&quot;c&quot;</span>, <span class="t-num">3</span>)])
  <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1.1</span>), (<span class="t-str">&quot;b&quot;</span>, <span class="t-num">2.2</span>), (<span class="t-str">&quot;c&quot;</span>, <span class="t-num">3.3</span>)])
  <span class="t-dotName">let</span> <span class="t-dotName">dictValue</span> = <span class="t-funcCall">newValue</span>([(<span class="t-str">&quot;a&quot;</span>, <span class="t-funcCall">newValue</span>(<span class="t-num">1.1</span>)), (<span class="t-str">&quot;b&quot;</span>, <span class="t-funcCall">newValue</span>(<span class="t-str">&quot;a&quot;</span>))])
@@ -1002,7 +1002,7 @@ proc shortName(index: Natural): string
 
 </p><p>Example:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">var</span> <span class="t-dotName">signatureO</span> = <span class="t-funcCall">newSignatureO</span>(<span class="t-str">&quot;myname&quot;</span>, <span class="t-str">&quot;ifss&quot;</span>)
 <span class="t-dotName">echo</span> $<span class="t-funcCall">signatureO.get</span>()
 =&gt;

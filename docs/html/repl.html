@@ -22,20 +22,9 @@ body {
     white-space: pre-wrap;
 }
 
-pre {
-    border-left: 6px solid green;
-    padding: 16px;
-    background-color: #f6f8fa;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
 .t-funcCall {
     color: #5F34FF;
 }
-//.t-num {
-//    color: IndianRed;
-//}
 .t-str {
     color: #34A227;
 }
@@ -48,16 +37,27 @@ pre {
 .t-comment {
     color: #D7381E;
 }
-//.t-param {
-//    color: red;
-//}
 .t-type {
     color: #D7381E;
 }
 
-.desc-code {
-    border: 1px solid blue;
-    background-color: white;
+pre {
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.plain-code {
+    background-color: #f6f8fa;
+}
+
+.tea-code {
+    border-left: 6px solid green;
+}
+
+.nim-code {
+    border: 1px solid #D7381E;
+    background-color: #f6f8fa;
 }
 </style>
 </head>
@@ -72,7 +72,7 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 
 <ul>
 <li>type:  <a href="#ReplCommand">ReplCommand</a> &mdash; The REPL commands.</li>
-<li> <a href="#listInColumns">listInColumns</a> &mdash; Generate a string of the names in columns.</li>
+<li> <a href="#listInColumns">listInColumns</a> &mdash; Generate a string of names in columns.</li>
 <li> <a href="#stringToReplCommand">stringToReplCommand</a> &mdash; </li>
 <li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
 <li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
@@ -100,7 +100,7 @@ ReplCommand = enum
 
 <h3 id="listInColumns">listInColumns</h3>
 
-<p>Generate a string of the names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.</p>
+<p>Generate a string of names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.</p>
 
 <pre class="nim-code">
 proc listInColumns(names: seq[string]; width: Natural): string 

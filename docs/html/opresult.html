@@ -22,20 +22,9 @@ body {
     white-space: pre-wrap;
 }
 
-pre {
-    border-left: 6px solid green;
-    padding: 16px;
-    background-color: #f6f8fa;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
 .t-funcCall {
     color: #5F34FF;
 }
-//.t-num {
-//    color: IndianRed;
-//}
 .t-str {
     color: #34A227;
 }
@@ -48,16 +37,27 @@ pre {
 .t-comment {
     color: #D7381E;
 }
-//.t-param {
-//    color: red;
-//}
 .t-type {
     color: #D7381E;
 }
 
-.desc-code {
-    border: 1px solid blue;
-    background-color: white;
+pre {
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.plain-code {
+    background-color: #f6f8fa;
+}
+
+.tea-code {
+    border-left: 6px solid green;
+}
+
+.nim-code {
+    border: 1px solid #D7381E;
+    background-color: #f6f8fa;
 }
 </style>
 </head>
@@ -141,7 +141,7 @@ func `$`(opResult: OpResult): string
 
 </p><p>Example Usage:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">import</span> <span class="t-dotName">opresult</span>
 
 <span class="t-dotName">proc</span> <span class="t-funcCall">get_string</span>(): <span class="t-dotName">OpResultWarn</span>[<span class="t-dotName">string</span>] =
@@ -186,7 +186,7 @@ message id that tells why you cannot return the value.
 
 </p><p>Example Usage:
 
-</p><pre class="desc-code">
+</p><pre class="plain-code">
 <span class="t-dotName">import</span> <span class="t-dotName">opresult</span>
 
 <span class="t-dotName">proc</span> <span class="t-funcCall">get_string</span>(): <span class="t-dotName">OpResultId</span>[<span class="t-dotName">string</span>] =
