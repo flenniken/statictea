@@ -2677,7 +2677,23 @@ statement:   return(cmp(int(numStr1), int(numStr2)))
 mycmp = func(numStr1: string, numStr2: string) int
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(2): w238: Out of lines; Missing required doc comment.
+testcode.tea(2): w238: Missing required doc comment.
+"""
+    check testRunCodeFile(content, eErrLines=eErrLines)
+
+  test "user function no doc comments":
+    let content = """
+mycmp = func(numStr1: string, numStr2: string) int
+# regular comment not doc comment
+return(1)
+"""
+    let eErrLines: seq[string] = splitNewLines """
+testcode.tea(2): w238: Missing required doc comment.
+statement: # regular comment not doc comment
+           ^
+testcode.tea(3): w177: Expected 'skip' or 'stop' for the return function value.
+statement: return(1)
+           ^
 """
     check testRunCodeFile(content, eErrLines=eErrLines)
 

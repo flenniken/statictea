@@ -1,19 +1,5 @@
 ## Tea code file for use by templates nimModule.md and nimModule.html.
 
-# Define replacement patterns to remove formatting from the descriptions.
-patterns = list( +
-  "~~~~", "~~~", +
-  "@@", "", +
-  "@{", "[", +
-  "}@", "]", +
-  "@!", "|", +
-  "[ ]*@:", "\n", +
-  "@\\.", "*", +
-  "&quot;", "\"", +
-  "&gt;", ">", +
-  "&lt;", "<", +
-  "&amp;", "&")
-
 u.handle-html-bullet = func(ix: int, bullet: string, lines: list) bool
   ## Make the bullet text into an html bullet and add it to lines.
   lines &= join(["<li>", html(bullet, "body"), "</li>"], "")
@@ -24,7 +10,7 @@ u.html-paragraph = func(item: list) string
   return(join(["<p>", html(item[0], "body"), "</p>"], ""))
 
 u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
-  ## Make the html highlight the fragment and add it to frags.
+  ## Highlight the fragment for html and add it to the frags list.
   tag = fragment[0]
   str = html(fragment[1], "body")
   frags &= if((tag == "other"), str, +
@@ -32,7 +18,7 @@ u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
   return(false)
 
 u.html-code = func(item: list) string
-  ## Return html given a "code" md element list.
+  ## Format the "code" md element list as html.
   lines = []
   class = if((item[0] == "~~~statictea\n"), "tea-code", "plain-code")
   lines &= format("<pre class=\"{class}\">\n")
@@ -41,7 +27,7 @@ u.html-code = func(item: list) string
   return(join(lines, ""))
 
 u.html-bullets = func(item: list) string
-  ## Return html given a "bullets" md element list.
+  ## Format the "bullets" md element list as html.
   lines = []
   lines &= "<ul>\n"
   listLoop(item, lines, u.handle-html-bullet)
@@ -49,7 +35,7 @@ u.html-bullets = func(item: list) string
   return(join(lines, ""))
 
 u.handle-html-element = func(ix: int, element: list, lines: list) bool
-  ## Make the description md element into html and add it to lines.
+  ## Format the md element as html and add it to lines.
   l.fn = case(element[0], [ +
     "p", u.html-paragraph, +
     "code", u.html-code, +
@@ -71,30 +57,30 @@ u.get-name = func(ix: int, entry: dict, newList: list) bool
   newList &= entry.name
   return(false)
 
-# Determine the template type from the template's extension.
-path = path(t.args.resultFilename)
-templateType = if((path.ext == ".md"), "github", "html")
+u.fixup-description = func(rawDescripton: string, templateType: string, patterns: list) dict
+  ## Fix up the description for html or markdown. Remove the special
+  ## patterns from the description resulting in markdown.  For the
+  ## html template convert the markdown to html. For the md template
+  ## replace the statictea code blocks with javascript so the code is
+  ## highlighted by github.
 
-# Create the anchors for all the heading names.
-names = []
-listLoop(s.entries, names, u.get-name)
-anchors = anchors(names, templateType)
+  # Remove the special markup resulting in markdown text.
+  mdDescription = replaceRe(rawDescripton, patterns)
 
-# Use the filename's basename for the module name.
-orig-path = path(s.orig)
-o.moduleName = orig-path.filename
+  # Use the first sentence for the short description.
+  short = slice(mdDescription, 0, add(find(mdDescription, ".", -1), 1))
 
-# Remove the special patterns from the description resulting in
-# markdown.
-mdDescription = replaceRe(s.moduleDescription, patterns)
+  # Convert the markdown description to html for the html
+  # template. For md switch statictea code blocks to javascript.
+  description = if((templateType == "html"), +
+    u.get-html-description(mdDescription), +
+    replaceRe(mdDescription, ["~~~statictea", "~~~javascript"]))
 
-# For the html template convert the markdown to html. For the md
-# template replace the statictea code blocks with javascript so the
-# code is highlighted by github.
-
-o.moduleDescription = if((templateType == "html"), +
-  u.get-html-description(mdDescription), +
-  replaceRe(mdDescription, ["~~~statictea", "~~~javascript"]))
+  # Return both the full discription and the short form.
+  ret = dict()
+  ret.description = description
+  ret.short = short
+  return(ret)
 
 u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Reformat the entry and add it to the new list.
@@ -108,27 +94,53 @@ u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
     "skMacro", "macro: ")
   newEntry.type = case(entry.type, cases, "")
 
-  # Remove the formatting from the description and use the first
-  # sentence for the short description.
-  descr = get(entry, "description", "")
-  mdDescription = replaceRe(descr, state.patterns)
-  newEntry.short = slice(mdDescription, 0, add(find(mdDescription, ".", -1), 1))
+  # Remove the special formatting from the description and encode it
+  # for html or markdown.
+  rawDescription = get(entry, "description", "")
+  ret = u.fixup-description(rawDescription, state.templateType, state.patterns)
+  newEntry.description = ret.description
+  newEntry.short = ret.short
 
-  # Convert the markdown description to html for the html
-  # template. For md switch statictea to javascript.
-
-  newEntry.description = if((state.templateType == "html"), +
-    u.get-html-description(mdDescription), +
-    replaceRe(mdDescription, ["~~~statictea", "~~~javascript"]))
-
-  # Simplify the code by removing some text.
+  # Simplify the nim signatures by removing some text.
   junk = "{.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[].}"
-  code = replaceRe(entry.code, list(junk, "", "\n*\\s*$", ""))
+  newEntry.signature = replaceRe(entry.code, list(junk, "", "\n*\\s*$", ""))
 
-  newEntry.signature = code
   newEntry.anchor = state.anchors[ix]
   newList &= newEntry
   return(false)
+
+# Define replacement patterns to remove special formatting from the
+# descriptions.
+patterns = [ +
+  "~~~~", "~~~", +
+  "@@", "", +
+  "@{", "[", +
+  "}@", "]", +
+  "@!", "|", +
+  "[ ]*@:", "\n", +
+  "@\\.", "*", +
+  "&quot;", "\"", +
+  "&gt;", ">", +
+  "&lt;", "<", +
+  "&amp;", "&" +
+]
+
+# Determine the template type from the template's extension.
+path = path(t.args.resultFilename)
+templateType = if((path.ext == ".md"), "github", "html")
+
+# Create the link anchors for all the heading names.
+names = []
+listLoop(s.entries, names, u.get-name)
+anchors = anchors(names, templateType)
+
+# Use the filename without path info for the module name.
+origPath = path(s.orig)
+o.moduleName = origPath.filename
+
+# Format the description for html or markdown.
+ret = u.fixup-description(s.moduleDescription, templateType, patterns)
+o.moduleDescription = ret.description
 
 # Reformat the server entries list and store it in o.entries.
 state = dict()

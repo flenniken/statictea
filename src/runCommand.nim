@@ -2393,13 +2393,13 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   var docComment = ""
   let firstStatementO = readStatement(env, lb)
   if not firstStatementO.isSome:
-    # Out of lines; Missing required doc comment.
+    # Missing required doc comment.
     env.warn(sourceFilename, lb.getLineNum, wMissingDocComment, "")
     return true # handled
   let firstStatement = firstStatementO.get()
   if not isDocComment(firstStatement):
     # Missing required doc comment.
-    env.warnStatement(statement, wMissingDocComment, "",  0, sourceFilename)
+    env.warnStatement(firstStatement, wMissingDocComment, "",  0, sourceFilename)
     # Process it as a regular statement.
     return true # handled
   docComment.add(firstStatement.text & firstStatement.ending)
