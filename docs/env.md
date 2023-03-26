@@ -33,33 +33,33 @@ Environment holding the input and output streams.
 
 Warn the user when the log file gets over 1 GB.
 
-```nim
+~~~nim
 logWarnSize: int64 = 1073741824
-```
+~~~
 
 # dtFormat
 
 The date time format in local time written to the log.
 
-```nim
+~~~nim
 dtFormat = "yyyy-MM-dd HH:mm:ss\'.\'fff"
-```
+~~~
 
 # maxWarningsWritten
 
 The maximum number of warning messages to show.
 
-```nim
+~~~nim
 maxWarningsWritten = 32
-```
+~~~
 
 # staticteaLog
 
 Name of the default statictea log file.  The path on the Mac is different than the other platforms.
 
-```nim
+~~~nim
 staticteaLog = "/Users/steve/Library/Logs/statictea.log"
-```
+~~~
 
 # Env
 
@@ -83,7 +83,7 @@ close stdout.
 * resultStream -- result stream, may be stdout
 * warningsWritten -- the total number of warnings
 
-```nim
+~~~nim
 Env = object
   errStream*: Stream
   outStream*: Stream
@@ -98,172 +98,172 @@ Env = object
   resultFilename*: string
   resultStream*: Stream
   warningsWritten*: Natural
-```
+~~~
 
 # close
 
 Close the environment streams.
 
-```nim
+~~~nim
 proc close(env: var Env) {.raises: [Exception, IOError, OSError],
                            tags: [WriteIOEffect].}
-```
+~~~
 
 # outputWarning
 
 Write a message to the error stream and increment the warning count.
 
-```nim
+~~~nim
 proc outputWarning(env: var Env; lineNum: Natural; message: string) {.
     raises: [IOError, OSError, ValueError], tags: [WriteIOEffect].}
-```
+~~~
 
 # warn
 
 Write a formatted warning message to the error stream.
 
-```nim
+~~~nim
 proc warn(env: var Env; filename: string; lineNum: Natural; warning: MessageId;
           p1: string = "") {.raises: [ValueError, IOError, OSError],
                              tags: [WriteIOEffect].}
-```
+~~~
 
 # warn
 
 Write a formatted warning message to the error stream.
 
-```nim
+~~~nim
 proc warn(env: var Env; filename: string; lineNum: Natural;
           warningData: WarningData) {.raises: [ValueError, IOError, OSError],
                                       tags: [WriteIOEffect].}
-```
+~~~
 
 # warnNoFile
 
 Write a formatted warning message to the error stream.
 
-```nim
+~~~nim
 proc warnNoFile(env: var Env; messageId: MessageId; p1: string = "") {.
     raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
-```
+~~~
 
 # warnNoFile
 
 Write a formatted warning message to the error stream.
 
-```nim
+~~~nim
 proc warnNoFile(env: var Env; warningData: WarningData) {.
     raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
-```
+~~~
 
 # formatLogDateTime
 
 Return a formatted time stamp for the log.
 
-```nim
-func formatLogDateTime(dt: DateTime): string 
-```
+~~~nim
+func formatLogDateTime(dt: DateTime): string
+~~~
 
 # formatLogLine
 
 Return a formatted log line.
 
-```nim
+~~~nim
 func formatLogLine(filename: string; lineNum: int; message: string; dt = now()): string {.
     raises: [ValueError], tags: [].}
-```
+~~~
 
 # logLine
 
 Append a message to the log file. If there is an error writing, close the log. Do nothing when the log is closed. A newline is not added to the line.
 
-```nim
+~~~nim
 proc logLine(env: var Env; filename: string; lineNum: int; message: string) {.
     raises: [ValueError, ValueError, IOError, OSError],
     tags: [TimeEffect, WriteIOEffect].}
-```
+~~~
 
 # log
 
 Append the message to the log file. The current file and line becomes part of the message.
 
-```nim
+~~~nim
 template log(env: var Env; message: string)
-```
+~~~
 
 # writeOut
 
 Write a message to the output stream.
 
-```nim
+~~~nim
 proc writeOut(env: var Env; message: string) {.raises: [IOError, OSError],
     tags: [WriteIOEffect].}
-```
+~~~
 
 # writeErr
 
 Write a message to the error stream.
 
-```nim
+~~~nim
 proc writeErr(env: var Env; message: string) {.raises: [IOError, OSError],
     tags: [WriteIOEffect].}
-```
+~~~
 
 # checkLogSize
 
 Check the log file size and write a warning message when the file is big.
 
-```nim
+~~~nim
 proc checkLogSize(env: var Env) {.raises: [IOError, ValueError, OSError],
                                   tags: [ReadIOEffect, WriteIOEffect].}
-```
+~~~
 
 # openLogFile
 
 Open the log file and update the environment. If the log file cannot be opened, a warning is output and the environment is unchanged.
 
-```nim
+~~~nim
 proc openLogFile(env: var Env; logFilename: string) {.
     raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
-```
+~~~
 
 # openEnv
 
 Open and return the environment containing standard error and standard out as streams.
 
-```nim
-proc openEnv(logFilename: string = ""; warnSize: int64 = logWarnSize): Env 
-```
+~~~nim
+proc openEnv(logFilename: string = ""; warnSize: int64 = logWarnSize): Env
+~~~
 
 # setupLogging
 
 Turn on logging for the environment using the specified log file.
 
-```nim
+~~~nim
 proc setupLogging(env: var Env; logFilename: string = "";
                   warnSize: int64 = logWarnSize) {.
     raises: [ValueError, IOError, OSError], tags: [WriteIOEffect, ReadIOEffect].}
-```
+~~~
 
 # addExtraStreams
 
 Add the template and result streams to the environment.
 
-```nim
+~~~nim
 proc addExtraStreams(env: var Env; templateFilename: string;
                      resultFilename: string): Option[WarningData] {.raises: [],
     tags: [ReadDirEffect].}
-```
+~~~
 
 # addExtraStreamsForUpdate
 
 For the update case, add the template and result streams to the environment. Return true on success.
 
-```nim
+~~~nim
 proc addExtraStreamsForUpdate(env: var Env; resultFilename: string;
                               templateFilename: string): Option[WarningData] {.
     raises: [ValueError], tags: [ReadEnvEffect, ReadIOEffect, ReadDirEffect].}
-```
+~~~
 
 
 ---

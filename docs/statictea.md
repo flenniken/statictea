@@ -11,12 +11,12 @@ StaticTea; A template processor and language.
 
 Run statictea.
 
-```nim
+~~~nim
 proc main(env: var Env; argv: seq[string]) {.raises: [KeyError, OSError,
     ValueError, IOError, ValueError, IOError, OSError], tags: [ReadDirEffect,
     WriteIOEffect, ReadIOEffect, TimeEffect, RootEffect, ReadEnvEffect,
     WriteDirEffect].}
-```
+~~~
 
 
 ---

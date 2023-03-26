@@ -17,45 +17,45 @@ Read json content.
 
 The maximum depth you can nest items.
 
-```nim
+~~~nim
 maxDepth = 16
-```
+~~~
 
 # jsonToValue
 
 Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.
 
-```nim
-func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr 
-```
+~~~nim
+func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr
+~~~
 
 # readJsonStream
 
 Read a json stream and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
 
-```nim
+~~~nim
 func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
     raises: [], tags: [ReadIOEffect, WriteIOEffect].}
-```
+~~~
 
 # readJsonString
 
 Read a json string and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
 
-```nim
+~~~nim
 func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
     raises: [], tags: [ReadIOEffect, WriteIOEffect].}
-```
+~~~
 
 # readJsonFile
 
 Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.
 
-```nim
+~~~nim
 proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr {.
     raises: [Exception, IOError, OSError],
     tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect].}
-```
+~~~
 
 # unescapePopularChar
 
@@ -75,9 +75,9 @@ not a popular char, return 0.
 |r         | carriage return| U+000D |
 |t         | tab            | U+0009 |
 
-```nim
-func unescapePopularChar(popular: char): char 
-```
+~~~nim
+func unescapePopularChar(popular: char): char
+~~~
 
 # parseJsonStr
 
@@ -92,9 +92,9 @@ a = "test string"  # test
      ^           ^
 ~~~
 
-```nim
-func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr 
-```
+~~~nim
+func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr
+~~~
 
 
 ---

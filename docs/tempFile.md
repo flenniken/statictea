@@ -37,56 +37,56 @@ check line2 == "line 2"
 
 Temporary filename and associated file object.
 
-```nim
+~~~nim
 TempFile = object
   filename*: string
   file*: File
-```
+~~~
 
 # TempFileStream
 
 Temporary filename and associated stream object.
 
-```nim
+~~~nim
 TempFileStream = object
   filename*: string
   stream*: Stream
-```
+~~~
 
 # openTempFile
 
 Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.
 
-```nim
+~~~nim
 proc openTempFile(): Option[TempFile] {.raises: [ValueError],
                                         tags: [ReadEnvEffect, ReadIOEffect].}
-```
+~~~
 
 # closeDeleteFile
 
 Close and delete the temp file.
 
-```nim
+~~~nim
 proc closeDeleteFile(tempFile: TempFile) {.raises: [], tags: [WriteDirEffect].}
-```
+~~~
 
 # openTempFileStream
 
 Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.
 
-```nim
+~~~nim
 proc openTempFileStream(): Option[TempFileStream] {.
     raises: [ValueError, IOError], tags: [ReadEnvEffect, ReadIOEffect].}
-```
+~~~
 
 # closeDeleteStream
 
 Close the stream and delete the associated temp file.
 
-```nim
+~~~nim
 proc closeDeleteStream(tempFileStream: TempFileStream) {.
     raises: [Exception, IOError, OSError], tags: [WriteIOEffect, WriteDirEffect].}
-```
+~~~
 
 
 ---

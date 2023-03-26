@@ -21,27 +21,27 @@ echo timer.seconds()
 
 Holds the start time in seconds.
 
-```nim
+~~~nim
 Timer = object
   start: float
-```
+~~~
 
 # newTimer
 
 Create a new timer and set the start time.
 
-```nim
+~~~nim
 proc newTimer(): Timer {.raises: [], tags: [TimeEffect].}
-```
+~~~
 
 # seconds
 
 Return the elapsed seconds rounded to the specified number of digits.
 
-```nim
+~~~nim
 proc seconds(timer: Timer; digits: Natural = 3): float {.raises: [],
     tags: [TimeEffect].}
-```
+~~~
 
 
 ---

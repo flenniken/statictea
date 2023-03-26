@@ -35,7 +35,7 @@ prefix command  [code]   [comment] [continuation]
 Whitespace must follow a command except on the last line of the file.
 codeStart is 0 when codeLen is 0.
 
-```nim
+~~~nim
 LineParts = object
   prefix*: string
   command*: string
@@ -46,25 +46,25 @@ LineParts = object
   postfix*: string
   ending*: string
   lineNum*: Natural
-```
+~~~
 
 # LinePartsOr
 
 The line parts or a warning.
 
-```nim
+~~~nim
 LinePartsOr = OpResultWarn[LineParts]
-```
+~~~
 
 # CmdLines
 
 The collected command lines and their parts.
 
-```nim
+~~~nim
 CmdLines = object
   lines*: seq[string]
   lineParts*: seq[LineParts]
-```
+~~~
 
 # ExtraLineKind
 
@@ -74,77 +74,77 @@ The ExtraLine type.
 * elkOutOfLines -- no more lines in the template
 * elkNormalLine -- we have a line of some type
 
-```nim
+~~~nim
 ExtraLineKind = enum
   elkNoLine, elkOutOfLines, elkNormalLine
-```
+~~~
 
 # ExtraLine
 
 The extra line and its type. The line is empty except for the elkNormalLine type.
 
-```nim
+~~~nim
 ExtraLine = object
   kind*: ExtraLineKind
   line*: string
-```
+~~~
 
 # newNormalLine
 
 Create a normal ExtraLine.
 
-```nim
-func newNormalLine(line: string): ExtraLine 
-```
+~~~nim
+func newNormalLine(line: string): ExtraLine
+~~~
 
 # newNoLine
 
 Create a no line ExtraLine.
 
-```nim
-func newNoLine(): ExtraLine 
-```
+~~~nim
+func newNoLine(): ExtraLine
+~~~
 
 # newOutOfLines
 
 Create an out of lines ExtraLine.
 
-```nim
-func newOutOfLines(): ExtraLine 
-```
+~~~nim
+func newOutOfLines(): ExtraLine
+~~~
 
 # newLinePartsOr
 
 Return a new LinePartsOr object containing a warning.
 
-```nim
-func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr 
-```
+~~~nim
+func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
+~~~
 
 # newLinePartsOr
 
 Return a new LinePartsOr object containing a LineParts object.
 
-```nim
-func newLinePartsOr(lineParts: LineParts): LinePartsOr 
-```
+~~~nim
+func newLinePartsOr(lineParts: LineParts): LinePartsOr
+~~~
 
 # getCodeLength
 
 Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.
 
-```nim
-func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural 
-```
+~~~nim
+func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
+~~~
 
 # parseCmdLine
 
 Parse the line and return its parts. Return quickly when not a command line.
 
-```nim
+~~~nim
 proc parseCmdLine(prepostTable: PrepostTable; line: string; lineNum: Natural): LinePartsOr {.
     raises: [ValueError, KeyError], tags: [].}
-```
+~~~
 
 
 ---

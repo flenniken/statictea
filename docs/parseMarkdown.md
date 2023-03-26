@@ -25,20 +25,20 @@ Parse the simple markdown used in the function descriptions and highlight static
 
 
 
-```nim
+~~~nim
 ElementTag = enum
   nothing, p, code, bullets
-```
+~~~
 
 # Element
 
 Parse markdown elements (parseMarkdown).
 
-```nim
+~~~nim
 Element = object
   tag*: ElementTag
   content*: seq[string]
-```
+~~~
 
 # FragmentType
 
@@ -55,13 +55,13 @@ Hightlight fragments.
 * hlParamName -- a parameter name
 * hlParamType -- int, float, string, list, dict, bool, func, any and optional
 
-```nim
+~~~nim
 FragmentType = enum
   hlOther = "other", hlDotName = "dotName", hlFuncCall = "funcCall",
   hlNumber = "num", hlStringType = "str", hlMultiline = "multiline",
   hlDocComment = "doc", hlComment = "comment", hlParamName = "param",
   hlParamType = "type"
-```
+~~~
 
 # Fragment
 
@@ -70,52 +70,52 @@ A fragment of a string.
 * start -- the index in the string where the fragment starts
 * fEnd -- the end of the fragment, [start, end) half-open interval
 
-```nim
+~~~nim
 Fragment = object
   fragmentType*: FragmentType
   start*: Natural
   fEnd*: Natural
-```
+~~~
 
 # newElement
 
 Create an Element object.
 
-```nim
-proc newElement(tag: ElementTag; content: seq[string]): Element 
-```
+~~~nim
+proc newElement(tag: ElementTag; content: seq[string]): Element
+~~~
 
 # newFragment
 
 
 
-```nim
-func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
-```
+~~~nim
+func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment
+~~~
 
 # newFragmentLen2
 
 
 
-```nim
-func newFragmentLen2(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
-```
+~~~nim
+func newFragmentLen2(fragmentType: FragmentType; start: Natural; length: Natural): Fragment
+~~~
 
 # `$`
 
 Return a string representation of a Fragment.
 
-```nim
+~~~nim
 func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # `$`
 
 Return a string representation of a sequence of fragments.
 
-```nim
+~~~nim
 func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # parseMarkdown
 
@@ -136,49 +136,49 @@ example “~~~”.
 bullet point and it may contain newlines.  The leading “* “ is
 not part of the string.
 
-```nim
-func parseMarkdown(desc: string): seq[Element] 
-```
+~~~nim
+func parseMarkdown(desc: string): seq[Element]
+~~~
 
 # `$`
 
 Return a string representation of an Element. Each item in the content list starts with a colon on a new line.
 
-```nim
+~~~nim
 func `$`(element: Element): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # `$`
 
 Return a string representation of a list of Elements.
 
-```nim
+~~~nim
 func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # atMultiline
 
 Determine whether the start index points a the start of a multiline string. Return 0 when it doesn't. Return the position after the triple quotes, either 4 or 5 depending on the line endings.
 
-```nim
-func atMultiline(codeText: string; start: Natural): int 
-```
+~~~nim
+func atMultiline(codeText: string; start: Natural): int
+~~~
 
 # lineEnd
 
 Find the end of the line. It returns either one after the first newline or after the end of the string.
 
-```nim
-func lineEnd(str: string; start: Natural): int 
-```
+~~~nim
+func lineEnd(str: string; start: Natural): int
+~~~
 
 # highlightCode
 
 Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. HighlightCode doesn't validate the code but it works for valid code.
 
-```nim
-func highlightCode(codeText: string): seq[Fragment] 
-```
+~~~nim
+func highlightCode(codeText: string): seq[Fragment]
+~~~
 
 
 ---

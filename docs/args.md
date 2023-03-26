@@ -25,25 +25,25 @@ Types for handling command line arguments.
 
 Prepost holds one prefix and its associated postfix.
 
-```nim
+~~~nim
 Prepost = object
   prefix*: string
   postfix*: string
-```
+~~~
 
 # PrepostTable
 
 The prefix postfix pairs stored in an ordered dictionary.
 
-```nim
+~~~nim
 PrepostTable = OrderedTable[string, string]
-```
+~~~
 
 # Args
 
 Args holds all the command line arguments.
 
-```nim
+~~~nim
 Args = object
   help*: bool
   version*: bool
@@ -56,79 +56,79 @@ Args = object
   templateFilename*: string
   resultFilename*: string
   logFilename*: string
-```
+~~~
 
 # ArgsOr
 
 The args or a warning.
 
-```nim
+~~~nim
 ArgsOr = OpResultWarn[Args]
-```
+~~~
 
 # makeUserPrepostTable
 
 Return the user's ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.
 
-```nim
-proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable 
-```
+~~~nim
+proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
+~~~
 
 # newArgsOr
 
 Return a new ArgsOr object containing a warning.
 
-```nim
-func newArgsOr(warningData: WarningData): ArgsOr 
-```
+~~~nim
+func newArgsOr(warningData: WarningData): ArgsOr
+~~~
 
 # newArgsOr
 
 Return a new ArgsOr object containing a warning.
 
-```nim
-func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr 
-```
+~~~nim
+func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
+~~~
 
 # newArgsOr
 
 Return a new ArgsOr object containing args.
 
-```nim
-func newArgsOr(args: Args): ArgsOr 
-```
+~~~nim
+func newArgsOr(args: Args): ArgsOr
+~~~
 
 # newPrepost
 
 Create a new prepost object from the prefix and postfix.
 
-```nim
-func newPrepost(prefix: string; postfix: string): Prepost 
-```
+~~~nim
+func newPrepost(prefix: string; postfix: string): Prepost
+~~~
 
 # `$`
 
 Return the Prepost string representation.
 
-```nim
+~~~nim
 func `$`(p: Prepost): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # `$`
 
 Return the Args string representation.
 
-```nim
+~~~nim
 func `$`(args: Args): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # `$`
 
 Return the seq[Prepost] string representation.
 
-```nim
+~~~nim
 func `$`(prepostList: seq[Prepost]): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # predefinedPrepost
 
@@ -143,7 +143,7 @@ The predefined prefixes and postfixes.
 * &amp;lt;!--$ and --&amp;gt; -- HTML inside a textarea element
 * # $ -- Org Mode
 
-```nim
+~~~nim
 predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
                                         (prefix: "<!--$", postfix: "-->"),
                                         (prefix: "#$", postfix: ""),
@@ -151,23 +151,23 @@ predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
                                         (prefix: "//$", postfix: ""),
                                         (prefix: "/*$", postfix: "*/"), (
     prefix: "&lt;!--$", postfix: "--&gt;"), (prefix: "# $", postfix: "")]
-```
+~~~
 
 # makeDefaultPrepostTable
 
 Return the default ordered table that maps prefixes to postfixes.
 
-```nim
-proc makeDefaultPrepostTable(): PrepostTable 
-```
+~~~nim
+proc makeDefaultPrepostTable(): PrepostTable
+~~~
 
 # getPrepostTable
 
 Get the the prepost settings from the user or use the default ones.
 
-```nim
-proc getPrepostTable(args: Args): PrepostTable 
-```
+~~~nim
+proc getPrepostTable(args: Args): PrepostTable
+~~~
 
 
 ---

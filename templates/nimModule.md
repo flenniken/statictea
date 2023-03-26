@@ -31,9 +31,9 @@ $$ : entry = o.entries[t.row]
 
 {entry.description}
 
-```nim
+~~~nim
 {entry.signature}
-```
+~~~
 
 $$ endblock
 

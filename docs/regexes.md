@@ -78,9 +78,9 @@ expression pattern for next time.
 
 
 
-```nim
+~~~nim
 CompilePattern = Regex
-```
+~~~
 
 # Matches
 
@@ -90,201 +90,201 @@ Holds the result of a match.
 * start -- where the match started
 * numGroups -- number of groups
 
-```nim
+~~~nim
 Matches = object
   groups*: seq[string]
   length*: Natural
   start*: Natural
   numGroups*: Natural
-```
+~~~
 
 # Replacement
 
 Holds the regular expression pattern and its replacement for the replaceMany function.
 
-```nim
+~~~nim
 Replacement = object
   pattern*: string
   sub*: string
-```
+~~~
 
 # newMatches
 
 Create a new Matches object with no groups.
 
-```nim
-func newMatches(length: Natural; start: Natural): Matches 
-```
+~~~nim
+func newMatches(length: Natural; start: Natural): Matches
+~~~
 
 # newMatches
 
 Create a new Matches object with one group.
 
-```nim
-func newMatches(length: Natural; start: Natural; group: string): Matches 
-```
+~~~nim
+func newMatches(length: Natural; start: Natural; group: string): Matches
+~~~
 
 # newMatches
 
 Create a new Matches object with two groups.
 
-```nim
-func newMatches(length: Natural; start: Natural; group1: string; group2: string): Matches 
-```
+~~~nim
+func newMatches(length: Natural; start: Natural; group1: string; group2: string): Matches
+~~~
 
 # newMatches
 
 Create a new Matches object with three groups.
 
-```nim
+~~~nim
 func newMatches(length: Natural; start: Natural; group1: string; group2: string;
-                group3: string): Matches 
-```
+                group3: string): Matches
+~~~
 
 # newMatches
 
 Create a Matches object with the given number of groups.
 
-```nim
-proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches 
-```
+~~~nim
+proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches
+~~~
 
 # newMatches
 
 Create a Matches object with the given number of groups.
 
-```nim
-proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches 
-```
+~~~nim
+proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches
+~~~
 
 # newReplacement
 
 Create a new Replacement object.
 
-```nim
-func newReplacement(pattern: string; sub: string): Replacement 
-```
+~~~nim
+func newReplacement(pattern: string; sub: string): Replacement
+~~~
 
 # getGroup
 
 Get the group in matches.
 
-```nim
-func getGroup(matches: Matches): string 
-```
+~~~nim
+func getGroup(matches: Matches): string
+~~~
 
 # getGroupLen
 
 Get the group in matches.
 
-```nim
-func getGroupLen(matches: Matches): (string, Natural) 
-```
+~~~nim
+func getGroupLen(matches: Matches): (string, Natural)
+~~~
 
 # getGroup
 
 Get the group in matches.
 
-```nim
-func getGroup(matchesO: Option[Matches]): string 
-```
+~~~nim
+func getGroup(matchesO: Option[Matches]): string
+~~~
 
 # getGroupLen
 
 Get the group in matches and the match length.
 
-```nim
-func getGroupLen(matchesO: Option[Matches]): (string, Natural) 
-```
+~~~nim
+func getGroupLen(matchesO: Option[Matches]): (string, Natural)
+~~~
 
 # get2Groups
 
 Get two groups in matches.
 
-```nim
-func get2Groups(matches: Matches): (string, string) 
-```
+~~~nim
+func get2Groups(matches: Matches): (string, string)
+~~~
 
 # get2GroupsLen
 
 Get two groups and length in matches.
 
-```nim
-func get2GroupsLen(matches: Matches): (string, string, Natural) 
-```
+~~~nim
+func get2GroupsLen(matches: Matches): (string, string, Natural)
+~~~
 
 # get2Groups
 
 Get two groups in matches.
 
-```nim
-func get2Groups(matchesO: Option[Matches]): (string, string) 
-```
+~~~nim
+func get2Groups(matchesO: Option[Matches]): (string, string)
+~~~
 
 # get2GroupsLen
 
 Get two groups and length in matchesO.
 
-```nim
-func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural) 
-```
+~~~nim
+func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural)
+~~~
 
 # get3Groups
 
 Get three groups in matches.
 
-```nim
-func get3Groups(matches: Matches): (string, string, string) 
-```
+~~~nim
+func get3Groups(matches: Matches): (string, string, string)
+~~~
 
 # get3Groups
 
 Get three groups in matches.
 
-```nim
-func get3Groups(matchesO: Option[Matches]): (string, string, string) 
-```
+~~~nim
+func get3Groups(matchesO: Option[Matches]): (string, string, string)
+~~~
 
 # get3GroupsLen
 
 Return the three groups and the length of the match.
 
-```nim
-func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural) 
-```
+~~~nim
+func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
+~~~
 
 # getGroups
 
 Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.
 
-```nim
-func getGroups(matches: Matches; numGroups: Natural): seq[string] 
-```
+~~~nim
+func getGroups(matches: Matches; numGroups: Natural): seq[string]
+~~~
 
 # getGroups
 
 Return the number of groups specified. If one of the groups doesn't exist, "" is returned for it.
 
-```nim
-func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string] 
-```
+~~~nim
+func getGroups(matchesO: Option[Matches]; numGroups: Natural): seq[string]
+~~~
 
 # matchRegex
 
 Match a regular expression pattern in a string. Start is the index in the string to start the search. NumGroups is the number of groups in the pattern.
 
-```nim
+~~~nim
 func matchRegex(str: string; regex: CompilePattern; start: Natural;
-                numGroups: Natural): Option[Matches] 
-```
+                numGroups: Natural): Option[Matches]
+~~~
 
 # compilePattern
 
 Compile the pattern and return a regex object.
 
-```nim
-func compilePattern(pattern: string): Option[CompilePattern] 
-```
+~~~nim
+func compilePattern(pattern: string): Option[CompilePattern]
+~~~
 
 # matchPattern
 
@@ -294,10 +294,10 @@ of groups in the pattern.
 
 Note: the pattern uses the anchored option.
 
-```nim
+~~~nim
 func matchPattern(str: string; pattern: string; start: Natural;
-                  numGroups: Natural): Option[Matches] 
-```
+                  numGroups: Natural): Option[Matches]
+~~~
 
 # matchPatternCached
 
@@ -306,20 +306,20 @@ expression pattern for next time. Start is the index in the
 string to start the search. NumGroups is the number of groups in
 the pattern.
 
-```nim
+~~~nim
 proc matchPatternCached(str: string; pattern: string; start: Natural;
                         numGroups: Natural): Option[Matches] {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # replaceMany
 
 Replace the patterns in the string with their replacements.
 
-```nim
+~~~nim
 proc replaceMany(str: string; replacements: seq[Replacement]): Option[string] {.
     raises: [ValueError], tags: [].}
-```
+~~~
 
 
 ---

@@ -24,47 +24,47 @@ The REPL commands.
 * v_cmd -- print number of variables in the one letter dictionaries
 * q_cmd -- quit (or Ctrl-d)
 
-```nim
+~~~nim
 ReplCommand = enum
   not_cmd, h_cmd, p_cmd, pd_cmd, pf_cmd, plc_cmd, plv_cmd, v_cmd, q_cmd
-```
+~~~
 
 # listInColumns
 
 Generate a string of names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.
 
-```nim
-proc listInColumns(names: seq[string]; width: Natural): string 
-```
+~~~nim
+proc listInColumns(names: seq[string]; width: Natural): string
+~~~
 
 # stringToReplCommand
 
 
 
-```nim
-func stringToReplCommand(str: string): ReplCommand 
-```
+~~~nim
+func stringToReplCommand(str: string): ReplCommand
+~~~
 
 # handleReplLine
 
 Handle the REPL line. Return true to end the loop.
 
-```nim
+~~~nim
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
     raises: [KeyError, IOError, OSError, ValueError, Exception],
     tags: [WriteIOEffect, RootEffect, TimeEffect, ReadEnvEffect].}
-```
+~~~
 
 # runEvaluatePrintLoop
 
 Run commands at a prompt.
 
-```nim
+~~~nim
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.
     raises: [Exception, IOError, ValueError, OSError, KeyError], tags: [
     RootEffect, WriteIOEffect, TimeEffect, ReadDirEffect, ReadIOEffect,
     ReadEnvEffect].}
-```
+~~~
 
 
 ---

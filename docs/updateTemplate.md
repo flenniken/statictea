@@ -13,33 +13,33 @@ Update a template.
 
 Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.
 
-```nim
+~~~nim
 proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
                            prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines {.
     raises: [IOError, OSError, ValueError, KeyError],
     tags: [ReadIOEffect, WriteIOEffect].}
-```
+~~~
 
 # updateTemplate
 
 Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
 
-```nim
+~~~nim
 proc updateTemplate(env: var Env; args: Args) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError],
     tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
-```
+~~~
 
 # updateTemplateTop
 
 Update the template.
 
-```nim
+~~~nim
 proc updateTemplateTop(env: var Env; args: Args) {.raises: [ValueError, IOError,
     OSError, Exception, KeyError, Exception, IOError, ValueError, OSError], tags: [
     ReadEnvEffect, ReadIOEffect, ReadDirEffect, WriteIOEffect, TimeEffect,
     RootEffect, WriteDirEffect].}
-```
+~~~
 
 
 ---

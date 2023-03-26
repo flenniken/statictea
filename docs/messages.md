@@ -19,7 +19,7 @@ Messages IDs and associated strings and routines to get them.
 
 Message numbers.
 
-```nim
+~~~nim
 MessageId = enum
   wSuccess, wUnknownSwitch, wUnknownArg, wOneResultAllowed, wExtraPrepostText,
   wOneTemplateAllowed, wNoPrepostValue, wSkippingExtraPrepost,
@@ -92,13 +92,13 @@ MessageId = enum
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
   wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace, wNotDictVariable,
   wSpecifyF, wNotListVariable
-```
+~~~
 
 # Messages
 
 The message text.
 
-```nim
+~~~nim
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "Unknown argument: $1.", "", "", "", "", "Skipping extra prepost text: $1.",
     "Unable to open log file: \'$1\'.", "",
@@ -263,7 +263,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     """Invalid html place, expected "body", or "attribute".""",
     "The variable is not a dictionary.", "Specify f or a function variable.",
     "The variable is not a list."]
-```
+~~~
 
 # WarningData
 
@@ -273,21 +273,21 @@ Warning data.<ul class="simple"><li>messageId -- the message id</li>
 </ul>
 
 
-```nim
+~~~nim
 WarningData = object
   messageId*: MessageId
   p1*: string
   pos*: Natural
-```
+~~~
 
 # getWarning
 
 Return the warning string.
 
-```nim
+~~~nim
 func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
     tags: [].}
-```
+~~~
 
 # getWarningLine
 
@@ -297,10 +297,10 @@ Return a formatted warning line. For example:
 filename(line): wId: message.
 ~~~
 
-```nim
+~~~nim
 func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string {.
     raises: [ValueError], tags: [].}
-```
+~~~
 
 # getWarningLine
 
@@ -310,17 +310,17 @@ Return a formatted warning line. For example:
 filename(line): wId: message.
 ~~~
 
-```nim
-func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string 
-```
+~~~nim
+func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
+~~~
 
 # newWarningData
 
 Create a WarningData object containing all the warning information.
 
-```nim
-func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData 
-```
+~~~nim
+func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
+~~~
 
 # `$`
 
@@ -331,17 +331,17 @@ let warning = newWarningData(wUnknownArg, "p1", 5)
 check $warning == "wUnknownArg(p1):5"
 ~~~
 
-```nim
+~~~nim
 func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # `==`
 
 Return true when the two WarningData objects are equal.
 
-```nim
-func `==`(w1: WarningData; w2: WarningData): bool 
-```
+~~~nim
+func `==`(w1: WarningData; w2: WarningData): bool
+~~~
 
 
 ---

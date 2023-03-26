@@ -22,97 +22,97 @@ Functions that deal with Unicode.
 
 Compares two UTF-8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally ignore case.
 
-```nim
-func cmpString(a, b: string; insensitive: bool = false): int 
-```
+~~~nim
+func cmpString(a, b: string; insensitive: bool = false): int
+~~~
 
 # stringLen
 
 Return the number of unicode characters in the string (not bytes). If there are invalid byte sequences, they are counted too.
 
-```nim
-func stringLen(str: string): Natural 
-```
+~~~nim
+func stringLen(str: string): Natural
+~~~
 
 # githubAnchor
 
 Convert the name to a github anchor name.
 
-```nim
-func githubAnchor(name: string): string 
-```
+~~~nim
+func githubAnchor(name: string): string
+~~~
 
 # htmlAnchor
 
 Convert the name to a html anchor (class) name.
 
-```nim
-func htmlAnchor(name: string): string 
-```
+~~~nim
+func htmlAnchor(name: string): string
+~~~
 
 # parseHexUnicode16
 
 Return the unicode code point given a 4 character unicode escape string like u1234. Start is pointing at the u. On error, return a message id telling what went wrong.
 
-```nim
-func parseHexUnicode16(text: string; start: Natural): OpResultId[uint32] 
-```
+~~~nim
+func parseHexUnicode16(text: string; start: Natural): OpResultId[uint32]
+~~~
 
 # parseHexUnicode
 
 Return the unicode code point given a 4 or 8 character unicode escape string. For example like u1234 or u1234u1234. Advance the pos past the end of the escape string. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
 
-```nim
-func parseHexUnicode(text: string; pos: var Natural): OpResultId[uint32] 
-```
+~~~nim
+func parseHexUnicode(text: string; pos: var Natural): OpResultId[uint32]
+~~~
 
 # codePointToString
 
 Convert a code point to a one character UTF-8 string.
 
-```nim
-func codePointToString(codePoint: uint32): OpResultId[string] 
-```
+~~~nim
+func codePointToString(codePoint: uint32): OpResultId[string]
+~~~
 
 # codePointsToString
 
 Convert a list of code points to a string.
 
-```nim
-func codePointsToString(codePoints: seq[uint32]): OpResultId[string] 
-```
+~~~nim
+func codePointsToString(codePoints: seq[uint32]): OpResultId[string]
+~~~
 
 # parseHexUnicodeToString
 
 Return a one character string given a 4 or 8 character unicode escape string. For example like u1234 or u1234u1234. Advance the pos past the end of the escape string. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.
 
-```nim
-func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string] 
-```
+~~~nim
+func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
+~~~
 
 # slice
 
 Extract a substring from a string by its Unicode character position (not byte index). You pass the string, the substring's start index, and its length. If the length is negative, return all the characters from start to the end of the string. If the str is "" or the length is 0, return "".
 
-```nim
-func slice(str: string; start: int; length: int): FunResult 
-```
+~~~nim
+func slice(str: string; start: int; length: int): FunResult
+~~~
 
 # visibleControl
 
 Return a new string with the tab and line endings and other control characters visible.
 
-```nim
-func visibleControl(str: string; spacesToo = false): string 
-```
+~~~nim
+func visibleControl(str: string; spacesToo = false): string
+~~~
 
 # startColumn
 
 Return enough spaces to point at the start byte position of the given text.  This accounts for multibyte UTF-8 sequences that might be in the text.
 
-```nim
-func startColumn(text: string; start: Natural; message: string = "^"): string 
-```
+~~~nim
+func startColumn(text: string; start: Natural; message: string = "^"): string
+~~~
 
 
 ---

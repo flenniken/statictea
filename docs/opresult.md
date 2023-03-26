@@ -25,16 +25,16 @@ You use this to make particular OpResult objects. See [OpResultId](opresultid.md
 
 The kind of OpResult object, either a message or a value.
 
-```nim
+~~~nim
 OpResultKind = enum
   orMessage, orValue
-```
+~~~
 
 # OpResult
 
 Contains either a value or a message. Defaults to an empty message.
 
-```nim
+~~~nim
 OpResult[T; T2] = object
   case kind*: OpResultKind
   of orValue:
@@ -42,31 +42,31 @@ OpResult[T; T2] = object
 
   of orMessage:
       message*: T2
-```
+~~~
 
 # isMessage
 
 Return true when the OpResult object contains a message.
 
-```nim
+~~~nim
 func isMessage(opResult: OpResult): bool
-```
+~~~
 
 # isValue
 
 Return true when the OpResult object contains a value.
 
-```nim
+~~~nim
 func isValue(opResult: OpResult): bool
-```
+~~~
 
 # `$`
 
 Return a string representation of an OpResult object.
 
-```nim
+~~~nim
 func `$`(opResult: OpResult): string
-```
+~~~
 
 # OpResultWarn
 
@@ -90,25 +90,25 @@ else:
   echo "value = " & $strOr.value
 ~~~
 
-```nim
+~~~nim
 OpResultWarn[T] = OpResult[T, WarningData]
-```
+~~~
 
 # opValueW
 
 Create a new OpResultWarn object containing a value T.
 
-```nim
+~~~nim
 func opValueW[T](value: T): OpResultWarn[T]
-```
+~~~
 
 # opMessageW
 
 Create a new OpResultWarn object containing a warning.
 
-```nim
+~~~nim
 func opMessageW[T](message: WarningData): OpResultWarn[T]
-```
+~~~
 
 # OpResultId
 
@@ -134,25 +134,25 @@ else:
   echo "value = " & $strOr.value
 ~~~
 
-```nim
+~~~nim
 OpResultId[T] = OpResult[T, MessageId]
-```
+~~~
 
 # opValue
 
 Create a new OpResultId object containing a value T.
 
-```nim
+~~~nim
 func opValue[T](value: T): OpResultId[T]
-```
+~~~
 
 # opMessage
 
 Create a new OpResultId object containing a message id.
 
-```nim
+~~~nim
 func opMessage[T](message: MessageId): OpResultId[T]
-```
+~~~
 
 
 ---

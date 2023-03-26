@@ -52,121 +52,121 @@ Line type returned by yieldReplacementLine.
 * rlEndblockLine -- The endblock command line.
 * rlNormalLine -- The last line when maxLines was exceeded.
 
-```nim
+~~~nim
 ReplaceLineKind = enum
   rlNoLine, rlReplaceLine, rlEndblockLine, rlNormalLine
-```
+~~~
 
 # ReplaceLine
 
 Line information returned by yieldReplacementLine.
 
-```nim
+~~~nim
 ReplaceLine = object
   kind*: ReplaceLineKind
   line*: string
-```
+~~~
 
 # newReplaceLine
 
 Return a new ReplaceLine object.
 
-```nim
-func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine 
-```
+~~~nim
+func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
+~~~
 
 # `$`
 
 Return a string representation of a ReplaceLine object.
 
-```nim
-func `$`(replaceLine: ReplaceLine): string 
-```
+~~~nim
+func `$`(replaceLine: ReplaceLine): string
+~~~
 
 # stringSegment
 
 Return a string segment made from the fragment. AtEnd is true when the fragment ends the line.
 
-```nim
+~~~nim
 proc stringSegment(fragment: string; atEnd: bool): string {.
     raises: [ValueError], tags: [].}
-```
+~~~
 
 # varSegment
 
 Return a variable segment made from the dot name. AtEnd is true when the bracketed variable ends the line.
 
-```nim
+~~~nim
 proc varSegment(dotName: string; atEnd: bool): string {.raises: [ValueError],
     tags: [].}
-```
+~~~
 
 # lineToSegments
 
 Convert a line to a list of segments. No warnings.
 
-```nim
+~~~nim
 proc lineToSegments(line: string): seq[string] {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # varSegmentDotName
 
 Given a variable segment, return its dot name.
 
-```nim
-func varSegmentDotName(segment: string): string 
-```
+~~~nim
+func varSegmentDotName(segment: string): string
+~~~
 
 # writeTempSegments
 
 Write the replacement block's stored segments to the result stream with the variables filled in.  The lineNum is the beginning line of the replacement block.
 
-```nim
+~~~nim
 proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
                        lineNum: Natural; variables: Variables) {.
     raises: [IOError, OSError, KeyError, Exception, ValueError],
     tags: [ReadIOEffect, RootEffect, WriteIOEffect, TimeEffect].}
-```
+~~~
 
 # allocTempSegments
 
 Create a TempSegments object. This reserves memory for a line buffer and creates a backing temp file. Call the closeDeleteTempSegments procedure when done to free the memory and to close and delete the file.
 
-```nim
+~~~nim
 proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments] {.
     raises: [ValueError, IOError, OSError, Exception],
     tags: [ReadEnvEffect, ReadIOEffect, WriteIOEffect, WriteDirEffect].}
-```
+~~~
 
 # closeDeleteTempSegments
 
 Close the TempSegments and delete its backing temporary file.
 
-```nim
+~~~nim
 proc closeDeleteTempSegments(tempSegments: TempSegments) {.
     raises: [Exception, IOError, OSError], tags: [WriteIOEffect, WriteDirEffect].}
-```
+~~~
 
 # storeLineSegments
 
 Divide the line into segments and write them to the TempSegments' temp file.
 
-```nim
+~~~nim
 proc storeLineSegments(env: var Env; tempSegments: TempSegments; line: string) {.
     raises: [ValueError, IOError, OSError], tags: [WriteIOEffect].}
-```
+~~~
 
 # yieldReplacementLine
 
 Yield all the replacement block lines and one line after.
 
-```nim
+~~~nim
 iterator yieldReplacementLine(env: var Env; firstReplaceLine: string;
                               lb: var LineBuffer; prepostTable: PrepostTable;
                               command: string; maxLines: Natural): ReplaceLine {.
     raises: [ValueError, KeyError, IOError, OSError],
     tags: [WriteIOEffect, ReadIOEffect].}
-```
+~~~
 
 
 ---

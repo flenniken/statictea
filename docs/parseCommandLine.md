@@ -11,10 +11,10 @@ Parse the StaticTea terminal command line and return the arguments.
 
 Parse the terminal command line.
 
-```nim
+~~~nim
 proc parseCommandLine(argv: seq[string]): ArgsOr {.raises: [KeyError, OSError],
     tags: [ReadDirEffect].}
-```
+~~~
 
 
 ---

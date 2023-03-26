@@ -11,9 +11,9 @@ The current StaticTea version number.
 
 The statictea version number. It follows a subset of Semantic Versioning; it always uses three components and each uses 1 to 3 ascii digits.
 
-```nim
+~~~nim
 staticteaVersion = "0.1.1"
-```
+~~~
 
 
 ---

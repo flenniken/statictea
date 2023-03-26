@@ -56,37 +56,37 @@ dictionary. The keys are the supported options found on the
 command line and each value is a list of associated arguments.
 An option without arguments will have an empty list.
 
-```nim
+~~~nim
 CmlArgs = OrderedTable[string, seq[string]]
-```
+~~~
 
 # CmlMessageId
 
 Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.
 
-```nim
+~~~nim
 CmlMessageId = enum
   cml_00_BareTwoDashes, cml_01_InvalidOption, cml_02_OptionRequiresArg,
   cml_03_BareOneDash, cml_04_InvalidShortOption, cml_05_ShortArgInList,
   cml_06_DupShortOption, cml_07_DupLongOption, cml_08_BareShortName,
   cml_09_AlphaNumericShort, cml_10_MissingArgument, cml_11_TooManyBareArgs,
   cml_12_AlreadyHaveOneArg
-```
+~~~
 
 # ArgsOrMessageKind
 
 The kind of an ArgsOrMessage object, either args or a message.
 
-```nim
+~~~nim
 ArgsOrMessageKind = enum
   cmlArgsKind, cmlMessageKind
-```
+~~~
 
 # ArgsOrMessage
 
 Contains the command line args or a message.
 
-```nim
+~~~nim
 ArgsOrMessage = object
   case kind*: ArgsOrMessageKind
   of cmlArgsKind:
@@ -95,7 +95,7 @@ ArgsOrMessage = object
   of cmlMessageKind:
       messageId*: CmlMessageId
       problemArg*: string
-```
+~~~
 
 # CmlOptionType
 
@@ -112,93 +112,93 @@ The option type.
 * cmlStopArgument -- option without an argument, 0 or 1
     times. Stop and return this option by itself.
 
-```nim
+~~~nim
 CmlOptionType = enum
   cmlArgument0or1, cmlNoArgument, cmlOptionalArgument, cmlBareArgument,
   cmlArgumentOnce, cmlArgumentMany, cmlStopArgument
-```
+~~~
 
 # CmlOption
 
 An CmlOption holds its type, long name and short name.
 
-```nim
+~~~nim
 CmlOption = object
   optionType: CmlOptionType
   long: string
   short: char
-```
+~~~
 
 # newCmlOption
 
 Create a new CmlOption object. For no short option use a dash.
 
-```nim
-func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption 
-```
+~~~nim
+func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
+~~~
 
 # newArgsOrMessage
 
 Create a new ArgsOrMessage object containing arguments.
 
-```nim
-func newArgsOrMessage(args: CmlArgs): ArgsOrMessage 
-```
+~~~nim
+func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
+~~~
 
 # newArgsOrMessage
 
 Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
 
-```nim
-func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage 
-```
+~~~nim
+func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
+~~~
 
 # `$`
 
 Return a string representation of an CmlOption object.
 
-```nim
+~~~nim
 func `$`(a: CmlOption): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # `$`
 
 Return a string representation of a ArgsOrMessage object.
 
-```nim
+~~~nim
 func `$`(a: ArgsOrMessage): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # commandLineEcho
 
 Show the command line arguments.
 
-```nim
+~~~nim
 proc commandLineEcho() {.raises: [ValueError], tags: [ReadIOEffect].}
-```
+~~~
 
 # collectArgs
 
 Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.
 
-```nim
+~~~nim
 proc collectArgs(): seq[string] {.raises: [], tags: [ReadIOEffect].}
-```
+~~~
 
 # cmdLine
 
 Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".
 
-```nim
+~~~nim
 func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # cmlMessages
 
 Messages used by this module.
 
-```nim
+~~~nim
 cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
     "Two dashes must be followed by an option name.",
     "The option \'--$1\' is not supported.",
@@ -210,24 +210,24 @@ cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
     "Use the short name \'_\' instead of \'$1\' with a bare argument.", "Use an alphanumeric ascii character for a short option name instead of \'$1\'.",
     "Missing \'$1\' argument.", "Extra bare argument.",
     "One \'$1\' argument is allowed."]
-```
+~~~
 
 # getMessage
 
 Return a message from a message id and problem argument.
 
-```nim
+~~~nim
 func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
     raises: [ValueError], tags: [].}
-```
+~~~
 
 # `$`
 
 Return a string representation of an Args object.
 
-```nim
+~~~nim
 func `$`(a: Args): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 
 ---

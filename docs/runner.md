@@ -53,67 +53,67 @@ glow.
 
 The first line of the stf file.
 
-```nim
+~~~nim
 runnerId = "stf file, version 0.1.0"
-```
+~~~
 
 # RunArgs
 
 RunArgs holds the command line arguments.
 
-```nim
+~~~nim
 RunArgs = object
   help*: bool
   version*: bool
   leaveTempDir*: bool
   filename*: string
   directory*: string
-```
+~~~
 
 # Rc
 
 Rc holds a return code where 0 is success.
 
-```nim
+~~~nim
 Rc = int
-```
+~~~
 
 # RunFileLine
 
 RunFileLine holds the file line options.
 
-```nim
+~~~nim
 RunFileLine = object
   filename*: string
   noLastEnding*: bool
   command*: bool
   nonZeroReturn*: bool
-```
+~~~
 
 # ExpectedLine
 
 ExpectedLine holds the expected line options.
 
-```nim
+~~~nim
 ExpectedLine = object
   gotFilename*: string
   expectedFilename*: string
-```
+~~~
 
 # LineKind
 
 The kind of line in a stf file.
 
-```nim
+~~~nim
 LineKind = enum
   lkRunFileLine, lkExpectedLine, lkBlockLine, lkIdLine, lkCommentLine
-```
+~~~
 
 # AnyLine
 
 Contains the information about one line in a stf file.
 
-```nim
+~~~nim
 AnyLine = object
   case kind*: LineKind
   of lkRunFileLine:
@@ -130,226 +130,226 @@ AnyLine = object
 
   of lkCommentLine:
       commentLine*: string
-```
+~~~
 
 # DirAndFiles
 
 DirAndFiles holds the file and compare lines of the stf file.
 
-```nim
+~~~nim
 DirAndFiles = object
   expectedLines*: seq[ExpectedLine]
   runFileLines*: seq[RunFileLine]
-```
+~~~
 
 # newAnyLineRunFileLine
 
 Create a new AnyLine object for a file line.
 
-```nim
-func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine 
-```
+~~~nim
+func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine
+~~~
 
 # newAnyLineExpectedLine
 
 Create a new AnyLine object for a expected line.
 
-```nim
-func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine 
-```
+~~~nim
+func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
+~~~
 
 # newAnyLineBlockLine
 
 Create a new AnyLine object for a block line.
 
-```nim
-func newAnyLineBlockLine(blockLine: string): AnyLine 
-```
+~~~nim
+func newAnyLineBlockLine(blockLine: string): AnyLine
+~~~
 
 # newAnyLineCommentLine
 
 Create a new AnyLine object for a comment line.
 
-```nim
-func newAnyLineCommentLine(commentLine: string): AnyLine 
-```
+~~~nim
+func newAnyLineCommentLine(commentLine: string): AnyLine
+~~~
 
 # newAnyLineIdLine
 
 Create a new AnyLine object for a id line.
 
-```nim
-func newAnyLineIdLine(idLine: string): AnyLine 
-```
+~~~nim
+func newAnyLineIdLine(idLine: string): AnyLine
+~~~
 
 # newRunArgs
 
 Create a new RunArgs object.
 
-```nim
+~~~nim
 func newRunArgs(help = false; version = false; leaveTempDir = false;
-                filename = ""; directory = ""): RunArgs 
-```
+                filename = ""; directory = ""): RunArgs
+~~~
 
 # newRunFileLine
 
 Create a new RunFileLine object.
 
-```nim
+~~~nim
 func newRunFileLine(filename: string; noLastEnding = false; command = false;
-                    nonZeroReturn = false): RunFileLine 
-```
+                    nonZeroReturn = false): RunFileLine
+~~~
 
 # newExpectedLine
 
 Create a new ExpectedLine object.
 
-```nim
-func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine 
-```
+~~~nim
+func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine
+~~~
 
 # newDirAndFiles
 
 Create a new DirAndFiles object.
 
-```nim
+~~~nim
 func newDirAndFiles(expectedLines: seq[ExpectedLine];
-                    runFileLines: seq[RunFileLine]): DirAndFiles 
-```
+                    runFileLines: seq[RunFileLine]): DirAndFiles
+~~~
 
 # `$`
 
 Return a string representation of a ExpectedLine object.
 
-```nim
+~~~nim
 func `$`(r: ExpectedLine): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # `$`
 
 Return a string representation of a RunFileLine object.
 
-```nim
+~~~nim
 func `$`(r: RunFileLine): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # writeErr
 
 Write a message to stderr.
 
-```nim
+~~~nim
 proc writeErr(message: string) {.raises: [IOError], tags: [WriteIOEffect].}
-```
+~~~
 
 # createFolder
 
 Create a folder with the given name. When the folder cannot be created return a message telling why, else return "".
 
-```nim
+~~~nim
 proc createFolder(folder: string): string {.raises: [],
     tags: [WriteDirEffect, ReadDirEffect].}
-```
+~~~
 
 # deleteFolder
 
 Delete a folder with the given name. When the folder cannot be deleted return a message telling why, else return "".
 
-```nim
+~~~nim
 proc deleteFolder(folder: string): string {.raises: [],
     tags: [WriteDirEffect, ReadDirEffect].}
-```
+~~~
 
 # parseRunCommandLine
 
 Parse the command line arguments.
 
-```nim
+~~~nim
 proc parseRunCommandLine(argv: seq[string]): OpResultStr[RunArgs] {.
     raises: [ValueError], tags: [ReadIOEffect].}
-```
+~~~
 
 # isRunFileLine
 
 Return true when the line is a file line.
 
-```nim
+~~~nim
 proc isRunFileLine(line: string): bool {.raises: [KeyError], tags: [].}
-```
+~~~
 
 # isExpectedLine
 
 Return true when the line is an expected line.
 
-```nim
+~~~nim
 proc isExpectedLine(line: string): bool {.raises: [KeyError], tags: [].}
-```
+~~~
 
 # parseRunFileLine
 
 Parse a file command line.
 
-```nim
+~~~nim
 proc parseRunFileLine(line: string): OpResultStr[RunFileLine] {.
     raises: [KeyError, ValueError], tags: [].}
-```
+~~~
 
 # parseExpectedLine
 
 Parse an expected line.
 
-```nim
+~~~nim
 proc parseExpectedLine(line: string): OpResultStr[ExpectedLine] {.
     raises: [KeyError, ValueError], tags: [].}
-```
+~~~
 
 # openNewFile
 
 Create a new file in the given folder and return an open File object.
 
-```nim
+~~~nim
 proc openNewFile(folder: string; filename: string): OpResultStr[File] {.
     raises: [ValueError], tags: [ReadDirEffect].}
-```
+~~~
 
 # getAnyLine
 
 Return information about the stf line.
 
-```nim
+~~~nim
 proc getAnyLine(line: string): OpResultStr[AnyLine] {.
     raises: [KeyError, ValueError], tags: [].}
-```
+~~~
 
 # makeDirAndFiles
 
 Read the stf file and create its temp folder and files. Return the file lines and expected lines.
 
-```nim
+~~~nim
 proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles] {.
     raises: [ValueError, Exception, IOError, OSError, KeyError],
     tags: [ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect].}
-```
+~~~
 
 # runCommands
 
 Run the command files and return 0 when they all returned their expected return code.
 
-```nim
+~~~nim
 proc runCommands(folder: string; runFileLines: seq[RunFileLine]): int {.
     raises: [OSError, ValueError], tags: [ReadDirEffect, WriteDirEffect,
     ExecIOEffect, ReadIOEffect, RootEffect].}
-```
+~~~
 
 # runStfFilename
 
 Run the stf file and leave the temp dir. Return 0 when all the tests passed.
 
-```nim
+~~~nim
 proc runStfFilename(filename: string): int {.
     raises: [ValueError, Exception, IOError, OSError, KeyError], tags: [
     ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect, ExecIOEffect,
     RootEffect].}
-```
+~~~
 
 
 ---

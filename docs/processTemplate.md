@@ -19,34 +19,34 @@ On input extraLine is the first line to use.  On exit extraLine
 is the line that caused the collection to stop which is commonly
 the first replacement block line.
 
-```nim
+~~~nim
 proc collectCommand(env: var Env; lb: var LineBuffer;
                     prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines {.
     raises: [IOError, OSError, ValueError, KeyError],
     tags: [ReadIOEffect, WriteIOEffect].}
-```
+~~~
 
 # processTemplate
 
 Process the template.
 
-```nim
+~~~nim
 proc processTemplate(env: var Env; args: Args) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
     TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect,
     ReadEnvEffect, WriteDirEffect].}
-```
+~~~
 
 # processTemplateTop
 
 Setup the environment streams then process the template.
 
-```nim
+~~~nim
 proc processTemplateTop(env: var Env; args: Args) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
     ReadDirEffect, WriteIOEffect, TimeEffect, ReadIOEffect, RootEffect,
     ReadEnvEffect, WriteDirEffect].}
-```
+~~~
 
 
 ---

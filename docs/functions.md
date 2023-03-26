@@ -116,85 +116,85 @@ syntax highlighting.
 
 StringOr holds a string or a warning.
 
-```nim
+~~~nim
 StringOr = OpResultWarn[string]
-```
+~~~
 
 # PathComponents
 
 PathComponents holds the components of the file path components.
 
-```nim
+~~~nim
 PathComponents = object
   dir: string
   filename: string
   basename: string
   ext: string
-```
+~~~
 
 # newStringOr
 
 Create a new StringOr object containing a warning.
 
-```nim
+~~~nim
 func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
-```
+~~~
 
 # newStringOr
 
 Create a new StringOr object containing a warning.
 
-```nim
+~~~nim
 func newStringOr(warningData: WarningData): StringOr
-```
+~~~
 
 # newStringOr
 
 Create a new StringOr object containing a string.
 
-```nim
+~~~nim
 func newStringOr(str: string): StringOr
-```
+~~~
 
 # newPathComponents
 
 Create a new PathComponents object from its pieces.
 
-```nim
+~~~nim
 func newPathComponents(dir, filename, basename, ext: string): PathComponents
-```
+~~~
 
 # signatureDetails
 
 Convert the signature object to a dictionary value.
 
-```nim
+~~~nim
 func signatureDetails(signature: Signature): Value
-```
+~~~
 
 # functionDetails
 
 Convert the function spec to a dictionary value.
 
-```nim
+~~~nim
 func functionDetails(fs: FunctionSpec): Value
-```
+~~~
 
 # cmpBaseValues
 
 Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
 
-```nim
+~~~nim
 func cmpBaseValues(a, b: Value; insensitive: bool = false): int
-```
+~~~
 
 # parseNumber
 
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
-```nim
+~~~nim
 func parseNumber(line: string; start: Natural): ValuePosSiOr
-```
+~~~
 
 # formatString
 
@@ -212,10 +212,10 @@ To enter a left bracket use two in a row.
 "{{" => "{"
 ~~~
 
-```nim
+~~~nim
 proc formatString(variables: Variables; text: string): StringOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
-```
+~~~
 
 # fun_cmp_iii
 
@@ -234,10 +234,10 @@ cmp(8, 8) => 0
 cmp(9, 2) => 1
 ~~~
 
-```nim
+~~~nim
 func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_cmp_ffi
 
@@ -256,10 +256,10 @@ cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
 ~~~
 
-```nim
+~~~nim
 func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_cmp_ssobi
 
@@ -283,10 +283,10 @@ cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
 ~~~
 
-```nim
+~~~nim
 func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_concat_sss
 
@@ -303,10 +303,10 @@ concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
 ~~~
 
-```nim
+~~~nim
 func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_len_si
 
@@ -323,10 +323,10 @@ len("tea") => 3
 len("añyóng") => 6
 ~~~
 
-```nim
+~~~nim
 func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_len_li
 
@@ -344,10 +344,10 @@ len(list(1)) => 1
 len(list(4, 5)) => 2
 ~~~
 
-```nim
+~~~nim
 func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_len_di
 
@@ -365,10 +365,10 @@ len(dict("a", 4)) => 1
 len(dict("a", 4, "b", 3)) => 2
 ~~~
 
-```nim
+~~~nim
 func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_get_lioaa
 
@@ -402,10 +402,10 @@ You can also use bracket notation to access list items.
 a = teas[0]
 ~~~
 
-```nim
+~~~nim
 func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_get_dsoaa
 
@@ -434,10 +434,10 @@ d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 ~~~
 
-```nim
+~~~nim
 func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_if0_iaoaa
 
@@ -489,9 +489,9 @@ The if takes two arguments when there is no assignment.
 if0(c, warn("got zero value"))
 ~~~
 
-```nim
+~~~nim
 func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_if_baoaa
 
@@ -525,9 +525,9 @@ if(c, warn("c is true"))
 if(c, return("skip"))
 ~~~
 
-```nim
+~~~nim
 func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_add_iii
 
@@ -545,10 +545,10 @@ add(3, -2) => 1
 add(-2, -5) => -7
 ~~~
 
-```nim
+~~~nim
 func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_add_fff
 
@@ -565,10 +565,10 @@ add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
 ~~~
 
-```nim
+~~~nim
 func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_sub_iii
 
@@ -586,10 +586,10 @@ add(3, -2) => 5
 add(1, 5) => -4
 ~~~
 
-```nim
+~~~nim
 func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_sub_fff
 
@@ -606,10 +606,10 @@ sub(4.5, 2.3) => 2.2
 sub(1.0, 2.2) => -1.2
 ~~~
 
-```nim
+~~~nim
 func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_exists_dsb
 
@@ -628,10 +628,10 @@ exists(d, "tea") => true
 exists(d, "coffee") => false
 ~~~
 
-```nim
+~~~nim
 func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_case_iloaa
 
@@ -664,10 +664,10 @@ case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
 ~~~
 
-```nim
+~~~nim
 func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_case_sloaa
 
@@ -699,18 +699,18 @@ case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
 ~~~
 
-```nim
+~~~nim
 func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # parseVersion
 
 Parse a StaticTea version number and return its three components.
 
-```nim
+~~~nim
 func parseVersion(version: string): Option[(int, int, int)]
-```
+~~~
 
 # fun_cmpVersion_ssi
 
@@ -733,10 +733,10 @@ cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
 
-```nim
+~~~nim
 func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_float_if
 
@@ -753,10 +753,10 @@ float(2) => 2.0
 float(-33) => -33.0
 ~~~
 
-```nim
+~~~nim
 func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_float_sf
 
@@ -774,10 +774,10 @@ float("2.4") => 2.4
 float("33") => 33.0
 ~~~
 
-```nim
+~~~nim
 func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_float_saa
 
@@ -795,10 +795,10 @@ float("2") => 2.0
 float("notnum", "nan") => nan
 ~~~
 
-```nim
+~~~nim
 func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_int_fosi
 
@@ -831,10 +831,10 @@ int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
 ~~~
 
-```nim
+~~~nim
 func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_int_sosi
 
@@ -867,10 +867,10 @@ int("6.3456", "truncate") => 6
 int("-6.3456", "truncate") => -6
 ~~~
 
-```nim
+~~~nim
 func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_int_ssaa
 
@@ -895,18 +895,18 @@ int("2", "round", "nan") => 2
 int("notnum", "round", "nan") => nan
 ~~~
 
-```nim
+~~~nim
 func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # if0Condition
 
 Convert the value to a boolean.
 
-```nim
+~~~nim
 func if0Condition(cond: Value): bool
-```
+~~~
 
 # fun_bool_ab
 
@@ -942,10 +942,10 @@ bool("tea") => true
 bool(dict("tea", 2)) => true
 ~~~
 
-```nim
+~~~nim
 func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_find_ssoaa
 
@@ -971,10 +971,10 @@ find(msg, "party", len(msg)) = 17
 find(msg, "party", 0) = 0
 ~~~
 
-```nim
+~~~nim
 func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_slice_siois
 
@@ -997,10 +997,10 @@ slice("Earl Grey", 6) => "rey"
 slice("añyóng", 0, 3) => "añy"
 ~~~
 
-```nim
+~~~nim
 func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_dup_sis
 
@@ -1021,10 +1021,10 @@ dup("abc", 2) => "abcabc"
 dup("", 3) => ""
 ~~~
 
-```nim
+~~~nim
 func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_dict_old
 
@@ -1044,10 +1044,10 @@ dict(["a", 5, "b", 33, "c", 0]) =>
   {"a": 5, "b": 33, "c": 0}
 ~~~
 
-```nim
+~~~nim
 func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_list_al
 
@@ -1070,9 +1070,9 @@ a = [1, 2, 3]
 a = ["a", 5, "b"]
 ~~~
 
-```nim
+~~~nim
 func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_listLoop_lapoab
 
@@ -1117,9 +1117,9 @@ b5 = func(ix: int, value: int, container: list) bool
   return(false)
 ~~~
 
-```nim
+~~~nim
 func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_replace_siiss
 
@@ -1181,10 +1181,10 @@ replace("", 0, 0, "abc") => abc
 replace("", 0, 0, "abcd") => abcd
 ~~~
 
-```nim
+~~~nim
 func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_replaceRe_sls
 
@@ -1208,18 +1208,18 @@ replaceRe("abcdefabc", list))
 For developing and debugging regular expressions see the
 website: https://regex101.com/
 
-```nim
+~~~nim
 func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # parsePath
 
 Parse the given file path into its component pieces.
 
-```nim
+~~~nim
 func parsePath(path: string; separator = '/'): PathComponents
-```
+~~~
 
 # fun_path_sosd
 
@@ -1252,10 +1252,10 @@ path("src\functions.nim", "\") => {
 }
 ~~~
 
-```nim
+~~~nim
 func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_lower_ss
 
@@ -1273,10 +1273,10 @@ lower("TEA") => "tea"
 lower("TEĀ") => "teā"
 ~~~
 
-```nim
+~~~nim
 func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_keys_dl
 
@@ -1294,10 +1294,10 @@ keys(d) => ["a", "b", "c"]
 values(d) => [1, 2, 3]
 ~~~
 
-```nim
+~~~nim
 func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_values_dl
 
@@ -1315,10 +1315,10 @@ keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
 ~~~
 
-```nim
+~~~nim
 func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_sort_lsosl
 
@@ -1351,10 +1351,10 @@ sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
 sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
 
-```nim
+~~~nim
 func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_sort_lssil
 
@@ -1383,10 +1383,10 @@ sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
 sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~
 
-```nim
+~~~nim
 func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_sort_lsssl
 
@@ -1415,10 +1415,10 @@ sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
 sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~
 
-```nim
+~~~nim
 func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_anchors_lsl
 
@@ -1443,10 +1443,10 @@ anchores(list, "github") =>
   ["tea", "water", "tea-1"]
 ~~~
 
-```nim
+~~~nim
 func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
-```
+~~~
 
 # fun_type_as
 
@@ -1469,10 +1469,10 @@ type(true) => "bool"
 type(f.cmp[0]) => "func"
 ~~~
 
-```nim
+~~~nim
 func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_joinPath_loss
 
@@ -1513,10 +1513,10 @@ joinPath(["/", "tea"]) =>
   "/tea"
 ~~~
 
-```nim
+~~~nim
 func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_join_lsois
 
@@ -1541,10 +1541,10 @@ join(["a", "", "c"], "|") => "a||c"
 join(["a", "", "c"], "|", true) => "a|c"
 ~~~
 
-```nim
+~~~nim
 func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_warn_ss
 
@@ -1567,10 +1567,10 @@ You can warn unconditionally using a bare warn statement:
 warn("always warn")
 ~~~
 
-```nim
+~~~nim
 func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_log_ss
 
@@ -1593,10 +1593,10 @@ You can log unconditionally using a bare log statement:
 log("always log")
 ~~~
 
-```nim
+~~~nim
 func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_return_aa
 
@@ -1647,9 +1647,9 @@ output:
 3
 ~~~
 
-```nim
+~~~nim
 func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_string_aoss
 
@@ -1726,10 +1726,10 @@ a =>
 2: "blue"
 ~~~
 
-```nim
+~~~nim
 func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
-```
+~~~
 
 # fun_string_sds
 
@@ -1751,10 +1751,10 @@ teas.y = "tea"
 teas.z.a = 8
 ~~~
 
-```nim
+~~~nim
 func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
-```
+~~~
 
 # fun_format_ss
 
@@ -1783,10 +1783,10 @@ str = format("use two {{ to get one")
 str => "use two { to get one"
 ~~~
 
-```nim
+~~~nim
 func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception], tags: [RootEffect].}
-```
+~~~
 
 # fun_func_sp
 
@@ -1807,9 +1807,9 @@ mycmp = func(numStr1: string, numStr2: string) int
   return(cmp(num1, num2))
 ~~~
 
-```nim
+~~~nim
 func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_functionDetails_pd
 
@@ -1843,10 +1843,10 @@ fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 ~~~
 
-```nim
+~~~nim
 func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_startsWith_ssb
 
@@ -1867,10 +1867,10 @@ a => true
 b => false
 ~~~
 
-```nim
+~~~nim
 func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_not_bb
 
@@ -1887,10 +1887,10 @@ not(true) => false
 not(false) => true
 ~~~
 
-```nim
+~~~nim
 func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_and_bbb
 
@@ -1911,9 +1911,9 @@ and(false, false) => false
 and(false, warn("not hit")) => false
 ~~~
 
-```nim
+~~~nim
 func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_or_bbb
 
@@ -1934,9 +1934,9 @@ or(false, false) => false
 or(true, warn("not hit")) => true
 ~~~
 
-```nim
+~~~nim
 func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
-```
+~~~
 
 # fun_eq_iib
 
@@ -1953,10 +1953,10 @@ eq(1, 1) => true
 eq(2, 3) => false
 ~~~
 
-```nim
+~~~nim
 func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_eq_ffb
 
@@ -1973,10 +1973,10 @@ eq(1.2, 1.2) => true
 eq(1.2, 3.2) => false
 ~~~
 
-```nim
+~~~nim
 func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_eq_ssb
 
@@ -1994,10 +1994,10 @@ eq("tea", "tea") => true
 eq("1.2", "3.2") => false
 ~~~
 
-```nim
+~~~nim
 func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_ne_iib
 
@@ -2014,10 +2014,10 @@ ne(1, 1) => false
 ne(2, 3) => true
 ~~~
 
-```nim
+~~~nim
 func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_ne_ffb
 
@@ -2034,10 +2034,10 @@ ne(1.2, 1.2) => false
 ne(1.2, 3.2) => true
 ~~~
 
-```nim
+~~~nim
 func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_ne_ssb
 
@@ -2054,10 +2054,10 @@ ne("tea", "tea") => false
 ne("earl", "grey") => true
 ~~~
 
-```nim
+~~~nim
 func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_gt_iib
 
@@ -2074,10 +2074,10 @@ gt(2, 4) => false
 gt(3, 2) => true
 ~~~
 
-```nim
+~~~nim
 func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_gt_ffb
 
@@ -2094,10 +2094,10 @@ gt(2.8, 4.3) => false
 gt(3.1, 2.5) => true
 ~~~
 
-```nim
+~~~nim
 func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_gte_iib
 
@@ -2114,10 +2114,10 @@ gte(2, 4) => false
 gte(3, 3) => true
 ~~~
 
-```nim
+~~~nim
 func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_gte_ffb
 
@@ -2134,10 +2134,10 @@ gte(2.8, 4.3) => false
 gte(3.1, 3.1) => true
 ~~~
 
-```nim
+~~~nim
 func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_lt_iib
 
@@ -2154,10 +2154,10 @@ gt(2, 4) => true
 gt(3, 2) => false
 ~~~
 
-```nim
+~~~nim
 func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_lt_ffb
 
@@ -2174,10 +2174,10 @@ lt(2.8, 4.3) => true
 lt(3.1, 2.5) => false
 ~~~
 
-```nim
+~~~nim
 func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_lte_iib
 
@@ -2195,10 +2195,10 @@ lte(3, 3) => true
 lte(4, 3) => false
 ~~~
 
-```nim
+~~~nim
 func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_lte_ffb
 
@@ -2216,10 +2216,10 @@ lte(3.0, 3.0) => true
 lte(4.0, 3.0) => false
 ~~~
 
-```nim
+~~~nim
 func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_readJson_sa
 
@@ -2239,10 +2239,10 @@ d = readJson("{\"a\":1, \"b\": 2}")
   => {"a": 1, "b", 2}
 ~~~
 
-```nim
+~~~nim
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
-```
+~~~
 
 # fun_markdownLite_sl
 
@@ -2277,10 +2277,10 @@ elements => [
 ]
 ~~~
 
-```nim
+~~~nim
 func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # fun_highlight_sl
 
@@ -2315,26 +2315,26 @@ frags => [
 ]
 ~~~
 
-```nim
+~~~nim
 func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # escapeHtmlBody
 
 Excape text for placing in body html.
 
-```nim
+~~~nim
 proc escapeHtmlBody(text: string): string
-```
+~~~
 
 # escapeHtmlAttribute
 
 Excape text for placing in an html attribute.
 
-```nim
+~~~nim
 proc escapeHtmlAttribute(text: string): string
-```
+~~~
 
 # fun_html_sss
 
@@ -2357,18 +2357,18 @@ name = html("Mad <Hatter>", "body")
 For more information about how to escape and what is safe see:
 [[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]
 
-```nim
+~~~nim
 func fun_html_sss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-```
+~~~
 
 # functionsDict
 
 Maps a built-in function name to a function pointer you can call.
 
-```nim
+~~~nim
 functionsDict = newTable(32)
-```
+~~~
 
 # BuiltInInfo
 
@@ -2378,53 +2378,53 @@ The built-in function information.
 * docComment -- the function documentation
 * numLines -- the number of function code lines
 
-```nim
+~~~nim
 BuiltInInfo = object
   funcName*: string
   docComment*: string
   numLines*: Natural
-```
+~~~
 
 # newBuiltInInfo
 
 Return a BuiltInInfo object.
 
-```nim
+~~~nim
 func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
-```
+~~~
 
 # getBestFunction
 
 Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 
-```nim
+~~~nim
 proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
-```
+~~~
 
 # splitFuncName
 
 Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 
-```nim
+~~~nim
 func splitFuncName(funcName: string): (string, string)
-```
+~~~
 
 # makeFuncDictionary
 
 Create the f dictionary from the built in functions.
 
-```nim
+~~~nim
 proc makeFuncDictionary(): VarsDict {.raises: [ValueError, KeyError, Exception],
                                       tags: [RootEffect].}
-```
+~~~
 
 # funcsVarDict
 
 The f dictionary of built-in functions.
 
-```nim
+~~~nim
 funcsVarDict = makeFuncDictionary()
-```
+~~~
 
 
 ---

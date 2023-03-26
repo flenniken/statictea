@@ -11,9 +11,9 @@ Get the command line help message.
 
 Get the command line help message.
 
-```nim
-func getHelp(): string 
-```
+~~~nim
+func getHelp(): string
+~~~
 
 
 ---

@@ -17,60 +17,60 @@ Compare lines of text.
 
 On success return T, otherwise return a message telling what went wrong.
 
-```nim
+~~~nim
 OpResultStr[T] = OpResult[T, string]
-```
+~~~
 
 # opValueStr
 
 Return an OpResultStr with a value.
 
-```nim
+~~~nim
 func opValueStr[T](value: T): OpResultStr[T]
-```
+~~~
 
 # opMessageStr
 
 Return an OpResultStr with a message why the value cannot be returned.
 
-```nim
+~~~nim
 func opMessageStr[T](message: string): OpResultStr[T]
-```
+~~~
 
 # splitNewLines
 
 Split lines and keep the line endings. Works with n and rn type endings. keyword: splitLines
 
-```nim
-func splitNewLines(content: string): seq[string] 
-```
+~~~nim
+func splitNewLines(content: string): seq[string]
+~~~
 
 # linesSideBySide
 
 Show the two sets of lines side by side (above and below).
 
-```nim
+~~~nim
 proc linesSideBySide(gotContent: string; expectedContent: string;
                      spacesToo = false): string {.raises: [ValueError], tags: [].}
-```
+~~~
 
 # testLinesSideBySide
 
 If the two strings are equal, return true, else show the differences and return false.
 
-```nim
+~~~nim
 proc testLinesSideBySide(got: string; expected: string): bool {.
     raises: [ValueError], tags: [].}
-```
+~~~
 
 # compareFiles
 
 Compare two files and return the differences. When they are equal return "".
 
-```nim
+~~~nim
 proc compareFiles(gotFilename: string; expectedFilename: string): OpResultStr[
     string] {.raises: [ValueError], tags: [ReadIOEffect].}
-```
+~~~
 
 
 ---
