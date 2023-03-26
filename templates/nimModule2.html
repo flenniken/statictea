@@ -7,63 +7,7 @@
 <meta charset="utf-8">
 <!--$ nextline -->
 <title>{o.moduleName}</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <!--$ block -->
@@ -74,9 +18,6 @@ pre {
 Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
 <!--$ endblock -->
 
-<!--$ # Show the index label when there are entries. -->
-<!--$ nextline -->
-<!--$ : t.repeat = if0(o.entries, 0, 1) -->
 <h1>Index</h1>
 
 <ul>
@@ -86,47 +27,6 @@ Nim source code: <a href="../../src/{o.moduleName}">{o.moduleName}</a>
 <li>{entry.type} <a href="#{entry.anchor}">{entry.name}</a> &mdash; {entry.short}</li>
 </ul>
 
-<!--$ # Create a test function section. -->
-<!--$ block t.repeat = 0-->
-<h3 id="test">Get</h3>
-<p>
-Get a dictionary value by its key.  If the key doesn't exist, the
-default value is returned if specified, else a warning is
-generated.
-</p>
-<pre class="tea-code">
-get = func(dictionary: dict, key: string, default: optional any) any
-</pre>
-<p>
-Note: For dictionary lookup you can use dot notation. It's the
-same as get without the default.
-</p>
-<p>
-StaticTea code block:
-</p>
-<pre class="tea-code">
-d = dict("tea", "Earl Grey")
-get(d, "tea") => "Earl Grey"
-get(d, "coffee", "Tea") => "Tea"
-</pre>
-
-Plain code block:
-
-<pre class="plain-code">
-d = dict("tea", "Earl Grey")
-get(d, "tea") => "Earl Grey"
-get(d, "coffee", "Tea") => "Tea"
-</pre>
-
-<p>
-nim code block:
-</p>
-<pre class="nim-code">
-func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
-</pre>
-
-<!--$ endblock -->
-<!--$ # -->
 <!--$ # Create the function sections. -->
 <!--$ block -->
 <!--$ : t.repeat = len(o.entries) -->
@@ -145,5 +45,32 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
 by <a href="https://github.com/flenniken/statictea/">statictea</a>
 from nim doc comments. ⦿</p>
 
+<!--$ # Create a section for testing the different code blocks -->
+<!--$ # that contain content. -->
+<!--$ block t.repeat = 0 -->
+<p>
+StaticTea code block:
+</p>
+<pre class="tea-code">
+d = dict("tea", "Earl Grey")
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
+</pre>
+<p>
+Plain code block:
+</p>
+<pre class="plain-code">
+d = dict("tea", "Earl Grey")
+get(d, "tea") => "Earl Grey"
+get(d, "coffee", "Tea") => "Tea"
+</pre>
+<p>
+nim code block:
+</p>
+<pre class="nim-code">
+func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
+</pre>
+
+<!--$ endblock -->
 </body>
 </html>

@@ -8,13 +8,11 @@ import std/algorithm
 include src/version
 include src/dot
 
-# todo: use runCmd everywhere
-
 proc runCmd(cmd: string) =
   ## Run the command and if it fails, generate an expection and print
   ## out debugging info.
 
-  let (result, rc) = gorgeEx(cmd)
+  let (stdouterr, rc) = gorgeEx(cmd)
   if rc != 0:
     echo "\n\n"
     echo "------"
@@ -22,10 +20,10 @@ proc runCmd(cmd: string) =
     echo ""
     echo cmd
     echo ""
-    echo result
+    echo stdouterr
     echo "------"
     echo ""
-    raise newException(IOError, "the command failed")
+    raise newException(OSError, "the command failed")
 
 proc get_last_argument(): string =
   ## Get the last argument specified on the command line. It is the
@@ -366,9 +364,10 @@ proc readDotFile*(dotFilename: string): seq[Dependency] =
       result.add(dependencyO.get())
 
 proc getFileSizeNimble(filename: string): int =
+  ## Get the size of a file.
+  # Note: getFileSize doesn't work in a nimble file.
   let cmd = fmt"ls -l {filename} | awk '{{print $5}}'"
-  let (str, rc) = gorgeEx(cmd)
-  # echo fmt"------{filename} {str} {rc}"
+  let (str, _) = gorgeEx(cmd)
   result = parseInt(str)
 
 proc createDependencyGraph() =
@@ -629,18 +628,26 @@ proc taskTestfilesReadme() =
   echo fmt"Generated: http://localhost:6419/{resultFilename}"
   rmFile(jsonFilename)
 
+proc myCopyFile(source: string, destination: string) =
+  ## Copy the source file to the destinations.
+  # note: copyFile doesn't work in a nimble file.
+  let cmd = fmt"cp {source} {destination}"
+  runCmd(cmd)
+
 proc myFileNewer(a: string, b: string): bool =
   ## Return true when file a is newer than file b.
-  # The following line doesn't work in a nimble file.
+
+  # Note: The following line doesn't work in a nimble file.
   # result = getLastModificationTime(a) > getLastModificationTime(b)
-  for filename in [a, b]:
-    if not fileExists(filename):
-      # echo "file doesn't exist: " & filename
-      return false
+
+  if not fileExists(a):
+    return false
+  if not fileExists(b):
+    return true
 
   let cmd = "echo $(($(date -r " & a & " +%s)-$(date -r " & b & " +%s)))"
   # echo cmd
-  let diffStr = staticExec(cmd)
+  let (diffStr, _) = gorgeEx(cmd)
   let diff = parseInt(diffStr)
   # echo diff
   if diff > 0:
@@ -691,6 +698,13 @@ proc taskDocm(namePart: string, forceRebuild = false) =
 proc taskDoch(namePart: string, forceRebuild = false) =
   ## Create one or more html docs; specify part of the name.":
   ## namePart is part of a source file name, or "docs" when not specified.
+
+  # Copy the css file to the docs html dir when it's newer or missing.
+  let templateCssFile = fmt"templates/nimModule.css"
+  let htmlCssFile = fmt"docs/html/nimModule.css"
+  if myFileNewer(templateCssFile, htmlCssFile):
+    myCopyFile(templateCssFile, htmlCssFile)
+
   let filenames = get_source_filenames()
   for basename in filenames:
 
@@ -720,7 +734,7 @@ proc taskDoch(namePart: string, forceRebuild = false) =
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
     # echo cmd
-    let output = staticExec(cmd)
+    let (output, _) = gorgeEx(cmd)
     if len(output) > 0:
       echo output
       exec fmt"rm {resultFile}"
@@ -758,11 +772,8 @@ proc runRunnerFolder() =
 
   let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
   # echo cmd
-  let (result, rc) = gorgeEx(cmd)
+  let (result, _) = gorgeEx(cmd)
   echo result
-  if rc != 0:
-    echo "stf test failure"
-    raise newException(IOError, "stf failure")
 
 proc get_stf_filenames(): seq[string] =
   ## Return the basename of the stf files in the testfiles folder.
@@ -780,7 +791,7 @@ proc runRunStf() =
   # whole directory using the -d option.
   if name == "rt":
     let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
-    let result = staticExec cmd
+    let (result, _) = gorgeEx(cmd)
     echo result
     return
 
@@ -796,7 +807,7 @@ proc runRunStf() =
       let cmd = fmt"""
 export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -f=testfiles/{filename}"""
       echo "Running: " & filename
-      let result = staticExec cmd
+      let (result, _) = gorgeEx(cmd)
       lastCmd = cmd
       inc(numberRan)
       if result != "":
@@ -1071,9 +1082,6 @@ task br, "\tBuild the stf test runner (bin/x/runner).":
 task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
   runRunStfMain()
 
-# task stf, "\tList stf tests with newest last.":
-#   exec """ls -1tr testfiles/*.stf | xargs grep "##" | cut -c 11- | sed 's/:## / -- /'"""
-
 task stfix, "\tCreate stf test files index (testfiles/stf-index.md).":
   taskTestfilesReadme()
 
@@ -1123,14 +1131,14 @@ const
 
 proc doesImageExist(): bool =
   let cmd = fmt"docker inspect {staticteaImage} 2>/dev/null | grep 'Id'"
-  let (imageStatus, rc) = gorgeEx(cmd)
+  let (imageStatus, _) = gorgeEx(cmd)
   # echo imageStatus
   if "sha256" in imageStatus:
     result = true
 
 proc getContainerState(): string =
   let cmd2=fmt"docker inspect {staticteaContainer} 2>/dev/null | grep Status"
-  let (containerStatus, rc2) = gorgeEx(cmd2)
+  let (containerStatus, _) = gorgeEx(cmd2)
   if "running" in containerStatus:
     result = "running"
   elif "exited" in containerStatus:
@@ -1183,7 +1191,7 @@ task ddelete, "\tDelete the statictea docker image and container.":
     return
   let cmd = fmt"docker rm {staticteaContainer}; docker image rm {staticteaImage}"
   # echo cmd
-  let (output, rc) = gorgeEx(cmd)
+  let (output, _) = gorgeEx(cmd)
   echo output
 
 task dlist, "\tList the docker image and container.":
@@ -1197,7 +1205,7 @@ task dlist, "\tList the docker image and container.":
     echo fmt"No {staticteaImage}."
 
   let cmd2=fmt"docker inspect {staticteaContainer} 2>/dev/null | grep Status"
-  let (containerStatus, rc2) = gorgeEx(cmd2)
+  let (containerStatus, _) = gorgeEx(cmd2)
   # echo containerStatus
   if "running" in containerStatus:
     echo fmt"The {staticteaContainer} is running."

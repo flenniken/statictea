@@ -1,0 +1,76 @@
+/* The css code used with the nim module docs. The docs are created by */
+/* the nimModule.html template. */
+
+body {
+    max-width: 40em;
+    font-size: 2em;
+    margin-left: 1em;
+}
+
+/* Syntax highlighing classes for statictea code blocks. */
+
+/* a dot name */
+.t-dotName {
+    color: black;
+}
+
+/* a dot name followed by a left parenthesis */
+.t-funcCall {
+    color: #5F34FF;
+}
+
+/* a literal number */
+.t-num {
+    color: black;
+}
+
+/* a literal string */
+.t-str {
+    color: #34A227;
+}
+
+/* a multiline literal string */
+.t-multiline {
+    color: green;
+}
+
+/* a doc comment */
+.t-doc {
+    color: #B03B84;
+}
+
+/*  a comment */
+.t-comment {
+    color: #D7381E;
+}
+
+/* a parameter name */
+.t-param {
+    color: black;
+}
+
+/* int, float, string, list, dict, bool, func, any and optional */
+.t-type {
+    color: #D7381E;
+}
+
+pre {
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.plain-code {
+    background-color: #f6f8fa;
+}
+
+/* statictea code block */
+.tea-code {
+    border-left: 6px solid green;
+}
+
+/* nim code block */
+.nim-code {
+    border: 1px solid #D7381E;
+    background-color: #f6f8fa;
+}

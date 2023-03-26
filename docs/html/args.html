@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>args.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>args.nim</h1>
@@ -138,7 +82,7 @@ ArgsOr = OpResultWarn[Args]
 <p>Return the user&#x27;s ordered table that maps prefixes to postfixes. This is used when the user specifies prefixes on the command line and it does not contain any defaults.</p>
 
 <pre class="nim-code">
-proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable 
+proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 </pre>
 
 <h3 id="newArgsOr">newArgsOr</h3>
@@ -146,7 +90,7 @@ proc makeUserPrepostTable(prepostList: seq[Prepost]): PrepostTable
 <p>Return a new ArgsOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newArgsOr(warningData: WarningData): ArgsOr 
+func newArgsOr(warningData: WarningData): ArgsOr
 </pre>
 
 <h3 id="newArgsOr-1">newArgsOr</h3>
@@ -154,7 +98,7 @@ func newArgsOr(warningData: WarningData): ArgsOr
 <p>Return a new ArgsOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr 
+func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
 </pre>
 
 <h3 id="newArgsOr-2">newArgsOr</h3>
@@ -162,7 +106,7 @@ func newArgsOr(warning: MessageId; p1: string = ""; pos = 0): ArgsOr
 <p>Return a new ArgsOr object containing args.</p>
 
 <pre class="nim-code">
-func newArgsOr(args: Args): ArgsOr 
+func newArgsOr(args: Args): ArgsOr
 </pre>
 
 <h3 id="newPrepost">newPrepost</h3>
@@ -170,7 +114,7 @@ func newArgsOr(args: Args): ArgsOr
 <p>Create a new prepost object from the prefix and postfix.</p>
 
 <pre class="nim-code">
-func newPrepost(prefix: string; postfix: string): Prepost 
+func newPrepost(prefix: string; postfix: string): Prepost
 </pre>
 
 <h3 id="a__">`$`</h3>
@@ -227,7 +171,7 @@ predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),
 <p>Return the default ordered table that maps prefixes to postfixes.</p>
 
 <pre class="nim-code">
-proc makeDefaultPrepostTable(): PrepostTable 
+proc makeDefaultPrepostTable(): PrepostTable
 </pre>
 
 <h3 id="getPrepostTable">getPrepostTable</h3>
@@ -235,7 +179,7 @@ proc makeDefaultPrepostTable(): PrepostTable
 <p>Get the the prepost settings from the user or use the default ones.</p>
 
 <pre class="nim-code">
-proc getPrepostTable(args: Args): PrepostTable 
+proc getPrepostTable(args: Args): PrepostTable
 </pre>
 
 

@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>functions.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>functions.nim</h1>
@@ -204,7 +148,7 @@ PathComponents = object
 <p>Create a new StringOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr 
+func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 </pre>
 
 <h3 id="newStringOr-1">newStringOr</h3>
@@ -212,7 +156,7 @@ func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 <p>Create a new StringOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newStringOr(warningData: WarningData): StringOr 
+func newStringOr(warningData: WarningData): StringOr
 </pre>
 
 <h3 id="newStringOr-2">newStringOr</h3>
@@ -220,7 +164,7 @@ func newStringOr(warningData: WarningData): StringOr
 <p>Create a new StringOr object containing a string.</p>
 
 <pre class="nim-code">
-func newStringOr(str: string): StringOr 
+func newStringOr(str: string): StringOr
 </pre>
 
 <h3 id="newPathComponents">newPathComponents</h3>
@@ -228,7 +172,7 @@ func newStringOr(str: string): StringOr
 <p>Create a new PathComponents object from its pieces.</p>
 
 <pre class="nim-code">
-func newPathComponents(dir, filename, basename, ext: string): PathComponents 
+func newPathComponents(dir, filename, basename, ext: string): PathComponents
 </pre>
 
 <h3 id="signatureDetails">signatureDetails</h3>
@@ -236,7 +180,7 @@ func newPathComponents(dir, filename, basename, ext: string): PathComponents
 <p>Convert the signature object to a dictionary value.</p>
 
 <pre class="nim-code">
-func signatureDetails(signature: Signature): Value 
+func signatureDetails(signature: Signature): Value
 </pre>
 
 <h3 id="functionDetails">functionDetails</h3>
@@ -244,7 +188,7 @@ func signatureDetails(signature: Signature): Value
 <p>Convert the function spec to a dictionary value.</p>
 
 <pre class="nim-code">
-func functionDetails(fs: FunctionSpec): Value 
+func functionDetails(fs: FunctionSpec): Value
 </pre>
 
 <h3 id="cmpBaseValues">cmpBaseValues</h3>
@@ -252,7 +196,7 @@ func functionDetails(fs: FunctionSpec): Value
 <p>Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.</p>
 
 <pre class="nim-code">
-func cmpBaseValues(a, b: Value; insensitive: bool = false): int 
+func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 </pre>
 
 <h3 id="parseNumber">parseNumber</h3>
@@ -260,7 +204,7 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 <p>Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.</p>
 
 <pre class="nim-code">
-func parseNumber(line: string; start: Natural): ValuePosSiOr 
+func parseNumber(line: string; start: Natural): ValuePosSiOr
 </pre>
 
 <h3 id="formatString">formatString</h3>
@@ -570,7 +514,7 @@ The if takes two arguments when there is no assignment.
 
 
 <pre class="nim-code">
-func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_if_baoaa">fun_if_baoaa</h3>
@@ -607,7 +551,7 @@ The if takes two arguments when there is no assignment.
 
 
 <pre class="nim-code">
-func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_add_iii">fun_add_iii</h3>
@@ -797,7 +741,7 @@ func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Parse a StaticTea version number and return its three components.</p>
 
 <pre class="nim-code">
-func parseVersion(version: string): Option[(int, int, int)] 
+func parseVersion(version: string): Option[(int, int, int)]
 </pre>
 
 <h3 id="fun_cmpVersion_ssi">fun_cmpVersion_ssi</h3>
@@ -1006,7 +950,7 @@ func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Convert the value to a boolean.</p>
 
 <pre class="nim-code">
-func if0Condition(cond: Value): bool 
+func if0Condition(cond: Value): bool
 </pre>
 
 <h3 id="fun_bool_ab">fun_bool_ab</h3>
@@ -1180,7 +1124,7 @@ Examples:
 
 
 <pre class="nim-code">
-func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_listLoop_lapoab">fun_listLoop_lapoab</h3>
@@ -1228,7 +1172,7 @@ Below is the definition of the b5 callback function.
 
 
 <pre class="nim-code">
-func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_replace_siiss">fun_replace_siiss</h3>
@@ -1331,7 +1275,7 @@ func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult {
 <p>Parse the given file path into its component pieces.</p>
 
 <pre class="nim-code">
-func parsePath(path: string; separator = '/'): PathComponents 
+func parsePath(path: string; separator = '/'): PathComponents
 </pre>
 
 <h3 id="fun_path_sosd">fun_path_sosd</h3>
@@ -1779,7 +1723,7 @@ $$ <span class="t-dotName">endblock</span>
 
 
 <pre class="nim-code">
-func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_string_aoss">fun_string_aoss</h3>
@@ -1945,7 +1889,7 @@ Example:
 
 
 <pre class="nim-code">
-func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_functionDetails_pd">fun_functionDetails_pd</h3>
@@ -2053,7 +1997,7 @@ Examples:
 
 
 <pre class="nim-code">
-func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_or_bbb">fun_or_bbb</h3>
@@ -2077,7 +2021,7 @@ Examples:
 
 
 <pre class="nim-code">
-func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_eq_iib">fun_eq_iib</h3>
@@ -2492,7 +2436,7 @@ func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Excape text for placing in body html.</p>
 
 <pre class="nim-code">
-proc escapeHtmlBody(text: string): string 
+proc escapeHtmlBody(text: string): string
 </pre>
 
 <h3 id="escapeHtmlAttribute">escapeHtmlAttribute</h3>
@@ -2500,7 +2444,7 @@ proc escapeHtmlBody(text: string): string
 <p>Excape text for placing in an html attribute.</p>
 
 <pre class="nim-code">
-proc escapeHtmlAttribute(text: string): string 
+proc escapeHtmlAttribute(text: string): string
 </pre>
 
 <h3 id="fun_html_sss">fun_html_sss</h3>
@@ -2561,7 +2505,7 @@ BuiltInInfo = object
 <p>Return a BuiltInInfo object.</p>
 
 <pre class="nim-code">
-func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo 
+func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
 </pre>
 
 <h3 id="getBestFunction">getBestFunction</h3>
@@ -2569,7 +2513,7 @@ func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): Bu
 <p>Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.</p>
 
 <pre class="nim-code">
-proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr 
+proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 </pre>
 
 <h3 id="splitFuncName">splitFuncName</h3>
@@ -2577,7 +2521,7 @@ proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 <p>Split a funcName like &quot;fun_cmp_ffi&quot; to its name and signature like: &quot;cmp&quot; and &quot;ffi&quot;.</p>
 
 <pre class="nim-code">
-func splitFuncName(funcName: string): (string, string) 
+func splitFuncName(funcName: string): (string, string)
 </pre>
 
 <h3 id="makeFuncDictionary">makeFuncDictionary</h3>

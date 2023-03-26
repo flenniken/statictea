@@ -13,6 +13,7 @@ u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
   ## Highlight the fragment for html and add it to the frags list.
   tag = fragment[0]
   str = html(fragment[1], "body")
+  # Wrap each fragment with a span element except the "other" element.
   frags &= if((tag == "other"), str, +
     format("<span class=\"t-{tag}\">{str}</span>"))
   return(false)
