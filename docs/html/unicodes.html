@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>unicodes.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>unicodes.nim</h1>
@@ -90,7 +34,7 @@ Nim source code: <a href="../../src/unicodes.nim">unicodes.nim</a>
 <p>Compares two UTF-8 strings a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. Optionally ignore case.</p>
 
 <pre class="nim-code">
-func cmpString(a, b: string; insensitive: bool = false): int 
+func cmpString(a, b: string; insensitive: bool = false): int
 </pre>
 
 <h3 id="stringLen">stringLen</h3>
@@ -98,7 +42,7 @@ func cmpString(a, b: string; insensitive: bool = false): int
 <p>Return the number of unicode characters in the string (not bytes). If there are invalid byte sequences, they are counted too.</p>
 
 <pre class="nim-code">
-func stringLen(str: string): Natural 
+func stringLen(str: string): Natural
 </pre>
 
 <h3 id="githubAnchor">githubAnchor</h3>
@@ -106,7 +50,7 @@ func stringLen(str: string): Natural
 <p>Convert the name to a github anchor name.</p>
 
 <pre class="nim-code">
-func githubAnchor(name: string): string 
+func githubAnchor(name: string): string
 </pre>
 
 <h3 id="htmlAnchor">htmlAnchor</h3>
@@ -114,7 +58,7 @@ func githubAnchor(name: string): string
 <p>Convert the name to a html anchor (class) name.</p>
 
 <pre class="nim-code">
-func htmlAnchor(name: string): string 
+func htmlAnchor(name: string): string
 </pre>
 
 <h3 id="parseHexUnicode16">parseHexUnicode16</h3>
@@ -122,7 +66,7 @@ func htmlAnchor(name: string): string
 <p>Return the unicode code point given a 4 character unicode escape string like u1234. Start is pointing at the u. On error, return a message id telling what went wrong.</p>
 
 <pre class="nim-code">
-func parseHexUnicode16(text: string; start: Natural): OpResultId[uint32] 
+func parseHexUnicode16(text: string; start: Natural): OpResultId[uint32]
 </pre>
 
 <h3 id="parseHexUnicode">parseHexUnicode</h3>
@@ -130,7 +74,7 @@ func parseHexUnicode16(text: string; start: Natural): OpResultId[uint32]
 <p>Return the unicode code point given a 4 or 8 character unicode escape string. For example like u1234 or u1234u1234. Advance the pos past the end of the escape string. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.</p>
 
 <pre class="nim-code">
-func parseHexUnicode(text: string; pos: var Natural): OpResultId[uint32] 
+func parseHexUnicode(text: string; pos: var Natural): OpResultId[uint32]
 </pre>
 
 <h3 id="codePointToString">codePointToString</h3>
@@ -138,7 +82,7 @@ func parseHexUnicode(text: string; pos: var Natural): OpResultId[uint32]
 <p>Convert a code point to a one character UTF-8 string.</p>
 
 <pre class="nim-code">
-func codePointToString(codePoint: uint32): OpResultId[string] 
+func codePointToString(codePoint: uint32): OpResultId[string]
 </pre>
 
 <h3 id="codePointsToString">codePointsToString</h3>
@@ -146,7 +90,7 @@ func codePointToString(codePoint: uint32): OpResultId[string]
 <p>Convert a list of code points to a string.</p>
 
 <pre class="nim-code">
-func codePointsToString(codePoints: seq[uint32]): OpResultId[string] 
+func codePointsToString(codePoints: seq[uint32]): OpResultId[string]
 </pre>
 
 <h3 id="parseHexUnicodeToString">parseHexUnicodeToString</h3>
@@ -154,7 +98,7 @@ func codePointsToString(codePoints: seq[uint32]): OpResultId[string]
 <p>Return a one character string given a 4 or 8 character unicode escape string. For example like u1234 or u1234u1234. Advance the pos past the end of the escape string. Pos is initially pointing at the u. On error, return the message id telling what went wrong and pos points at the error.</p>
 
 <pre class="nim-code">
-func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string] 
+func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
 </pre>
 
 <h3 id="slice">slice</h3>
@@ -162,7 +106,7 @@ func parseHexUnicodeToString(text: string; pos: var Natural): OpResultId[string]
 <p>Extract a substring from a string by its Unicode character position (not byte index). You pass the string, the substring&#x27;s start index, and its length. If the length is negative, return all the characters from start to the end of the string. If the str is &quot;&quot; or the length is 0, return &quot;&quot;.</p>
 
 <pre class="nim-code">
-func slice(str: string; start: int; length: int): FunResult 
+func slice(str: string; start: int; length: int): FunResult
 </pre>
 
 <h3 id="visibleControl">visibleControl</h3>
@@ -170,7 +114,7 @@ func slice(str: string; start: int; length: int): FunResult
 <p>Return a new string with the tab and line endings and other control characters visible.</p>
 
 <pre class="nim-code">
-func visibleControl(str: string; spacesToo = false): string 
+func visibleControl(str: string; spacesToo = false): string
 </pre>
 
 <h3 id="startColumn">startColumn</h3>
@@ -178,7 +122,7 @@ func visibleControl(str: string; spacesToo = false): string
 <p>Return enough spaces to point at the start byte position of the given text.  This accounts for multibyte UTF-8 sequences that might be in the text.</p>
 
 <pre class="nim-code">
-func startColumn(text: string; start: Natural; message: string = "^"): string 
+func startColumn(text: string; start: Natural; message: string = "^"): string
 </pre>
 
 

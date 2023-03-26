@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>vartypes.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>vartypes.nim</h1>
@@ -500,7 +444,7 @@ ValuePosSiOr = OpResultWarn[ValuePosSi]
 
 <pre class="nim-code">
 proc newSignature(optional: bool; name: string; params: seq[Param];
-                  returnType: ParamType): Signature 
+                  returnType: ParamType): Signature
 </pre>
 
 <h3 id="newSignatureOr">newSignatureOr</h3>
@@ -508,7 +452,7 @@ proc newSignature(optional: bool; name: string; params: seq[Param];
 <p>Create a new SignatureOr with a message.</p>
 
 <pre class="nim-code">
-func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr 
+func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
 </pre>
 
 <h3 id="newSignatureOr-1">newSignatureOr</h3>
@@ -516,7 +460,7 @@ func newSignatureOr(warning: MessageId; p1 = ""; pos = 0): SignatureOr
 <p>Create a new SignatureOr with a message.</p>
 
 <pre class="nim-code">
-func newSignatureOr(warningData: WarningData): SignatureOr 
+func newSignatureOr(warningData: WarningData): SignatureOr
 </pre>
 
 <h3 id="newSignatureOr-2">newSignatureOr</h3>
@@ -524,7 +468,7 @@ func newSignatureOr(warningData: WarningData): SignatureOr
 <p>Create a new SignatureOr with a value.</p>
 
 <pre class="nim-code">
-func newSignatureOr(signature: Signature): SignatureOr 
+func newSignatureOr(signature: Signature): SignatureOr
 </pre>
 
 <h3 id="newSignatureOr-3">newSignatureOr</h3>
@@ -533,7 +477,7 @@ func newSignatureOr(signature: Signature): SignatureOr
 
 <pre class="nim-code">
 proc newSignatureOr(optional: bool; name: string; params: seq[Param];
-                    returnType: ParamType): SignatureOr 
+                    returnType: ParamType): SignatureOr
 </pre>
 
 <h3 id="newParam">newParam</h3>
@@ -541,7 +485,7 @@ proc newSignatureOr(optional: bool; name: string; params: seq[Param];
 <p>Create a new Param object.</p>
 
 <pre class="nim-code">
-func newParam(name: string; paramType: ParamType): Param 
+func newParam(name: string; paramType: ParamType): Param
 </pre>
 
 <h3 id="newVarsDict">newVarsDict</h3>
@@ -549,7 +493,7 @@ func newParam(name: string; paramType: ParamType): Param
 <p>Create a new empty variables dictionary. VarsDict is a ref type.</p>
 
 <pre class="nim-code">
-proc newVarsDict(): VarsDict 
+proc newVarsDict(): VarsDict
 </pre>
 
 <h3 id="newVarsDictOr">newVarsDictOr</h3>
@@ -557,7 +501,7 @@ proc newVarsDict(): VarsDict
 <p>Create a new varsDictOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr 
+func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr
 </pre>
 
 <h3 id="newVarsDictOr-1">newVarsDictOr</h3>
@@ -565,7 +509,7 @@ func newVarsDictOr(warning: MessageId; p1: string = ""; pos = 0): VarsDictOr
 <p>Create a new VarsDict object containing a dictionary.</p>
 
 <pre class="nim-code">
-func newVarsDictOr(varsDict: VarsDict): VarsDictOr 
+func newVarsDictOr(varsDict: VarsDict): VarsDictOr
 </pre>
 
 <h3 id="newDictType">newDictType</h3>
@@ -573,7 +517,7 @@ func newVarsDictOr(varsDict: VarsDict): VarsDictOr
 <p>Create a new DictType object.</p>
 
 <pre class="nim-code">
-func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType 
+func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType
 </pre>
 
 <h3 id="newListType">newListType</h3>
@@ -581,7 +525,7 @@ func newDictType(varsDict: VarsDict; mutable = Mutable.immutable): DictType
 <p>Create a new ListType object.</p>
 
 <pre class="nim-code">
-func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType 
+func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType
 </pre>
 
 <h3 id="newValue">newValue</h3>
@@ -589,7 +533,7 @@ func newListType(valueList: seq[Value]; mutable = Mutable.immutable): ListType
 <p>Create a string value.</p>
 
 <pre class="nim-code">
-proc newValue(str: string): Value 
+proc newValue(str: string): Value
 </pre>
 
 <h3 id="newValue-1">newValue</h3>
@@ -605,7 +549,7 @@ proc newValue(num: int | int64): Value
 <p>Create a bool value.</p>
 
 <pre class="nim-code">
-proc newValue(a: bool): Value 
+proc newValue(a: bool): Value
 </pre>
 
 <h3 id="newValue-3">newValue</h3>
@@ -613,7 +557,7 @@ proc newValue(a: bool): Value
 <p>Create a float value.</p>
 
 <pre class="nim-code">
-proc newValue(num: float): Value 
+proc newValue(num: float): Value
 </pre>
 
 <h3 id="newValue-4">newValue</h3>
@@ -621,7 +565,7 @@ proc newValue(num: float): Value
 <p>Create a list value.</p>
 
 <pre class="nim-code">
-proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value 
+proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value
 </pre>
 
 <h3 id="newValue-5">newValue</h3>
@@ -629,7 +573,7 @@ proc newValue(valueList: seq[Value]; mutable = Mutable.immutable): Value
 <p>Create a dictionary value from a VarsDict.</p>
 
 <pre class="nim-code">
-proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value 
+proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value
 </pre>
 
 <h3 id="newValue-6">newValue</h3>
@@ -637,7 +581,7 @@ proc newValue(varsDict: VarsDict; mutable = Mutable.immutable): Value
 <p>Create a new value from an existing value. Since values are ref types, the new value is an alias.</p>
 
 <pre class="nim-code">
-proc newValue(value: Value): Value 
+proc newValue(value: Value): Value
 </pre>
 
 <h3 id="newValue-7">newValue</h3>
@@ -681,7 +625,7 @@ proc newValue[T](dictPairs: openArray[(string, T)]; mutable = Mutable.immutable)
 <pre class="nim-code">
 func newFunc(builtIn: bool; signature: Signature; docComment: string;
              filename: string; lineNum: Natural; numLines: Natural;
-             statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec 
+             statements: seq[Statement]; functionPtr: FunctionPtr): FunctionSpec
 </pre>
 
 <h3 id="newValue-9">newValue</h3>
@@ -689,7 +633,7 @@ func newFunc(builtIn: bool; signature: Signature; docComment: string;
 <p>Create a new func value.</p>
 
 <pre class="nim-code">
-func newValue(function: FunctionSpec): Value 
+func newValue(function: FunctionSpec): Value
 </pre>
 
 <h3 id="newEmptyListValue">newEmptyListValue</h3>
@@ -697,7 +641,7 @@ func newValue(function: FunctionSpec): Value
 <p>Create a new empty list value.</p>
 
 <pre class="nim-code">
-proc newEmptyListValue(mutable = Mutable.immutable): Value 
+proc newEmptyListValue(mutable = Mutable.immutable): Value
 </pre>
 
 <h3 id="newEmptyDictValue">newEmptyDictValue</h3>
@@ -705,7 +649,7 @@ proc newEmptyListValue(mutable = Mutable.immutable): Value
 <p>Create a dictionary value from a VarsDict.</p>
 
 <pre class="nim-code">
-proc newEmptyDictValue(mutable = Mutable.immutable): Value 
+proc newEmptyDictValue(mutable = Mutable.immutable): Value
 </pre>
 
 <h3 id="a___">`==`</h3>
@@ -713,7 +657,7 @@ proc newEmptyDictValue(mutable = Mutable.immutable): Value
 <p>Return true when two variables are equal.</p>
 
 <pre class="nim-code">
-proc `==`(a: Value; b: Value): bool 
+proc `==`(a: Value; b: Value): bool
 </pre>
 
 <h3 id="newStatement">newStatement</h3>
@@ -721,7 +665,7 @@ proc `==`(a: Value; b: Value): bool
 <p>Create a new statement.</p>
 
 <pre class="nim-code">
-func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement 
+func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
 </pre>
 
 <h3 id="a__">`$`</h3>
@@ -729,7 +673,7 @@ func newStatement(text: string; lineNum: Natural = 1; ending = "\n"): Statement
 <p>Return a string representation of a signature. name = func(p1: type, p2: type, ...) type</p>
 
 <pre class="nim-code">
-func `$`(signature: Signature): string 
+func `$`(signature: Signature): string
 </pre>
 
 <h3 id="a__-1">`$`</h3>
@@ -737,7 +681,7 @@ func `$`(signature: Signature): string
 <p>Return a string representation of a function.</p>
 
 <pre class="nim-code">
-func `$`(function: FunctionSpec): string 
+func `$`(function: FunctionSpec): string
 </pre>
 
 <h3 id="jsonStringRepr">jsonStringRepr</h3>
@@ -745,7 +689,7 @@ func `$`(function: FunctionSpec): string
 <p>Return the JSON string representation. It is assumed the string is a valid UTF-8 encoded string.</p>
 
 <pre class="nim-code">
-proc jsonStringRepr(str: string): string 
+proc jsonStringRepr(str: string): string
 </pre>
 
 <h3 id="dictToString">dictToString</h3>
@@ -823,7 +767,7 @@ func verticalLines(value: Value): string {.raises: [Exception, ValueError],
 <p>Create a new ValueOr containing a warning.</p>
 
 <pre class="nim-code">
-func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr 
+func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr
 </pre>
 
 <h3 id="newValueOr-1">newValueOr</h3>
@@ -831,7 +775,7 @@ func newValueOr(warning: MessageId; p1 = ""; pos = 0): ValueOr
 <p>Create a new ValueOr containing a warning.</p>
 
 <pre class="nim-code">
-func newValueOr(warningData: WarningData): ValueOr 
+func newValueOr(warningData: WarningData): ValueOr
 </pre>
 
 <h3 id="newValueOr-2">newValueOr</h3>
@@ -839,7 +783,7 @@ func newValueOr(warningData: WarningData): ValueOr
 <p>Create a new ValueOr containing a value.</p>
 
 <pre class="nim-code">
-func newValueOr(value: Value): ValueOr 
+func newValueOr(value: Value): ValueOr
 </pre>
 
 <h3 id="newFunResultWarn">newFunResultWarn</h3>
@@ -848,7 +792,7 @@ func newValueOr(value: Value): ValueOr
 
 <pre class="nim-code">
 func newFunResultWarn(warning: MessageId; parameter: int = 0; p1: string = "";
-                      pos = 0): FunResult 
+                      pos = 0): FunResult
 </pre>
 
 <h3 id="newFunResultWarn-1">newFunResultWarn</h3>
@@ -856,7 +800,7 @@ func newFunResultWarn(warning: MessageId; parameter: int = 0; p1: string = "";
 <p>Return a new FunResult object containing a warning created from a WarningData object.</p>
 
 <pre class="nim-code">
-func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult 
+func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult
 </pre>
 
 <h3 id="newFunResult">newFunResult</h3>
@@ -864,7 +808,7 @@ func newFunResultWarn(warningData: WarningData; parameter: int = 0): FunResult
 <p>Return a new FunResult object containing a value.</p>
 
 <pre class="nim-code">
-func newFunResult(value: Value): FunResult 
+func newFunResult(value: Value): FunResult
 </pre>
 
 <h3 id="a___-1">`==`</h3>
@@ -872,7 +816,7 @@ func newFunResult(value: Value): FunResult
 <p>Compare two FunResult objects and return true when equal.</p>
 
 <pre class="nim-code">
-func `==`(r1: FunResult; r2: FunResult): bool 
+func `==`(r1: FunResult; r2: FunResult): bool
 </pre>
 
 <h3 id="a___-2">`!=`</h3>
@@ -880,7 +824,7 @@ func `==`(r1: FunResult; r2: FunResult): bool
 <p>Compare two FunResult objects and return false when equal.</p>
 
 <pre class="nim-code">
-proc `!=`(a: FunResult; b: FunResult): bool 
+proc `!=`(a: FunResult; b: FunResult): bool
 </pre>
 
 <h3 id="a__-4">`$`</h3>
@@ -897,7 +841,7 @@ func `$`(funResult: FunResult): string {.raises: [Exception, ValueError],
 <p>Create a newValuePosSi object.</p>
 
 <pre class="nim-code">
-proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi 
+proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSi
 </pre>
 
 <h3 id="newValuePosSiOr">newValuePosSiOr</h3>
@@ -905,7 +849,7 @@ proc newValuePosSi(value: Value; pos: Natural; sideEffect: SideEffect = seNone):
 <p>Create a ValuePosSiOr warning.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr 
+func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr
 </pre>
 
 <h3 id="newValuePosSiOr-1">newValuePosSiOr</h3>
@@ -913,7 +857,7 @@ func newValuePosSiOr(warning: MessageId; p1 = ""; pos = 0): ValuePosSiOr
 <p>Create a ValuePosSiOr warning.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(warningData: WarningData): ValuePosSiOr 
+func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
 </pre>
 
 <h3 id="a___-3">`==`</h3>
@@ -921,7 +865,7 @@ func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
 <p>Return true when a equals b.</p>
 
 <pre class="nim-code">
-proc `==`(a: ValuePosSi; b: ValuePosSi): bool 
+proc `==`(a: ValuePosSi; b: ValuePosSi): bool
 </pre>
 
 <h3 id="a___-4">`==`</h3>
@@ -929,7 +873,7 @@ proc `==`(a: ValuePosSi; b: ValuePosSi): bool
 <p>Return true when a equals b.</p>
 
 <pre class="nim-code">
-proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool 
+proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 </pre>
 
 <h3 id="a___-5">`!=`</h3>
@@ -937,7 +881,7 @@ proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 <p>Compare two ValuePosSi objects and return false when equal.</p>
 
 <pre class="nim-code">
-proc `!=`(a: ValuePosSi; b: ValuePosSi): bool 
+proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
 </pre>
 
 <h3 id="a___-6">`!=`</h3>
@@ -945,7 +889,7 @@ proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
 <p>Compare two ValuePosSiOr objects and return false when equal.</p>
 
 <pre class="nim-code">
-proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool 
+proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 </pre>
 
 <h3 id="newValuePosSiOr-2">newValuePosSiOr</h3>
@@ -953,7 +897,7 @@ proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 <p>Create a ValuePosSiOr from a value, pos and exit.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr 
+func newValuePosSiOr(value: Value; pos: Natural; sideEffect: SideEffect = seNone): ValuePosSiOr
 </pre>
 
 <h3 id="newValuePosSiOr-3">newValuePosSiOr</h3>
@@ -969,7 +913,7 @@ proc newValuePosSiOr(number: int | int64 | float64 | string; pos: Natural): Valu
 <p>Create a ValuePosSiOr from a ValuePosSi.</p>
 
 <pre class="nim-code">
-func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr 
+func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr
 </pre>
 
 <h3 id="codeToParamType">codeToParamType</h3>
@@ -977,7 +921,7 @@ func newValuePosSiOr(val: ValuePosSi): ValuePosSiOr
 <p>Convert a parameter code letter to a ParamType.</p>
 
 <pre class="nim-code">
-func codeToParamType(code: ParamCode): ParamType 
+func codeToParamType(code: ParamCode): ParamType
 </pre>
 
 <h3 id="strToParamType">strToParamType</h3>
@@ -985,7 +929,7 @@ func codeToParamType(code: ParamCode): ParamType
 <p>Return the parameter type for the given string, e.g. &quot;int&quot; to ptInt.</p>
 
 <pre class="nim-code">
-func strToParamType(str: string): ParamType 
+func strToParamType(str: string): ParamType
 </pre>
 
 <h3 id="shortName">shortName</h3>
@@ -993,7 +937,7 @@ func strToParamType(str: string): ParamType
 <p>Return a short name based on the given index value. Return a for 0, b for 1, etc.  It returns names a, b, c, ..., z then repeats a0, b0, c0,....</p>
 
 <pre class="nim-code">
-proc shortName(index: Natural): string 
+proc shortName(index: Natural): string
 </pre>
 
 <h3 id="newSignatureO">newSignatureO</h3>
@@ -1012,7 +956,7 @@ proc shortName(index: Natural): string
 
 <pre class="nim-code">
 func newSignatureO(functionName: string; signatureCode: string): Option[
-    Signature] 
+    Signature]
 </pre>
 
 

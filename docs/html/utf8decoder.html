@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>utf8decoder.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>utf8decoder.nim</h1>
@@ -83,7 +27,7 @@ Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 <p>Interior part of a UTF-8 decoder.</p>
 
 <pre class="nim-code">
-proc decode(state: var uint32; codep: var uint32; sByte: char) 
+proc decode(state: var uint32; codep: var uint32; sByte: char)
 </pre>
 
 <h3 id="yieldUtf8Chars">yieldUtf8Chars</h3>
@@ -99,7 +43,7 @@ str[ixStartSeq .. ixEndSeq]
 
 <pre class="nim-code">
 iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
-                        codePoint: var uint32): bool 
+                        codePoint: var uint32): bool
 </pre>
 
 <h3 id="validateUtf8String">validateUtf8String</h3>
@@ -107,7 +51,7 @@ iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
 <p>Return the position of the first invalid UTF-8 byte in the string else return -1.</p>
 
 <pre class="nim-code">
-func validateUtf8String(str: string): int 
+func validateUtf8String(str: string): int
 </pre>
 
 <h3 id="sanitizeUtf8">sanitizeUtf8</h3>
@@ -115,7 +59,7 @@ func validateUtf8String(str: string): int
 <p>Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.</p>
 
 <pre class="nim-code">
-func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string 
+func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 </pre>
 
 <h3 id="utf8CharString">utf8CharString</h3>
@@ -123,7 +67,7 @@ func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 <p>Get the unicode character at pos.  Return a one character string. Return &quot;&quot; when not a UTF-8 character.</p>
 
 <pre class="nim-code">
-func utf8CharString(str: string; pos: Natural): string 
+func utf8CharString(str: string; pos: Natural): string
 </pre>
 
 

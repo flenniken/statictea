@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>runner.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>runner.nim</h1>
@@ -214,7 +158,7 @@ DirAndFiles = object
 <p>Create a new AnyLine object for a file line.</p>
 
 <pre class="nim-code">
-func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine 
+func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine
 </pre>
 
 <h3 id="newAnyLineExpectedLine">newAnyLineExpectedLine</h3>
@@ -222,7 +166,7 @@ func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine
 <p>Create a new AnyLine object for a expected line.</p>
 
 <pre class="nim-code">
-func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine 
+func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
 </pre>
 
 <h3 id="newAnyLineBlockLine">newAnyLineBlockLine</h3>
@@ -230,7 +174,7 @@ func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
 <p>Create a new AnyLine object for a block line.</p>
 
 <pre class="nim-code">
-func newAnyLineBlockLine(blockLine: string): AnyLine 
+func newAnyLineBlockLine(blockLine: string): AnyLine
 </pre>
 
 <h3 id="newAnyLineCommentLine">newAnyLineCommentLine</h3>
@@ -238,7 +182,7 @@ func newAnyLineBlockLine(blockLine: string): AnyLine
 <p>Create a new AnyLine object for a comment line.</p>
 
 <pre class="nim-code">
-func newAnyLineCommentLine(commentLine: string): AnyLine 
+func newAnyLineCommentLine(commentLine: string): AnyLine
 </pre>
 
 <h3 id="newAnyLineIdLine">newAnyLineIdLine</h3>
@@ -246,7 +190,7 @@ func newAnyLineCommentLine(commentLine: string): AnyLine
 <p>Create a new AnyLine object for a id line.</p>
 
 <pre class="nim-code">
-func newAnyLineIdLine(idLine: string): AnyLine 
+func newAnyLineIdLine(idLine: string): AnyLine
 </pre>
 
 <h3 id="newRunArgs">newRunArgs</h3>
@@ -255,7 +199,7 @@ func newAnyLineIdLine(idLine: string): AnyLine
 
 <pre class="nim-code">
 func newRunArgs(help = false; version = false; leaveTempDir = false;
-                filename = ""; directory = ""): RunArgs 
+                filename = ""; directory = ""): RunArgs
 </pre>
 
 <h3 id="newRunFileLine">newRunFileLine</h3>
@@ -264,7 +208,7 @@ func newRunArgs(help = false; version = false; leaveTempDir = false;
 
 <pre class="nim-code">
 func newRunFileLine(filename: string; noLastEnding = false; command = false;
-                    nonZeroReturn = false): RunFileLine 
+                    nonZeroReturn = false): RunFileLine
 </pre>
 
 <h3 id="newExpectedLine">newExpectedLine</h3>
@@ -272,7 +216,7 @@ func newRunFileLine(filename: string; noLastEnding = false; command = false;
 <p>Create a new ExpectedLine object.</p>
 
 <pre class="nim-code">
-func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine 
+func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine
 </pre>
 
 <h3 id="newDirAndFiles">newDirAndFiles</h3>
@@ -281,7 +225,7 @@ func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLin
 
 <pre class="nim-code">
 func newDirAndFiles(expectedLines: seq[ExpectedLine];
-                    runFileLines: seq[RunFileLine]): DirAndFiles 
+                    runFileLines: seq[RunFileLine]): DirAndFiles
 </pre>
 
 <h3 id="a__">`$`</h3>

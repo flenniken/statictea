@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>signatures.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>signatures.nim</h1>
@@ -83,7 +27,7 @@ Nim source code: <a href="../../src/signatures.nim">signatures.nim</a>
 <p>Return a string representation of a ParamCode object.</p>
 
 <pre class="nim-code">
-func paramCodeString(paramCode: ParamCode): string 
+func paramCodeString(paramCode: ParamCode): string
 </pre>
 
 <h3 id="kindToParamCode">kindToParamCode</h3>
@@ -91,7 +35,7 @@ func paramCodeString(paramCode: ParamCode): string
 <p>Convert a value type to a parameter type.</p>
 
 <pre class="nim-code">
-func kindToParamCode(kind: ValueKind): ParamCode 
+func kindToParamCode(kind: ValueKind): ParamCode
 </pre>
 
 <h3 id="sameType">sameType</h3>
@@ -99,7 +43,7 @@ func kindToParamCode(kind: ValueKind): ParamCode
 <p>Check whether the param type is the same type or compatible with the value.</p>
 
 <pre class="nim-code">
-func sameType(paramCode: ParamCode; valueKind: ValueKind): bool 
+func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
 </pre>
 
 <h3 id="sameType-1">sameType</h3>
@@ -107,7 +51,7 @@ func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
 <p>Check whether the param type is the same type or compatible with the value.</p>
 
 <pre class="nim-code">
-func sameType(paramType: ParamType; valueKind: ValueKind): bool 
+func sameType(paramType: ParamType; valueKind: ValueKind): bool
 </pre>
 
 <h3 id="mapParameters">mapParameters</h3>
@@ -115,7 +59,7 @@ func sameType(paramType: ParamType; valueKind: ValueKind): bool
 <p>Create a dictionary of the parameters and arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.</p>
 
 <pre class="nim-code">
-func mapParameters(signature: Signature; args: seq[Value]): FunResult 
+func mapParameters(signature: Signature; args: seq[Value]): FunResult
 </pre>
 
 

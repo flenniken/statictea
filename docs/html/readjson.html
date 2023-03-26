@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>readjson.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>readjson.nim</h1>
@@ -93,7 +37,7 @@ maxDepth = 16
 <p>Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.</p>
 
 <pre class="nim-code">
-func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr 
+func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr
 </pre>
 
 <h3 id="readJsonStream">readJsonStream</h3>
@@ -143,7 +87,7 @@ not a popular char, return 0.
 |t         | tab            | U+0009 |</p>
 
 <pre class="nim-code">
-func unescapePopularChar(popular: char): char 
+func unescapePopularChar(popular: char): char
 </pre>
 
 <h3 id="parseJsonStr">parseJsonStr</h3>
@@ -161,7 +105,7 @@ the message id tells what went wrong.
 
 
 <pre class="nim-code">
-func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr 
+func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr
 </pre>
 
 

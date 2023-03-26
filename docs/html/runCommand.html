@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>runCommand.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>runCommand.nim</h1>
@@ -244,7 +188,7 @@ LoopControl = enum
 <p>Return a new LinesOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr 
+func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
 </pre>
 
 <h3 id="newLinesOr-1">newLinesOr</h3>
@@ -252,7 +196,7 @@ func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
 <p>Return a new LinesOr object containing a warning.</p>
 
 <pre class="nim-code">
-func newLinesOr(warningData: WarningData): LinesOr 
+func newLinesOr(warningData: WarningData): LinesOr
 </pre>
 
 <h3 id="newLinesOr-2">newLinesOr</h3>
@@ -260,7 +204,7 @@ func newLinesOr(warningData: WarningData): LinesOr
 <p>Return a new LinesOr object containing a list of lines.</p>
 
 <pre class="nim-code">
-func newLinesOr(lines: seq[string]): LinesOr 
+func newLinesOr(lines: seq[string]): LinesOr
 </pre>
 
 <h3 id="newPosOr">newPosOr</h3>
@@ -268,7 +212,7 @@ func newLinesOr(lines: seq[string]): LinesOr
 <p>Create a PosOr warning.</p>
 
 <pre class="nim-code">
-func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr 
+func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
 </pre>
 
 <h3 id="newPosOr-1">newPosOr</h3>
@@ -276,7 +220,7 @@ func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
 <p>Create a PosOr value.</p>
 
 <pre class="nim-code">
-func newPosOr(pos: Natural): PosOr 
+func newPosOr(pos: Natural): PosOr
 </pre>
 
 <h3 id="newSpecialFunctionOr">newSpecialFunctionOr</h3>
@@ -284,7 +228,7 @@ func newPosOr(pos: Natural): PosOr
 <p>Create a PosOr warning.</p>
 
 <pre class="nim-code">
-func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunctionOr 
+func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunctionOr
 </pre>
 
 <h3 id="newSpecialFunctionOr-1">newSpecialFunctionOr</h3>
@@ -292,7 +236,7 @@ func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunction
 <p>Create a SpecialFunctionOr value.</p>
 
 <pre class="nim-code">
-func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr 
+func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
 </pre>
 
 <h3 id="a__">`$`</h3>
@@ -308,7 +252,7 @@ func `$`(s: Statement): string {.raises: [ValueError], tags: [].}
 <p>Return true when the two statements are equal.</p>
 
 <pre class="nim-code">
-func `==`(s1: Statement; s2: Statement): bool 
+func `==`(s1: Statement; s2: Statement): bool
 </pre>
 
 <h3 id="a___-1">`==`</h3>
@@ -316,7 +260,7 @@ func `==`(s1: Statement; s2: Statement): bool
 <p>Return true when a equals b.</p>
 
 <pre class="nim-code">
-func `==`(a: PosOr; b: PosOr): bool 
+func `==`(a: PosOr; b: PosOr): bool
 </pre>
 
 <h3 id="a___-2">`!=`</h3>
@@ -324,7 +268,7 @@ func `==`(a: PosOr; b: PosOr): bool
 <p>Compare whether two PosOr are not equal.</p>
 
 <pre class="nim-code">
-func `!=`(a: PosOr; b: PosOr): bool 
+func `!=`(a: PosOr; b: PosOr): bool
 </pre>
 
 <h3 id="VariableNameKind">VariableNameKind</h3>
@@ -388,7 +332,7 @@ RightType = enum
 <p>Create a new VariableName object.</p>
 
 <pre class="nim-code">
-func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName 
+func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName
 </pre>
 
 <h3 id="newVariableNameOr">newVariableNameOr</h3>
@@ -396,7 +340,7 @@ func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): Var
 <p>Create a PosOr warning.</p>
 
 <pre class="nim-code">
-func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr 
+func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
 </pre>
 
 <h3 id="newVariableNameOr-1">newVariableNameOr</h3>
@@ -404,7 +348,7 @@ func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
 <p>Create a new VariableNameOr object.</p>
 
 <pre class="nim-code">
-func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr 
+func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr
 </pre>
 
 <h3 id="getRightType">getRightType</h3>
@@ -412,7 +356,7 @@ func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): V
 <p>Return the type of the right hand side of the statement at the start position.</p>
 
 <pre class="nim-code">
-func getRightType(statement: Statement; start: Natural): RightType 
+func getRightType(statement: Statement; start: Natural): RightType
 </pre>
 
 <h3 id="getVariableNameOr">getVariableNameOr</h3>
@@ -430,7 +374,7 @@ func getRightType(statement: Statement; start: Natural): RightType
 
 
 <pre class="nim-code">
-proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr 
+proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
 </pre>
 
 <h3 id="getVariableName">getVariableName</h3>
@@ -447,7 +391,7 @@ proc getVariableName(text: string; start: Natural): VariableNameOr {.
 <p>Match the optional &quot;&quot;&quot; or + at the end of the line. This tells whether the statement continues on the next line for code files.</p>
 
 <pre class="nim-code">
-func matchTripleOrPlusSign(line: string): Found 
+func matchTripleOrPlusSign(line: string): Found
 </pre>
 
 <h3 id="addText">addText</h3>
@@ -455,7 +399,7 @@ func matchTripleOrPlusSign(line: string): Found
 <p>Add the line up to the line-ending to the text string.</p>
 
 <pre class="nim-code">
-func addText(line: string; found: Found; text: var string) 
+func addText(line: string; found: Found; text: var string)
 </pre>
 
 <h3 id="getFragmentAndPos">getFragmentAndPos</h3>
@@ -463,7 +407,7 @@ func addText(line: string; found: Found; text: var string)
 <p>Split up a long statement around the given position.  Return the statement fragment, and the position where the fragment starts in the statement.</p>
 
 <pre class="nim-code">
-func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural) 
+func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
 </pre>
 
 <h3 id="getWarnStatement">getWarnStatement</h3>
@@ -501,7 +445,7 @@ proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
 <p>Return a new string with the n or rn removed from the end of the line.</p>
 
 <pre class="nim-code">
-func removeLineEnd(s: string): string 
+func removeLineEnd(s: string): string
 </pre>
 
 <h3 id="yieldStatements">yieldStatements</h3>
@@ -531,7 +475,7 @@ string value and the ending position one past the trailing
 whitespace.</p>
 
 <pre class="nim-code">
-func getMultilineStr(text: string; start: Natural): ValuePosSiOr 
+func getMultilineStr(text: string; start: Natural): ValuePosSiOr
 </pre>
 
 <h3 id="matchTabSpace2">matchTabSpace2</h3>
@@ -539,7 +483,7 @@ func getMultilineStr(text: string; start: Natural): ValuePosSiOr
 <p>Match one or more spaces or tabs starting at the given position.</p>
 
 <pre class="nim-code">
-proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches] 
+proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches]
 </pre>
 
 <h3 id="getString">getString</h3>
@@ -553,7 +497,7 @@ proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches]
 
 
 <pre class="nim-code">
-func getString(str: string; start: Natural): ValuePosSiOr 
+func getString(str: string; start: Natural): ValuePosSiOr
 </pre>
 
 <h3 id="getNumber">getNumber</h3>
@@ -561,7 +505,7 @@ func getString(str: string; start: Natural): ValuePosSiOr
 <p>Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.</p>
 
 <pre class="nim-code">
-func getNumber(statement: Statement; start: Natural): ValuePosSiOr 
+func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 </pre>
 
 <h3 id="skipArgument">skipArgument</h3>
@@ -577,7 +521,7 @@ func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 
 
 <pre class="nim-code">
-func skipArgument(statement: Statement; startPos: Natural): PosOr 
+func skipArgument(statement: Statement; startPos: Natural): PosOr
 </pre>
 
 <h3 id="ifFunctions">ifFunctions</h3>
@@ -673,7 +617,7 @@ proc getFunctionValuePosSi(env: var Env; functionName: string;
 <p>Evaluate the bool expression and return a bool value.</p>
 
 <pre class="nim-code">
-func runBoolOp(left: Value; op: string; right: Value): Value 
+func runBoolOp(left: Value; op: string; right: Value): Value
 </pre>
 
 <h3 id="runCompareOp">runCompareOp</h3>
@@ -681,7 +625,7 @@ func runBoolOp(left: Value; op: string; right: Value): Value
 <p>Evaluate the comparison and return a bool value.</p>
 
 <pre class="nim-code">
-func runCompareOp(left: Value; op: string; right: Value): Value 
+func runCompareOp(left: Value; op: string; right: Value): Value
 </pre>
 
 <h3 id="getCondition">getCondition</h3>

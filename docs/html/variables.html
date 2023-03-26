@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>variables.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>variables.nim</h1>
@@ -176,7 +120,7 @@ NoPrefixDict = enum
 <p>Create an object containing a warning.</p>
 
 <pre class="nim-code">
-func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr 
+func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
 </pre>
 
 <h3 id="newVariableDataOr-1">newVariableDataOr</h3>
@@ -184,7 +128,7 @@ func newVariableDataOr(warning: MessageId; p1 = ""; pos = 0): VariableDataOr
 <p>Create an object containing a warning.</p>
 
 <pre class="nim-code">
-func newVariableDataOr(warningData: WarningData): VariableDataOr 
+func newVariableDataOr(warningData: WarningData): VariableDataOr
 </pre>
 
 <h3 id="newVariableDataOr-2">newVariableDataOr</h3>
@@ -192,7 +136,7 @@ func newVariableDataOr(warningData: WarningData): VariableDataOr
 <p>Create an object containing a VariableData object.</p>
 
 <pre class="nim-code">
-func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr 
+func newVariableDataOr(dotNameStr: string; operator: Operator; value: Value): VariableDataOr
 </pre>
 
 <h3 id="a__">`$`</h3>
@@ -210,7 +154,7 @@ func `$`(v: VariableData): string {.raises: [ValueError, Exception],
 
 <pre class="nim-code">
 func startVariables(server: VarsDict = nil; args: VarsDict = nil;
-                    funcs: VarsDict = nil; userFuncs: VarsDict = nil): Variables 
+                    funcs: VarsDict = nil; userFuncs: VarsDict = nil): Variables
 </pre>
 
 <h3 id="getTeaVarIntDefault">getTeaVarIntDefault</h3>

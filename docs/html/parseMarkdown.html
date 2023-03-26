@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>parseMarkdown.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>parseMarkdown.nim</h1>
@@ -153,7 +97,7 @@ Fragment = object
 <p>Create an Element object.</p>
 
 <pre class="nim-code">
-proc newElement(tag: ElementTag; content: seq[string]): Element 
+proc newElement(tag: ElementTag; content: seq[string]): Element
 </pre>
 
 <h3 id="newFragment">newFragment</h3>
@@ -161,7 +105,7 @@ proc newElement(tag: ElementTag; content: seq[string]): Element
 
 
 <pre class="nim-code">
-func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment 
+func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fragment
 </pre>
 
 <h3 id="newFragmentLen2">newFragmentLen2</h3>
@@ -169,7 +113,7 @@ func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fra
 
 
 <pre class="nim-code">
-func newFragmentLen2(fragmentType: FragmentType; start: Natural; length: Natural): Fragment 
+func newFragmentLen2(fragmentType: FragmentType; start: Natural; length: Natural): Fragment
 </pre>
 
 <h3 id="a__">`$`</h3>
@@ -214,7 +158,7 @@ not part of the string.</li></ul>
 
 
 <pre class="nim-code">
-func parseMarkdown(desc: string): seq[Element] 
+func parseMarkdown(desc: string): seq[Element]
 </pre>
 
 <h3 id="a__-2">`$`</h3>
@@ -238,7 +182,7 @@ func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
 <p>Determine whether the start index points a the start of a multiline string. Return 0 when it doesn&#x27;t. Return the position after the triple quotes, either 4 or 5 depending on the line endings.</p>
 
 <pre class="nim-code">
-func atMultiline(codeText: string; start: Natural): int 
+func atMultiline(codeText: string; start: Natural): int
 </pre>
 
 <h3 id="lineEnd">lineEnd</h3>
@@ -246,7 +190,7 @@ func atMultiline(codeText: string; start: Natural): int
 <p>Find the end of the line. It returns either one after the first newline or after the end of the string.</p>
 
 <pre class="nim-code">
-func lineEnd(str: string; start: Natural): int 
+func lineEnd(str: string; start: Natural): int
 </pre>
 
 <h3 id="highlightCode">highlightCode</h3>
@@ -254,7 +198,7 @@ func lineEnd(str: string; start: Natural): int
 <p>Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in &quot;other&quot; fragments. HighlightCode doesn&#x27;t validate the code but it works for valid code.</p>
 
 <pre class="nim-code">
-func highlightCode(codeText: string): seq[Fragment] 
+func highlightCode(codeText: string): seq[Fragment]
 </pre>
 
 

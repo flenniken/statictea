@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>replacement.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>replacement.nim</h1>
@@ -141,7 +85,7 @@ ReplaceLine = object
 <p>Return a new ReplaceLine object.</p>
 
 <pre class="nim-code">
-func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine 
+func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
 </pre>
 
 <h3 id="a__">`$`</h3>
@@ -149,7 +93,7 @@ func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
 <p>Return a string representation of a ReplaceLine object.</p>
 
 <pre class="nim-code">
-func `$`(replaceLine: ReplaceLine): string 
+func `$`(replaceLine: ReplaceLine): string
 </pre>
 
 <h3 id="stringSegment">stringSegment</h3>
@@ -183,7 +127,7 @@ proc lineToSegments(line: string): seq[string] {.raises: [ValueError], tags: [].
 <p>Given a variable segment, return its dot name.</p>
 
 <pre class="nim-code">
-func varSegmentDotName(segment: string): string 
+func varSegmentDotName(segment: string): string
 </pre>
 
 <h3 id="writeTempSegments">writeTempSegments</h3>

@@ -73,20 +73,6 @@ pre {
 <pre>
 <span class="t-doc">## Tea code file for use by templates nimModule.md and nimModule.html.
 </span>
-<span class="t-comment"># Define replacement patterns to remove formatting from the descriptions.
-</span><span class="t-dotName">patterns</span> = <span class="t-funcCall">list</span>( +
-  <span class="t-str">&quot;~~~~&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>, +
-  <span class="t-str">&quot;@@&quot;</span>, <span class="t-str">&quot;&quot;</span>, +
-  <span class="t-str">&quot;@{&quot;</span>, <span class="t-str">&quot;[&quot;</span>, +
-  <span class="t-str">&quot;}@&quot;</span>, <span class="t-str">&quot;]&quot;</span>, +
-  <span class="t-str">&quot;@!&quot;</span>, <span class="t-str">&quot;|&quot;</span>, +
-  <span class="t-str">&quot;[ ]*@:&quot;</span>, <span class="t-str">&quot;\n&quot;</span>, +
-  <span class="t-str">&quot;@\\.&quot;</span>, <span class="t-str">&quot;*&quot;</span>, +
-  <span class="t-str">&quot;&amp;quot;&quot;</span>, <span class="t-str">&quot;\&quot;&quot;</span>, +
-  <span class="t-str">&quot;&amp;gt;&quot;</span>, <span class="t-str">&quot;&gt;&quot;</span>, +
-  <span class="t-str">&quot;&amp;lt;&quot;</span>, <span class="t-str">&quot;&lt;&quot;</span>, +
-  <span class="t-str">&quot;&amp;amp;&quot;</span>, <span class="t-str">&quot;&amp;&quot;</span>)
-
 <span class="t-dotName">u.handle-html-bullet</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">bullet</span>: <span class="t-type">string</span>, <span class="t-param">lines</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Make the bullet text into an html bullet and add it to lines.
 </span>  <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;li&gt;&quot;</span>, <span class="t-funcCall">html</span>(<span class="t-dotName">bullet</span>, <span class="t-str">&quot;body&quot;</span>), <span class="t-str">&quot;&lt;/li&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>)
@@ -97,15 +83,16 @@ pre {
 </span>  <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;p&gt;&quot;</span>, <span class="t-funcCall">html</span>(<span class="t-dotName">item</span>[<span class="t-num">0</span>], <span class="t-str">&quot;body&quot;</span>), <span class="t-str">&quot;&lt;/p&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>))
 
 <span class="t-dotName">u.handle-html-fragment</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">fragment</span>: <span class="t-type">list</span>, <span class="t-param">frags</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
-  <span class="t-doc">## Make the html highlight the fragment and add it to frags.
+  <span class="t-doc">## Highlight the fragment for html and add it to the frags list.
 </span>  <span class="t-dotName">tag</span> = <span class="t-dotName">fragment</span>[<span class="t-num">0</span>]
   <span class="t-dotName">str</span> = <span class="t-funcCall">html</span>(<span class="t-dotName">fragment</span>[<span class="t-num">1</span>], <span class="t-str">&quot;body&quot;</span>)
-  <span class="t-dotName">frags</span> &amp;= <span class="t-funcCall">if</span>((<span class="t-dotName">tag</span> == <span class="t-str">&quot;other&quot;</span>), <span class="t-dotName">str</span>, +
+  <span class="t-comment"># Wrap each fragment with a span element except the &quot;other&quot; element.
+</span>  <span class="t-dotName">frags</span> &amp;= <span class="t-funcCall">if</span>((<span class="t-dotName">tag</span> == <span class="t-str">&quot;other&quot;</span>), <span class="t-dotName">str</span>, +
     <span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;span class=\&quot;t-{tag}\&quot;&gt;{str}&lt;/span&gt;&quot;</span>))
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-dotName">u.html-code</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
-  <span class="t-doc">## Return html given a &quot;code&quot; md element list.
+  <span class="t-doc">## Format the &quot;code&quot; md element list as html.
 </span>  <span class="t-dotName">lines</span> = []
   <span class="t-dotName">class</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">item</span>[<span class="t-num">0</span>] == <span class="t-str">&quot;~~~statictea\n&quot;</span>), <span class="t-str">&quot;tea-code&quot;</span>, <span class="t-str">&quot;plain-code&quot;</span>)
   <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;pre class=\&quot;{class}\&quot;&gt;\n&quot;</span>)
@@ -114,7 +101,7 @@ pre {
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
 
 <span class="t-dotName">u.html-bullets</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
-  <span class="t-doc">## Return html given a &quot;bullets&quot; md element list.
+  <span class="t-doc">## Format the &quot;bullets&quot; md element list as html.
 </span>  <span class="t-dotName">lines</span> = []
   <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;ul&gt;\n&quot;</span>
   <span class="t-funcCall">listLoop</span>(<span class="t-dotName">item</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-bullet</span>)
@@ -122,7 +109,7 @@ pre {
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
 
 <span class="t-dotName">u.handle-html-element</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">element</span>: <span class="t-type">list</span>, <span class="t-param">lines</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
-  <span class="t-doc">## Make the description md element into html and add it to lines.
+  <span class="t-doc">## Format the md element as html and add it to lines.
 </span>  <span class="t-dotName">l.fn</span> = <span class="t-funcCall">case</span>(<span class="t-dotName">element</span>[<span class="t-num">0</span>], [ +
     <span class="t-str">&quot;p&quot;</span>, <span class="t-dotName">u.html-paragraph</span>, +
     <span class="t-str">&quot;code&quot;</span>, <span class="t-dotName">u.html-code</span>, +
@@ -144,30 +131,30 @@ pre {
 </span>  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">entry.name</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
-<span class="t-comment"># Determine the template type from the template&#x27;s extension.
-</span><span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">t.args.resultFilename</span>)
-<span class="t-dotName">templateType</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">path.ext</span> == <span class="t-str">&quot;.md&quot;</span>), <span class="t-str">&quot;github&quot;</span>, <span class="t-str">&quot;html&quot;</span>)
-
-<span class="t-comment"># Create the anchors for all the heading names.
-</span><span class="t-dotName">names</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">names</span>, <span class="t-dotName">u.get-name</span>)
-<span class="t-dotName">anchors</span> = <span class="t-funcCall">anchors</span>(<span class="t-dotName">names</span>, <span class="t-dotName">templateType</span>)
-
-<span class="t-comment"># Use the filename&#x27;s basename for the module name.
-</span><span class="t-dotName">orig-path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">s.orig</span>)
-<span class="t-dotName">o.moduleName</span> = <span class="t-dotName">orig-path.filename</span>
-
-<span class="t-comment"># Remove the special patterns from the description resulting in
-</span><span class="t-comment"># markdown.
-</span><span class="t-dotName">mdDescription</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">s.moduleDescription</span>, <span class="t-dotName">patterns</span>)
-
-<span class="t-comment"># For the html template convert the markdown to html. For the md
-</span><span class="t-comment"># template replace the statictea code blocks with javascript so the
-</span><span class="t-comment"># code is highlighted by github.
+<span class="t-dotName">u.fixup-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">rawDescripton</span>: <span class="t-type">string</span>, <span class="t-param">templateType</span>: <span class="t-type">string</span>, <span class="t-param">patterns</span>: <span class="t-type">list</span>) <span class="t-type">dict</span>
+  <span class="t-doc">## Fix up the description for html or markdown. Remove the special
+</span>  <span class="t-doc">## patterns from the description resulting in markdown.  For the
+</span>  <span class="t-doc">## html template convert the markdown to html. For the md template
+</span>  <span class="t-doc">## replace the statictea code blocks with javascript so the code is
+</span>  <span class="t-doc">## highlighted by github.
 </span>
-<span class="t-dotName">o.moduleDescription</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">templateType</span> == <span class="t-str">&quot;html&quot;</span>), +
-  <span class="t-funcCall">u.get-html-description</span>(<span class="t-dotName">mdDescription</span>), +
-  <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDescription</span>, [<span class="t-str">&quot;~~~statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
+  <span class="t-comment"># Remove the special markup resulting in markdown text.
+</span>  <span class="t-dotName">mdDescription</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">rawDescripton</span>, <span class="t-dotName">patterns</span>)
+
+  <span class="t-comment"># Use the first sentence for the short description.
+</span>  <span class="t-dotName">short</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">mdDescription</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">mdDescription</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
+
+  <span class="t-comment"># Convert the markdown description to html for the html
+</span>  <span class="t-comment"># template. For md switch statictea code blocks to javascript.
+</span>  <span class="t-dotName">description</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">templateType</span> == <span class="t-str">&quot;html&quot;</span>), +
+    <span class="t-funcCall">u.get-html-description</span>(<span class="t-dotName">mdDescription</span>), +
+    <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDescription</span>, [<span class="t-str">&quot;~~~statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
+
+  <span class="t-comment"># Return both the full discription and the short form.
+</span>  <span class="t-dotName">ret</span> = <span class="t-funcCall">dict</span>()
+  <span class="t-dotName">ret.description</span> = <span class="t-dotName">description</span>
+  <span class="t-dotName">ret.short</span> = <span class="t-dotName">short</span>
+  <span class="t-funcCall">return</span>(<span class="t-dotName">ret</span>)
 
 <span class="t-dotName">u.get-entry</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>, <span class="t-param">state</span>: <span class="t-type">dict</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Reformat the entry and add it to the new list.
@@ -181,27 +168,54 @@ pre {
     <span class="t-str">&quot;skMacro&quot;</span>, <span class="t-str">&quot;macro: &quot;</span>)
   <span class="t-dotName">newEntry.type</span> = <span class="t-funcCall">case</span>(<span class="t-dotName">entry.type</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;&quot;</span>)
 
-  <span class="t-comment"># Remove the formatting from the description and use the first
-</span>  <span class="t-comment"># sentence for the short description.
-</span>  <span class="t-dotName">descr</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
-  <span class="t-dotName">mdDescription</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">descr</span>, <span class="t-dotName">state.patterns</span>)
-  <span class="t-dotName">newEntry.short</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">mdDescription</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">mdDescription</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
+  <span class="t-comment"># Remove the special formatting from the description and encode it
+</span>  <span class="t-comment"># for html or markdown.
+</span>  <span class="t-dotName">rawDescription</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
+  <span class="t-dotName">ret</span> = <span class="t-funcCall">u.fixup-description</span>(<span class="t-dotName">rawDescription</span>, <span class="t-dotName">state.templateType</span>, <span class="t-dotName">state.patterns</span>)
+  <span class="t-dotName">newEntry.description</span> = <span class="t-dotName">ret.description</span>
+  <span class="t-dotName">newEntry.short</span> = <span class="t-dotName">ret.short</span>
 
-  <span class="t-comment"># Convert the markdown description to html for the html
-</span>  <span class="t-comment"># template. For md switch statictea to javascript.
-</span>
-  <span class="t-dotName">newEntry.description</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">state.templateType</span> == <span class="t-str">&quot;html&quot;</span>), +
-    <span class="t-funcCall">u.get-html-description</span>(<span class="t-dotName">mdDescription</span>), +
-    <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDescription</span>, [<span class="t-str">&quot;~~~statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
+  <span class="t-comment"># Simplify the nim signatures by removing empty raises list and
+</span>  <span class="t-comment"># empty tags list. Leave the lists that contain something.
+</span>  <span class="t-dotName">junk</span> = <span class="t-str">&quot;\\s*{\\.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[]\\.}&quot;</span>
+  <span class="t-dotName">newEntry.signature</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">entry.code</span>, <span class="t-funcCall">list</span>(<span class="t-dotName">junk</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;\n*\\s*$&quot;</span>, <span class="t-str">&quot;&quot;</span>))
 
-  <span class="t-comment"># Simplify the code by removing some text.
-</span>  <span class="t-dotName">junk</span> = <span class="t-str">&quot;{.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[].}&quot;</span>
-  <span class="t-dotName">code</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">entry.code</span>, <span class="t-funcCall">list</span>(<span class="t-dotName">junk</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;\n*\\s*$&quot;</span>, <span class="t-str">&quot;&quot;</span>))
-
-  <span class="t-dotName">newEntry.signature</span> = <span class="t-dotName">code</span>
   <span class="t-dotName">newEntry.anchor</span> = <span class="t-dotName">state.anchors</span>[<span class="t-dotName">ix</span>]
   <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">newEntry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-comment"># Define replacement patterns to remove special formatting from the
+</span><span class="t-comment"># descriptions.
+</span><span class="t-dotName">patterns</span> = [ +
+  <span class="t-str">&quot;~~~~&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>, +
+  <span class="t-str">&quot;@@&quot;</span>, <span class="t-str">&quot;&quot;</span>, +
+  <span class="t-str">&quot;@{&quot;</span>, <span class="t-str">&quot;[&quot;</span>, +
+  <span class="t-str">&quot;}@&quot;</span>, <span class="t-str">&quot;]&quot;</span>, +
+  <span class="t-str">&quot;@!&quot;</span>, <span class="t-str">&quot;|&quot;</span>, +
+  <span class="t-str">&quot;[ ]*@:&quot;</span>, <span class="t-str">&quot;\n&quot;</span>, +
+  <span class="t-str">&quot;@\\.&quot;</span>, <span class="t-str">&quot;*&quot;</span>, +
+  <span class="t-str">&quot;&amp;quot;&quot;</span>, <span class="t-str">&quot;\&quot;&quot;</span>, +
+  <span class="t-str">&quot;&amp;gt;&quot;</span>, <span class="t-str">&quot;&gt;&quot;</span>, +
+  <span class="t-str">&quot;&amp;lt;&quot;</span>, <span class="t-str">&quot;&lt;&quot;</span>, +
+  <span class="t-str">&quot;&amp;amp;&quot;</span>, <span class="t-str">&quot;&amp;&quot;</span> +
+]
+
+<span class="t-comment"># Determine the template type from the template&#x27;s extension.
+</span><span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">t.args.resultFilename</span>)
+<span class="t-dotName">templateType</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">path.ext</span> == <span class="t-str">&quot;.md&quot;</span>), <span class="t-str">&quot;github&quot;</span>, <span class="t-str">&quot;html&quot;</span>)
+
+<span class="t-comment"># Create the link anchors for all the heading names.
+</span><span class="t-dotName">names</span> = []
+<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">names</span>, <span class="t-dotName">u.get-name</span>)
+<span class="t-dotName">anchors</span> = <span class="t-funcCall">anchors</span>(<span class="t-dotName">names</span>, <span class="t-dotName">templateType</span>)
+
+<span class="t-comment"># Use the filename without path info for the module name.
+</span><span class="t-dotName">origPath</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">s.orig</span>)
+<span class="t-dotName">o.moduleName</span> = <span class="t-dotName">origPath.filename</span>
+
+<span class="t-comment"># Format the description for html or markdown.
+</span><span class="t-dotName">ret</span> = <span class="t-funcCall">u.fixup-description</span>(<span class="t-dotName">s.moduleDescription</span>, <span class="t-dotName">templateType</span>, <span class="t-dotName">patterns</span>)
+<span class="t-dotName">o.moduleDescription</span> = <span class="t-dotName">ret.description</span>
 
 <span class="t-comment"># Reformat the server entries list and store it in o.entries.
 </span><span class="t-dotName">state</span> = <span class="t-funcCall">dict</span>()

@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>cmdline.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>cmdline.nim</h1>
@@ -203,7 +147,7 @@ CmlOption = object
 <p>Create a new CmlOption object. For no short option use a dash.</p>
 
 <pre class="nim-code">
-func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption 
+func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
 </pre>
 
 <h3 id="newArgsOrMessage">newArgsOrMessage</h3>
@@ -211,7 +155,7 @@ func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOpti
 <p>Create a new ArgsOrMessage object containing arguments.</p>
 
 <pre class="nim-code">
-func newArgsOrMessage(args: CmlArgs): ArgsOrMessage 
+func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
 </pre>
 
 <h3 id="newArgsOrMessage-1">newArgsOrMessage</h3>
@@ -219,7 +163,7 @@ func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
 <p>Create a new ArgsOrMessage object containing a message id and optionally the problem argument.</p>
 
 <pre class="nim-code">
-func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage 
+func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
 </pre>
 
 <h3 id="a__">`$`</h3>

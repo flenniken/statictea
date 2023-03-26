@@ -3,63 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>parseNumber.nim</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-.t-type {
-    color: #D7381E;
-}
-
-pre {
-    padding: 16px;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.plain-code {
-    background-color: #f6f8fa;
-}
-
-.tea-code {
-    border-left: 6px solid green;
-}
-
-.nim-code {
-    border: 1px solid #D7381E;
-    background-color: #f6f8fa;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
 <h1>parseNumber.nim</h1>
@@ -81,7 +25,7 @@ Nim source code: <a href="../../src/parseNumber.nim">parseNumber.nim</a>
 
 <pre class="nim-code">
 proc parseFloat(str: string; start: Natural = 0): Option[
-    tuple[number: float64, pos: Natural]] 
+    tuple[number: float64, pos: Natural]]
 </pre>
 
 <h3 id="parseInteger">parseInteger</h3>
@@ -94,7 +38,7 @@ skipped.</p>
 
 <pre class="nim-code">
 proc parseInteger(s: string; start: Natural = 0): Option[
-    tuple[number: int64, pos: Natural]] 
+    tuple[number: int64, pos: Natural]]
 </pre>
 
 
