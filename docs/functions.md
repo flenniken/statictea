@@ -137,7 +137,7 @@ PathComponents = object
 Create a new StringOr object containing a warning.
 
 ```nim
-func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr 
+func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 ```
 
 # newStringOr
@@ -145,7 +145,7 @@ func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 Create a new StringOr object containing a warning.
 
 ```nim
-func newStringOr(warningData: WarningData): StringOr 
+func newStringOr(warningData: WarningData): StringOr
 ```
 
 # newStringOr
@@ -153,7 +153,7 @@ func newStringOr(warningData: WarningData): StringOr
 Create a new StringOr object containing a string.
 
 ```nim
-func newStringOr(str: string): StringOr 
+func newStringOr(str: string): StringOr
 ```
 
 # newPathComponents
@@ -161,7 +161,7 @@ func newStringOr(str: string): StringOr
 Create a new PathComponents object from its pieces.
 
 ```nim
-func newPathComponents(dir, filename, basename, ext: string): PathComponents 
+func newPathComponents(dir, filename, basename, ext: string): PathComponents
 ```
 
 # signatureDetails
@@ -169,7 +169,7 @@ func newPathComponents(dir, filename, basename, ext: string): PathComponents
 Convert the signature object to a dictionary value.
 
 ```nim
-func signatureDetails(signature: Signature): Value 
+func signatureDetails(signature: Signature): Value
 ```
 
 # functionDetails
@@ -177,7 +177,7 @@ func signatureDetails(signature: Signature): Value
 Convert the function spec to a dictionary value.
 
 ```nim
-func functionDetails(fs: FunctionSpec): Value 
+func functionDetails(fs: FunctionSpec): Value
 ```
 
 # cmpBaseValues
@@ -185,7 +185,7 @@ func functionDetails(fs: FunctionSpec): Value
 Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
 
 ```nim
-func cmpBaseValues(a, b: Value; insensitive: bool = false): int 
+func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 ```
 
 # parseNumber
@@ -193,7 +193,7 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
 
 ```nim
-func parseNumber(line: string; start: Natural): ValuePosSiOr 
+func parseNumber(line: string; start: Natural): ValuePosSiOr
 ```
 
 # formatString
@@ -490,7 +490,7 @@ if0(c, warn("got zero value"))
 ~~~
 
 ```nim
-func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_if_baoaa
@@ -526,7 +526,7 @@ if(c, return("skip"))
 ~~~
 
 ```nim
-func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_add_iii
@@ -709,7 +709,7 @@ func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
 Parse a StaticTea version number and return its three components.
 
 ```nim
-func parseVersion(version: string): Option[(int, int, int)] 
+func parseVersion(version: string): Option[(int, int, int)]
 ```
 
 # fun_cmpVersion_ssi
@@ -905,7 +905,7 @@ func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
 Convert the value to a boolean.
 
 ```nim
-func if0Condition(cond: Value): bool 
+func if0Condition(cond: Value): bool
 ```
 
 # fun_bool_ab
@@ -1071,7 +1071,7 @@ a = ["a", 5, "b"]
 ~~~
 
 ```nim
-func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_listLoop_lapoab
@@ -1118,7 +1118,7 @@ b5 = func(ix: int, value: int, container: list) bool
 ~~~
 
 ```nim
-func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_replace_siiss
@@ -1218,7 +1218,7 @@ func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult {
 Parse the given file path into its component pieces.
 
 ```nim
-func parsePath(path: string; separator = '/'): PathComponents 
+func parsePath(path: string; separator = '/'): PathComponents
 ```
 
 # fun_path_sosd
@@ -1648,7 +1648,7 @@ output:
 ~~~
 
 ```nim
-func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_string_aoss
@@ -1808,7 +1808,7 @@ mycmp = func(numStr1: string, numStr2: string) int
 ~~~
 
 ```nim
-func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_functionDetails_pd
@@ -1912,7 +1912,7 @@ and(false, warn("not hit")) => false
 ~~~
 
 ```nim
-func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_or_bbb
@@ -1935,7 +1935,7 @@ or(true, warn("not hit")) => true
 ~~~
 
 ```nim
-func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult 
+func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ```
 
 # fun_eq_iib
@@ -2325,7 +2325,7 @@ func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
 Excape text for placing in body html.
 
 ```nim
-proc escapeHtmlBody(text: string): string 
+proc escapeHtmlBody(text: string): string
 ```
 
 # escapeHtmlAttribute
@@ -2333,7 +2333,7 @@ proc escapeHtmlBody(text: string): string
 Excape text for placing in an html attribute.
 
 ```nim
-proc escapeHtmlAttribute(text: string): string 
+proc escapeHtmlAttribute(text: string): string
 ```
 
 # fun_html_sss
@@ -2390,7 +2390,7 @@ BuiltInInfo = object
 Return a BuiltInInfo object.
 
 ```nim
-func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo 
+func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
 ```
 
 # getBestFunction
@@ -2398,7 +2398,7 @@ func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): Bu
 Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
 
 ```nim
-proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr 
+proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 ```
 
 # splitFuncName
@@ -2406,7 +2406,7 @@ proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 
 ```nim
-func splitFuncName(funcName: string): (string, string) 
+func splitFuncName(funcName: string): (string, string)
 ```
 
 # makeFuncDictionary
