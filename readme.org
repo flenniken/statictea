@@ -174,7 +174,7 @@ template:
 
 shared code file:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 o.header = """
 <!doctype html>
 <html lang="en">
@@ -246,7 +246,7 @@ server json:
 
 shared code file:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 o.header = """
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">
@@ -398,7 +398,7 @@ boolean expression or a function.
 
 Here are a few example statements:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 tea = "Earl Grey"
 num = 5
 t.repeat = len(tealist)
@@ -414,7 +414,7 @@ replace commands.
 Most operations are done with functions. For example, to add 1 to
 t.row you use the add function.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 num = add(t.row, 1)
 #+END_SRC
 
@@ -666,7 +666,7 @@ function call is a variable followed by a left parentheses.
 
 Equivalent statements:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 rt = cmp(a, b)
 rt = f.cmp(a, b)
 #+END_SRC
@@ -734,7 +734,7 @@ are not reset like local variables.
 
 Shared code cannot see or set g variables.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 g.title = “Teas of the World”
 g.names &= entry.name
 #+END_SRC
@@ -757,7 +757,7 @@ dictionary used for its local variables and parameters.
 
 Examples:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 a = 5
 pot = "black"
 l.tea = "earl grey"
@@ -816,7 +816,7 @@ function.
 
 Only user function variables are allowed in the u dictionary. 
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 u.myCmp = func(…) int
 …
 a = u.myCmp(“3”, “4”)
@@ -935,7 +935,7 @@ and a warning is output. This catches the case where you forget
 the endblock command. You can increase or decrease the value.
 
 #+BEGIN_SRC
-<!--$ block t.maxLines=200 -->
+<!--$ block t.maxLines = 200 -->
 #+END_SRC
 
 [[#contents][茶]]
@@ -1334,7 +1334,7 @@ d2 = dict("one", 1, "two", 2))
 
 You can append to a dict using dot name notation:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 d = dict()
 d.a = 5
 d.tea = "Eary Grey"
@@ -1344,7 +1344,7 @@ You can append to a dict using bracket notation on the left hand
 side of the equal sign and this way allows you to use a variable
 for the key:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 d = dict()
 d["a"] = 5
 var = "tea"
@@ -1354,7 +1354,7 @@ d[var] = "Eary Grey"
 You append to the l dict when you create a new variable without a
 prefix.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 a = 5
 tea = "Eary Grey"
 #+END_SRC
@@ -1366,7 +1366,7 @@ cannot access it using dot notation.
 The get function has an optional default parameter that's used
 when the key doesn't exist (the z case below).
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 d = dict("x", 100, "y", 200)
 x = get(d, "x") # => 100
 y = get(d, "y") # => 200
@@ -1401,7 +1401,7 @@ A list contains a sequence of values of any type.
 
 You can create a list with the list function or with brackets:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 a = list()
 a = list(1)
 a = list(1, 2, 3)
@@ -1437,7 +1437,7 @@ $$ endblock
 
 You can access list elements with the get function or bracket notation:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 list = list(1, 3.3, "a")
 get(list, 0) => 1
 get(list, 1) => 3.3
@@ -1461,7 +1461,7 @@ A bool is a true or false value.
 You can create a bool value using true or false or with the bool
 function.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 a = true
 b = false
 c = bool(0) # false
@@ -1472,7 +1472,7 @@ True and false are variables in the local dictionary.  It's not
 recommended, but you can define variables called true and false
 in other dictionaries.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 s.true = "server true"
 #+END_SRC
 
@@ -1495,7 +1495,7 @@ name. Each dictionary value is a list of func values with the
 same name. There are three cmp functions so the f dictionary
 value for it is a list of three function variables:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 cmp => ["cmp","cmp","cmp"]
 #+END_SRC
 
@@ -1505,7 +1505,7 @@ signature is called. All the built-in functions are lists
 containing one or more items. Below is an example calling a
 function given a list:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 value = f.cmp(1,2)
 #+END_SRC
 
@@ -1513,14 +1513,14 @@ You can call a func variable directly. In the following example
 the “a” func variable is defined to be equal to the second
 built-in cmp function.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 l.a = f.cmp[1]
 #+END_SRC
 
 You call it with parentheses:
 
-#+BEGIN_SRC
-b = l.a(4, 7) => -1
+#+BEGIN_SRC nim
+b = l.a(4, 7) #=> -1
 #+END_SRC
 
 You can have multiple functions with the same name as long as
@@ -1573,9 +1573,8 @@ a true or false value.
 In the following example the (3 == 4) is an expression and the e
 variable is assigned false because 3 does not equal 4.
 
-#+BEGIN_SRC
-e = (3 == 4)
-  => false
+#+BEGIN_SRC nim
+e = (3 == 4) #=> false
 #+END_SRC
 
 You can write boolean expressions with the following operators:
@@ -1592,9 +1591,8 @@ You can write boolean expressions with the following operators:
 You typically use a boolean expression with an if statement. In
 the next example v is set to “s” because 3 is less than 5.
 
-#+BEGIN_SRC
-v = if((3 < 5), “s”, “l”)
-  => “s”
+#+BEGIN_SRC nim
+v = if((3 < 5), “s”, “l”) #=> “s”
 #+END_SRC
 
 Note: a conditional is wrapped in parentheses and there is no
@@ -1645,7 +1643,7 @@ numbers and strings.
 pass a logical expression to it to invert it.  Here are a couple
 of examples:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 x = not( (a < b and c > d) )
 y = (a < b and not((c > d)))
 #+END_SRC
@@ -1664,17 +1662,17 @@ There is an equivalent function for each boolean operator:
 
 The following  code fragments are equivalent:
 
-#+BEGIN_SRC
-(a < b) => lt(a, b)
+#+BEGIN_SRC nim
+(a < b) #=> lt(a, b)
 
-(a < b and c > d) =>
-  and(lt(a, b), gt(c,d))
+(a < b and c > d) #=>
+  # and(lt(a, b), gt(c,d))
 
-(a or b or c) =>
-  or(or(a, b), c)
+(a or b or c) #=>
+  # or(or(a, b), c)
 
-(a and (b or c)) =>
-  and(a, or(b, c))
+(a and (b or c)) #=>
+  # and(a, or(b, c))
 #+END_SRC
 
 Note: If you need case insensitive string compare, use the cmp
@@ -1695,7 +1693,7 @@ controls the code files.
 Here is an example of a code file that defines two variables, pi
 and footer.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 o.pi = 3.14159
 o.footer = "</html>"
 #+END_SRC
@@ -1709,7 +1707,7 @@ Below is an example of defining a multiline string header in a
 code file for sharing with templates. The code populates the o
 dictionary that is available to the template commands.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 o.header = “””
 <!doctype html>
 <html lang="en">
@@ -1736,7 +1734,7 @@ You can use the local variables for intermediate values but they
 disappear when the code file finishes running.  For example the
 "a" variable is local:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 a = 5
 o.x = a + 6
 #+END_SRC
@@ -1765,7 +1763,7 @@ Multiline strings are triple quoted UTF-8 encode strings. In the
 following example the header variable is assigned a two line
 string containing quotes and newlines.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 o.header = """
 <!doctype html>
 <html lang="en">
@@ -1778,7 +1776,7 @@ follows the quotes except the lf or crlf.
 The next couple of examples compare multiline strings with normal
 strings.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 str = """
 All the tea in China.
 """
@@ -1786,20 +1784,20 @@ All the tea in China.
 
 is equivalent to:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 str = "All the tea in China.\n"
 #+END_SRC
 
 The multiline string:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 str = """
 All the tea in China."""
 #+END_SRC
 
 is equivalent to:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 str = "All the tea in China."
 #+END_SRC
 
@@ -1808,7 +1806,7 @@ quoting of the newline and other special characters.  For example
 you can copy and paste HTML directly into the code file then mark
 variables in it:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 o.header = """
 <!DOCTYPE html>
 <html lang="{s.languageCode}"
@@ -1832,7 +1830,7 @@ A multiline string literal cannot be an argument to a
 function. The workaround is to assign it to a local variable and
 pass that to the function.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 str = """
 Teas of China
 """
@@ -1848,16 +1846,16 @@ count = len(str)
 
 You can define your own functions in code files.
 
-User defined functions are important for sharing common code,
-looping (listLoop) and as callbacks for building lists and
-dictionaries.
+User defined functions are important for sharing common code, as
+conditional code blocks, looping (listLoop) and as callbacks for
+building lists and dictionaries.
 
 In the following example we define a function called mycmp and
 assign the result to the mycmp function variable. The function
 takes two string parameters called numStr1 and numStr2 and it
 returns an integer.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 u.mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings
   ## and return 1, 0, or -1.
@@ -1870,13 +1868,13 @@ The first line names the function and defines its signature and
 assigns it to a variable. The function variable is stored in the
 u dictionary so it is visible inside other functions.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 u.mycmp = func(numStr1: string, numStr2: string) int
 #+END_SRC
 
 The doc comment comes next and tells what the function does:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
   ## Compare two number strings
   ## and return 1, 0, or -1.
 #+END_SRC
@@ -1884,7 +1882,7 @@ The doc comment comes next and tells what the function does:
 The last lines of the definition are the statement lines. A bare
 return statement ends the function definition.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
   num1 = int(numStr1)
   num2 = int(numStr2)
   return(cmp(num1, num2))
@@ -1895,7 +1893,7 @@ aren’t any brackets, and no line terminators.
 
 Here is how you call the example function:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 a = u.mycmp(“1”, "2")
 #+END_SRC
 
@@ -1905,7 +1903,7 @@ A function signature tells the function name, the parameter names
 and types and the return type. For the example above the
 signature string is:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 u.mycmp = func(numStr1: string, numStr2: string) int
 #+END_SRC
 
@@ -1913,7 +1911,7 @@ You can specify an optional last parameter and a parameter can
 use "any" when it accepts any type. The built-in get function
 is an example of optional and any.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 get = func(dictionary: dict, key: string, default: optional any) any
 #+END_SRC
 
@@ -2133,7 +2131,7 @@ return code.
 For example if the server item list should contain one or more
 items, you could output a warning when it's zero:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 if0(s.items, warn("no items"))
 #+END_SRC
 
@@ -2311,7 +2309,7 @@ returns a value and there are no side effects.
 A normal statement has a left side, an operator, and a right hand
 side, for example:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 a = len(“tea”)
 #+END_SRC
 
@@ -2327,13 +2325,14 @@ the normal form:
   value and has a bare form
 - log - writes a message to the log file and has a bare form
 - func - defines a function, see [[#user-functions][User Functions]]
+- listLoop — has a bare form
 
 If the form doesn't have an assignment it's called a bare
 function. The warn, return, if and log have bare forms.
 
 Special Form Examples:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 v = list(1,2,3,4,5,6,7)
 v = if(b, 5, 6)
 if(c, warn(“abc”))
@@ -2360,7 +2359,7 @@ statement without an assignment.
 There are three basic forms, a three parameter form, a two
 parameter form and a bare two parameter form. Here are examples:
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 tea = if(cond, “black”, “green”)
 newList &= if(cond, value)
 if(cond, return(“stop”))
@@ -2388,7 +2387,7 @@ true but not when it’s false. You use it to conditionally append
 to a list or dictionary. You cannot use this form as an argument
 to another function.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim 
 newList &= if(cond, value)
 d.tea = if(cond, value)
 #+END_SRC
@@ -2398,7 +2397,7 @@ d.tea = if(cond, value)
 The bare two parameter form doesn’t have an assignment. You use
 it with the warn and return functions for their side effects.
 
-#+BEGIN_SRC
+#+BEGIN_SRC nim
 if(c, return(“stop”))
 if(c, warn("buy more tea!"))
 #+END_SRC
@@ -2431,8 +2430,8 @@ can reside in the same github repository. Github renders markdown
 (unlike HTML) without having to create a separate github.io repo.
 
 The index was created with one template and the module docs with
-another. The nimble *docsix* task builds the module index and the
-*docs* task builds one or more modules docs. For more details see
+another. The nimble *docmix* task builds the module index and the
+*docm* task builds one or more modules docs. For more details see
 the [[#html-formatted-json][HTML Formatted Json]] section.
 
 For easier reading of the markdown templates, click the link then
@@ -2448,8 +2447,8 @@ switch to "View Raw".
 A second set of nim source documents exist for HTML. They are
 designed for viewing locally on your machine and for testing. The
 HTML templates share the same tea code files with the markdown
-templates. The nimble *docsix2* task builds the module index and
-the *docs2* task builds one or more HTML modules docs.
+templates. The nimble *dochix* task builds the module index and
+the *docsh* task builds one or more HTML modules docs.
 
 - Open docs/html/index.html in your browser.
 - [[templates/nimModuleIndex2.html][nimModuleIndex2.html]] HTML template

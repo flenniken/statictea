@@ -580,7 +580,7 @@ str => "use two { to get one"
 Define a function.
 
 ~~~javascript
-func = func(signature: string) func
+func = func(name: type, ...) retType
 ~~~
 
 Example:
@@ -616,7 +616,7 @@ fd = functionDetails(mycmp)
 fd =>
 fd.builtIn = false
 fd.signature.optional = false
-fd.signature.name = "strNumCmp"
+fd.signature.name = "mycmp"
 fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
@@ -1290,7 +1290,7 @@ bullets and code blocks. This subset is used to document all
 StaticTea functions. Return a list of lists.
 
 ~~~javascript
-markdownList = func(mdText: string) list
+markdownLite = func(mdText: string) list
 ~~~
 
 list elements:

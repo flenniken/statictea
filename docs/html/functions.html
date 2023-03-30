@@ -1873,7 +1873,7 @@ func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 <p>Define a function.
 
 </p><pre class="tea-code">
-<span class="t-dotName">func</span> = <span class="t-funcCall">func</span>(<span class="t-param">signature</span>: <span class="t-type">string</span>) <span class="t-type">func</span>
+<span class="t-dotName">func</span> = <span class="t-funcCall">func</span>(<span class="t-param">name</span>: <span class="t-type">type</span>, ...) <span class="t-type">ret</span>T<span class="t-dotName">ype</span>
 </pre>
 <p>
 Example:
@@ -1913,7 +1913,7 @@ function details.
 <span class="t-dotName">fd</span> =&gt;
 <span class="t-dotName">fd.builtIn</span> = <span class="t-dotName">false</span>
 <span class="t-dotName">fd.signature.optional</span> = <span class="t-dotName">false</span>
-<span class="t-dotName">fd.signature.name</span> = <span class="t-str">&quot;strNumCmp&quot;</span>
+<span class="t-dotName">fd.signature.name</span> = <span class="t-str">&quot;mycmp&quot;</span>
 <span class="t-dotName">fd.signature.paramNames</span> = [<span class="t-str">&quot;numStr1&quot;</span>,<span class="t-str">&quot;numStr2&quot;</span>]
 <span class="t-dotName">fd.signature.paramTypes</span> = [<span class="t-str">&quot;string&quot;</span>,<span class="t-str">&quot;string&quot;</span>]
 <span class="t-dotName">fd.signature.returnType</span> = <span class="t-str">&quot;int&quot;</span>
@@ -2352,7 +2352,7 @@ bullets and code blocks. This subset is used to document all
 StaticTea functions. Return a list of lists.
 
 </p><pre class="tea-code">
-<span class="t-dotName">markdownList</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdText</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
+<span class="t-dotName">markdownLite</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdText</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
 </pre>
 <p>
 list elements:

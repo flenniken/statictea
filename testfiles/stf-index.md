@@ -43,6 +43,7 @@ filename.
 * [logging-hello-world](../testfiles/logging-hello-world.stf.md) &mdash; Test logging with Hello World.
 * [logging-replacement-block](../testfiles/logging-replacement-block.stf.md) &mdash; Test logging the replacement block.
 * [lreturncode](../testfiles/lreturncode.stf.md) &mdash; Test the return code for -l -h is 0.
+* [markdownlite](../testfiles/markdownlite.stf.md) &mdash; Example using markdownLite.
 * [maxlines](../testfiles/maxlines.stf.md) &mdash; Test t maxLines tea variable.
 * [maxrepeat](../testfiles/maxrepeat.stf.md) &mdash; Test the t maxRepeat tea variable.
 * [missingvar](../testfiles/missingvar.stf.md) &mdash; Test with a missing replacement variable.

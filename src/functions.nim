@@ -2293,7 +2293,7 @@ func fun_func_sp*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Define a function.
   ## @:
   ## @:~~~statictea
-  ## @:func = func(signature: string) func
+  ## @:func = func(name: type, ...) retType
   ## @:~~~~
   ## @:
   ## @:Example:
@@ -2330,7 +2330,7 @@ func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRe
   ## @:fd =>
   ## @:fd.builtIn = false
   ## @:fd.signature.optional = false
-  ## @:fd.signature.name = "strNumCmp"
+  ## @:fd.signature.name = "mycmp"
   ## @:fd.signature.paramNames = ["numStr1","numStr2"]
   ## @:fd.signature.paramTypes = ["string","string"]
   ## @:fd.signature.returnType = "int"
@@ -2730,7 +2730,7 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
   ## @:StaticTea functions. Return a list of lists.
   ## @:
   ## @:~~~statictea
-  ## @:markdownList = func(mdText: string) list
+  ## @:markdownLite = func(mdText: string) list
   ## @:~~~~
   ## @:
   ## @:list elements:
