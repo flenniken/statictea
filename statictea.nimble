@@ -617,8 +617,8 @@ proc taskTestfilesReadme() =
   ## test files.
 
   # echo "Create a json file with the name of all the stf tests and their descriptions."
-  var jsonFilename = "testfiles.index.json"
-  var json = testfilesIndexJson()
+  let jsonFilename = "testfiles.index.json"
+  let json = testfilesIndexJson()
   writeFile(jsonFilename, json)
 
   # Create the stf index file in the testfiles folder.
@@ -909,12 +909,13 @@ proc runUnitTests(name = "") =
       echo cmd
       exec cmd
 
-proc makeJsonDoc(filename: string) =
-  # Create the json doc file for the given nim source file.
-  var jsonName = joinPath("docs", changeFileExt(filename, "json"))
-  var cmd = fmt"nim --hints:off jsondoc --out:{jsonName} src/{filename}"
+proc makeJsonDoc(filename: string): string =
+  # Create the json doc file for the given nim source file. Return the
+  # name of the json file.
+  result = joinPath("docs", changeFileExt(filename, "json"))
+  var cmd = fmt"nim --hints:off jsondoc --out:{result} src/{filename}"
   # echo cmd
-  exec cmd
+  runCmd(cmd)
 
 proc taskTea2Html(teaBasename: string) =
   ## Create an html file from a tea file using a statictea template.
@@ -933,12 +934,12 @@ proc taskTea2Html(teaBasename: string) =
 
   # Create the server json file with the tea file as a string element.
   let text = jsonQuote(slurp(filename))
-  let jsonStr = fmt"""{{
+  let json = fmt"""{{
 "filename": "{filename}",
 "text": "{text}"
 }}
 """
-  writeFile(server, jsonStr)
+  writeFile(server, json)
 
   # Build the html file.
   let cmd = fmt"{statictea} -s {server} -t {templateFile} -o {teaFile} -r {result}"
@@ -1002,24 +1003,25 @@ task dochix, "\tCreate html docs index (docs/html/index.html).":
   taskDochix()
 
 task jsonix, "\tDisplay docs index json.":
-  var json = sourceIndexJson()
-  for line in json.splitLines():
-    echo line
+  ## Create the json for the index from the source files top lines.
+  let jsonFilename = "docs/index.json"
+  let json = sourceIndexJson()
+  writeFile(jsonFilename, json)
+  let cmd = fmt"cat {jsonFilename} | jq -C | less -R"
+  exec cmd
+  rmFile(jsonFilename)
 
-task json, "\tDisplay one or more source file's json doc comments; specify part of the name.":
+task json, "\tDisplay a source file's json doc comments; specify part of the name.":
   let name = get_last_argument()
   let filenames = get_source_filenames()
   for filename in filenames:
     if name.toLower in filename.toLower:
-      let jsonName = joinPath("docs", changeFileExt(filename, "json"))
-      makeJsonDoc(filename)
-      let text = slurp(jsonName)
-      for line in text.splitLines():
-        echo line
+      echo filename
+      let jsonFilename = makeJsonDoc(filename)
+      let cmd = fmt"cat {jsonFilename} | jq -C | less -R"
+      exec cmd
+      rmFile(jsonFilename)
       break
-  # echo ""
-  # echo "The jq command is good for viewing the output."
-  # echo "n json name | jq | less"
 
 task teafuncs, "Create the function docs (docs/teaFunctions.md).":
   taskFuncDocs()
@@ -1032,22 +1034,20 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
   buildRelease()
 
   let statictea = fmt"bin/{dirName}/statictea"
-  let server = "docs/functions.json"
   let tFile = "templates/dynamicFuncList.nim"
   let teaFile = "templates/dynamicFuncList.tea"
   let result = "src/dynamicFuncList.nim"
   let functionsFile = "test_functions.nim"
 
   # Build the functions.json file.
-  echo fmt"make {server}"
-  makeJsonDoc("functions.nim")
+  let jsonName = makeJsonDoc("functions.nim")
 
   # Build the dynamicFuncList.nim file.
   echo fmt"make {result}"
-  let cmd = fmt"{statictea} -s {server} -t {tFile} -o {teaFile} -r {result}"
-  exec cmd
+  let cmd = fmt"{statictea} -s {jsonName} -t {tFile} -o {teaFile} -r {result}"
+  runCmd(cmd)
 
-  rmFile(server)
+  rmFile(jsonName)
 
   # Buld the functions.nim file.
   let cmd2 = get_test_module_cmd(functionsFile, force = true)
@@ -1082,9 +1082,12 @@ task stfix, "\tCreate stf test files index (testfiles/stf-index.md).":
   taskTestfilesReadme()
 
 task stfjson, "\tDisplay stf test files index JSON.":
-  var json = testfilesIndexJson()
-  for line in json.splitLines():
-    echo line
+  let json = testfilesIndexJson()
+  let jsonFilename = "docs/stfindex.json"
+  writeFile(jsonFilename, json)
+  let cmd = fmt"cat {jsonFilename} | jq -C | less -R"
+  exec cmd
+  rmFile(jsonFilename)
 
 task newstf, "\tCreate new stf test skeleton, specify a name no ext.":
   let name = get_last_argument()
@@ -1108,9 +1111,6 @@ task runhelp, "\tShow the runner help text with glow.":
 
 task helpme, "\tShow the statictea help text.":
   exec fmt"bin/{dirName}/statictea -h | less"
-
-task remote, "\tCheck whether the utf8decoder module needs updating.":
-  checkUtf8DecoderEcho()
 
 task cmdline, "\tBuild cmdline test app (bin/x/cmdline).":
   let part1 = "nim c --hint[Performance]:off "
@@ -1142,7 +1142,7 @@ proc getContainerState(): string =
   else:
     result = "no container"
 
-task drun, "\tRun a statictea debian docker build env.":
+task drun, "\tRun a statictea debian docker build environment":
   if existsEnv("statictea_env"):
     echo "Run on the host not in the docker container."
     return
