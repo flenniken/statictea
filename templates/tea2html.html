@@ -7,82 +7,16 @@
 <meta charset="utf-8">
 <!--$ nextline -->
 <title>{s.filename}</title>
-<style>
-body {
-    max-width: 40em;
-    font-size: 2em;
-    margin-left: 1em;
-}
-
-#staticteadep {
-    width: 100%;
-}
-
-.signature {
-    color: green;
-}
-
-.description {
-    white-space: pre-wrap;
-}
-
-pre {
-//    border-left: 6px solid green;
-    padding: 1em;
-    background-color: #f6f8fa;
-    overflow: auto;
-    white-space: pre-wrap;
-}
-
-.desc-code {
-    border: 1px solid blue;
-    background-color: white;
-}
-
-//.t-other {
-//    color: #D7381E;
-//}
-//.t-dotName {
-//    color: #CE7923;
-//}
-.t-funcCall {
-    color: #5F34FF;
-}
-.t-num {
-    color: IndianRed;
-}
-.t-str {
-    color: #34A227;
-}
-.t-multiline {
-    color: green;
-}
-.t-doc {
-    color: #B03B84;
-}
-.t-comment {
-    color: #D7381E;
-}
-//.t-param {
-//    color: red;
-//}
-.t-type {
-    color: #D7381E;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
-<!--$ block -->
+<!--$ nextline -->
 <h1>{s.filename}</h1>
 
 <pre>
+<!--$ nextline -->
 {o.htmlText}
 </pre>
-<!--$ endblock -->
-
-<p>⦿ This page was generated
-by <a href="https://github.com/flenniken/statictea/">statictea</a>
-from nim doc comments. ⦿</p>
 
 </body>
 </html>
