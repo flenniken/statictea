@@ -86,19 +86,19 @@ func `$`(opResult: OpResult): string
 </p><p>Example Usage:
 
 </p><pre class="plain-code">
-<span class="t-dotName">import</span> <span class="t-dotName">opresult</span>
+import opresult
 
-<span class="t-dotName">proc</span> <span class="t-funcCall">get_string</span>(): <span class="t-dotName">OpResultWarn</span>[<span class="t-dotName">string</span>] =
-  <span class="t-dotName">if</span> <span class="t-dotName">problem</span>:
-    <span class="t-dotName">result</span> = <span class="t-dotName">opMessage</span>[<span class="t-dotName">string</span>](<span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>))
-  <span class="t-dotName">else</span>:
-    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">&quot;string of char&quot;</span>)
+proc get_string(): OpResultWarn[string] =
+  if problem:
+    result = opMessage[string](newWarningData(wUnknownArg))
+  else:
+    result = opValue[string](&quot;string of char&quot;)
 
-<span class="t-dotName">let</span> <span class="t-dotName">strOr</span> = <span class="t-funcCall">get_string</span>()
-<span class="t-dotName">if</span> <span class="t-dotName">strOr.isMessage</span>:
-  <span class="t-dotName">echo</span> <span class="t-funcCall">show_message</span>(<span class="t-dotName">strOr.message</span>)
-<span class="t-dotName">else</span>:
-  <span class="t-dotName">echo</span> <span class="t-str">&quot;value = &quot;</span> &amp; $<span class="t-dotName">strOr.value</span>
+let strOr = get_string()
+if strOr.isMessage:
+  echo show_message(strOr.message)
+else:
+  echo &quot;value = &quot; &amp; $strOr.value
 </pre>
 
 
@@ -131,19 +131,19 @@ message id that tells why you cannot return the value.
 </p><p>Example Usage:
 
 </p><pre class="plain-code">
-<span class="t-dotName">import</span> <span class="t-dotName">opresult</span>
+import opresult
 
-<span class="t-dotName">proc</span> <span class="t-funcCall">get_string</span>(): <span class="t-dotName">OpResultId</span>[<span class="t-dotName">string</span>] =
-  <span class="t-dotName">if</span> <span class="t-dotName">problem</span>:
-    <span class="t-dotName">result</span> = <span class="t-dotName">opMessage</span>[<span class="t-dotName">string</span>](<span class="t-dotName">wUnknownArg</span>)
-  <span class="t-dotName">else</span>:
-    <span class="t-dotName">result</span> = <span class="t-dotName">opValue</span>[<span class="t-dotName">string</span>](<span class="t-str">&quot;string of char&quot;</span>)
+proc get_string(): OpResultId[string] =
+  if problem:
+    result = opMessage[string](wUnknownArg)
+  else:
+    result = opValue[string](&quot;string of char&quot;)
 
-<span class="t-dotName">let</span> <span class="t-dotName">strOr</span> = <span class="t-funcCall">get_string</span>()
-<span class="t-dotName">if</span> <span class="t-dotName">strOr.isMessage</span>:
-  <span class="t-dotName">echo</span> <span class="t-funcCall">show_message</span>(<span class="t-dotName">strOr.message</span>)
-<span class="t-dotName">else</span>:
-  <span class="t-dotName">echo</span> <span class="t-str">&quot;value = &quot;</span> &amp; $<span class="t-dotName">strOr.value</span>
+let strOr = get_string()
+if strOr.isMessage:
+  echo show_message(strOr.message)
+else:
+  echo &quot;value = &quot; &amp; $strOr.value
 </pre>
 
 

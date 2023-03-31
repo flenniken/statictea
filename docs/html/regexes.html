@@ -15,38 +15,38 @@
 </p><p>Match a string with &quot;abc&quot; in it:
 
 </p><pre class="plain-code">
-<span class="t-dotName">let</span> <span class="t-dotName">line</span> = <span class="t-str">&quot;123abc456&quot;</span>
-<span class="t-dotName">let</span> <span class="t-dotName">pattern</span> = <span class="t-str">&quot;.*abc&quot;</span>
-<span class="t-dotName">let</span> <span class="t-dotName">matchesO</span> = <span class="t-funcCall">matchPattern</span>(<span class="t-dotName">line</span>, <span class="t-dotName">pattern</span>, <span class="t-dotName">start</span>=<span class="t-num">0</span>, <span class="t-dotName">numGroups</span>=<span class="t-num">0</span>)
+let line = &quot;123abc456&quot;
+let pattern = &quot;.*abc&quot;
+let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
 
-<span class="t-dotName">check</span> <span class="t-dotName">matchesO.isSome</span> == <span class="t-dotName">true</span>
-<span class="t-dotName">check</span> <span class="t-funcCall">matchesO.get</span>().<span class="t-dotName">length</span> == <span class="t-num">6</span>
+check matchesO.isSome == true
+check matchesO.get().length == 6
 </pre>
 <p>
 Match a file and line number like: filename(234):
 
 </p><pre class="plain-code">
-<span class="t-dotName">let</span> <span class="t-dotName">line</span> = <span class="t-str">&quot;template.html(87)&quot;</span>
-<span class="t-dotName">let</span> <span class="t-dotName">pattern</span> = <span class="t-dotName">r</span>&quot;^(.*)(([<span class="t-num">0</span>-<span class="t-num">9</span>]+))$<span class="t-str">&quot;
+let line = &quot;template.html(87)&quot;
+let pattern = r&quot;^(.*)(([0-9]+))$&quot;
 let matchesO = matchPatternCached(line, pattern, 0, 2)
 
 check matchesO.isSome == true
 let (filename, lineNum) = matchesO.get2Groups()
-check filename == &quot;</span>t<span class="t-dotName">emplate.html</span>&quot;
-<span class="t-dotName">check</span> <span class="t-dotName">lineNum</span> == <span class="t-str">&quot;87&quot;</span>
+check filename == &quot;template.html&quot;
+check lineNum == &quot;87&quot;
 </pre>
 <p>
 Replace the patterns in the string with their replacements:
 
 </p><pre class="plain-code">
-<span class="t-dotName">var</span> <span class="t-dotName">replacements</span>: <span class="t-dotName">seq</span>[<span class="t-dotName">Replacement</span>]
-<span class="t-funcCall">replacements.add</span>(<span class="t-funcCall">newReplacement</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-str">&quot;456&quot;</span>))
-<span class="t-funcCall">replacements.add</span>(<span class="t-funcCall">newReplacement</span>(<span class="t-str">&quot;def&quot;</span>, <span class="t-str">&quot;&quot;</span>))
+var replacements: seq[Replacement]
+replacements.add(newReplacement(&quot;abc&quot;, &quot;456&quot;))
+replacements.add(newReplacement(&quot;def&quot;, &quot;&quot;))
 
-<span class="t-dotName">let</span> <span class="t-dotName">resultStringO</span> = <span class="t-funcCall">replaceMany</span>(<span class="t-str">&quot;abcdefabc&quot;</span>, <span class="t-dotName">replacements</span>)
+let resultStringO = replaceMany(&quot;abcdefabc&quot;, replacements)
 
-<span class="t-dotName">check</span> <span class="t-dotName">resultStringO.isSome</span>
-<span class="t-dotName">check</span> <span class="t-funcCall">resultStringO.get</span>() == <span class="t-str">&quot;456456&quot;</span>
+check resultStringO.isSome
+check resultStringO.get() == &quot;456456&quot;
 </pre>
 
 

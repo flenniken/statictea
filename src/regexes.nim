@@ -4,7 +4,7 @@
 ## @:
 ## @:Match a string with "abc" in it:
 ## @:
-## @:~~~
+## @:~~~nim
 ## @:let line = "123abc456"
 ## @:let pattern = ".@.abc"
 ## @:let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
@@ -15,7 +15,7 @@
 ## @:
 ## @:Match a file and line number like: filename(234):
 ## @:
-## @:~~~
+## @:~~~ nim
 ## @:let line = "template.html(87)"
 ## @:let pattern = r"^(.@.)\(([0-9]+)\)$"
 ## @:let matchesO = matchPatternCached(line, pattern, 0, 2)
@@ -28,7 +28,7 @@
 ## @:
 ## @:Replace the patterns in the string with their replacements:
 ## @:
-## @:~~~
+## @:~~~ nim
 ## @:var replacements: seq[Replacement]
 ## @:replacements.add(newReplacement("abc", "456"))
 ## @:replacements.add(newReplacement("def", ""))

@@ -18,12 +18,22 @@ u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
     format("<span class=\"t-{tag}\">{str}</span>"))
   return(false)
 
+u.handle-plain-code = func(codeBlock: string, frags: list) bool
+  ## Add the plain code block (not tea code) to the frags list.
+  frags &= html(codeBlock, "body")
+  return(false)
+
 u.html-code = func(item: list) string
   ## Format the "code" md element list as html.
   lines = []
   class = if((item[0] == "~~~statictea\n"), "tea-code", "plain-code")
   lines &= format("<pre class=\"{class}\">\n")
-  listLoop(highlight(item[1]), lines, u.handle-html-fragment)
+
+  codeBlock = item[1]
+  ret = if((class == "tea-code"), +
+    listLoop(highlight(codeBlock), lines, u.handle-html-fragment), +
+    u.handle-plain-code(codeBlock, lines))
+    
   lines &= "</pre>\n"
   return(join(lines, ""))
 

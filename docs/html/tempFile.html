@@ -12,23 +12,23 @@
 
 </p><p>Example:
 </p><pre class="plain-code">
-<span class="t-dotName">var</span> <span class="t-dotName">tempFileO</span> = <span class="t-funcCall">openTempFile</span>()
-<span class="t-dotName">require</span> <span class="t-dotName">tempFileO.isSome</span>
-<span class="t-dotName">var</span> <span class="t-dotName">tempFile</span> = <span class="t-funcCall">tempFileO.get</span>()
+var tempFileO = openTempFile()
+require tempFileO.isSome
+var tempFile = tempFileO.get()
 
-<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">&quot;this is a test\n&quot;</span>)
-<span class="t-funcCall">tempFile.file.write</span>(<span class="t-str">&quot;line 2\n&quot;</span>)
-<span class="t-funcCall">tempFile.file.close</span>()
+tempFile.file.write(&quot;this is a test\n&quot;)
+tempFile.file.write(&quot;line 2\n&quot;)
+tempFile.file.close()
 
-<span class="t-dotName">var</span> <span class="t-dotName">fh</span> = <span class="t-funcCall">open</span>(<span class="t-dotName">tempFile.filename</span>, <span class="t-dotName">fmRead</span>)
-<span class="t-dotName">let</span> <span class="t-dotName">line1</span> = <span class="t-funcCall">readline</span>(<span class="t-dotName">fh</span>)
-<span class="t-dotName">let</span> <span class="t-dotName">line2</span> = <span class="t-funcCall">readline</span>(<span class="t-dotName">fh</span>)
-<span class="t-funcCall">fh.close</span>()
+var fh = open(tempFile.filename, fmRead)
+let line1 = readline(fh)
+let line2 = readline(fh)
+fh.close()
 
-<span class="t-dotName">discard</span> <span class="t-funcCall">tryRemoveFile</span>(<span class="t-dotName">tempFile.filename</span>)
+discard tryRemoveFile(tempFile.filename)
 
-<span class="t-dotName">check</span> <span class="t-dotName">line1</span> == <span class="t-str">&quot;this is a test&quot;</span>
-<span class="t-dotName">check</span> <span class="t-dotName">line2</span> == <span class="t-str">&quot;line 2&quot;</span>
+check line1 == &quot;this is a test&quot;
+check line2 == &quot;line 2&quot;
 </pre>
 
 

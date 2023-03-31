@@ -13,11 +13,11 @@
 </p><p>Example:
 
 </p><pre class="plain-code">
-<span class="t-dotName">let</span> <span class="t-dotName">lbO</span> = <span class="t-funcCall">newLineBuffer</span>(<span class="t-dotName">stream</span>)
-<span class="t-dotName">check</span> <span class="t-dotName">lbO.isSome</span> == <span class="t-dotName">true</span>
-<span class="t-dotName">var</span> <span class="t-dotName">lb</span> = <span class="t-funcCall">lbO.get</span>()
-<span class="t-dotName">while</span> <span class="t-dotName">line</span> = <span class="t-funcCall">lb.readLine</span>():
-  <span class="t-funcCall">processLine</span>(<span class="t-dotName">line</span>)
+let lbO = newLineBuffer(stream)
+check lbO.isSome == true
+var lb = lbO.get()
+while line = lb.readLine():
+  processLine(line)
 </pre>
 
 

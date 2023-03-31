@@ -34,13 +34,13 @@ Nim source code: <a href="../../src/parseCmdLine.nim">parseCmdLine.nim</a>
 <p>LineParts holds parsed components of a line.
 
 </p><pre class="plain-code">
-<span class="t-dotName">prefix</span> <span class="t-dotName">command</span>  [<span class="t-dotName">code</span>]   [<span class="t-dotName">comment</span>] [<span class="t-dotName">continuation</span>]
-|      |        |        |         |[<span class="t-dotName">postfix</span>]
-|      |        |        |         ||  [<span class="t-dotName">ending</span>]
+prefix command  [code]   [comment] [continuation]
+|      |        |        |         |[postfix]
+|      |        |        |         ||  [ending]
 |      |        |        |         ||  |
-&lt;!<span class="t-num">-</span>-$  <span class="t-dotName">nextline</span> <span class="t-dotName">var</span> = <span class="t-num">5</span>  <span class="t-comment"># comment +--&gt;n
-</span>     |
-     <span class="t-dotName">optional</span> <span class="t-dotName">spaces</span>
+&lt;!--$  nextline var = 5  # comment +--&gt;n
+     |
+     optional spaces
 </pre>
 <p>
 Whitespace must follow a command except on the last line of the file.

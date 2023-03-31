@@ -166,7 +166,7 @@ the bracket.
 </p><p>A replacement variable is inside brackets.
 
 </p><pre class="plain-code">
-<span class="t-dotName">text</span> <span class="t-dotName">on</span> <span class="t-dotName">the</span> <span class="t-dotName">line</span> {<span class="t-dotName">variable</span>} <span class="t-dotName">more</span> <span class="t-dotName">text</span> {<span class="t-dotName">variable2</span>} <span class="t-dotName">asdf</span>
+text on the line {variable} more text {variable2} asdf
                   ^
 </pre>
 
@@ -221,7 +221,7 @@ length returned includes the optional trailing whitespace.
 </p><p>Example call:
 
 </p><pre class="plain-code">
-<span class="t-dotName">let</span> (_, <span class="t-dotName">dotNameStr</span>, <span class="t-dotName">leftParenBrack</span>, <span class="t-dotName">dotNameLen</span>) = <span class="t-funcCall">matchesO.get3GroupsLen</span>()
+let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
 </pre>
 
 

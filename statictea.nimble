@@ -8,7 +8,7 @@ import std/algorithm
 include src/version
 include src/dot
 
-proc runCmd(cmd: string) =
+proc runCmd(cmd: string, showOutput = false) =
   ## Run the command and if it fails, generate an expection and print
   ## out debugging info.
 
@@ -24,6 +24,8 @@ proc runCmd(cmd: string) =
     echo "------"
     echo ""
     raise newException(OSError, "the command failed")
+  if showOutput:
+    echo showOutput
 
 proc get_last_argument(): string =
   ## Get the last argument specified on the command line. It is the
@@ -734,12 +736,8 @@ proc taskDoch(namePart: string, forceRebuild = false) =
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
     # echo cmd
-    let (output, _) = gorgeEx(cmd)
-    if len(output) > 0:
-      echo output
-      exec fmt"rm {resultFile}"
-    else:
-      echo fmt"file:///{getCurrentDir()}/{resultFile}"
+    runCmd(cmd)
+    echo fmt"file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)
 
 proc taskFuncDocs() =
@@ -772,8 +770,7 @@ proc runRunnerFolder() =
 
   let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
   # echo cmd
-  let (result, _) = gorgeEx(cmd)
-  echo result
+  runCmd(cmd, showOutput = true)
 
 proc get_stf_filenames(): seq[string] =
   ## Return the basename of the stf files in the testfiles folder.
@@ -791,8 +788,7 @@ proc runRunStf() =
   # whole directory using the -d option.
   if name == "rt":
     let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
-    let (result, _) = gorgeEx(cmd)
-    echo result
+    runCmd(cmd, showOutput = true)
     return
 
   let stf_filenames = get_stf_filenames()
@@ -1191,8 +1187,7 @@ task ddelete, "\tDelete the statictea docker image and container.":
     return
   let cmd = fmt"docker rm {staticteaContainer}; docker image rm {staticteaImage}"
   # echo cmd
-  let (output, _) = gorgeEx(cmd)
-  echo output
+  runCmd(cmd, showOutput = true)
 
 task dlist, "\tList the docker image and container.":
   if existsEnv("statictea_env"):

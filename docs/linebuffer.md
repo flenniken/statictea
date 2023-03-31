@@ -4,7 +4,7 @@ Read lines from a stream without exceeding the maximum line length. The returned
 
 Example:
 
-~~~
+~~~ nim
 let lbO = newLineBuffer(stream)
 check lbO.isSome == true
 var lb = lbO.get()

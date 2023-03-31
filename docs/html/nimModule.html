@@ -91,12 +91,22 @@ pre {
     <span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;span class=\&quot;t-{tag}\&quot;&gt;{str}&lt;/span&gt;&quot;</span>))
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
+<span class="t-dotName">u.handle-plain-code</span> = <span class="t-funcCall">func</span>(<span class="t-param">codeBlock</span>: <span class="t-type">string</span>, <span class="t-param">frags</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Add the plain code block (not tea code) to the frags list.
+</span>  <span class="t-dotName">frags</span> &amp;= <span class="t-funcCall">html</span>(<span class="t-dotName">codeBlock</span>, <span class="t-str">&quot;body&quot;</span>)
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
 <span class="t-dotName">u.html-code</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
   <span class="t-doc">## Format the &quot;code&quot; md element list as html.
 </span>  <span class="t-dotName">lines</span> = []
   <span class="t-dotName">class</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">item</span>[<span class="t-num">0</span>] == <span class="t-str">&quot;~~~statictea\n&quot;</span>), <span class="t-str">&quot;tea-code&quot;</span>, <span class="t-str">&quot;plain-code&quot;</span>)
   <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;pre class=\&quot;{class}\&quot;&gt;\n&quot;</span>)
-  <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">highlight</span>(<span class="t-dotName">item</span>[<span class="t-num">1</span>]), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-fragment</span>)
+
+  <span class="t-dotName">codeBlock</span> = <span class="t-dotName">item</span>[<span class="t-num">1</span>]
+  <span class="t-dotName">ret</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">class</span> == <span class="t-str">&quot;tea-code&quot;</span>), +
+    <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">highlight</span>(<span class="t-dotName">codeBlock</span>), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-fragment</span>), +
+    <span class="t-funcCall">u.handle-plain-code</span>(<span class="t-dotName">codeBlock</span>, <span class="t-dotName">lines</span>))
+    
   <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;/pre&gt;\n&quot;</span>
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
 

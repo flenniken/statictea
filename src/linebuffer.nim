@@ -4,7 +4,7 @@
 ## @:
 ## @:Example:
 ## @:
-## @:~~~
+## @:~~~ nim
 ## @:let lbO = newLineBuffer(stream)
 ## @:check lbO.isSome == true
 ## @:var lb = lbO.get()

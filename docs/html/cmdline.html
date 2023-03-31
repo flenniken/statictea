@@ -13,27 +13,29 @@
 </p><p>Example:
 
 </p><pre class="plain-code">
-<span class="t-dotName">import</span> <span class="t-dotName">cmdline</span>
+import cmdline
 
-<span class="t-comment"># Define the supported options.
-</span><span class="t-dotName">var</span> <span class="t-dotName">options</span> = <span class="t-dotName">newSeq</span>[<span class="t-dotName">CmlOption</span>]()
-<span class="t-funcCall">options.add</span>(<span class="t-funcCall">newCmlOption</span>(<span class="t-str">&quot;help&quot;</span>, &#x27;<span class="t-dotName">h</span>&#x27;, <span class="t-dotName">cmlStopArgument</span>))
-<span class="t-funcCall">options.add</span>(<span class="t-funcCall">newCmlOption</span>(<span class="t-str">&quot;log&quot;</span>, &#x27;<span class="t-dotName">l</span>&#x27;, <span class="t-dotName">cmlOptionalArgument</span>))
+# Define the supported options.
+var options = newSeq[CmlOption]()
+options.add(newCmlOption(&quot;help&quot;, &#x27;h&#x27;, cmlStopArgument))
+options.add(newCmlOption(&quot;log&quot;, &#x27;l&#x27;, cmlOptionalArgument))
 ...
 
-<span class="t-comment"># Parse the command line.
-</span><span class="t-dotName">let</span> <span class="t-dotName">argsOrMessage</span> = <span class="t-funcCall">cmdline</span>(<span class="t-dotName">options</span>, <span class="t-funcCall">collectArgs</span>())
-<span class="t-dotName">if</span> <span class="t-dotName">argsOrMessage.kind</span> == <span class="t-dotName">cmlMessageKind</span>:
-  <span class="t-comment"># Display the message.
-</span>  <span class="t-dotName">echo</span> <span class="t-funcCall">getMessage</span>(<span class="t-dotName">argsOrMessage.messageId</span>,
-    <span class="t-dotName">argsOrMessage.problemArg</span>)
-<span class="t-dotName">else</span>:
-  <span class="t-comment"># Optionally post process the resulting arguments.
-</span>  <span class="t-dotName">let</span> <span class="t-dotName">args</span> = <span class="t-funcCall">newArgs</span>(<span class="t-dotName">argsOrMessage.args</span>)
+# Parse the command line.
+let argsOrMessage = cmdline(options, collectArgs())
+if argsOrMessage.kind == cmlMessageKind:
+  # Display the message.
+  echo getMessage(argsOrMessage.messageId,
+    argsOrMessage.problemArg)
+else:
+  # Optionally post process the resulting arguments.
+  let args = newArgs(argsOrMessage.args)
 </pre>
+
 <p>
 For a complete example see the bottom of the file in the isMainModule
-section.</p>
+section.
+</p>
 
 Nim source code: <a href="../../src/cmdline.nim">cmdline.nim</a>
 

@@ -305,7 +305,7 @@ func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
 <p>Return a formatted warning line. For example:
 
 </p><pre class="plain-code">
-<span class="t-funcCall">filename</span>(<span class="t-dotName">line</span>): <span class="t-dotName">wId</span>: <span class="t-dotName">message.</span>
+filename(line): wId: message.
 </pre>
 
 
@@ -319,7 +319,7 @@ func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = "")
 <p>Return a formatted warning line. For example:
 
 </p><pre class="plain-code">
-<span class="t-funcCall">filename</span>(<span class="t-dotName">line</span>): <span class="t-dotName">wId</span>: <span class="t-dotName">message.</span>
+filename(line): wId: message.
 </pre>
 
 
@@ -340,8 +340,8 @@ func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 <p>Return a string representation of WarningData.
 
 </p><pre class="plain-code">
-<span class="t-dotName">let</span> <span class="t-dotName">warning</span> = <span class="t-funcCall">newWarningData</span>(<span class="t-dotName">wUnknownArg</span>, <span class="t-str">&quot;p1&quot;</span>, <span class="t-num">5</span>)
-<span class="t-dotName">check</span> $<span class="t-dotName">warning</span> == <span class="t-str">&quot;wUnknownArg(p1):5&quot;</span>
+let warning = newWarningData(wUnknownArg, &quot;p1&quot;, 5)
+check $warning == &quot;wUnknownArg(p1):5&quot;
 </pre>
 
 
