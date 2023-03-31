@@ -549,8 +549,14 @@ proc createDependencyGraph2() =
     elif nameCount[left] == 2:
       nodetAttrs = "color=red;"
       lineAttrs = "color=red;"
-    let attrs = fmt"""{left} [fontsize=24; {nodetAttrs}];""" & "\n"
-    dotText.add(attrs)
+
+    let url = fmt"""target="_parent", URL="html/{dependency.right}.html""""
+
+    let leftAttrs = fmt"""{left} [fontsize=24; {nodetAttrs}];""" & "\n"
+    dotText.add(leftAttrs)
+    let rightAttrs = fmt"""{dependency.right} [fontsize=24, {url}]""" & "\n"
+    dotText.add(rightAttrs)
+
     dotText.add("$1 -> \"$2\" [$3];\n" % [left, dependency.right, lineAttrs])
     # dotText.add(fmt"""{dependency.left} -> "{dependency.right}" [{lineAttrs}];""" & "\n")
   dotText.add("}\n")

@@ -75,16 +75,19 @@ not a popular char, return 0.
 
 </p><p> Popular characters and their escape values:
 
-</p><p>|char      | name           | unicode|
+</p><pre class="plain-code">
+|char      | name           | unicode|
 |----------|----------------|--------|
 |&quot;         | quotation mark | U+0022 |
-|\        | reverse solidus| U+005C |
+|\         | reverse solidus| U+005C |
 |/         | solidus        | U+002F |
 |b         | backspace      | U+0008 |
 |f         | form feed      | U+000C |
 |n         | line feed      | U+000A |
 |r         | carriage return| U+000D |
-|t         | tab            | U+0009 |</p>
+|t         | tab            | U+0009 |
+</pre>
+
 
 <pre class="nim-code">
 func unescapePopularChar(popular: char): char
