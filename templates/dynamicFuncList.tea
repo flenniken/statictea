@@ -1,4 +1,7 @@
-## Statictea code file for the functionsList.nim template.
+## Create a list of dictionaries, one dictionary per statictea
+## function.  Statictea code file for the functionsList.nim template.
+
+## The nimble task dyfuncs runs the template.
 
 get-starts = func(ix: int, entry: dict, starts: dict, entries: list) bool
   ## Collect the a function's start line and number of lines.
@@ -15,10 +18,6 @@ get-starts = func(ix: int, entry: dict, starts: dict, entries: list) bool
   if(exists(starts, key), return(false))
   starts[key] = numLines
   return(false)
-
-# Make a dictionary mapping a function's start line to its number of lines.
-starts = dict()
-listLoop(s.entries, starts, get-starts, s.entries)
 
 get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   ## Add the Statictea functions to the new list.
@@ -40,10 +39,12 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   newList &= newEntry
   return(false)
 
+# Make a dictionary mapping a function's start line to its number of lines.
+starts = dict()
+listLoop(s.entries, starts, get-starts, s.entries)
 
 # Define replacement patterns to remove formatting from the doc
 # comments (descriptions).
-
 patterns = list( +
   "~~~~", "~~~", +
   "@@", "", +
@@ -57,7 +58,7 @@ patterns = list( +
   "&lt;", "<", +
   "&amp;", "&")
 
-# Create a list of the statictea functions.
+# Create a list of dictionaries, one dictionary per statictea function.
 state = dict()
 state.patterns = patterns
 state.starts = starts

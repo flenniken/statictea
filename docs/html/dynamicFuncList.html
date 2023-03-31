@@ -9,7 +9,10 @@
 <h1>templates/dynamicFuncList.tea</h1>
 
 <pre>
-<span class="t-doc">## Statictea code file for the functionsList.nim template.
+<span class="t-doc">## Create a list of dictionaries, one dictionary per statictea
+</span><span class="t-doc">## function.  Statictea code file for the functionsList.nim template.
+</span>
+<span class="t-doc">## The nimble task dyfuncs runs the template.
 </span>
 <span class="t-dotName">get-starts</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">starts</span>: <span class="t-type">dict</span>, <span class="t-param">entries</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Collect the a function&#x27;s start line and number of lines.
@@ -26,10 +29,6 @@
 </span>  <span class="t-funcCall">if</span>(<span class="t-funcCall">exists</span>(<span class="t-dotName">starts</span>, <span class="t-dotName">key</span>), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
   <span class="t-dotName">starts</span>[<span class="t-dotName">key</span>] = <span class="t-dotName">numLines</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
-
-<span class="t-comment"># Make a dictionary mapping a function&#x27;s start line to its number of lines.
-</span><span class="t-dotName">starts</span> = <span class="t-funcCall">dict</span>()
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
 
 <span class="t-dotName">get-entry</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>, <span class="t-param">state</span>: <span class="t-type">dict</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Add the Statictea functions to the new list.
@@ -51,11 +50,13 @@
   <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">newEntry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
+<span class="t-comment"># Make a dictionary mapping a function&#x27;s start line to its number of lines.
+</span><span class="t-dotName">starts</span> = <span class="t-funcCall">dict</span>()
+<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
 
 <span class="t-comment"># Define replacement patterns to remove formatting from the doc
 </span><span class="t-comment"># comments (descriptions).
-</span>
-<span class="t-dotName">patterns</span> = <span class="t-funcCall">list</span>( +
+</span><span class="t-dotName">patterns</span> = <span class="t-funcCall">list</span>( +
   <span class="t-str">&quot;~~~~&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>, +
   <span class="t-str">&quot;@@&quot;</span>, <span class="t-str">&quot;&quot;</span>, +
   <span class="t-str">&quot;@{&quot;</span>, <span class="t-str">&quot;[&quot;</span>, +
@@ -68,7 +69,7 @@
   <span class="t-str">&quot;&amp;lt;&quot;</span>, <span class="t-str">&quot;&lt;&quot;</span>, +
   <span class="t-str">&quot;&amp;amp;&quot;</span>, <span class="t-str">&quot;&amp;&quot;</span>)
 
-<span class="t-comment"># Create a list of the statictea functions.
+<span class="t-comment"># Create a list of dictionaries, one dictionary per statictea function.
 </span><span class="t-dotName">state</span> = <span class="t-funcCall">dict</span>()
 <span class="t-dotName">state.patterns</span> = <span class="t-dotName">patterns</span>
 <span class="t-dotName">state.starts</span> = <span class="t-dotName">starts</span>

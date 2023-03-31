@@ -2,6 +2,8 @@
 ## function in the f function dictionary.  Each dictionary contains,
 ## the function name, doc comment, anchor name and a short description.
 
+## The nimble task teafuncs runs the template.
+
 u.add-func-var = func(ix: int, funcVar: func, newList: list) bool
   ## Add the function variable to the list.
   newList &= funcVar
@@ -13,26 +15,11 @@ add-vars = func(ix: int, key: string, newList: list) bool
   listLoop(funcList, newList, u.add-func-var)
   return(false)
 
-# Create a flat list of all the function variables in the f
-# dictionary.
-flatFuncList = []
-listLoop(keys(f), flatFuncList, add-vars)
-
 get-name = func(ix: int, funcVar: func, newList: list) bool
   ## Add the function name to the new list.
   fd = functionDetails(funcVar)
   newList &= fd.signature.name
   return(false)
-
-# Get the anchor type based on the template type.
-path = path(t.args.resultFilename)
-type = if((path.ext == ".md"), "github", "html")
-
-# Get a list of all the function names then make that into anchor
-# names.
-names = []
-listLoop(flatFuncList, names, get-name)
-anchors = anchors(names, type)
 
 make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
   ## Make a dictionary of function details for the given function
@@ -50,6 +37,21 @@ make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
   entry.anchorName = anchors[ix]
   newList &= entry
   return(false)
+
+# Create a flat list of all the function variables in the f
+# dictionary.
+flatFuncList = []
+listLoop(keys(f), flatFuncList, add-vars)
+
+# Get the anchor type based on the template type.
+path = path(t.args.resultFilename)
+type = if((path.ext == ".md"), "github", "html")
+
+# Get a list of all the function names then make that into anchor
+# names.
+names = []
+listLoop(flatFuncList, names, get-name)
+anchors = anchors(names, type)
 
 # Create a list of dictionaries, one dictionary for each function
 # variable in the f function dictionary.  Each dictionary contains,

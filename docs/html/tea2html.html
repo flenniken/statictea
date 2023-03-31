@@ -9,7 +9,10 @@
 <h1>templates/tea2html.tea</h1>
 
 <pre>
-<span class="t-doc">## Highlight the statictea code with colored html spans.
+<span class="t-doc">## Highlight the statictea code with colored html spans.  Convert the
+</span><span class="t-doc">## tea code (s.text) to syntax highlighted html text (o.htmlText).
+</span>
+<span class="t-doc">## The nimble task tea2html runs the template.
 </span>
 <span class="t-dotName">u.handle-fragment</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">fragment</span>: <span class="t-type">list</span>, <span class="t-param">frags</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Highlight the fragment for html and add it to frags.
@@ -23,6 +26,7 @@
 </span><span class="t-dotName">highlightedFrags</span> = []
 <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">highlight</span>(<span class="t-dotName">s.text</span>), <span class="t-dotName">highlightedFrags</span>, <span class="t-dotName">u.handle-fragment</span>)
 <span class="t-dotName">o.htmlText</span> = <span class="t-funcCall">join</span>(<span class="t-dotName">highlightedFrags</span>, <span class="t-str">&quot;&quot;</span>)
+
 </pre>
 
 </body>
