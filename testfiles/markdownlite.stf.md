@@ -21,9 +21,8 @@ noLastEnding
 ~~~
 $$ block 
 $$ : str = string(o.fragments, "vl")
-$$ : doc = replaceRe(o.md, ["~~~", "```"])
 doc = """
-{doc}
+{o.md}
 """
 
 fragments = markdownLite(doc)
@@ -31,8 +30,7 @@ fragments => [
 $$ endblock
 $$ block
 $$ : t.repeat = len(o.fragments)
-$$ : str = string(o.fragments[t.row], "json")
-$$ : line = replaceRe(str, ["~~~", "```"])
+$$ : line = string(o.fragments[t.row], "json")
   {line}
 $$ endblock
 ]
@@ -40,34 +38,32 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
-doc = """
+```
+o.md = """
 A subset of markdown which contains paragraphs,
 bullets and code blocks.
 
-{fence}statictea
+~~~ statictea
 markdownLite = func(mdText: string) list
-{fence}
+~~~
 
 * p -- a paragraph
 * code -- code block
 * bullets -- bullets"""
 
-fence = "~~~"
-o.md = format(doc)
 o.fragments = markdownLite(o.md)
-~~~
+```
 
 ### File result.expected
 
-~~~
+```
 doc = """
 A subset of markdown which contains paragraphs,
 bullets and code blocks.
 
-```statictea
+~~~ statictea
 markdownLite = func(mdText: string) list
-```
+~~~
 
 * p -- a paragraph
 * code -- code block
@@ -77,11 +73,11 @@ markdownLite = func(mdText: string) list
 fragments = markdownLite(doc)
 fragments => [
   ["p",["A subset of markdown which contains paragraphs,\nbullets and code blocks.\n\n"]]
-  ["code",["```statictea\n","markdownLite = func(mdText: string) list\n","```\n"]]
+  ["code",["~~~ statictea\n","markdownLite = func(mdText: string) list\n","~~~\n"]]
   ["p",["\n"]]
   ["bullets",["p -- a paragraph\n","code -- code block\n","bullets -- bullets"]]
 ]
-~~~
+```
 
 ### File stdout.expected
 
