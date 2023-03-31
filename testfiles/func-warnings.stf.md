@@ -23,7 +23,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 a = 1
 o.name = a("shared")
 b &= 2

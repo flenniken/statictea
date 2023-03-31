@@ -69,7 +69,7 @@ $$ : num = add(t.row, 1)
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.name = "shared"
 o.type = "json"
 ~~~

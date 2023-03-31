@@ -40,7 +40,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 log("log inside shared.tea")
 if(false, log("not hit"))
 if(true, log("hello"))

@@ -30,7 +30,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.shared = "shared"
 g.hello = "hello"
 ~~~

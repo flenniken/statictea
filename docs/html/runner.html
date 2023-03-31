@@ -31,9 +31,12 @@ Nim source code: <a href="../../src/runner.nim">runner.nim</a>
 <li>type:  <a href="#Rc">Rc</a> &mdash; Rc holds a return code where 0 is success.</li>
 <li>type:  <a href="#RunFileLine">RunFileLine</a> &mdash; RunFileLine holds the file line options.</li>
 <li>type:  <a href="#ExpectedLine">ExpectedLine</a> &mdash; ExpectedLine holds the expected line options.</li>
+<li>type:  <a href="#BlockLineType">BlockLineType</a> &mdash; The kind of block line.</li>
+<li>type:  <a href="#BlockLine">BlockLine</a> &mdash; BlockLine holds a line that starts with tildas or accents.</li>
 <li>type:  <a href="#LineKind">LineKind</a> &mdash; The kind of line in a stf file.</li>
 <li>type:  <a href="#AnyLine">AnyLine</a> &mdash; Contains the information about one line in a stf file.</li>
 <li>type:  <a href="#DirAndFiles">DirAndFiles</a> &mdash; DirAndFiles holds the file and compare lines of the stf file.</li>
+<li> <a href="#newBlockLine">newBlockLine</a> &mdash; Create a new BlockLine type.</li>
 <li> <a href="#newAnyLineRunFileLine">newAnyLineRunFileLine</a> &mdash; Create a new AnyLine object for a file line.</li>
 <li> <a href="#newAnyLineExpectedLine">newAnyLineExpectedLine</a> &mdash; Create a new AnyLine object for a expected line.</li>
 <li> <a href="#newAnyLineBlockLine">newAnyLineBlockLine</a> &mdash; Create a new AnyLine object for a block line.</li>
@@ -111,6 +114,25 @@ ExpectedLine = object
   expectedFilename*: string
 </pre>
 
+<h3 id="BlockLineType">BlockLineType</h3>
+
+<p>The kind of block line.</p>
+
+<pre class="nim-code">
+BlockLineType = enum
+  blTildes, blAccents
+</pre>
+
+<h3 id="BlockLine">BlockLine</h3>
+
+<p>BlockLine holds a line that starts with tildas or accents.</p>
+
+<pre class="nim-code">
+BlockLine = object
+  blockLineType*: BlockLineType
+  line*: string
+</pre>
+
 <h3 id="LineKind">LineKind</h3>
 
 <p>The kind of line in a stf file.</p>
@@ -134,7 +156,7 @@ AnyLine = object
       expectedLine*: ExpectedLine
 
   of lkBlockLine:
-      blockLine*: string
+      blockLine*: BlockLine
 
   of lkIdLine:
       idLine*: string
@@ -151,6 +173,14 @@ AnyLine = object
 DirAndFiles = object
   expectedLines*: seq[ExpectedLine]
   runFileLines*: seq[RunFileLine]
+</pre>
+
+<h3 id="newBlockLine">newBlockLine</h3>
+
+<p>Create a new BlockLine type.</p>
+
+<pre class="nim-code">
+func newBlockLine(blockLineType: BlockLineType; line: string): BlockLine
 </pre>
 
 <h3 id="newAnyLineRunFileLine">newAnyLineRunFileLine</h3>
@@ -174,7 +204,7 @@ func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
 <p>Create a new AnyLine object for a block line.</p>
 
 <pre class="nim-code">
-func newAnyLineBlockLine(blockLine: string): AnyLine
+func newAnyLineBlockLine(blockLine: BlockLine): AnyLine
 </pre>
 
 <h3 id="newAnyLineCommentLine">newAnyLineCommentLine</h3>

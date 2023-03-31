@@ -25,7 +25,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 callback = func(ix: int, value: int, container: dict) bool
   ## Add key for each value mapping to its index.
   key = concat("a", string(value))

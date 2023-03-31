@@ -29,7 +29,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.content = "shared content"
 ~~~
 

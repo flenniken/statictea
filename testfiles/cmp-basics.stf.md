@@ -44,7 +44,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.a = cmp(l, f)
 o.b = cmp(1, 4.5)
 o.c = cmp(1.9, 5)

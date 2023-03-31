@@ -31,7 +31,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.floatCmp = get(f.cmp, 0)
 o.intCmp = get(f.cmp, 1)
 ~~~

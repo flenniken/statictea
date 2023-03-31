@@ -79,7 +79,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.name = "shared"
 o.type = "json"
 ~~~

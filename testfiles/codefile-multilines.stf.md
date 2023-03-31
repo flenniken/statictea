@@ -50,7 +50,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.header = """
 <!doctype html>
 <html lang="en">

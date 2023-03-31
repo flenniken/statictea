@@ -16,7 +16,7 @@ $statictea \
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.name = "tea"
 o.num = 5
 o.realnum = 3.14158

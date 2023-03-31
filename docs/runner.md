@@ -21,9 +21,12 @@ glow.
 * type: [Rc](#rc) &mdash; Rc holds a return code where 0 is success.
 * type: [RunFileLine](#runfileline) &mdash; RunFileLine holds the file line options.
 * type: [ExpectedLine](#expectedline) &mdash; ExpectedLine holds the expected line options.
+* type: [BlockLineType](#blocklinetype) &mdash; The kind of block line.
+* type: [BlockLine](#blockline) &mdash; BlockLine holds a line that starts with tildas or accents.
 * type: [LineKind](#linekind) &mdash; The kind of line in a stf file.
 * type: [AnyLine](#anyline) &mdash; Contains the information about one line in a stf file.
 * type: [DirAndFiles](#dirandfiles) &mdash; DirAndFiles holds the file and compare lines of the stf file.
+* [newBlockLine](#newblockline) &mdash; Create a new BlockLine type.
 * [newAnyLineRunFileLine](#newanylinerunfileline) &mdash; Create a new AnyLine object for a file line.
 * [newAnyLineExpectedLine](#newanylineexpectedline) &mdash; Create a new AnyLine object for a expected line.
 * [newAnyLineBlockLine](#newanylineblockline) &mdash; Create a new AnyLine object for a block line.
@@ -100,6 +103,25 @@ ExpectedLine = object
   expectedFilename*: string
 ~~~
 
+# BlockLineType
+
+The kind of block line.
+
+~~~nim
+BlockLineType = enum
+  blTildes, blAccents
+~~~
+
+# BlockLine
+
+BlockLine holds a line that starts with tildas or accents.
+
+~~~nim
+BlockLine = object
+  blockLineType*: BlockLineType
+  line*: string
+~~~
+
 # LineKind
 
 The kind of line in a stf file.
@@ -123,7 +145,7 @@ AnyLine = object
       expectedLine*: ExpectedLine
 
   of lkBlockLine:
-      blockLine*: string
+      blockLine*: BlockLine
 
   of lkIdLine:
       idLine*: string
@@ -140,6 +162,14 @@ DirAndFiles holds the file and compare lines of the stf file.
 DirAndFiles = object
   expectedLines*: seq[ExpectedLine]
   runFileLines*: seq[RunFileLine]
+~~~
+
+# newBlockLine
+
+Create a new BlockLine type.
+
+~~~nim
+func newBlockLine(blockLineType: BlockLineType; line: string): BlockLine
 ~~~
 
 # newAnyLineRunFileLine
@@ -163,7 +193,7 @@ func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
 Create a new AnyLine object for a block line.
 
 ~~~nim
-func newAnyLineBlockLine(blockLine: string): AnyLine
+func newAnyLineBlockLine(blockLine: BlockLine): AnyLine
 ~~~
 
 # newAnyLineCommentLine

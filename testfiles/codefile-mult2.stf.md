@@ -37,7 +37,7 @@ or invalid UTF-8 characters.
 Errors in a statement skip the statement and continue with the next
 one.
 
-~~~
+~~~ nim
 o.a = 5
 o.b = "missing ending quote
 o.c = 6

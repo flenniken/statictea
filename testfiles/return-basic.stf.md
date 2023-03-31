@@ -92,7 +92,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.a = 1
 return("skip")
 o.b = 2

@@ -68,7 +68,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.true = "my true"
 o.false = "my false"
 o.true_type = type(true)

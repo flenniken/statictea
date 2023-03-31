@@ -38,7 +38,7 @@ $$ endblock
 
 ### File shared.tea
 
-```
+``` nim
 o.md = """
 A subset of markdown which contains paragraphs,
 bullets and code blocks.

@@ -52,7 +52,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.get5 = func() int
   ## Return 5.
   return(5)

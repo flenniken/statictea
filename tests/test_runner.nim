@@ -229,11 +229,23 @@ suite "runner.nim":
     check testGetAnyLine("### Expected file1 == file2", eAnyLine)
 
   test "getAnyLine ~~~ block":
-    let eAnyLine = newAnyLineBlockLine("~~~")
+    let blockLine = newBlockLine(blTildes, "~~~")
+    let eAnyLine = newAnyLineBlockLine(blockLine)
     check testGetAnyLine("~~~", eAnyLine)
 
+  test "getAnyLine ~~~ javascript":
+    let blockLine = newBlockLine(blTildes, "~~~ javascript")
+    let eAnyLine = newAnyLineBlockLine(blockLine)
+    check testGetAnyLine("~~~ javascript", eAnyLine)
+
+  test "getAnyLine ~~~nim":
+    let blockLine = newBlockLine(blTildes, "~~~nim")
+    let eAnyLine = newAnyLineBlockLine(blockLine)
+    check testGetAnyLine("~~~nim", eAnyLine)
+
   test "getAnyLine ``` block":
-    let eAnyLine = newAnyLineBlockLine("```")
+    let blockLine = newBlockLine(blAccents, "```")
+    let eAnyLine = newAnyLineBlockLine(blockLine)
     check testGetAnyLine("```", eAnyLine)
 
   test "getAnyLine comment":

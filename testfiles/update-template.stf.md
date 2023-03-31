@@ -31,7 +31,7 @@ footer location
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.header = "=== header ==="
 o.menu = "pick an option"
 o.footer = "=== footer ==="

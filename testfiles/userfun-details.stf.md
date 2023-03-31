@@ -50,7 +50,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.fn1 = func(num: int, str: string) dict
   ## Simple function that returns a dictionary.
   dict = dict("one", num, "two", str)

@@ -58,6 +58,16 @@ type
     gotFilename*: string
     expectedFilename*: string
 
+  BlockLineType* = enum
+    ## The kind of block line.
+    blTildes,
+    blAccents
+
+  BlockLine* = object
+    ## BlockLine holds a line that starts with tildas or accents.
+    blockLineType*: BlockLineType
+    line*: string
+
   LineKind* = enum
     ## The kind of line in a stf file.
     lkRunFileLine,
@@ -74,7 +84,7 @@ type
       of lkExpectedLine:
         expectedLine*: ExpectedLine
       of lkBlockLine:
-        blockLine*: string
+        blockLine*: BlockLine
       of lkIdLine:
         idLine*: string
       of lkCommentLine:
@@ -85,6 +95,10 @@ type
     expectedLines*: seq[ExpectedLine]
     runFileLines*: seq[RunFileLine]
 
+func newBlockLine*(blockLineType: BlockLineType, line: string): BlockLine =
+  ## Create a new BlockLine type.
+  result = BlockLine(blockLineType: blockLineType, line: line)
+
 func newAnyLineRunFileLine*(runFileLine: RunFileLine): AnyLine =
   ## Create a new AnyLine object for a file line.
   result = AnyLine(kind: lkRunFileLine, runFileLine: runFileLine)
@@ -93,7 +107,7 @@ func newAnyLineExpectedLine*(expectedLine: ExpectedLine): AnyLine =
   ## Create a new AnyLine object for a expected line.
   result = AnyLine(kind: lkExpectedLine, expectedLine: expectedLine)
 
-func newAnyLineBlockLine*(blockLine: string): AnyLine =
+func newAnyLineBlockLine*(blockLine: BlockLine): AnyLine =
   ## Create a new AnyLine object for a block line.
   result = AnyLine(kind: lkBlockLine, blockLine: blockLine)
 
@@ -284,8 +298,10 @@ code.  With nonZeroReturn set, it fails when it returns zero.
 
 The content of a file is bracketed by markdown code blocks, either
 "~~~" or "```".  The block follows a file line. The first block found
-is used, so you can have blocks as comments too.  All content up to the
-ending code marker go in the file, even lines that look like commands.
+is used, so you can have blocks as comments too.  All content up to
+the ending code marker go in the file, even lines that look like
+commands. You follow the ~~~ with a code name, e.g. javascript, for
+syntax highlighting.
 
 ### Expected Line
 
@@ -455,8 +471,13 @@ proc getAnyLine*(line: string): OpResultStr[AnyLine] =
   if line == runnerId:
     return opValueStr(AnyLine(kind: lkIdLine, idLine: line))
 
-  if line.startsWith("~~~")  or line.startsWith("```"):
-    return opValueStr(AnyLine(kind: lkBlockLine, blockLine: line))
+  if line.startsWith("~~~"):
+    let blockLine = newBlockLine(blTildes, line)
+    return opValueStr(AnyLine(kind: lkBlockLine, blockLine: blockLine))
+
+  if line.startsWith("```"):
+    let blockLine = newBlockLine(blAccents, line)
+    return opValueStr(AnyLine(kind: lkBlockLine, blockLine: blockLine))
 
   if isRunFileLine(line):
     let runFileLineOp = parseRunFileLine(line)
@@ -491,7 +512,7 @@ proc createSectionFile(lb: var LineBuffer, folder: string,
 
   # Look for the starting block line.
   var line: string
-  var blockLine: string
+  var blockLine: BlockLine
   var lineNum = 0
   while true:
     line = linebuffer.readline(lb)
@@ -525,7 +546,7 @@ proc createSectionFile(lb: var LineBuffer, folder: string,
     if anyLineOr.isMessage:
       return fmt"{lineNum}: {anyLineOr.message}"
     let anyLine = anyLineOr.value
-    if anyLine.kind == lkBlockLine and anyLine.blockLine == blockLine:
+    if anyLine.kind == lkBlockLine and anyLine.blockLine.blockLineType == blockLine.blockLineType:
       break
 
     # Write the previous line to the file.

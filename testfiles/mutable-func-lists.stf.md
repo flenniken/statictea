@@ -29,7 +29,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.anchors = anchors(["a", "b"], "github")
 o.anchors &= "c"
 

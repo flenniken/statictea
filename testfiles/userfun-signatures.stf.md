@@ -28,7 +28,7 @@ $$ endblock
 
 Make a list of the functions and their signatures.
 
-~~~
+~~~ nim
 addFuncVar = func(ix: int, funcVar: func, funcList: list) bool
   ## Add the function variable to the function list.
   funcList &= funcVar

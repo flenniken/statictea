@@ -16,7 +16,7 @@ $statictea \
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.header = "<html>\n"
 ~~~
 

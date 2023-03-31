@@ -24,7 +24,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 args = t.args
 args.extra = 5
 args.serverList &= "another"

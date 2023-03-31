@@ -23,7 +23,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 warn("todo: not done")
 # if(true, warn("expected this"))
 # if(false, warn("should not hit this"))

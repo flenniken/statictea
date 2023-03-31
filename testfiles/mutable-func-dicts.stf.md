@@ -40,7 +40,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.path = path("filename.tif")
 o.path.abc = 5
 

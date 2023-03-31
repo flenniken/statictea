@@ -39,7 +39,7 @@ $statictea \
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.header = """
 <!DOCTYPE html>
 <html lang="{s.languageCode}" dir="{s.languageDirection}">

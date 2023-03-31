@@ -67,7 +67,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 # Create a list of 7 ints.
 o.v = list(1,2,3,4,5,6,7)
 

@@ -43,7 +43,7 @@ $$ endblock
 
 ### File shared.tea
 
-~~~
+~~~ nim
 o.name = if((s.color == "green"), "ok", "failed")
 o.shortCiruit = if((false and exists(aaa, x)), "failed", "expected")
 
