@@ -34,7 +34,7 @@ $$ endblock
 
 ### File codefile.tea
 
-~~~
+~~~ nim
 # codefile.tea
 
 o.a = 5

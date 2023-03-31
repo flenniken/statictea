@@ -46,13 +46,13 @@ hello {o.data2}
 
 ### File c1.tea
 
-~~~
+~~~ nim
 o.data1 = "c1.tea"
 ~~~
 
 ### File c2.tea
 
-~~~
+~~~ nim
 o.data2 = "c2.tea"
 ~~~
 

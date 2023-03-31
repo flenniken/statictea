@@ -42,7 +42,7 @@ $$ endblock
 
 How to tell whether an element exists in a list using listLoop.
 
-~~~
+~~~ nim
 item-exists = func(ix: int, value: int, needle: int) bool
   ## Return true when needle equals value.
   return((needle == value))
@@ -61,7 +61,7 @@ o.tea1.found = found
 
 How to determine the index of an item in a list.
 
-~~~
+~~~ nim
 item-index = func(ix: int, value: int, d: dict) bool
   ## Set d.ix with the index of d.needle when found.
   if((value != d.needle), return(false))
