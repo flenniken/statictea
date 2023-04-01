@@ -39,6 +39,18 @@ proc testGetDotNameOr(text: string, start: Natural,
     if eNewDotNameOr.isMessage:
       showWarningData(text, start, eNewDotNameOr.message, "expected")
 
+proc testGetParameterNameOr(text: string, start: Natural,
+    eNewParameterNameOr: ParameterNameOr): bool =
+  let gotVnOr = getParameterNameOr(text, start)
+  result = gotExpected($gotVnOr, $eNewParameterNameOr)
+  if not result:
+    echo startColumn(text, start, "↓ start")
+    echo "0123456789 123456789 123456789 123456789"
+    if gotVnOr.isMessage:
+      showWarningData(text, start, gotVnOr.message, "got")
+    if eNewParameterNameOr.isMessage:
+      showWarningData(text, start, eNewParameterNameOr.message, "expected")
+
 proc echoValuePosSiOr(statement: Statement, start: Natural,
     valueAndPosOr: ValuePosSiOr, eValuePosSiOr: ValuePosSiOr) =
   ## Show the statement and the two values and positions so you can
@@ -1996,11 +2008,11 @@ White$1
     check testParseSignature("fn", "", 0, newSignatureOr(wParameterName, "", 0))
 
   test "signature missing signature2":
-    check testParseSignature("fn", "   \t  ", 0, newSignatureOr(wParameterName, "", 0))
+    check testParseSignature("fn", "   \t  ", 0, newSignatureOr(wParameterName, "", 6))
 
   test "signature bad parameter name":
     check testParseSignature("path", "func(21name: string) dict", 5,
-      newSignatureOr(wParameterName, "", 5))
+      newSignatureOr(wVarStartsWithLetter, "", 5))
 
   test "signature extra parentheses":
     check testParseSignature("path", "func(name(): string) dict", 5,
@@ -2013,6 +2025,10 @@ White$1
   test "signature invalid type":
     check testParseSignature("path", "func(name: number) dict", 5,
       newSignatureOr(wExpectedParamType, "", 11))
+
+  test "signature dotname":
+    check testParseSignature("path", "func(d.name: int) dict", 5,
+      newSignatureOr(wVarNameNotDotName, "", 6))
 
   test "signature comma or paren":
     check testParseSignature("path", "func(num: string;) dict", 5,
@@ -2045,7 +2061,7 @@ White$1
   test "signature missing":
     check testParseSignature("path", "func(", 5, newSignatureOr(wParameterName, "", 5))
     check testParseSignature("path", "func( ", 6, newSignatureOr(wParameterName, "", 6))
-    check testParseSignature("path", "func( :", 6, newSignatureOr(wParameterName, "", 6))
+    check testParseSignature("path", "func( :", 6, newSignatureOr(wVarStartsWithLetter, "", 6))
     check testParseSignature("path", "func(name", 5, newSignatureOr(wMissingColon, "", 9))
     check testParseSignature("path", "func(name a", 5, newSignatureOr(wMissingColon, "", 10))
     check testParseSignature("path", "func(name:", 5, newSignatureOr(wExpectedParamType, "", 10))
@@ -2103,7 +2119,7 @@ White$1
     check testParseSignature2("""fn = func()""", 10, "fn",
       newSignatureOr(wExpectedReturnType, "", 11))
     check testParseSignature2("""fn = func(")""", 10, "fn",
-      newSignatureOr(wParameterName, "", 10))
+      newSignatureOr(wVarStartsWithLetter, "", 10))
     check testParseSignature2("""fn = func() j """, 10, "fn",
       newSignatureOr(wExpectedReturnType, "", 12))
 
@@ -3403,3 +3419,19 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
+  test "getParameterNameOr":
+    check testGetParameterNameOr("a = func(name: int) bool", 9, newParameterNameOr("name", 13))
+    check testGetParameterNameOr("name: int) bool", 0, newParameterNameOr("name", 4))
+    check testGetParameterNameOr("name-A_09: int) bool", 0, newParameterNameOr("name-A_09", 9))
+    check testGetParameterNameOr("name  : int) bool", 0, newParameterNameOr("name", 6))
+    check testGetParameterNameOr("name--zz  : int) bool", 0, newParameterNameOr("name--zz", 10))
+    var longName = "a23456789_123456789_123456789_123456789_123456789_123456789_1234"
+    check testGetParameterNameOr("func($1: int" % longName, 5, newParameterNameOr(longName, 69))
+
+    check testGetParameterNameOr("", 0, newParameterNameOr(wParameterName, "", 0))
+    check testGetParameterNameOr("abcde", 10, newParameterNameOr(wParameterName, "", 10))
+    check testGetParameterNameOr("func($one: int", 5, newParameterNameOr(wVarStartsWithLetter, "", 5))
+    check testGetParameterNameOr("func(d.one: int", 5, newParameterNameOr(wVarNameNotDotName, "", 6))
+    check testGetParameterNameOr("func(one-: int", 5, newParameterNameOr(wVarEndsWith, "", 9))
+    longName.add("a")
+    check testGetParameterNameOr("func($1: int" % longName, 5, newParameterNameOr(wVarMaximumLength, "", 69))

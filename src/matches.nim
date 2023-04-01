@@ -163,31 +163,6 @@ func matchVersionNotCached*(line: string, start: Natural = 0,
   ## called by a function because it has no side effects.
   result = matchPattern(line, versionPattern, start, 3)
 
-proc matchDotNames*(line: string, start: Natural = 0): Option[Matches] =
-  ## Matches variable dot names and surrounding whitespace. Return the
-  ## dot names as one string like "a.b.c.d".
-  ## @:
-  ## @:A dot name is a list of variable names separated y dots.
-  ## @:You can have 1 to 5 variable names in a dot name.
-  ## @:
-  ## @:A variable name starts with a letter followed by letters, digits
-  ## @:minuses and underscores limited to a total of 64 characters.
-  ## @:No space is allowed between the function name and the left
-  ## @:parentheses or bracket.
-  ## @:Return three groups, the leading whitespace, the dotNames and the
-  ## @:optional left parentheses or bracket following the dot name. The
-  ## @:length returned includes the optional trailing whitespace.
-  ## @:
-  ## @:Example call:
-  ## @:
-  ## @:~~~
-  ## @:let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
-  ## @:~~~~
-
-  let name = r"[a-zA-Z][a-zA-Z0-9_-]{0,63}"
-  let pattern = r"(\s*)((?:$1)(?:\.$1){0,4})([\(\[]){0,1}\s*" % [name]
-  result = matchPatternCached(line, pattern, start, 3)
-
 type
   GroupSymbol* = enum
     ## Grouping symbols we search for in the statements.

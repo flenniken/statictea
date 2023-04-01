@@ -180,6 +180,17 @@ type
   DotNameOr* = OpResultWarn[DotName]
     ## A DotName or a warning.
 
+  ParameterName* = object
+    ## A parameter name in a statement.
+    ## @:
+    ## @:* name -- the parameter name string
+    ## @:* pos -- the position after the trailing whitespace
+    name*: string
+    pos*: Natural
+
+  ParameterNameOr* = OpResultWarn[ParameterName]
+    ## A parameter name or a warning.
+
   RightType* = enum
     ## The type of the right hand side of a statement.
     ## @:
@@ -214,6 +225,20 @@ func newDotNameOr*(dotName: string, kind: DotNameKind,
   let vn = newDotName(dotName, kind, pos)
   result = opValueW[DotName](vn)
 
+func newParameterName*(name: string, pos: Natural): ParameterName =
+  ## Create a new ParameterName object.
+  result = ParameterName(name: name, pos: pos)
+
+func newParameterNameOr*(name: string, pos: Natural): ParameterNameOr =
+  ## Create a new ParameterNameOr object.
+  let parameterName = newParameterName(name, pos)
+  result = opValueW[ParameterName](parameterName)
+
+func newParameterNameOr*(warning: MessageId, p1 = "", pos = 0): ParameterNameOr =
+  ## Create a warning.
+  let warningData = newWarningData(warning, p1, pos)
+  result = opMessageW[ParameterName](warningData)
+
 func getRightType*(statement: Statement, start: Natural): RightType =
   ## Return the type of the right hand side of the statement at the
   ## start position.
@@ -243,10 +268,96 @@ func getRightType*(statement: Statement, start: Natural): RightType =
   else:
     result = rtNothing
 
+proc getParameterNameOr*(text: string, startPos: Natural): ParameterNameOr =
+  ## Get a parameter name from the statement and skip trailing
+  ## @:whitespace. Start points at a name.
+  ## @:
+  ## @:~~~statictea
+  ## @:a = func(var-name : int) dict
+  ## @:         ^        ^
+  ## @:~~~~
+  assert(startPos >= 0, "startPos is less than 0")
+
+  if startPos >= text.len:
+    # Expected a parameter name.
+    return newParameterNameOr(wParameterName, "", startPos)
+
+  type
+    State = enum
+      ## Parsing states.
+      start, middle, atHyphenUnderscore, endWhitespace
+
+  var state = start
+  var parameterName = ""
+  var currentPos: int
+
+  # Loop through the text one byte at a time.
+  currentPos = startPos - 1
+  while true:
+    inc(currentPos)
+    if currentPos > text.len - 1:
+      break
+
+    let ch = text[currentPos]
+    case state
+    of start:
+      case ch
+      of 'a'..'z', 'A'..'Z':
+        parameterName.add(ch)
+        state = middle
+      else:
+        # A variable starts with an ascii letter.
+        return newParameterNameOr(wVarStartsWithLetter, "", currentPos)
+
+    of middle:
+      case ch
+      of 'a'..'z', 'A'..'Z', '0'..'9':
+        parameterName.add(ch)
+      of '-', '_':
+        parameterName.add(ch)
+        state = atHyphenUnderscore
+      of '.':
+        # Expected a variable name without dots.
+        return newParameterNameOr(wVarNameNotDotName, "", currentPos)
+      of ' ', '\t':
+        state = endWhitespace
+      else:
+        break # done
+
+    of atHyphenUnderscore:
+      case ch
+      of 'a'..'z', 'A'..'Z', '0'..'9':
+        state = middle
+      of '-', '_':
+        discard
+      else:
+        break
+      parameterName.add(ch)
+
+    of endWhitespace:
+      case ch
+      of ' ', '\t':
+        discard
+      else:
+        break # done
+
+  case state:
+  of start, middle, endWhitespace:
+    discard
+  of atHyphenUnderscore:
+    # A variable name ends with an ascii letter or digit.
+    return newParameterNameOr(wVarEndsWith, "", currentPos)
+
+  if parameterName.len > maxNameLength:
+    # A variable and dot name are limited to 64 characters.
+    return newParameterNameOr(wVarMaximumLength, "", startPos+maxNameLength)
+
+  result = newParameterNameOr(parameterName, currentPos)
+
 proc getDotNameOr*(text: string, startPos: Natural): DotNameOr =
   ## Get a dot name from the statement. Start points at a name.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = var-name( 1 )
   ## @:    ^         ^
   ## @:a = abc # comment
@@ -367,7 +478,8 @@ proc getDotNameOr*(text: string, startPos: Natural): DotNameOr =
   result = newDotNameOr(dotName, variableNameKind, currentPos)
 
 proc getDotName*(text: string, start: Natural): DotNameOr =
-  ## Get a variable name from the statement. Skip leading whitespace.
+  ## Get a variable name (dotname) from the statement. Skip leading
+  ## whitespace.
 
   # Skip whitespace, if any.
   var runningPos = start
@@ -745,7 +857,7 @@ func getString*(str: string, start: Natural): ValuePosSiOr =
   ## the return position is after the optional trailing white space
   ## following the last quote.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:var = "hello" # asdf
   ## @:      ^       ^
   ## @:~~~~
@@ -778,7 +890,7 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
   ## of a function argument.  Return the first non-whitespace
   ## character after the argument or a message when there is a
   ## problem.
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = fn( 1 )
   ## @:        ^ ^
   ## @:          ^^
@@ -1006,7 +1118,7 @@ proc ifFunctions*(
   ## @:
   ## @:This handles the three parameter form with an assignment.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = if(cond, then, else)
   ## @:       ^                ^
   ## @:a = if(cond, then)
@@ -1106,7 +1218,7 @@ proc bareIfAndIf0*(
   ## Handle the bare if/if0. Return the resulting value and the
   ## position in the statement after the if.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:if(cond, return("stop"))
   ## @:   ^                    ^
   ## @:if(c, warn("c is true"))
@@ -1287,7 +1399,7 @@ proc getArguments*(
   ## Get the function arguments and the position of each. If an
   ## argument has a side effect, the return value and pos and side
   ## effect is returned, else a 0 value and seNone is returned.
-  ## @:~~~
+  ## @:~~~statictea
   ## @:newList = listLoop(list, callback, state)  # comment
   ## @:                   ^                       ^
   ## @:newList = listLoop(return(3), callback, state)  # comment
@@ -1358,7 +1470,7 @@ proc getFunctionValuePosSi*(
   ## first argument of the function. The position includes the trailing
   ## whitespace after the ending ).
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = get(b, 2, c) # condition
   ## @:        ^        ^
   ## @:a = get(b, len("hi"), c)
@@ -1476,7 +1588,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
   ## parentheses. The position includes the trailing whitespace after
   ## the ending ).
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = (5 < 3) # condition
   ## @:    ^       ^
   ## @:~~~~
@@ -1608,7 +1720,7 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
   ## Return the value of the bracketed variable and the position after
   ## the trailing whitespace.. Start points at the the first argument.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = list[ 4 ]
   ## @:          ^  ^
   ## @:a = dict[ "abc" ]
@@ -1743,7 +1855,7 @@ proc listLoop*(
   ## @:includes the trailing whitespace after the ending right
   ## @:parentheses.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:stopped = listLoop(list, new, callback, state)
   ## @:                   ^                          ^
   ## @:~~~~
@@ -1773,7 +1885,7 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
   ## points at the right hand side of the statement. The return pos is
   ## the first character after trailing whitespace.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = 5  # statement
   ## @:    ^  ^
   ## @:
@@ -1878,7 +1990,7 @@ proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variable
   ## pointed to by start is the first item after the equal sign (not
   ## an argument).
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:a = "tea" # string
   ## @:    ^     ^
   ## @:a = cmp(b, c) # calling variable
@@ -1905,7 +2017,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   ## Handle bare function: if, if0, return, warn, log and listLoop. A
   ## bare function does not assign a variable.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:if( true, warn("tea time")) # test
   ## @:^                           ^
   ## @:return(5)
@@ -1943,7 +2055,7 @@ proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: DotName): ValuePosSiOr =
   ## Convert var[key] to a dot name.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:key = "hello"
   ## @:name[key] = 20
   ## @:^         ^
@@ -2224,6 +2336,11 @@ proc parseSignature*(dotName: string, signature: string, start: Natural): Signat
     # No parameters case.
     runningPos += rightParen.get().length
   else:
+    # Skip whitespace, if any.
+    let spaceMatchO = matchTabSpace(signature, runningPos)
+    if isSome(spaceMatchO):
+      runningPos += spaceMatchO.get().length
+    
     # One or more parameters.
 
     while true:
@@ -2232,19 +2349,11 @@ proc parseSignature*(dotName: string, signature: string, start: Natural): Signat
         return newSignatureOr(wNotLastOptional, "", runningPos)
 
       # Get the parameter name and following white space.
-      let paramNameOr = getDotName(signature, runningPos)
-      if paramNameOr.isMessage:
-        # Excected a parameter name.
-        return newSignatureOr(wParameterName, "", runningPos)
-      let paramName = paramNameOr.value
-
-      case paramName.kind
-      of vnkFunction, vnkGet:
-        # Expected a colon.
-        return newSignatureOr(wMissingColon, "", runningPos + paramName.dotName.len)
-      of vnkNormal:
-        discard
-      runningPos = paramName.pos
+      let parameterNameOr = getParameterNameOr(signature, runningPos)
+      if parameterNameOr.isMessage:
+        return newSignatureOr(parameterNameOr.message)
+      let parameterName = parameterNameOr.value
+      runningPos = parameterName.pos
 
       # Look for : and the following white space.
       let colonO = matchSymbol(signature, gColon, runningPos)
@@ -2264,7 +2373,7 @@ proc parseSignature*(dotName: string, signature: string, start: Natural): Signat
       runningPos += paramTypeLen
 
       let paramType = strToParamType(paramTypeStr)
-      params.add(newParam(paramName.dotName, paramType))
+      params.add(newParam(parameterName.name, paramType))
 
       # Look for a comma or right parentheses.
       let corpO = matchCommaOrSymbol(signature, gRightParentheses, runningPos)

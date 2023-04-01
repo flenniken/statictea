@@ -21,7 +21,6 @@ Methods for matching sub-strings.
 * [matchFileLine](#matchfileline) &mdash; Match a file and line number like: filename(234).
 * [matchVersion](#matchversion) &mdash; Match a StaticTea version number.
 * [matchVersionNotCached](#matchversionnotcached) &mdash; Match a StaticTea version number.
-* [matchDotNames](#matchdotnames) &mdash; Matches variable dot names and surrounding whitespace.
 * type: [GroupSymbol](#groupsymbol) &mdash; Grouping symbols we search for in the statements.
 * [matchCommaOrSymbol](#matchcommaorsymbol) &mdash; Match a comma or the symbol and the optional trailing whitespace.
 * [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
@@ -187,32 +186,6 @@ Match a StaticTea version number. "Not cached" allows it to be called by a funct
 ~~~nim
 func matchVersionNotCached(line: string; start: Natural = 0;
                            numGroups: Natural = 0): Option[Matches]
-~~~
-
-# matchDotNames
-
-Matches variable dot names and surrounding whitespace. Return the dot names as one string like "a.b.c.d".
-
-A dot name is a list of variable names separated y dots.
-You can have 1 to 5 variable names in a dot name.
-
-A variable name starts with a letter followed by letters, digits
-minuses and underscores limited to a total of 64 characters.
-No space is allowed between the function name and the left
-parentheses or bracket.
-Return three groups, the leading whitespace, the dotNames and the
-optional left parentheses or bracket following the dot name. The
-length returned includes the optional trailing whitespace.
-
-Example call:
-
-~~~
-let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
-~~~
-
-~~~nim
-proc matchDotNames(line: string; start: Natural = 0): Option[Matches] {.
-    raises: [ValueError, KeyError], tags: [].}
 ~~~
 
 # GroupSymbol

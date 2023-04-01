@@ -31,7 +31,6 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 <li> <a href="#matchFileLine">matchFileLine</a> &mdash; Match a file and line number like: filename(234).</li>
 <li> <a href="#matchVersion">matchVersion</a> &mdash; Match a StaticTea version number.</li>
 <li> <a href="#matchVersionNotCached">matchVersionNotCached</a> &mdash; Match a StaticTea version number.</li>
-<li> <a href="#matchDotNames">matchDotNames</a> &mdash; Matches variable dot names and surrounding whitespace.</li>
 <li>type:  <a href="#GroupSymbol">GroupSymbol</a> &mdash; Grouping symbols we search for in the statements.</li>
 <li> <a href="#matchCommaOrSymbol">matchCommaOrSymbol</a> &mdash; Match a comma or the symbol and the optional trailing whitespace.</li>
 <li> <a href="#matchSymbol">matchSymbol</a> &mdash; Match the symbol and the optional trailing whitespace.</li>
@@ -201,33 +200,6 @@ proc matchVersion(line: string; start: Natural = 0): Option[Matches] {.
 <pre class="nim-code">
 func matchVersionNotCached(line: string; start: Natural = 0;
                            numGroups: Natural = 0): Option[Matches]
-</pre>
-
-<h3 id="matchDotNames">matchDotNames</h3>
-
-<p>Matches variable dot names and surrounding whitespace. Return the dot names as one string like &quot;a.b.c.d&quot;.
-
-</p><p>A dot name is a list of variable names separated y dots.
-You can have 1 to 5 variable names in a dot name.
-
-</p><p>A variable name starts with a letter followed by letters, digits
-minuses and underscores limited to a total of 64 characters.
-No space is allowed between the function name and the left
-parentheses or bracket.
-Return three groups, the leading whitespace, the dotNames and the
-optional left parentheses or bracket following the dot name. The
-length returned includes the optional trailing whitespace.
-
-</p><p>Example call:
-
-</p><pre class="plain-code">
-let (_, dotNameStr, leftParenBrack, dotNameLen) = matchesO.get3GroupsLen()
-</pre>
-
-
-<pre class="nim-code">
-proc matchDotNames(line: string; start: Natural = 0): Option[Matches] {.
-    raises: [ValueError, KeyError], tags: [].}
 </pre>
 
 <h3 id="GroupSymbol">GroupSymbol</h3>

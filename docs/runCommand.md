@@ -27,13 +27,20 @@ Run a command and fill in the variables dictionaries.
 * type: [DotNameKind](#dotnamekind) &mdash; The variable name type.
 * type: [DotName](#dotname) &mdash; A variable name in a statement.
 * type: [DotNameOr](#dotnameor) &mdash; A DotName or a warning.
+* type: [ParameterName](#parametername) &mdash; A parameter name in a statement.
+* type: [ParameterNameOr](#parameternameor) &mdash; A parameter name or a warning.
 * type: [RightType](#righttype) &mdash; The type of the right hand side of a statement.
 * [newDotName](#newdotname) &mdash; Create a new DotName object.
 * [newDotNameOr](#newdotnameor) &mdash; Create a PosOr warning.
 * [newDotNameOr](#newdotnameor-1) &mdash; Create a new DotNameOr object.
+* [newParameterName](#newparametername) &mdash; Create a new ParameterName object.
+* [newParameterNameOr](#newparameternameor) &mdash; Create a new ParameterNameOr object.
+* [newParameterNameOr](#newparameternameor-1) &mdash; Create a warning.
 * [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the start position.
+* [getParameterNameOr](#getparameternameor) &mdash; Get a parameter name from the statement and skip trailing
+whitespace.
 * [getDotNameOr](#getdotnameor) &mdash; Get a dot name from the statement.
-* [getDotName](#getdotname) &mdash; Get a variable name from the statement.
+* [getDotName](#getdotname) &mdash; Get a variable name (dotname) from the statement.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
@@ -291,6 +298,27 @@ A DotName or a warning.
 DotNameOr = OpResultWarn[DotName]
 ~~~
 
+# ParameterName
+
+A parameter name in a statement.
+
+* name -- the parameter name string
+* pos -- the position after the trailing whitespace
+
+~~~nim
+ParameterName = object
+  name*: string
+  pos*: Natural
+~~~
+
+# ParameterNameOr
+
+A parameter name or a warning.
+
+~~~nim
+ParameterNameOr = OpResultWarn[ParameterName]
+~~~
+
 # RightType
 
 The type of the right hand side of a statement.
@@ -333,6 +361,30 @@ Create a new DotNameOr object.
 func newDotNameOr(dotName: string; kind: DotNameKind; pos: Natural): DotNameOr
 ~~~
 
+# newParameterName
+
+Create a new ParameterName object.
+
+~~~nim
+func newParameterName(name: string; pos: Natural): ParameterName
+~~~
+
+# newParameterNameOr
+
+Create a new ParameterNameOr object.
+
+~~~nim
+func newParameterNameOr(name: string; pos: Natural): ParameterNameOr
+~~~
+
+# newParameterNameOr
+
+Create a warning.
+
+~~~nim
+func newParameterNameOr(warning: MessageId; p1 = ""; pos = 0): ParameterNameOr
+~~~
+
 # getRightType
 
 Return the type of the right hand side of the statement at the start position.
@@ -341,11 +393,25 @@ Return the type of the right hand side of the statement at the start position.
 func getRightType(statement: Statement; start: Natural): RightType
 ~~~
 
+# getParameterNameOr
+
+Get a parameter name from the statement and skip trailing
+whitespace. Start points at a name.
+
+~~~javascript
+a = func(var-name : int) dict
+         ^        ^
+~~~
+
+~~~nim
+proc getParameterNameOr(text: string; startPos: Natural): ParameterNameOr
+~~~
+
 # getDotNameOr
 
 Get a dot name from the statement. Start points at a name.
 
-~~~
+~~~javascript
 a = var-name( 1 )
     ^         ^
 a = abc # comment
@@ -360,7 +426,7 @@ proc getDotNameOr(text: string; startPos: Natural): DotNameOr
 
 # getDotName
 
-Get a variable name from the statement. Skip leading whitespace.
+Get a variable name (dotname) from the statement. Skip leading whitespace.
 
 ~~~nim
 proc getDotName(text: string; start: Natural): DotNameOr {.raises: [KeyError],
@@ -471,7 +537,7 @@ proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches]
 
 Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
 
-~~~
+~~~javascript
 var = "hello" # asdf
       ^       ^
 ~~~
@@ -491,7 +557,7 @@ func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 # skipArgument
 
 Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
-~~~
+~~~javascript
 a = fn( 1 )
         ^ ^
           ^^
@@ -509,7 +575,7 @@ Return the if/if0 function's value and position after. It conditionally runs one
 
 This handles the three parameter form with an assignment.
 
-~~~
+~~~javascript
 a = if(cond, then, else)
        ^                ^
 a = if(cond, then)
@@ -527,7 +593,7 @@ proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
 
 Handle the bare if/if0. Return the resulting value and the position in the statement after the if.
 
-~~~
+~~~javascript
 if(cond, return("stop"))
    ^                    ^
 if(c, warn("c is true"))
@@ -554,7 +620,7 @@ proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
 # getArguments
 
 Get the function arguments and the position of each. If an argument has a side effect, the return value and pos and side effect is returned, else a 0 value and seNone is returned.
-~~~
+~~~javascript
 newList = listLoop(list, callback, state)  # comment
                    ^                       ^
 newList = listLoop(return(3), callback, state)  # comment
@@ -572,7 +638,7 @@ proc getArguments(env: var Env; statement: Statement; start: Natural;
 
 Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
 
-~~~
+~~~javascript
 a = get(b, 2, c) # condition
         ^        ^
 a = get(b, len("hi"), c)
@@ -607,7 +673,7 @@ func runCompareOp(left: Value; op: string; right: Value): Value
 
 Return the bool value of the condition expression and the position after it.  The start index points at the ( left parentheses. The position includes the trailing whitespace after the ending ).
 
-~~~
+~~~javascript
 a = (5 < 3) # condition
     ^       ^
 ~~~
@@ -622,7 +688,7 @@ proc getCondition(env: var Env; statement: Statement; start: Natural;
 
 Return the value of the bracketed variable and the position after the trailing whitespace.. Start points at the the first argument.
 
-~~~
+~~~javascript
 a = list[ 4 ]
           ^  ^
 a = dict[ "abc" ]
@@ -644,7 +710,7 @@ points at the first parameter of the function. The position
 includes the trailing whitespace after the ending right
 parentheses.
 
-~~~
+~~~javascript
 stopped = listLoop(list, new, callback, state)
                    ^                          ^
 ~~~
@@ -659,7 +725,7 @@ proc listLoop(env: var Env; specialFunction: SpecialFunction;
 
 Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.  The position returned includes the trailing whitespace after the item. The ending position is pointing at the end of the statement, or at the first non-whitespace character after the argument. A true topLevel parameter means the item pointed to by start is the first item after the equal sign (not an argument).
 
-~~~
+~~~javascript
 a = "tea" # string
     ^     ^
 a = cmp(b, c) # calling variable
@@ -678,7 +744,7 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 
 Handle bare function: if, if0, return, warn, log and listLoop. A bare function does not assign a variable.
 
-~~~
+~~~javascript
 if( true, warn("tea time")) # test
 ^                           ^
 return(5)
@@ -695,7 +761,7 @@ proc runBareFunction(env: var Env; statement: Statement; start: Natural;
 
 Convert var[key] to a dot name.
 
-~~~
+~~~javascript
 key = "hello"
 name[key] = 20
 ^         ^
