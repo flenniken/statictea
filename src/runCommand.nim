@@ -157,7 +157,7 @@ func `!=`*(a: PosOr, b: PosOr): bool =
   result = not (a == b)
 
 type
-  VariableNameKind* = enum
+  DotNameKind* = enum
     ## The variable name type.
     ## @:
     ## @:vtNormal -- a variable with whitespace following it
@@ -167,17 +167,18 @@ type
     vnkFunction,
     vnkGet
 
-  VariableName* = object
+  DotName* = object
     ## A variable name in a statement.
     ## @:
     ## @:* dotName -- the dot name string
     ## @:* kind -- the kind of name defined by the character following the name
     ## @:* pos -- the position after the trailing whitespace
     dotName*: string
-    kind*: VariableNameKind
+    kind*: DotNameKind
     pos*: Natural
 
-  VariableNameOr* = OpResultWarn[VariableName]
+  DotNameOr* = OpResultWarn[DotName]
+    ## A DotName or a warning.
 
   RightType* = enum
     ## The type of the right hand side of a statement.
@@ -197,21 +198,21 @@ type
     rtList,
     rtCondition,
 
-func newVariableName*(dotName: string, kind: VariableNameKind,
-    pos: Natural): VariableName =
-  ## Create a new VariableName object.
-  result = VariableName(dotName: dotName, kind: kind, pos: pos)
+func newDotName*(dotName: string, kind: DotNameKind,
+    pos: Natural): DotName =
+  ## Create a new DotName object.
+  result = DotName(dotName: dotName, kind: kind, pos: pos)
 
-func newVariableNameOr*(warning: MessageId, p1 = "", pos = 0): VariableNameOr =
+func newDotNameOr*(warning: MessageId, p1 = "", pos = 0): DotNameOr =
   ## Create a PosOr warning.
   let warningData = newWarningData(warning, p1, pos)
-  result = opMessageW[VariableName](warningData)
+  result = opMessageW[DotName](warningData)
 
-func newVariableNameOr*(dotName: string, kind: VariableNameKind,
-    pos: Natural): VariableNameOr =
-  ## Create a new VariableNameOr object.
-  let vn = newVariableName(dotName, kind, pos)
-  result = opValueW[VariableName](vn)
+func newDotNameOr*(dotName: string, kind: DotNameKind,
+    pos: Natural): DotNameOr =
+  ## Create a new DotNameOr object.
+  let vn = newDotName(dotName, kind, pos)
+  result = opValueW[DotName](vn)
 
 func getRightType*(statement: Statement, start: Natural): RightType =
   ## Return the type of the right hand side of the statement at the
@@ -242,8 +243,8 @@ func getRightType*(statement: Statement, start: Natural): RightType =
   else:
     result = rtNothing
 
-proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
-  ## Get a variable name from the statement. Start points at a name.
+proc getDotNameOr*(text: string, startPos: Natural): DotNameOr =
+  ## Get a dot name from the statement. Start points at a name.
   ## @:
   ## @:~~~
   ## @:a = var-name( 1 )
@@ -257,7 +258,7 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
 
   if startPos >= text.len:
     # A variable starts with an ascii letter.
-    return newVariableNameOr(wVarStartsWithLetter, "", startPos)
+    return newDotNameOr(wVarStartsWithLetter, "", startPos)
 
   type
     State = enum
@@ -267,7 +268,7 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
   var state = start
   var names = newSeq[string]()
   var currentName = ""
-  var variableNameKind: VariableNameKind
+  var variableNameKind: DotNameKind
   var currentPos: int
   var stopOnChar = false
 
@@ -287,7 +288,7 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
         state = middle
       else:
         # A variable starts with an ascii letter.
-        return newVariableNameOr(wVarStartsWithLetter, "", currentPos)
+        return newDotNameOr(wVarStartsWithLetter, "", currentPos)
 
     of middle:
       case ch
@@ -328,7 +329,7 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
         discard
       else:
         # A variable name ends with an ascii letter or digit.
-        return newVariableNameOr(wVarEndsWith, "", currentPos)
+        return newDotNameOr(wVarEndsWith, "", currentPos)
       currentName.add(ch)
 
     of dotState:
@@ -338,7 +339,7 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
         currentName.add(ch)
       else:
         # A variable starts with an ascii letter.
-        return newVariableNameOr(wVarStartsWithLetter, "", currentPos)
+        return newDotNameOr(wVarStartsWithLetter, "", currentPos)
 
     of endWhitespace:
       case ch
@@ -356,16 +357,16 @@ proc getVariableNameOr*(text: string, startPos: Natural): VariableNameOr =
     discard
   of dotState, atHyphenUnderscore:
     # A variable name ends with an ascii letter or digit.
-    return newVariableNameOr(wVarEndsWith, "", currentPos)
+    return newDotNameOr(wVarEndsWith, "", currentPos)
 
   let dotName = names.join(".")
   if dotName.len > maxNameLength:
     # A variable and dot name are limited to 64 characters.
-    return newVariableNameOr(wVarMaximumLength, "", startPos+maxNameLength)
+    return newDotNameOr(wVarMaximumLength, "", startPos+maxNameLength)
 
-  result = newVariableNameOr(dotName, variableNameKind, currentPos)
+  result = newDotNameOr(dotName, variableNameKind, currentPos)
 
-proc getVariableName*(text: string, start: Natural): VariableNameOr =
+proc getDotName*(text: string, start: Natural): DotNameOr =
   ## Get a variable name from the statement. Skip leading whitespace.
 
   # Skip whitespace, if any.
@@ -374,7 +375,7 @@ proc getVariableName*(text: string, start: Natural): VariableNameOr =
   if isSome(spaceMatchO):
     runningPos += spaceMatchO.get().length
 
-  result = getVariableNameOr(text, runningPos)
+  result = getDotNameOr(text, runningPos)
 
 func isTriple(line: string, ch: char, ix: Natural): bool =
   if ch == '"' and line.len >= ix-2 and
@@ -557,6 +558,7 @@ proc warnStatement*(env: var Env, statement: Statement,
 
 proc warnStatement*(env: var Env, statement: Statement,
     messageId: MessageId, p1: string, pos:Natural, sourceFilename = "") =
+  ## Show an invalid statement with a pointer pointing at the start of the problem.
   let warningData = newWarningData(messageId, p1, pos)
   env.warnStatement(statement, warningData, sourceFilename)
 
@@ -1810,7 +1812,7 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
 
   of rtVariable:
     # Get the variable name.
-    let rightNameOr = getVariableName(statement.text, start)
+    let rightNameOr = getDotName(statement.text, start)
     if rightNameOr.isMessage:
       return newValuePosSiOr(rightNameOr.message)
     let rightName = rightNameOr.value
@@ -1899,7 +1901,7 @@ proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variable
     showDebugPos(statement, pos, "^ f")
 
 proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables, leftName: VariableName): ValuePosSiOr =
+    variables: Variables, leftName: DotName): ValuePosSiOr =
   ## Handle bare function: if, if0, return, warn, log and listLoop. A
   ## bare function does not assign a variable.
   ## @:
@@ -1938,7 +1940,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
       statement, runningPos, variables, listCase=false, topLevel = true)
 
 proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables, leftName: VariableName): ValuePosSiOr =
+    variables: Variables, leftName: DotName): ValuePosSiOr =
   ## Convert var[key] to a dot name.
   ## @:
   ## @:~~~
@@ -1954,7 +1956,7 @@ proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
   # Get the index name.
   var runningPos = leftName.pos
   var indexName: string
-  let indexVarNameOr = getVariableName(statement.text, runningPos)
+  let indexVarNameOr = getDotName(statement.text, runningPos)
   if indexVarNameOr.isMessage:
     # Not a variable name, Look for a string literal.
     let valuePosSiOr = getString(statement.text, runningPos)
@@ -1983,7 +1985,7 @@ proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
       return newValuePosSiOr(wNotIndexString, "", runningPos)
 
     # Make sure the string is a valid variable name.
-    let indexVarNameOr = getVariableName(value.stringv, 0)
+    let indexVarNameOr = getDotName(value.stringv, 0)
     if indexVarNameOr.isMessage:
       # The index variable value is not a valid variable name.
       return newValuePosSiOr(wNotVariableName, "", runningPos)
@@ -2023,7 +2025,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
 
   # Get the variable dot name string and match the trailing white
   # space.
-  let leftNameOr = getVariableName(statement.text, runningPos)
+  let leftNameOr = getDotName(statement.text, runningPos)
   if leftNameOr.isMessage:
     return newVariableDataOr(leftNameOr.message)
   let leftName = leftNameOr.value
@@ -2096,6 +2098,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   result = newVariableDataOr(finalLeftName, operator, vlOr.value.value)
 
 proc skipSpaces*(text: string): Natural =
+  ## Skip the leading spaces and tabs.
   let spacesO = matchTabSpace(text, 0)
   if isSome(spacesO):
     result = spacesO.get().length
@@ -2204,9 +2207,9 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
 
 proc parseSignature*(dotName: string, signature: string, start: Natural): SignatureOr =
   ## Parse the signature and return the list of parameters or a
-  ## message.
+  ## @:message. Start points at the first parameter.
   ## @:
-  ## @:~~~
+  ## @:~~~statictea
   ## @:cmp = func(numStr1: string, numStr2: string) int
   ## @:           ^
   ## @:~~~~
@@ -2229,7 +2232,7 @@ proc parseSignature*(dotName: string, signature: string, start: Natural): Signat
         return newSignatureOr(wNotLastOptional, "", runningPos)
 
       # Get the parameter name and following white space.
-      let paramNameOr = getVariableName(signature, runningPos)
+      let paramNameOr = getDotName(signature, runningPos)
       if paramNameOr.isMessage:
         # Excected a parameter name.
         return newSignatureOr(wParameterName, "", runningPos)
@@ -2318,7 +2321,7 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
 
   # Get the left hand variable dot name string and match the
   # surrounding white space.
-  let leftNameOr = getVariableName(statement.text, runningPos)
+  let leftNameOr = getDotName(statement.text, runningPos)
   if leftNameOr.isMessage:
     return false
   let leftName = leftNameOr.value
@@ -2343,7 +2346,7 @@ proc isFunctionDefinition*(statement: Statement, retLeftName: var string,
   runningPos += matchLen
 
   # Look for "func(".
-  let funcNameOr = getVariableName(statement.text, runningPos)
+  let funcNameOr = getDotName(statement.text, runningPos)
   if funcNameOr.isMessage:
     return false
   let funcName = funcNameOr.value
@@ -2420,7 +2423,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
   userStatements.add(statement)
   while true:
     # Look for a return statement.
-    let leftNameOr = getVariableName(statement.text, 0)
+    let leftNameOr = getDotName(statement.text, 0)
     if leftNameOr.isValue:
       let leftName = leftNameOr.value
       if leftName.dotName == "return" and leftName.kind == vnkFunction:
@@ -2531,4 +2534,3 @@ proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]
   for filename in codeList:
     runCodeFile(env, variables, filename)
     resetVariables(variables)
-

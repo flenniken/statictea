@@ -188,22 +188,22 @@ proc get_test_module_cmd(filename: string, release = false, force = false): stri
   else:
     fb = ""
 
-  let part1 = "nim c --verbosity:0 --hint[Performance]:off "
-  let part2 = "--hint[XCannotRaiseY]:off --hint[Name]:off -d:test "
-  let part3 = fmt"{rel}{fb}-r -p:src --out:bin/{dirName}/{binName} tests/{filename}"
-
-  result = part1 & part2 & part3
+  result = fmt"""
+nim c --verbosity:0 --hint[Performance]:off --hint[XCannotRaiseY]:off \
+  --hint[Name]:off {rel} {fb} -r -p:src \
+  -d:test --out:bin/{dirName}/{binName} tests/{filename}"""
 
 proc buildRelease() =
   ## Build the release version of statictea.
-  let part1 = "nim c --hint[Performance]:off "
-  let part2 = "--hint[Conf]:off --hint[Name]:off --hint[Link]:off -d:release "
-  let part3 = fmt"--out:bin/{dirName}/ src/statictea"
-  var cmd = part1 & part2 & part3
-  echo cmd
-  exec cmd
-  cmd = fmt"strip bin/{dirName}/statictea"
-  exec cmd
+  let cmd = fmt"""
+nim c --hint[Performance]:off --hint[Conf]:off --hint[Name]:off --hint[Link]:off \
+  -d:release --out:bin/{dirName}/ src/statictea"""
+
+  let exeName = fmt"bin/{dirName}/statictea"
+  echo fmt"Build: {exeName}"
+  runCmd(cmd)
+  echo fmt"Strip: {exeName}"
+  runCmd(fmt"strip bin/{dirName}/statictea")
 
 proc readModuleDescription(filename: string): string =
   ## Return the module doc comment at the top of the file.
@@ -762,14 +762,18 @@ proc taskFuncDocs() =
   echo fmt"Generated: http://localhost:6419/{result}"
 
 proc buildRunner() =
-  let part1 = "nim c --hint[Performance]:off "
-  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
-  let part3 = fmt"--out:bin/{dirName}/ src/runner"
-  var cmd = part1 & part2 & part3
-  echo cmd
-  exec cmd
-  cmd = fmt"strip bin/{dirName}/runner"
-  exec cmd
+  let cmd = fmt"""
+nim c --hint[Performance]:off \
+  --hint[Conf]:off --hint[Link]: off \
+  -d:release \
+  --out:bin/{dirName}/ src/runner"""
+
+  let exeName = fmt"bin/{dirName}/runner"
+  echo fmt"Build runner: {exeName}"
+  runCmd(cmd)
+
+  echo fmt"Strip runner: {exeName}"
+  runCmd(fmt"strip {exeName}")
 
 proc runRunnerFolder() =
   ## Run the stf files in the testfiles folder.
@@ -786,15 +790,19 @@ proc get_stf_filenames(): seq[string] =
     if ".stf" in filename and not filename.startsWith(".#"):
       result.add(lastPathPart(filename))
 
+proc runAllStf() =
+  ## Run all the stf tests in the testfiles directory.
+  # Run the whole directory using the -d option.
+  let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
+  exec cmd
+
 proc runRunStf() =
   # Get the name of the stf to run.
   let name = get_last_argument()
 
-  # When the name is "rt" that means no name was specified.  Run the
-  # whole directory using the -d option.
+  # When the name is "rt" that means no name was specified, run all.
   if name == "rt":
-    let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
-    runCmd(cmd, showOutput = true)
+    runAllStf()
     return
 
   let stf_filenames = get_stf_filenames()
@@ -825,13 +833,6 @@ export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -f=testfi
     echo "command line used:"
     echo lastCmd
 
-proc runRunStfMain() =
-  try:
-    runRunStf()
-  except:
-    echo ""
-    discard
-
 proc sameBytes(a: string, b: string): bool =
   ## Return true when the two files contain the same bytes.
   let aBytes = slurp(a)
@@ -847,6 +848,14 @@ proc sameBytes(a: string, b: string): bool =
 
   result = true
 
+proc buildCmdLine() =
+  # Build the cmdline exe.
+  let cmd = fmt"""
+nim c --hint[Performance]:off \
+  --hint[Conf]:off --hint[Link]: off -d:release \
+  --out:bin/{dirName}/ src/cmdline"""
+  echo fmt"Build bin/{dirName}/cmdline"
+  runCmd(cmd)
 
 proc checkUtf8DecoderEcho() =
   ## Check whether there is a new version of utf8decoder.nim in the
@@ -880,6 +889,8 @@ proc checkUtf8DecoderEcho() =
     echo "Use ^^ to update the local copy."
 
 proc otherTests() =
+  ## Run miscellaneous tests except unit tests.
+
   # If functions.nim changes the dynamically generated content might
   # need to change. So check that the dynamic content file is newer
   # than the functions.nim source file.
@@ -890,14 +901,17 @@ proc otherTests() =
     echo ""
     exit()
 
-  # Make sure it builds with test undefined.
+  # Build the statictea release exe.
   buildRelease()
 
   # Build runner.
   buildRunner()
 
+  # Build the cmdline exe.
+  buildCmdLine()
+
   # Run the stf tests.
-  runRunnerFolder()
+  runAllStf()
 
   # Make sure utf8decoder is up-to-date.
   checkUtf8DecoderEcho()
@@ -1082,7 +1096,7 @@ task br, "\tBuild the stf test runner (bin/x/runner).":
   buildRunner()
 
 task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
-  runRunStfMain()
+  runRunStf()
 
 task stfix, "\tCreate stf test files index (testfiles/stf-index.md).":
   taskTestfilesReadme()
@@ -1119,13 +1133,7 @@ task helpme, "\tShow the statictea help text.":
   exec fmt"bin/{dirName}/statictea -h | less"
 
 task cmdline, "\tBuild cmdline test app (bin/x/cmdline).":
-  let part1 = "nim c --hint[Performance]:off "
-  let part2 = "--hint[Conf]:off --hint[Link]: off -d:release "
-  let part3 = fmt"--out:bin/{dirName}/ src/cmdline"
-  var cmd = part1 & part2 & part3
-  echo cmd
-  exec cmd
-  echo fmt"Run bin/{dirName}/cmdline"
+  buildCmdLine()
 
 const
   staticteaImage = "statictea-image"

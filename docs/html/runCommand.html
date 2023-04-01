@@ -34,22 +34,22 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#a___">`==`</a> &mdash; Return true when the two statements are equal.</li>
 <li> <a href="#a___-1">`==`</a> &mdash; Return true when a equals b.</li>
 <li> <a href="#a___-2">`!=`</a> &mdash; Compare whether two PosOr are not equal.</li>
-<li>type:  <a href="#VariableNameKind">VariableNameKind</a> &mdash; The variable name type.</li>
-<li>type:  <a href="#VariableName">VariableName</a> &mdash; A variable name in a statement.</li>
-<li>type:  <a href="#VariableNameOr">VariableNameOr</a> &mdash; </li>
+<li>type:  <a href="#DotNameKind">DotNameKind</a> &mdash; The variable name type.</li>
+<li>type:  <a href="#DotName">DotName</a> &mdash; A variable name in a statement.</li>
+<li>type:  <a href="#DotNameOr">DotNameOr</a> &mdash; A DotName or a warning.</li>
 <li>type:  <a href="#RightType">RightType</a> &mdash; The type of the right hand side of a statement.</li>
-<li> <a href="#newVariableName">newVariableName</a> &mdash; Create a new VariableName object.</li>
-<li> <a href="#newVariableNameOr">newVariableNameOr</a> &mdash; Create a PosOr warning.</li>
-<li> <a href="#newVariableNameOr-1">newVariableNameOr</a> &mdash; Create a new VariableNameOr object.</li>
+<li> <a href="#newDotName">newDotName</a> &mdash; Create a new DotName object.</li>
+<li> <a href="#newDotNameOr">newDotNameOr</a> &mdash; Create a PosOr warning.</li>
+<li> <a href="#newDotNameOr-1">newDotNameOr</a> &mdash; Create a new DotNameOr object.</li>
 <li> <a href="#getRightType">getRightType</a> &mdash; Return the type of the right hand side of the statement at the start position.</li>
-<li> <a href="#getVariableNameOr">getVariableNameOr</a> &mdash; Get a variable name from the statement.</li>
-<li> <a href="#getVariableName">getVariableName</a> &mdash; Get a variable name from the statement.</li>
+<li> <a href="#getDotNameOr">getDotNameOr</a> &mdash; Get a dot name from the statement.</li>
+<li> <a href="#getDotName">getDotName</a> &mdash; Get a variable name from the statement.</li>
 <li> <a href="#matchTripleOrPlusSign">matchTripleOrPlusSign</a> &mdash; Match the optional """ or + at the end of the line.</li>
 <li> <a href="#addText">addText</a> &mdash; Add the line up to the line-ending to the text string.</li>
 <li> <a href="#getFragmentAndPos">getFragmentAndPos</a> &mdash; Split up a long statement around the given position.</li>
 <li> <a href="#getWarnStatement">getWarnStatement</a> &mdash; Return a multiline error message.</li>
 <li> <a href="#warnStatement">warnStatement</a> &mdash; Show an invalid statement with a pointer pointing at the start of the problem.</li>
-<li> <a href="#warnStatement-1">warnStatement</a> &mdash; </li>
+<li> <a href="#warnStatement-1">warnStatement</a> &mdash; Show an invalid statement with a pointer pointing at the start of the problem.</li>
 <li> <a href="#removeLineEnd">removeLineEnd</a> &mdash; Return a new string with the n or rn removed from the end of the line.</li>
 <li> <a href="#yieldStatements">yieldStatements</a> &mdash; Iterate through the command's statements.</li>
 <li> <a href="#readStatement">readStatement</a> &mdash; Read the next statement from the code file reading multiple lines if needed.</li>
@@ -72,10 +72,11 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, if0, return, warn, log and listLoop.</li>
 <li> <a href="#getBracketDotName">getBracketDotName</a> &mdash; Convert var[key] to a dot name.</li>
 <li> <a href="#runStatement">runStatement</a> &mdash; Run one statement and return the variable dot name string, operator and value.</li>
-<li> <a href="#skipSpaces">skipSpaces</a> &mdash; </li>
+<li> <a href="#skipSpaces">skipSpaces</a> &mdash; Skip the leading spaces and tabs.</li>
 <li> <a href="#callUserFunction">callUserFunction</a> &mdash; Run the given user function.</li>
 <li> <a href="#runStatementAssignVar">runStatementAssignVar</a> &mdash; Run a statement and assign the variable if appropriate.</li>
-<li> <a href="#parseSignature">parseSignature</a> &mdash; Parse the signature and return the list of parameters or a message.</li>
+<li> <a href="#parseSignature">parseSignature</a> &mdash; Parse the signature and return the list of parameters or a
+message.</li>
 <li> <a href="#isFunctionDefinition">isFunctionDefinition</a> &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.</li>
 <li> <a href="#defineUserFunctionAssignVar">defineUserFunctionAssignVar</a> &mdash; If the statement starts a function definition, define it and assign the variable.</li>
 <li> <a href="#runCommand">runCommand</a> &mdash; Run a command and fill in the variables dictionaries.</li>
@@ -271,7 +272,7 @@ func `==`(a: PosOr; b: PosOr): bool
 func `!=`(a: PosOr; b: PosOr): bool
 </pre>
 
-<h3 id="VariableNameKind">VariableNameKind</h3>
+<h3 id="DotNameKind">DotNameKind</h3>
 
 <p>The variable name type.
 
@@ -280,11 +281,11 @@ vtFunction -- a variable with ( following it
 vtGet -- a variable with [ following it</p>
 
 <pre class="nim-code">
-VariableNameKind = enum
+DotNameKind = enum
   vnkNormal, vnkFunction, vnkGet
 </pre>
 
-<h3 id="VariableName">VariableName</h3>
+<h3 id="DotName">DotName</h3>
 
 <p>A variable name in a statement.
 
@@ -295,18 +296,18 @@ VariableNameKind = enum
 
 
 <pre class="nim-code">
-VariableName = object
+DotName = object
   dotName*: string
-  kind*: VariableNameKind
+  kind*: DotNameKind
   pos*: Natural
 </pre>
 
-<h3 id="VariableNameOr">VariableNameOr</h3>
+<h3 id="DotNameOr">DotNameOr</h3>
 
-
+<p>A DotName or a warning.</p>
 
 <pre class="nim-code">
-VariableNameOr = OpResultWarn[VariableName]
+DotNameOr = OpResultWarn[DotName]
 </pre>
 
 <h3 id="RightType">RightType</h3>
@@ -327,28 +328,28 @@ RightType = enum
   rtNothing, rtString, rtNumber, rtVariable, rtList, rtCondition
 </pre>
 
-<h3 id="newVariableName">newVariableName</h3>
+<h3 id="newDotName">newDotName</h3>
 
-<p>Create a new VariableName object.</p>
+<p>Create a new DotName object.</p>
 
 <pre class="nim-code">
-func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName
+func newDotName(dotName: string; kind: DotNameKind; pos: Natural): DotName
 </pre>
 
-<h3 id="newVariableNameOr">newVariableNameOr</h3>
+<h3 id="newDotNameOr">newDotNameOr</h3>
 
 <p>Create a PosOr warning.</p>
 
 <pre class="nim-code">
-func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
+func newDotNameOr(warning: MessageId; p1 = ""; pos = 0): DotNameOr
 </pre>
 
-<h3 id="newVariableNameOr-1">newVariableNameOr</h3>
+<h3 id="newDotNameOr-1">newDotNameOr</h3>
 
-<p>Create a new VariableNameOr object.</p>
+<p>Create a new DotNameOr object.</p>
 
 <pre class="nim-code">
-func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr
+func newDotNameOr(dotName: string; kind: DotNameKind; pos: Natural): DotNameOr
 </pre>
 
 <h3 id="getRightType">getRightType</h3>
@@ -359,9 +360,9 @@ func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): V
 func getRightType(statement: Statement; start: Natural): RightType
 </pre>
 
-<h3 id="getVariableNameOr">getVariableNameOr</h3>
+<h3 id="getDotNameOr">getDotNameOr</h3>
 
-<p>Get a variable name from the statement. Start points at a name.
+<p>Get a dot name from the statement. Start points at a name.
 
 </p><pre class="plain-code">
 a = var-name( 1 )
@@ -374,16 +375,16 @@ a = o.def.bbb # comment
 
 
 <pre class="nim-code">
-proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
+proc getDotNameOr(text: string; startPos: Natural): DotNameOr
 </pre>
 
-<h3 id="getVariableName">getVariableName</h3>
+<h3 id="getDotName">getDotName</h3>
 
 <p>Get a variable name from the statement. Skip leading whitespace.</p>
 
 <pre class="nim-code">
-proc getVariableName(text: string; start: Natural): VariableNameOr {.
-    raises: [KeyError], tags: [].}
+proc getDotName(text: string; start: Natural): DotNameOr {.raises: [KeyError],
+    tags: [].}
 </pre>
 
 <h3 id="matchTripleOrPlusSign">matchTripleOrPlusSign</h3>
@@ -432,7 +433,7 @@ proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
 
 <h3 id="warnStatement-1">warnStatement</h3>
 
-
+<p>Show an invalid statement with a pointer pointing at the start of the problem.</p>
 
 <pre class="nim-code">
 proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
@@ -717,7 +718,7 @@ return(5)
 
 <pre class="nim-code">
 proc runBareFunction(env: var Env; statement: Statement; start: Natural;
-                     variables: Variables; leftName: VariableName): ValuePosSiOr {.
+                     variables: Variables; leftName: DotName): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
@@ -738,7 +739,7 @@ name[&quot;hello&quot;] = 20
 
 <pre class="nim-code">
 proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
-                       variables: Variables; leftName: VariableName): ValuePosSiOr {.
+                       variables: Variables; leftName: DotName): ValuePosSiOr {.
     raises: [KeyError, ValueError], tags: [].}
 </pre>
 
@@ -753,7 +754,7 @@ proc runStatement(env: var Env; statement: Statement; variables: Variables): Var
 
 <h3 id="skipSpaces">skipSpaces</h3>
 
-
+<p>Skip the leading spaces and tabs.</p>
 
 <pre class="nim-code">
 proc skipSpaces(text: string): Natural {.raises: [KeyError], tags: [].}
@@ -783,10 +784,11 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 
 <h3 id="parseSignature">parseSignature</h3>
 
-<p>Parse the signature and return the list of parameters or a message.
+<p>Parse the signature and return the list of parameters or a
+message. Start points at the first parameter.
 
-</p><pre class="plain-code">
-cmp = func(numStr1: string, numStr2: string) int
+</p><pre class="tea-code">
+<span class="t-dotName">cmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">numStr1</span>: <span class="t-type">string</span>, <span class="t-param">numStr2</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
            ^
 </pre>
 

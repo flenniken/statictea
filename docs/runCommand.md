@@ -24,22 +24,22 @@ Run a command and fill in the variables dictionaries.
 * [`==`](#-1) &mdash; Return true when the two statements are equal.
 * [`==`](#-2) &mdash; Return true when a equals b.
 * [`!=`](#-3) &mdash; Compare whether two PosOr are not equal.
-* type: [VariableNameKind](#variablenamekind) &mdash; The variable name type.
-* type: [VariableName](#variablename) &mdash; A variable name in a statement.
-* type: [VariableNameOr](#variablenameor) &mdash; 
+* type: [DotNameKind](#dotnamekind) &mdash; The variable name type.
+* type: [DotName](#dotname) &mdash; A variable name in a statement.
+* type: [DotNameOr](#dotnameor) &mdash; A DotName or a warning.
 * type: [RightType](#righttype) &mdash; The type of the right hand side of a statement.
-* [newVariableName](#newvariablename) &mdash; Create a new VariableName object.
-* [newVariableNameOr](#newvariablenameor) &mdash; Create a PosOr warning.
-* [newVariableNameOr](#newvariablenameor-1) &mdash; Create a new VariableNameOr object.
+* [newDotName](#newdotname) &mdash; Create a new DotName object.
+* [newDotNameOr](#newdotnameor) &mdash; Create a PosOr warning.
+* [newDotNameOr](#newdotnameor-1) &mdash; Create a new DotNameOr object.
 * [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the start position.
-* [getVariableNameOr](#getvariablenameor) &mdash; Get a variable name from the statement.
-* [getVariableName](#getvariablename) &mdash; Get a variable name from the statement.
+* [getDotNameOr](#getdotnameor) &mdash; Get a dot name from the statement.
+* [getDotName](#getdotname) &mdash; Get a variable name from the statement.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
 * [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
-* [warnStatement](#warnstatement-1) &mdash; 
+* [warnStatement](#warnstatement-1) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [removeLineEnd](#removelineend) &mdash; Return a new string with the n or rn removed from the end of the line.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
 * [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines if needed.
@@ -62,10 +62,11 @@ Run a command and fill in the variables dictionaries.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn, log and listLoop.
 * [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
-* [skipSpaces](#skipspaces) &mdash; 
+* [skipSpaces](#skipspaces) &mdash; Skip the leading spaces and tabs.
 * [callUserFunction](#calluserfunction) &mdash; Run the given user function.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
-* [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
+* [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a
+message.
 * [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
 * [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
@@ -254,7 +255,7 @@ Compare whether two PosOr are not equal.
 func `!=`(a: PosOr; b: PosOr): bool
 ~~~
 
-# VariableNameKind
+# DotNameKind
 
 The variable name type.
 
@@ -263,11 +264,11 @@ vtFunction -- a variable with ( following it
 vtGet -- a variable with [ following it
 
 ~~~nim
-VariableNameKind = enum
+DotNameKind = enum
   vnkNormal, vnkFunction, vnkGet
 ~~~
 
-# VariableName
+# DotName
 
 A variable name in a statement.
 
@@ -276,18 +277,18 @@ A variable name in a statement.
 * pos -- the position after the trailing whitespace
 
 ~~~nim
-VariableName = object
+DotName = object
   dotName*: string
-  kind*: VariableNameKind
+  kind*: DotNameKind
   pos*: Natural
 ~~~
 
-# VariableNameOr
+# DotNameOr
 
-
+A DotName or a warning.
 
 ~~~nim
-VariableNameOr = OpResultWarn[VariableName]
+DotNameOr = OpResultWarn[DotName]
 ~~~
 
 # RightType
@@ -308,28 +309,28 @@ RightType = enum
   rtNothing, rtString, rtNumber, rtVariable, rtList, rtCondition
 ~~~
 
-# newVariableName
+# newDotName
 
-Create a new VariableName object.
+Create a new DotName object.
 
 ~~~nim
-func newVariableName(dotName: string; kind: VariableNameKind; pos: Natural): VariableName
+func newDotName(dotName: string; kind: DotNameKind; pos: Natural): DotName
 ~~~
 
-# newVariableNameOr
+# newDotNameOr
 
 Create a PosOr warning.
 
 ~~~nim
-func newVariableNameOr(warning: MessageId; p1 = ""; pos = 0): VariableNameOr
+func newDotNameOr(warning: MessageId; p1 = ""; pos = 0): DotNameOr
 ~~~
 
-# newVariableNameOr
+# newDotNameOr
 
-Create a new VariableNameOr object.
+Create a new DotNameOr object.
 
 ~~~nim
-func newVariableNameOr(dotName: string; kind: VariableNameKind; pos: Natural): VariableNameOr
+func newDotNameOr(dotName: string; kind: DotNameKind; pos: Natural): DotNameOr
 ~~~
 
 # getRightType
@@ -340,9 +341,9 @@ Return the type of the right hand side of the statement at the start position.
 func getRightType(statement: Statement; start: Natural): RightType
 ~~~
 
-# getVariableNameOr
+# getDotNameOr
 
-Get a variable name from the statement. Start points at a name.
+Get a dot name from the statement. Start points at a name.
 
 ~~~
 a = var-name( 1 )
@@ -354,16 +355,16 @@ a = o.def.bbb # comment
 ~~~
 
 ~~~nim
-proc getVariableNameOr(text: string; startPos: Natural): VariableNameOr
+proc getDotNameOr(text: string; startPos: Natural): DotNameOr
 ~~~
 
-# getVariableName
+# getDotName
 
 Get a variable name from the statement. Skip leading whitespace.
 
 ~~~nim
-proc getVariableName(text: string; start: Natural): VariableNameOr {.
-    raises: [KeyError], tags: [].}
+proc getDotName(text: string; start: Natural): DotNameOr {.raises: [KeyError],
+    tags: [].}
 ~~~
 
 # matchTripleOrPlusSign
@@ -412,7 +413,7 @@ proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
 
 # warnStatement
 
-
+Show an invalid statement with a pointer pointing at the start of the problem.
 
 ~~~nim
 proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
@@ -686,7 +687,7 @@ return(5)
 
 ~~~nim
 proc runBareFunction(env: var Env; statement: Statement; start: Natural;
-                     variables: Variables; leftName: VariableName): ValuePosSiOr {.
+                     variables: Variables; leftName: DotName): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 ~~~
 
@@ -706,7 +707,7 @@ name["hello"] = 20
 
 ~~~nim
 proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
-                       variables: Variables; leftName: VariableName): ValuePosSiOr {.
+                       variables: Variables; leftName: DotName): ValuePosSiOr {.
     raises: [KeyError, ValueError], tags: [].}
 ~~~
 
@@ -721,7 +722,7 @@ proc runStatement(env: var Env; statement: Statement; variables: Variables): Var
 
 # skipSpaces
 
-
+Skip the leading spaces and tabs.
 
 ~~~nim
 proc skipSpaces(text: string): Natural {.raises: [KeyError], tags: [].}
@@ -751,9 +752,10 @@ proc runStatementAssignVar(env: var Env; statement: Statement;
 
 # parseSignature
 
-Parse the signature and return the list of parameters or a message.
+Parse the signature and return the list of parameters or a
+message. Start points at the first parameter.
 
-~~~
+~~~javascript
 cmp = func(numStr1: string, numStr2: string) int
            ^
 ~~~

@@ -27,17 +27,17 @@ proc showWarningData(text: string, start: Natural,
   echo startColumn(text, wd.pos, msg)
   echo text
 
-proc testGetVariableNameOr(text: string, start: Natural,
-    eNewVariableNameOr: VariableNameOr): bool =
-  let gotVnOr = getVariableNameOr(text, start)
-  result = gotExpected($gotVnOr, $eNewVariableNameOr)
+proc testGetDotNameOr(text: string, start: Natural,
+    eNewDotNameOr: DotNameOr): bool =
+  let gotVnOr = getDotNameOr(text, start)
+  result = gotExpected($gotVnOr, $eNewDotNameOr)
   if not result:
     echo startColumn(text, start, "↓ start")
     echo "0123456789 123456789 123456789 123456789"
     if gotVnOr.isMessage:
       showWarningData(text, start, gotVnOr.message, "got")
-    if eNewVariableNameOr.isMessage:
-      showWarningData(text, start, eNewVariableNameOr.message, "expected")
+    if eNewDotNameOr.isMessage:
+      showWarningData(text, start, eNewDotNameOr.message, "expected")
 
 proc echoValuePosSiOr(statement: Statement, start: Natural,
     valueAndPosOr: ValuePosSiOr, eValuePosSiOr: ValuePosSiOr) =
@@ -3209,72 +3209,72 @@ statement:   syntaxError == 5
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "getVariableNameOr var":
+  test "getDotNameOr var":
     maxNameLength = 4
-    check testGetVariableNameOr("", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
-    check testGetVariableNameOr("a", 0, newVariableNameOr("a", vnkNormal, 1))
-    check testGetVariableNameOr("ab", 0, newVariableNameOr("ab", vnkNormal, 2))
-    check testGetVariableNameOr("abc", 0, newVariableNameOr("abc", vnkNormal, 3))
-    check testGetVariableNameOr("abcd", 0, newVariableNameOr("abcd", vnkNormal, 4))
-    check testGetVariableNameOr("abcde", 0, newVariableNameOr(wVarMaximumLength, "", 4))
+    check testGetDotNameOr("", 0, newDotNameOr(wVarStartsWithLetter, "", 0))
+    check testGetDotNameOr("a", 0, newDotNameOr("a", vnkNormal, 1))
+    check testGetDotNameOr("ab", 0, newDotNameOr("ab", vnkNormal, 2))
+    check testGetDotNameOr("abc", 0, newDotNameOr("abc", vnkNormal, 3))
+    check testGetDotNameOr("abcd", 0, newDotNameOr("abcd", vnkNormal, 4))
+    check testGetDotNameOr("abcde", 0, newDotNameOr(wVarMaximumLength, "", 4))
 
-    check testGetVariableNameOr("a ", 0, newVariableNameOr("a", vnkNormal, 2))
-    check testGetVariableNameOr("ab ", 0, newVariableNameOr("ab", vnkNormal, 3))
+    check testGetDotNameOr("a ", 0, newDotNameOr("a", vnkNormal, 2))
+    check testGetDotNameOr("ab ", 0, newDotNameOr("ab", vnkNormal, 3))
 
-    check testGetVariableNameOr("", 1, newVariableNameOr(wVarStartsWithLetter, "", 1))
-    check testGetVariableNameOr("a", 1, newVariableNameOr(wVarStartsWithLetter, "", 1))
-    check testGetVariableNameOr("ab", 1, newVariableNameOr("b", vnkNormal, 2))
-    check testGetVariableNameOr("abc", 1, newVariableNameOr("bc", vnkNormal, 3))
-    check testGetVariableNameOr("abcd", 1, newVariableNameOr("bcd", vnkNormal, 4))
-    check testGetVariableNameOr("abcde", 1, newVariableNameOr("bcde", vnkNormal, 5))
-    check testGetVariableNameOr("abcdef", 1, newVariableNameOr(wVarMaximumLength, "", 5))
+    check testGetDotNameOr("", 1, newDotNameOr(wVarStartsWithLetter, "", 1))
+    check testGetDotNameOr("a", 1, newDotNameOr(wVarStartsWithLetter, "", 1))
+    check testGetDotNameOr("ab", 1, newDotNameOr("b", vnkNormal, 2))
+    check testGetDotNameOr("abc", 1, newDotNameOr("bc", vnkNormal, 3))
+    check testGetDotNameOr("abcd", 1, newDotNameOr("bcd", vnkNormal, 4))
+    check testGetDotNameOr("abcde", 1, newDotNameOr("bcde", vnkNormal, 5))
+    check testGetDotNameOr("abcdef", 1, newDotNameOr(wVarMaximumLength, "", 5))
 
-    check testGetVariableNameOr("9", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
-    check testGetVariableNameOr("abc", 6, newVariableNameOr(wVarStartsWithLetter, "", 6))
-    check testGetVariableNameOr("abc*", 0, newVariableNameOr("abc", vnkNormal, 3))
-    check testGetVariableNameOr("var-* = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
-    check testGetVariableNameOr("var_ = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
-    check testGetVariableNameOr("va_", 0, newVariableNameOr(wVarEndsWith, "", 3))
-    check testGetVariableNameOr("var- = abc", 0, newVariableNameOr(wVarEndsWith, "", 4))
+    check testGetDotNameOr("9", 0, newDotNameOr(wVarStartsWithLetter, "", 0))
+    check testGetDotNameOr("abc", 6, newDotNameOr(wVarStartsWithLetter, "", 6))
+    check testGetDotNameOr("abc*", 0, newDotNameOr("abc", vnkNormal, 3))
+    check testGetDotNameOr("var-* = abc", 0, newDotNameOr(wVarEndsWith, "", 4))
+    check testGetDotNameOr("var_ = abc", 0, newDotNameOr(wVarEndsWith, "", 4))
+    check testGetDotNameOr("va_", 0, newDotNameOr(wVarEndsWith, "", 3))
+    check testGetDotNameOr("var- = abc", 0, newDotNameOr(wVarEndsWith, "", 4))
 
     maxNameLength = 8
-    check testGetVariableNameOr("a.b", 0, newVariableNameOr("a.b", vnkNormal, 3))
-    check testGetVariableNameOr("a.b.c", 0, newVariableNameOr("a.b.c", vnkNormal, 5))
-    check testGetVariableNameOr("a.b.c.d", 0, newVariableNameOr("a.b.c.d", vnkNormal, 7))
-    check testGetVariableNameOr("a.b.c.d.e", 0, newVariableNameOr(wVarMaximumLength, "", 8))
+    check testGetDotNameOr("a.b", 0, newDotNameOr("a.b", vnkNormal, 3))
+    check testGetDotNameOr("a.b.c", 0, newDotNameOr("a.b.c", vnkNormal, 5))
+    check testGetDotNameOr("a.b.c.d", 0, newDotNameOr("a.b.c.d", vnkNormal, 7))
+    check testGetDotNameOr("a.b.c.d.e", 0, newDotNameOr(wVarMaximumLength, "", 8))
 
-    check testGetVariableNameOr("o.abc", 0, newVariableNameOr("o.abc", vnkNormal, 5))
-    check testGetVariableNameOr("abc.def", 0, newVariableNameOr("abc.def", vnkNormal, 7))
+    check testGetDotNameOr("o.abc", 0, newDotNameOr("o.abc", vnkNormal, 5))
+    check testGetDotNameOr("abc.def", 0, newDotNameOr("abc.def", vnkNormal, 7))
 
-    check testGetVariableNameOr(".", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
-    check testGetVariableNameOr("a..b", 0, newVariableNameOr(wVarStartsWithLetter, "", 2))
-    check testGetVariableNameOr("a.", 0, newVariableNameOr(wVarEndsWith, "", 2))
+    check testGetDotNameOr(".", 0, newDotNameOr(wVarStartsWithLetter, "", 0))
+    check testGetDotNameOr("a..b", 0, newDotNameOr(wVarStartsWithLetter, "", 2))
+    check testGetDotNameOr("a.", 0, newDotNameOr(wVarEndsWith, "", 2))
 
   test "more":
     maxNameLength = 8
-    check testGetVariableNameOr(".a", 0, newVariableNameOr(wVarStartsWithLetter, "", 0))
+    check testGetDotNameOr(".a", 0, newDotNameOr(wVarStartsWithLetter, "", 0))
 
-    check testGetVariableNameOr("a-.b", 0, newVariableNameOr(wVarEndsWith, "", 2))
-    check testGetVariableNameOr("a.-b", 0, newVariableNameOr(wVarStartsWithLetter, "", 2))
-    check testGetVariableNameOr("a-b_c.a[  6", 0, newVariableNameOr("a-b_c.a", vnkGet, 10))
+    check testGetDotNameOr("a-.b", 0, newDotNameOr(wVarEndsWith, "", 2))
+    check testGetDotNameOr("a.-b", 0, newDotNameOr(wVarStartsWithLetter, "", 2))
+    check testGetDotNameOr("a-b_c.a[  6", 0, newDotNameOr("a-b_c.a", vnkGet, 10))
 
     maxNameLength = 4
-    check testGetVariableNameOr("a(", 0, newVariableNameOr("a", vnkFunction, 2))
-    check testGetVariableNameOr("ab(", 0, newVariableNameOr("ab", vnkFunction, 3))
-    check testGetVariableNameOr("abc(", 0, newVariableNameOr("abc", vnkFunction, 4))
-    check testGetVariableNameOr("abcd(", 0, newVariableNameOr("abcd", vnkFunction, 5))
-    check testGetVariableNameOr("abcde(", 0, newVariableNameOr(wVarMaximumLength, "", 4))
+    check testGetDotNameOr("a(", 0, newDotNameOr("a", vnkFunction, 2))
+    check testGetDotNameOr("ab(", 0, newDotNameOr("ab", vnkFunction, 3))
+    check testGetDotNameOr("abc(", 0, newDotNameOr("abc", vnkFunction, 4))
+    check testGetDotNameOr("abcd(", 0, newDotNameOr("abcd", vnkFunction, 5))
+    check testGetDotNameOr("abcde(", 0, newDotNameOr(wVarMaximumLength, "", 4))
 
-    check testGetVariableNameOr("a[", 0, newVariableNameOr("a", vnkGet, 2))
-    check testGetVariableNameOr("ab[", 0, newVariableNameOr("ab", vnkGet, 3))
+    check testGetDotNameOr("a[", 0, newDotNameOr("a", vnkGet, 2))
+    check testGetDotNameOr("ab[", 0, newDotNameOr("ab", vnkGet, 3))
 
-    check testGetVariableNameOr("a[ 5", 0, newVariableNameOr("a", vnkGet, 3))
-    check testGetVariableNameOr("ab[  6", 0, newVariableNameOr("ab", vnkGet, 5))
+    check testGetDotNameOr("a[ 5", 0, newDotNameOr("a", vnkGet, 3))
+    check testGetDotNameOr("ab[  6", 0, newDotNameOr("ab", vnkGet, 5))
 
     maxNameLength = 16
-    check testGetVariableNameOr("get(f.cmp, 0)", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
-    check testGetVariableNameOr("get(f.cmp)", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
-    check testGetVariableNameOr("get[f.cmp]", 4, newVariableNameOr("f.cmp", vnkNormal, 9))
+    check testGetDotNameOr("get(f.cmp, 0)", 4, newDotNameOr("f.cmp", vnkNormal, 9))
+    check testGetDotNameOr("get(f.cmp)", 4, newDotNameOr("f.cmp", vnkNormal, 9))
+    check testGetDotNameOr("get[f.cmp]", 4, newDotNameOr("f.cmp", vnkNormal, 9))
 
   test "getStatements ending \\n":
     let content = "<!--$ nextline a = \"tea\" -->\n"

@@ -302,11 +302,11 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
   # Read the variable for the REPL command.
   var haveDotName = false
-  var variableName: VariableName
+  var variableName: DotName
   var value: Value
 
   # Read as if the argument is a dot name.
-  let variableNameOr = getVariableName(line, runningPos)
+  let variableNameOr = getDotName(line, runningPos)
   if variableNameOr.isValue and variableNameOr.value.kind == vnkNormal:
     haveDotName = true
     variableName = variableNameOr.value
