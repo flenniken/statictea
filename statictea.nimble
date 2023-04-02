@@ -857,6 +857,15 @@ nim c --hint[Performance]:off \
   echo fmt"Build bin/{dirName}/cmdline"
   runCmd(cmd)
 
+proc buildJsonDocRaw() =
+  # Build the jsondocraw exe.
+  let cmd = fmt"""
+nim c --hint[Performance]:off \
+  --hint[Conf]:off --hint[Link]: off -d:release \
+  --out:bin/{dirName}/ src/jsondocraw"""
+  echo fmt"Build bin/{dirName}/jsondocraw"
+  runCmd(cmd)
+
 proc checkUtf8DecoderEcho() =
   ## Check whether there is a new version of utf8decoder.nim in the
   ## utftests repo. Return 0 when up-to-date.
@@ -910,6 +919,9 @@ proc otherTests() =
   # Build the cmdline exe.
   buildCmdLine()
 
+  # Build the jsondocraw exe.
+  buildJsonDocRaw()
+
   # Run the stf tests.
   runAllStf()
 
@@ -932,10 +944,12 @@ proc runUnitTests(name = "") =
 proc makeJsonDoc(filename: string): string =
   # Create the json doc file for the given nim source file. Return the
   # name of the json file.
-  result = joinPath("docs", changeFileExt(filename, "json"))
-  var cmd = fmt"nim --hints:off jsondoc --out:{result} src/{filename}"
+  let jsonFilename = joinPath("docs", changeFileExt(filename, "json"))
+  var cmd = fmt"nim --hints:off jsondoc --out:{jsonFilename} src/{filename}"
   # echo cmd
   runCmd(cmd)
+  # removePresentation(filename, jsonFilename)
+  result = jsonFilename
 
 proc taskTea2Html(teaBasename: string) =
   ## Create an html file from a tea file using a statictea template.
@@ -1134,6 +1148,9 @@ task helpme, "\tShow the statictea help text.":
 
 task cmdline, "\tBuild cmdline test app (bin/x/cmdline).":
   buildCmdLine()
+
+task jsondoc, "\tBuild jsondocraw app (bin/x/jsondocraw).":
+  buildJsonDocRaw()
 
 const
   staticteaImage = "statictea-image"

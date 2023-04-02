@@ -1,29 +1,29 @@
 ## Parse the command line.
-## @:
-## @:Example:
-## @:
-## @:~~~nim
-## @:import cmdline
-## @:
-## @:# Define the supported options.
-## @:var options = newSeq@{CmlOption]()
-## @:options.add(newCmlOption("help", 'h', cmlStopArgument))
-## @:options.add(newCmlOption("log", 'l', cmlOptionalArgument))
-## @:...
-## @:
-## @:# Parse the command line.
-## @:let argsOrMessage = cmdline(options, collectArgs())
-## @:if argsOrMessage.kind == cmlMessageKind:
-## @:  # Display the message.
-## @:  echo getMessage(argsOrMessage.messageId,
-## @:    argsOrMessage.problemArg)
-## @:else:
-## @:  # Optionally post process the resulting arguments.
-## @:  let args = newArgs(argsOrMessage.args)
-## @:~~~~
-## @:
-## @:For a complete example see the bottom of the file in the isMainModule
-## @:section.
+##
+## Example:
+##
+## ~~~nim
+## import cmdline
+##
+## # Define the supported options.
+## var options = newSeq@{CmlOption]()
+## options.add(newCmlOption("help", 'h', cmlStopArgument))
+## options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+## ...
+##
+## # Parse the command line.
+## let argsOrMessage = cmdline(options, collectArgs())
+## if argsOrMessage.kind == cmlMessageKind:
+##   # Display the message.
+##   echo getMessage(argsOrMessage.messageId,
+##     argsOrMessage.problemArg)
+## else:
+##   # Optionally post process the resulting arguments.
+##   let args = newArgs(argsOrMessage.args)
+## ~~~~
+##
+## For a complete example see the bottom of the file in the isMainModule
+## section.
 
 import std/os
 import std/tables
@@ -32,9 +32,9 @@ import std/strutils
 type
   CmlArgs* = OrderedTable[string, seq[string]]
     ## CmlArgs holds the parsed command line arguments in an ordered
-    ## @:dictionary. The keys are the supported options found on the
-    ## @:command line and each value is a list of associated arguments.
-    ## @:An option without arguments will have an empty list.
+    ## dictionary. The keys are the supported options found on the
+    ## command line and each value is a list of associated arguments.
+    ## An option without arguments will have an empty list.
 
   CmlMessageId* = enum
     ## Possible message IDs returned by cmdline. The number in the
@@ -74,17 +74,17 @@ type
 
   CmlOptionType* = enum
     ## The option type.
-    ## @:
-    ## @:* cmlArgument0or1 -- option with an argument, 0 or 1 times.
-    ## @:* cmlNoArgument -- option without an argument, 0 or 1 times.
-    ## @:* cmlOptionalArgument -- option with an optional argument, 0
-    ## @:    or 1 times.
-    ## @:* cmlBareArgument -- an argument without an option, 1 time.
-    ## @:* cmlArgumentOnce -- option with an argument, 1 time.
-    ## @:* cmlArgumentMany -- option with an argument, unlimited
-    ## @:    number of times.
-    ## @:* cmlStopArgument -- option without an argument, 0 or 1
-    ## @:    times. Stop and return this option by itself.
+    ##
+    ## * cmlArgument0or1 -- option with an argument, 0 or 1 times.
+    ## * cmlNoArgument -- option without an argument, 0 or 1 times.
+    ## * cmlOptionalArgument -- option with an optional argument, 0
+    ##     or 1 times.
+    ## * cmlBareArgument -- an argument without an option, 1 time.
+    ## * cmlArgumentOnce -- option with an argument, 1 time.
+    ## * cmlArgumentMany -- option with an argument, unlimited
+    ##     number of times.
+    ## * cmlStopArgument -- option without an argument, 0 or 1
+    ##     times. Stop and return this option by itself.
     cmlArgument0or1
     cmlNoArgument
     cmlOptionalArgument
