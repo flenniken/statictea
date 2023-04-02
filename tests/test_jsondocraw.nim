@@ -167,7 +167,7 @@ An option without arguments will have an empty list.
     var got = ""
     for k, v in mapping.pairs():
       got.add(fmt"{k}: {v}")
-    echo got
+    # echo got
     let expected = """
 1: The kind of an ArgsOrMessage object, either args or a message.
 6: Contains the command line args or a message.
