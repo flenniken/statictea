@@ -1,6 +1,6 @@
-## Generate json data from a nim source file. Like nim's jsondoc
-## command except no html presentation information in the
-## descriptions.
+## Generate json data from a nim source file. It's like nim's jsondoc
+## command except no html presentation information is in the
+## descriptions. The descriptions match the source.
 
 import std/strformat
 import std/strutils
@@ -29,6 +29,7 @@ jsondocraw [-h] srcFilename destFilename
 srcFilename -- nim source filename
 destFilename -- filename of the json file to create
 """
+    ## The help text shown with -h.
 
   cmlMessages: array[low(CmlMessageId)..high(CmlMessageId), string] = [
     #[_00_]# "Two dashes must be followed by an option name.",
@@ -92,8 +93,9 @@ proc readOneDesc*(srcLines: seq[string], start: int, finish: int): string =
   # and ## removed.
   var lines = newSeq[string]()
   var foundDescription = false
+  let pattern = re(r"\s*##")
   for line in srcLines[startIx .. endIx]:
-    if line.startsWith(re(r"\s*##")):
+    if line.startsWith(pattern):
       let stripped = strip(line, trailing = false)
       if stripped.len > 2:
         let str = stripped[2 .. ^1]

@@ -4,6 +4,7 @@ Create a temporary file.
 
 Example:
 ~~~
+import tempFile
 var tempFileO = openTempFile()
 require tempFileO.isSome
 var tempFile = tempFileO.get()

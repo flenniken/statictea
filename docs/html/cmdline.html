@@ -8,40 +8,33 @@
 <body>
 <h1>cmdline.nim</h1>
 
-<p>Parse the command line.
+<p>&lt;p&gt;Parse the command line.&lt;/p&gt;
+&lt;p&gt;Example:&lt;/p&gt;
+&lt;p&gt;~~~nim import cmdline&lt;/p&gt;
 
-</p><p>Example:
+</p><p>&lt;h1&gt;&lt;a class=&quot;toc-backref&quot; id=&quot;define-the-supported-optionsdot&quot; href=&quot;#define-the-supported-optionsdot&quot;&gt;Define the supported options.&lt;/a&gt;&lt;/h1&gt;&lt;p&gt;var options = newSeq[CmlOption]() options.add(newCmlOption(&quot;help&quot;, &#x27;h&#x27;, cmlStopArgument)) options.add(newCmlOption(&quot;log&quot;, &#x27;l&#x27;, cmlOptionalArgument)) ...&lt;/p&gt;
 
-</p><pre class="plain-code">
-import cmdline
-
-# Define the supported options.
-var options = newSeq[CmlOption]()
-options.add(newCmlOption(&quot;help&quot;, &#x27;h&#x27;, cmlStopArgument))
-options.add(newCmlOption(&quot;log&quot;, &#x27;l&#x27;, cmlOptionalArgument))
-...
-
-# Parse the command line.
-let argsOrMessage = cmdline(options, collectArgs())
-if argsOrMessage.kind == cmlMessageKind:
-  # Display the message.
-  echo getMessage(argsOrMessage.messageId,
-    argsOrMessage.problemArg)
-else:
-  # Optionally post process the resulting arguments.
-  let args = newArgs(argsOrMessage.args)
-</pre>
-<p>
-For a complete example see the bottom of the file in the isMainModule
-section.</p>
+</p><p>&lt;h1&gt;&lt;a class=&quot;toc-backref&quot; id=&quot;parse-the-command-linedot&quot; href=&quot;#parse-the-command-linedot&quot;&gt;Parse the command line.&lt;/a&gt;&lt;/h1&gt;&lt;p&gt;let argsOrMessage = cmdline(options, collectArgs())&lt;/p&gt;
+&lt;dl class=&quot;docutils&quot;&gt;&lt;dt&gt;if argsOrMessage.kind == cmlMessageKind:&lt;/dt&gt;
+&lt;dd&gt;
+&lt;h1&gt;&lt;a class=&quot;toc-backref&quot; id=&quot;display-the-messagedot&quot; href=&quot;#display-the-messagedot&quot;&gt;Display the message.&lt;/a&gt;&lt;/h1&gt;&lt;dl class=&quot;docutils&quot;&gt;&lt;dt&gt;echo getMessage(argsOrMessage.messageId,&lt;/dt&gt;
+&lt;dd&gt;argsOrMessage.problemArg)&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/dd&gt;
+&lt;dt&gt;else:&lt;/dt&gt;
+&lt;dd&gt;
+&lt;h1&gt;&lt;a class=&quot;toc-backref&quot; id=&quot;optionally-post-process-the-resulting-argumentsdot&quot; href=&quot;#optionally-post-process-the-resulting-argumentsdot&quot;&gt;Optionally post process the resulting arguments.&lt;/a&gt;&lt;/h1&gt;
+&lt;h1&gt;&lt;a class=&quot;toc-backref&quot; id=&quot;let-args-eq-newargs-argsormessagedotargs&quot; href=&quot;#let-args-eq-newargs-argsormessagedotargs&quot;&gt;let args = newArgs(argsOrMessage.args)&lt;/a&gt;&lt;/h1&gt;&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;For a complete example see the bottom of the file in the isMainModule section.&lt;/p&gt;
+</p>
 
 Nim source code: <a href="../../src/cmdline.nim">cmdline.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#CmlArgs">CmlArgs</a> &mdash; CmlArgs holds the parsed command line arguments in an ordered
-dictionary.</li>
+<li>type:  <a href="#CmlArgs">CmlArgs</a> &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.</li>
 <li>type:  <a href="#CmlMessageId">CmlMessageId</a> &mdash; Possible message IDs returned by cmdline.</li>
 <li>type:  <a href="#ArgsOrMessageKind">ArgsOrMessageKind</a> &mdash; The kind of an ArgsOrMessage object, either args or a message.</li>
 <li>type:  <a href="#ArgsOrMessage">ArgsOrMessage</a> &mdash; Contains the command line args or a message.</li>
@@ -62,10 +55,7 @@ dictionary.</li>
 
 <h3 id="CmlArgs">CmlArgs</h3>
 
-<p>CmlArgs holds the parsed command line arguments in an ordered
-dictionary. The keys are the supported options found on the
-command line and each value is a list of associated arguments.
-An option without arguments will have an empty list.</p>
+<p>CmlArgs holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated arguments. An option without arguments will have an empty list.</p>
 
 <pre class="nim-code">
 CmlArgs = OrderedTable[string, seq[string]]
@@ -110,20 +100,24 @@ ArgsOrMessage = object
 
 <h3 id="CmlOptionType">CmlOptionType</h3>
 
-<p>The option type.
-
-</p><ul>
-<li>cmlArgument0or1 -- option with an argument, 0 or 1 times.
-</li><li>cmlNoArgument -- option without an argument, 0 or 1 times.
-</li><li>cmlOptionalArgument -- option with an optional argument, 0
-    or 1 times.
-</li><li>cmlBareArgument -- an argument without an option, 1 time.
-</li><li>cmlArgumentOnce -- option with an argument, 1 time.
-</li><li>cmlArgumentMany -- option with an argument, unlimited
-    number of times.
-</li><li>cmlStopArgument -- option without an argument, 0 or 1
-    times. Stop and return this option by itself.</li></ul>
-
+<p>The option type.&lt;ul class=&quot;simple&quot;&gt;&lt;li&gt;cmlArgument0or1 -- option with an argument, 0 or 1 times.&lt;/li&gt;
+&lt;li&gt;cmlNoArgument -- option without an argument, 0 or 1 times.&lt;/li&gt;
+&lt;li&gt;&lt;dl class=&quot;docutils&quot;&gt;&lt;dt&gt;cmlOptionalArgument -- option with an optional argument, 0&lt;/dt&gt;
+&lt;dd&gt;or 1 times.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/li&gt;
+&lt;li&gt;cmlBareArgument -- an argument without an option, 1 time.&lt;/li&gt;
+&lt;li&gt;cmlArgumentOnce -- option with an argument, 1 time.&lt;/li&gt;
+&lt;li&gt;&lt;dl class=&quot;docutils&quot;&gt;&lt;dt&gt;cmlArgumentMany -- option with an argument, unlimited&lt;/dt&gt;
+&lt;dd&gt;number of times.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;dl class=&quot;docutils&quot;&gt;&lt;dt&gt;cmlStopArgument -- option without an argument, 0 or 1&lt;/dt&gt;
+&lt;dd&gt;times. Stop and return this option by itself.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</p>
 
 <pre class="nim-code">
 CmlOptionType = enum

@@ -1,37 +1,30 @@
 # cmdline.nim
 
-Parse the command line.
+<p>Parse the command line.</p>
+<p>Example:</p>
+<p>~~~nim import cmdline</p>
 
-Example:
+<h1><a class="toc-backref" id="define-the-supported-optionsdot" href="#define-the-supported-optionsdot">Define the supported options.</a></h1><p>var options = newSeq[CmlOption]() options.add(newCmlOption("help", 'h', cmlStopArgument)) options.add(newCmlOption("log", 'l', cmlOptionalArgument)) ...</p>
 
-~~~nim
-import cmdline
+<h1><a class="toc-backref" id="parse-the-command-linedot" href="#parse-the-command-linedot">Parse the command line.</a></h1><p>let argsOrMessage = cmdline(options, collectArgs())</p>
+<dl class="docutils"><dt>if argsOrMessage.kind == cmlMessageKind:</dt>
+<dd>
+<h1><a class="toc-backref" id="display-the-messagedot" href="#display-the-messagedot">Display the message.</a></h1><dl class="docutils"><dt>echo getMessage(argsOrMessage.messageId,</dt>
+<dd>argsOrMessage.problemArg)</dd>
+</dl>
+</dd>
+<dt>else:</dt>
+<dd>
+<h1><a class="toc-backref" id="optionally-post-process-the-resulting-argumentsdot" href="#optionally-post-process-the-resulting-argumentsdot">Optionally post process the resulting arguments.</a></h1>
+<h1><a class="toc-backref" id="let-args-eq-newargs-argsormessagedotargs" href="#let-args-eq-newargs-argsormessagedotargs">let args = newArgs(argsOrMessage.args)</a></h1></dd>
+</dl>
+<p>For a complete example see the bottom of the file in the isMainModule section.</p>
 
-# Define the supported options.
-var options = newSeq[CmlOption]()
-options.add(newCmlOption("help", 'h', cmlStopArgument))
-options.add(newCmlOption("log", 'l', cmlOptionalArgument))
-...
-
-# Parse the command line.
-let argsOrMessage = cmdline(options, collectArgs())
-if argsOrMessage.kind == cmlMessageKind:
-  # Display the message.
-  echo getMessage(argsOrMessage.messageId,
-    argsOrMessage.problemArg)
-else:
-  # Optionally post process the resulting arguments.
-  let args = newArgs(argsOrMessage.args)
-~~~
-
-For a complete example see the bottom of the file in the isMainModule
-section.
 
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
-* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered
-dictionary.
+* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.
 * type: [CmlMessageId](#cmlmessageid) &mdash; Possible message IDs returned by cmdline.
 * type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
@@ -51,10 +44,7 @@ dictionary.
 
 # CmlArgs
 
-CmlArgs holds the parsed command line arguments in an ordered
-dictionary. The keys are the supported options found on the
-command line and each value is a list of associated arguments.
-An option without arguments will have an empty list.
+CmlArgs holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated arguments. An option without arguments will have an empty list.
 
 ~~~nim
 CmlArgs = OrderedTable[string, seq[string]]
@@ -99,18 +89,24 @@ ArgsOrMessage = object
 
 # CmlOptionType
 
-The option type.
+The option type.<ul class="simple"><li>cmlArgument0or1 -- option with an argument, 0 or 1 times.</li>
+<li>cmlNoArgument -- option without an argument, 0 or 1 times.</li>
+<li><dl class="docutils"><dt>cmlOptionalArgument -- option with an optional argument, 0</dt>
+<dd>or 1 times.</dd>
+</dl>
+</li>
+<li>cmlBareArgument -- an argument without an option, 1 time.</li>
+<li>cmlArgumentOnce -- option with an argument, 1 time.</li>
+<li><dl class="docutils"><dt>cmlArgumentMany -- option with an argument, unlimited</dt>
+<dd>number of times.</dd>
+</dl>
+</li>
+<li><dl class="docutils"><dt>cmlStopArgument -- option without an argument, 0 or 1</dt>
+<dd>times. Stop and return this option by itself.</dd>
+</dl>
+</li>
+</ul>
 
-* cmlArgument0or1 -- option with an argument, 0 or 1 times.
-* cmlNoArgument -- option without an argument, 0 or 1 times.
-* cmlOptionalArgument -- option with an optional argument, 0
-    or 1 times.
-* cmlBareArgument -- an argument without an option, 1 time.
-* cmlArgumentOnce -- option with an argument, 1 time.
-* cmlArgumentMany -- option with an argument, unlimited
-    number of times.
-* cmlStopArgument -- option without an argument, 0 or 1
-    times. Stop and return this option by itself.
 
 ~~~nim
 CmlOptionType = enum

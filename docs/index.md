@@ -10,6 +10,7 @@ StaticTea nim source code documentation.
 * [env.nim](env.md) &mdash; Environment holding the input and output streams.
 * [functions.nim](functions.md) &mdash; StaticTea functions and supporting types.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
+* [jsondocraw.nim](jsondocraw.md) &mdash; Generate json data from a nim source file.
 * [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line
 length.
 * [matches.nim](matches.md) &mdash; Methods for matching sub-strings.
