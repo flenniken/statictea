@@ -59,29 +59,48 @@ line two
     let sourceCode = """
   ##   line one
   ##    line two
-  ##  line three
+  ## line three
 """
     let expected = """
- line one
-  line two
+  line one
+   line two
 line three
 """
     let srcLines = splitNewLines(sourceCode)
     let got = readOneDesc(srcLines, 1, 4)
     check gotExpected(got, expected)
 
-  test "readOneDesc 3":
+  test "readOneDesc 4":
     let sourceCode = """
   ##   line one
-  ##    line two
+  ##line two
   ##  line three
 """
     let expected = """
-line one
+   line one
+line two
+  line three
 """
     let srcLines = splitNewLines(sourceCode)
-    let got = readOneDesc(srcLines, 1, 2)
+    let got = readOneDesc(srcLines, 1, 4)
     check gotExpected(got, expected)
+
+  test "readOneDesc 0":
+    let sourceCode = """
+  ## line one
+  ##
+  ## line three
+"""
+    let expected = """
+line one
+
+line three
+"""
+    let srcLines = splitNewLines(sourceCode)
+    let got = readOneDesc(srcLines, 1, 4)
+    if got != expected:
+      echo linesSideBySide(got, expected, true)
+      fail
 
   test "readOneDesc cmdline":
     let sourceCode = """
@@ -168,21 +187,22 @@ An option without arguments will have an empty list.
     for k, v in mapping.pairs():
       got.add(fmt"{k}: {v}")
     # echo got
+
     let expected = """
 1: The kind of an ArgsOrMessage object, either args or a message.
 6: Contains the command line args or a message.
-15:  The option type.
+15: The option type.
 
- * cmlArgument0or1 -- option with an argument, 0 or 1 times.
- * cmlNoArgument -- option without an argument, 0 or 1 times.
- * cmlOptionalArgument -- option with an optional argument, 0
-     or 1 times.
- * cmlBareArgument -- an argument without an option, 1 time.
- * cmlArgumentOnce -- option with an argument, 1 time.
- * cmlArgumentMany -- option with an argument, unlimited
-     number of times.
- * cmlStopArgument -- option without an argument, 0 or 1
-     times. Stop and return this option by itself.
+* cmlArgument0or1 -- option with an argument, 0 or 1 times.
+* cmlNoArgument -- option without an argument, 0 or 1 times.
+* cmlOptionalArgument -- option with an optional argument, 0
+    or 1 times.
+* cmlBareArgument -- an argument without an option, 1 time.
+* cmlArgumentOnce -- option with an argument, 1 time.
+* cmlArgumentMany -- option with an argument, unlimited
+    number of times.
+* cmlStopArgument -- option without an argument, 0 or 1
+    times. Stop and return this option by itself.
 36: An CmlOption holds its type, long name and short name.
 """
     if got != expected:

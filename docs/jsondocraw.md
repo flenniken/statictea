@@ -1,22 +1,29 @@
 # jsondocraw.nim
 
-Generate json data from a nim source file. It's like nim's jsondoc command except no html presentation information is in the descriptions. The descriptions match the source.
+Generate json data from a nim source file. It's like nim's jsondoc
+command except no html presentation information is in the
+descriptions. The descriptions match the source.
+
 
 * [jsondocraw.nim](../src/jsondocraw.nim) &mdash; Nim source code.
 # Index
 
 * const: [helpText](#helptext) &mdash; The help text shown with -h.
-* type: [Args](#args) &mdash; Args holds the source nim filename and the destination json filename to create.
+* type: [Args](#args) &mdash; Args holds the source nim filename and the destination
+json filename to create.
 * [newArgs](#newargs) &mdash; Create an Args object from a CmlArgs.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.
 * [`$`](#) &mdash; Return a string representation of an Args object.
 * [readOneDesc](#readonedesc) &mdash; Return the doc comment found in the given range of line numbers.
-* [readDescriptions](#readdescriptions) &mdash; Read all the descriptions in the text specified by the line numbers.
-* [removePresentation](#removepresentation) &mdash; Create a json file without presentation formatting in the descriptions.
+* [readDescriptions](#readdescriptions) &mdash; Read all the descriptions in the text specified by the line
+numbers.
+* [removePresentation](#removepresentation) &mdash; Create a json file without presentation formatting in the
+descriptions.
 
 # helpText
 
 The help text shown with -h.
+
 
 ~~~nim
 helpText = """
@@ -35,7 +42,9 @@ destFilename -- filename of the json file to create
 
 # Args
 
-Args holds the source nim filename and the destination json filename to create.
+Args holds the source nim filename and the destination
+json filename to create.
+
 
 ~~~nim
 Args = object
@@ -48,6 +57,7 @@ Args = object
 
 Create an Args object from a CmlArgs.
 
+
 ~~~nim
 func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [].}
 ~~~
@@ -55,6 +65,7 @@ func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [].}
 # getMessage
 
 Return a message from a message id and problem argument.
+
 
 ~~~nim
 func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
@@ -65,6 +76,7 @@ func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
 
 Return a string representation of an Args object.
 
+
 ~~~nim
 func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 ~~~
@@ -73,6 +85,7 @@ func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 
 Return the doc comment found in the given range of line numbers.
 
+
 ~~~nim
 proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
     raises: [RegexError], tags: [].}
@@ -80,7 +93,10 @@ proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
 
 # readDescriptions
 
-Read all the descriptions in the text specified by the line numbers. Return a dictionary mapping the line number to its description.
+Read all the descriptions in the text specified by the line
+numbers. Return a dictionary mapping the line number to its
+description.
+
 
 ~~~nim
 proc readDescriptions(text: string; lineNums: seq[int]): OrderedTable[string,
@@ -89,7 +105,10 @@ proc readDescriptions(text: string; lineNums: seq[int]): OrderedTable[string,
 
 # removePresentation
 
-Create a json file without presentation formatting in the descriptions.  Pass in a source filename and the name of the json file to create.
+Create a json file without presentation formatting in the
+descriptions.  Pass in a source filename and the name of the json
+file to create.
+
 
 ~~~nim
 proc removePresentation(args: Args) {.raises: [JsonDocRawError, ValueError,

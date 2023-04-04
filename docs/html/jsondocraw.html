@@ -8,7 +8,10 @@
 <body>
 <h1>jsondocraw.nim</h1>
 
-<p>Generate json data from a nim source file. It&#x27;s like nim&#x27;s jsondoc command except no html presentation information is in the descriptions. The descriptions match the source.</p>
+<p>Generate json data from a nim source file. It&#x27;s like nim&#x27;s jsondoc
+command except no html presentation information is in the
+descriptions. The descriptions match the source.
+</p>
 
 Nim source code: <a href="../../src/jsondocraw.nim">jsondocraw.nim</a>
 
@@ -16,18 +19,22 @@ Nim source code: <a href="../../src/jsondocraw.nim">jsondocraw.nim</a>
 
 <ul>
 <li>const:  <a href="#helpText">helpText</a> &mdash; The help text shown with -h.</li>
-<li>type:  <a href="#Args">Args</a> &mdash; Args holds the source nim filename and the destination json filename to create.</li>
+<li>type:  <a href="#Args">Args</a> &mdash; Args holds the source nim filename and the destination
+json filename to create.</li>
 <li> <a href="#newArgs">newArgs</a> &mdash; Create an Args object from a CmlArgs.</li>
 <li> <a href="#getMessage">getMessage</a> &mdash; Return a message from a message id and problem argument.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Args object.</li>
 <li> <a href="#readOneDesc">readOneDesc</a> &mdash; Return the doc comment found in the given range of line numbers.</li>
-<li> <a href="#readDescriptions">readDescriptions</a> &mdash; Read all the descriptions in the text specified by the line numbers.</li>
-<li> <a href="#removePresentation">removePresentation</a> &mdash; Create a json file without presentation formatting in the descriptions.</li>
+<li> <a href="#readDescriptions">readDescriptions</a> &mdash; Read all the descriptions in the text specified by the line
+numbers.</li>
+<li> <a href="#removePresentation">removePresentation</a> &mdash; Create a json file without presentation formatting in the
+descriptions.</li>
 </ul>
 
 <h3 id="helpText">helpText</h3>
 
-<p>The help text shown with -h.</p>
+<p>The help text shown with -h.
+</p>
 
 <pre class="nim-code">
 helpText = """
@@ -46,7 +53,9 @@ destFilename -- filename of the json file to create
 
 <h3 id="Args">Args</h3>
 
-<p>Args holds the source nim filename and the destination json filename to create.</p>
+<p>Args holds the source nim filename and the destination
+json filename to create.
+</p>
 
 <pre class="nim-code">
 Args = object
@@ -57,7 +66,8 @@ Args = object
 
 <h3 id="newArgs">newArgs</h3>
 
-<p>Create an Args object from a CmlArgs.</p>
+<p>Create an Args object from a CmlArgs.
+</p>
 
 <pre class="nim-code">
 func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [].}
@@ -65,7 +75,8 @@ func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [].}
 
 <h3 id="getMessage">getMessage</h3>
 
-<p>Return a message from a message id and problem argument.</p>
+<p>Return a message from a message id and problem argument.
+</p>
 
 <pre class="nim-code">
 func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
@@ -74,7 +85,8 @@ func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
 
 <h3 id="a__">`$`</h3>
 
-<p>Return a string representation of an Args object.</p>
+<p>Return a string representation of an Args object.
+</p>
 
 <pre class="nim-code">
 func `$`(args: Args): string {.raises: [ValueError], tags: [].}
@@ -82,7 +94,8 @@ func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 
 <h3 id="readOneDesc">readOneDesc</h3>
 
-<p>Return the doc comment found in the given range of line numbers.</p>
+<p>Return the doc comment found in the given range of line numbers.
+</p>
 
 <pre class="nim-code">
 proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
@@ -91,7 +104,10 @@ proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
 
 <h3 id="readDescriptions">readDescriptions</h3>
 
-<p>Read all the descriptions in the text specified by the line numbers. Return a dictionary mapping the line number to its description.</p>
+<p>Read all the descriptions in the text specified by the line
+numbers. Return a dictionary mapping the line number to its
+description.
+</p>
 
 <pre class="nim-code">
 proc readDescriptions(text: string; lineNums: seq[int]): OrderedTable[string,
@@ -100,7 +116,10 @@ proc readDescriptions(text: string; lineNums: seq[int]): OrderedTable[string,
 
 <h3 id="removePresentation">removePresentation</h3>
 
-<p>Create a json file without presentation formatting in the descriptions.  Pass in a source filename and the name of the json file to create.</p>
+<p>Create a json file without presentation formatting in the
+descriptions.  Pass in a source filename and the name of the json
+file to create.
+</p>
 
 <pre class="nim-code">
 proc removePresentation(args: Args) {.raises: [JsonDocRawError, ValueError,

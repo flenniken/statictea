@@ -94,32 +94,33 @@ proc readOneDesc*(srcLines: seq[string], start: int, finish: int): string =
   var lines = newSeq[string]()
   var foundDescription = false
   let pattern = re(r"\s*##")
+  var blankFirstColumn = true
   for line in srcLines[startIx .. endIx]:
     if line.startsWith(pattern):
       let stripped = strip(line, trailing = false)
       if stripped.len > 2:
         let str = stripped[2 .. ^1]
         lines.add(str)
+        let ch = str[0]
+        if ch != '\n' and ch != '\r' and ch != ' ':
+          blankFirstColumn = false
       else:
         lines.add("")
       foundDescription = true
     elif foundDescription:
       break
 
-  # Determine the minimum number of spaces used with the doc comment.
-  var minSpaces = 1024
-  for line in lines:
-    for ix in 0 .. line.len - 1:
-      if line[ix] != ' ':
-        if ix < minSpaces:
-          minSpaces = ix
-        break
+  if not blankFirstColumn:
+    return lines.join("")
 
-  # Trim off the minimum leading spaces.
-  var trimmedLines = newSeq[string]()
+  # Trim off one leading blank column.
+  var trimmedLines: seq[string]
+  trimmedLines = newSeq[string]()
   for line in lines:
-    trimmedLines.add(line[minSpaces .. ^1])
-
+    if line.len > 0 and line[0] == ' ':
+      trimmedLines.add(line[1 .. ^1])
+    else:
+      trimmedLines.add(line)
   result = trimmedLines.join("")
 
 proc readDescriptions*(text: string, lineNums: seq[int]): OrderedTable[string, string] =

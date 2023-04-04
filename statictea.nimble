@@ -687,9 +687,7 @@ proc taskDocm(namePart: string, forceRebuild = false) =
     let jsonFile = fmt"docs/{name}.json"
 
     # Create json doc comments from the source file.
-    # echo fmt"Create {jsonFile} from nim json doc comments."
-    let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
-    var cmd = fmt"nim {hintsOff} jsonDoc --out:{jsonFile} {srcFile}"
+    var cmd = fmt"bin/{dirName}/jsondocraw {srcFile} {jsonFile}"
     # echo cmd
     exec cmd
 
@@ -730,9 +728,8 @@ proc taskDoch(namePart: string, forceRebuild = false) =
     let jsonFile = fmt"docs/{name}.json"
 
     # Create json doc comments from the source file.
-    # echo fmt"Create {jsonFile} from nim json doc comments."
-    let hintsOff = "--hint[Conf]:off --hint[SuccessX]:off --hint[Name]:off"
-    var cmd = fmt"nim {hintsOff} jsonDoc --out:{jsonFile} {srcFile}"
+    var cmd = fmt"bin/{dirName}/jsondocraw {srcFile} {jsonFile}"
+
     # echo cmd
     exec cmd
 
@@ -938,6 +935,7 @@ proc runUnitTests(name = "") =
       if filename == "testall.nim":
         continue
       let cmd = get_test_module_cmd(filename)
+      echo ""
       echo cmd
       exec cmd
 
@@ -945,10 +943,9 @@ proc makeJsonDoc(filename: string): string =
   # Create the json doc file for the given nim source file. Return the
   # name of the json file.
   let jsonFilename = joinPath("docs", changeFileExt(filename, "json"))
-  var cmd = fmt"nim --hints:off jsondoc --out:{jsonFilename} src/{filename}"
+  var cmd = fmt"bin/{dirName}/jsondocraw src/{filename} {jsonFilename}"
   # echo cmd
   runCmd(cmd)
-  # removePresentation(filename, jsonFilename)
   result = jsonFilename
 
 proc taskTea2Html(teaBasename: string) =
