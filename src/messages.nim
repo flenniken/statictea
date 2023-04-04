@@ -106,9 +106,6 @@ const
 
 genMsgData()
 
-# echo fmt"There are {Messages2.len} messages with enums from {MessageId2.low}({ord(MessageId2.low)}) to {MessageId2.high}({ord(MessageId2.high)})"
-# echo fmt"{wSuccess}: {Messages2[wSuccess]}"
-
 type
   WarningData* = object
     ## Warning data.
@@ -127,20 +124,20 @@ func getWarning*(warning: MessageId, p1 = ""): string =
 func getWarningLine*(filename: string, lineNum: int,
     warning: MessageId, p1 = ""): string =
   ## Return a formatted warning line. For example:
-  ## @:
-  ## @:~~~
-  ## @:filename(line): wId: message.
-  ## @:~~~~
+  ##
+  ## ~~~
+  ## filename(line): wId: message.
+  ## ~~~
   let warningCode = $ord(warning)
   result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, getWarning(warning, p1)]
 
 func getWarningLine*(filename: string, lineNum: int,
     warningData: WarningData): string =
   ## Return a formatted warning line. For example:
-  ## @:
-  ## @:~~~
-  ## @:filename(line): wId: message.
-  ## @:~~~~
+  ##
+  ## ~~~
+  ## filename(line): wId: message.
+  ## ~~~
   return getWarningLine(filename, lineNum, warningData)
 
 func newWarningData*(messageId: MessageId, p1 = "", pos = 0): WarningData =
@@ -150,11 +147,11 @@ func newWarningData*(messageId: MessageId, p1 = "", pos = 0): WarningData =
 
 func `$`*(warningData: WarningData): string =
   ## Return a string representation of WarningData.
-  ## @:
-  ## @:~~~
-  ## @:let warning = newWarningData(wUnknownArg, "p1", 5)
-  ## @:check $warning == "wUnknownArg(p1):5"
-  ## @:~~~~
+  ##
+  ## ~~~nim
+  ## let warning = newWarningData(wUnknownArg, "p1", 5)
+  ## check $warning == "wUnknownArg(p1):5"
+  ## ~~~
   result = """$1 p1="$2" pos=$3""" % [$warningData.messageId,
     warningData.p1, $warningData.pos]
 

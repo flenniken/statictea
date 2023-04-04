@@ -2,6 +2,7 @@
 
 Parse the StaticTea terminal command line and return the arguments.
 
+
 * [parseCommandLine.nim](../src/parseCommandLine.nim) &mdash; Nim source code.
 # Index
 
@@ -10,6 +11,7 @@ Parse the StaticTea terminal command line and return the arguments.
 # parseCommandLine
 
 Parse the terminal command line.
+
 
 ~~~nim
 proc parseCommandLine(argv: seq[string]): ArgsOr {.raises: [KeyError, OSError],

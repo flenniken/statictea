@@ -1,11 +1,11 @@
 ## Procedures for working with statictea variables.
-## @:
-## @:There is one dictionary to hold the logically separate dictionaries,
-## @:g, h, s, t etc which makes passing them around easier.
-## @:
-## @:The language allows local variables to be specified without the l
-## @:prefix and it allows functions to be specified without the f prefix.
-## @:
+##
+## There is one dictionary to hold the logically separate dictionaries,
+## g, h, s, t etc which makes passing them around easier.
+##
+## The language allows local variables to be specified without the l
+## prefix and it allows functions to be specified without the f prefix.
+
 import std/strutils
 import std/options
 import std/tables
@@ -17,21 +17,21 @@ import opresult
 const
   outputValues* = ["result", "stdout", "stderr", "log", "skip"]
     ## Where the replacement block's output goes.
-    ## @:* result -- output goes to the result file
-    ## @:* stdout -- output goes to the standard output stream
-    ## @:* stdout -- output goes to the standard error stream
-    ## @:* log -- output goes to the log file
-    ## @:* skip -- output goes to the bit bucket
+    ## * result — output goes to the result file
+    ## * stdout — output goes to the standard output stream
+    ## * stdout — output goes to the standard error stream
+    ## * log — output goes to the log file
+    ## * skip — output goes to the bit bucket
 
 type
   Operator* = enum
     ## The statement operator types.
-    ## @:
-    ## @:* opIgnore -- ignore the statement, e.g. comment or blank statement.
-    ## @:* opAppendDict (=) -- append the value to the dictionary
-    ## @:* opAppendList ($=) -- append the value to the list
-    ## @:* opReturn -- stop or skip the current replacement iteration
-    ## @:* opLog -- log a message
+    ##
+    ## * opIgnore — ignore the statement, e.g. comment or blank statement.
+    ## * opAppendDict (=) — append the value to the dictionary
+    ## * opAppendList ($=) — append the value to the list
+    ## * opReturn — stop or skip the current replacement iteration
+    ## * opLog — log a message
     opIgnore = "ignore",
     opEqual = "=",
     opAppendList = "&=",
@@ -40,12 +40,12 @@ type
 
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
-    ## @:and value which is the result of running a statement.
-    ## @:
-    ## @:* dotNameStr -- the variable dot name tells which dictionary contains
-    ## @:the variable, i.e.: l.d.a
-    ## @:* operator -- the statement's operator; what to do with the variable and value.
-    ## @:* value -- the variable's value
+    ## and value which is the result of running a statement.
+    ##
+    ## * dotNameStr — the variable dot name tells which dictionary contains
+    ## the variable, e.g.: l.d.a
+    ## * operator — the statement's operator; what to do with the variable and value.
+    ## * value — the variable's value
     dotNameStr*: string
     operator*: Operator
     value*: Value
@@ -55,9 +55,9 @@ type
 
   NoPrefixDict* = enum
     ## The variable letter prefix to use when it's missing.
-    ## @:
-    ## @:* npLocal -- use the local (l) dictionary
-    ## @:* npBuiltIn -- use the built in function (f) dictionary
+    ##
+    ## * npLocal — use the local (l) dictionary
+    ## * npBuiltIn — use the built in function (f) dictionary
     npLocal,
     npBuiltIn,
 
@@ -278,16 +278,16 @@ proc assignVariable*(
   ## Assign the variable the given value if possible, else return a
   ## warning.
 
-  # -- You cannot overwrite an existing variable.
-  # -- You can only assign to known tea variables.
-  # -- You can assign new values to the local and global dictionaries
+  # — You cannot overwrite an existing variable.
+  # — You can only assign to known tea variables.
+  # — You can assign new values to the local and global dictionaries
   #    but not the others (except for the previous rule).
-  # -- You can append to local and global lists but not others.
-  # -- You can specify local variables without the l prefix.
-  # -- You cannot assign true and false.
-  # -- You can assign new values to the code dictonary when in code files.
-  # -- You cannot assign or append to an immutable dict or list.
-  # -- You can assign a user function to the u dictionary but nothing else.
+  # — You can append to local and global lists but not others.
+  # — You can specify local variables without the l prefix.
+  # — You cannot assign true and false.
+  # — You can assign new values to the code dictonary when in code files.
+  # — You cannot assign or append to an immutable dict or list.
+  # — You can assign a user function to the u dictionary but nothing else.
 
   assert dotNameStr.len > 0
   var dotNameList = split(dotNameStr, '.')

@@ -8,7 +8,8 @@
 <body>
 <h1>matches.nim</h1>
 
-<p>Methods for matching sub-strings.</p>
+<p>Methods for matching sub-strings.
+</p>
 
 Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 
@@ -17,13 +18,15 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 <ul>
 <li>const:  <a href="#commands">commands</a> &mdash; The StaticTea commands.</li>
 <li> <a href="#parsePrepost">parsePrepost</a> &mdash; Parse the prepost item on the terminal command line.</li>
-<li> <a href="#matchPrefix">matchPrefix</a> &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.</li>
+<li> <a href="#matchPrefix">matchPrefix</a> &mdash; Match lines that start with one of the prefixes in the given
+table plus optional following whitespace.</li>
 <li> <a href="#matchCommand">matchCommand</a> &mdash; Match statictea commands.</li>
 <li> <a href="#matchLastPart">matchLastPart</a> &mdash; Match the last part of a command line.</li>
 <li> <a href="#getLastPart">getLastPart</a> &mdash; Return the optional plus sign and line endings from the line.</li>
 <li> <a href="#matchTabSpace">matchTabSpace</a> &mdash; Match one or more spaces or tabs starting at the given position.</li>
 <li> <a href="#emptyOrSpaces">emptyOrSpaces</a> &mdash; Return true when the text is empty or all whitespace from start to the end.</li>
-<li> <a href="#matchEqualSign">matchEqualSign</a> &mdash; Match an equal sign or "&=" and the optional trailing whitespace.</li>
+<li> <a href="#matchEqualSign">matchEqualSign</a> &mdash; Match an equal sign or "&=" and the optional trailing
+whitespace.</li>
 <li> <a href="#matchCommaParentheses">matchCommaParentheses</a> &mdash; Match a comma or right parentheses and the optional trailing whitespace.</li>
 <li> <a href="#matchNumber">matchNumber</a> &mdash; Match a number and the optional trailing whitespace.</li>
 <li> <a href="#matchNumberNotCached">matchNumberNotCached</a> &mdash; Match a number and the optional trailing whitespace.</li>
@@ -35,7 +38,8 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 <li> <a href="#matchCommaOrSymbol">matchCommaOrSymbol</a> &mdash; Match a comma or the symbol and the optional trailing whitespace.</li>
 <li> <a href="#matchSymbol">matchSymbol</a> &mdash; Match the symbol and the optional trailing whitespace.</li>
 <li> <a href="#matchNotOrParen">matchNotOrParen</a> &mdash; Match "not " or "(" and the trailing whitespace.</li>
-<li> <a href="#matchBoolExprOperator">matchBoolExprOperator</a> &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.</li>
+<li> <a href="#matchBoolExprOperator">matchBoolExprOperator</a> &mdash; Match boolean expression operators (bool operators plus compareh
+operators) and the trailing whitespace.</li>
 <li> <a href="#matchCompareOperator">matchCompareOperator</a> &mdash; Match the compare operators and the trailing whitespace.</li>
 <li> <a href="#matchReplCmd">matchReplCmd</a> &mdash; Match the REPL commands and the trailing optional whitespace.</li>
 <li> <a href="#matchParameterType">matchParameterType</a> &mdash; Match a parameter type and the trailing whitespace.</li>
@@ -47,12 +51,13 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 
 <p>The StaticTea commands.
 </p><ul>
-<li>nextline -- make substitutions in the next line
-</li><li>block —- make substitutions in the next block of lines
-</li><li>replace -— replace the block with a variable
-</li><li>&quot;#&quot; -- code comment
-</li><li>&quot;:&quot; -- continue a command
-</li><li>endblock -- end the block and replace commands</li></ul>
+<li>nextline — make substitutions in the next line
+</li><li>block — make substitutions in the next block of lines
+</li><li>replace — replace the block with a variable
+</li><li>&quot;#&quot; — code comment
+</li><li>&quot;:&quot; — continue a command
+</li><li>endblock — end the block and replace commands
+</li></ul>
 
 
 <pre class="nim-code">
@@ -62,7 +67,11 @@ commands: array[6, string] = ["nextline", "block", "replace", "#", ":",
 
 <h3 id="parsePrepost">parsePrepost</h3>
 
-<p>Parse the prepost item on the terminal command line.  A prefix is followed by an optional postfix, prefix[,postfix].  Each part contains 1 to 20 ascii characters including spaces but without control characters or commas.</p>
+<p>Parse the prepost item on the terminal command line.  A prefix is
+followed by an optional postfix, prefix[,postfix].  Each part
+contains 1 to 20 ascii characters including spaces but without
+control characters or commas.
+</p>
 
 <pre class="nim-code">
 proc parsePrepost(str: string): Option[tuple[prefix: string, postfix: string]]
@@ -70,7 +79,9 @@ proc parsePrepost(str: string): Option[tuple[prefix: string, postfix: string]]
 
 <h3 id="matchPrefix">matchPrefix</h3>
 
-<p>Match lines that start with one of the prefixes in the given table plus optional following whitespace.</p>
+<p>Match lines that start with one of the prefixes in the given
+table plus optional following whitespace.
+</p>
 
 <pre class="nim-code">
 proc matchPrefix(line: string; prefixes: seq[string]; start: Natural = 0): Option[
@@ -79,7 +90,8 @@ proc matchPrefix(line: string; prefixes: seq[string]; start: Natural = 0): Optio
 
 <h3 id="matchCommand">matchCommand</h3>
 
-<p>Match statictea commands.</p>
+<p>Match statictea commands.
+</p>
 
 <pre class="nim-code">
 proc matchCommand(line: string; start: Natural = 0): Option[Matches] {.
@@ -88,7 +100,11 @@ proc matchCommand(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchLastPart">matchLastPart</h3>
 
-<p>Match the last part of a command line.  It matches the optional continuation plus character, the optional postfix and the optional line endings. A match has two groups, the plus sign and the line ending. When nothing at the end, return groups: &quot;&quot;, &quot;&quot;.</p>
+<p>Match the last part of a command line.  It matches the optional
+continuation plus character, the optional postfix and the
+optional line endings. A match has two groups, the plus sign and
+the line ending. When nothing at the end, return groups: &quot;&quot;, &quot;&quot;.
+</p>
 
 <pre class="nim-code">
 proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[
@@ -97,7 +113,8 @@ proc matchLastPart(line: string; postfix: string; start: Natural = 0): Option[
 
 <h3 id="getLastPart">getLastPart</h3>
 
-<p>Return the optional plus sign and line endings from the line.</p>
+<p>Return the optional plus sign and line endings from the line.
+</p>
 
 <pre class="nim-code">
 proc getLastPart(line: string; postfix: string): Option[Matches] {.
@@ -106,7 +123,8 @@ proc getLastPart(line: string; postfix: string): Option[Matches] {.
 
 <h3 id="matchTabSpace">matchTabSpace</h3>
 
-<p>Match one or more spaces or tabs starting at the given position.</p>
+<p>Match one or more spaces or tabs starting at the given position.
+</p>
 
 <pre class="nim-code">
 proc matchTabSpace(line: string; start: Natural = 0): Option[Matches] {.
@@ -115,7 +133,8 @@ proc matchTabSpace(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="emptyOrSpaces">emptyOrSpaces</h3>
 
-<p>Return true when the text is empty or all whitespace from start to the end.</p>
+<p>Return true when the text is empty or all whitespace from start to the end.
+</p>
 
 <pre class="nim-code">
 proc emptyOrSpaces(text: string; start: Natural = 0): bool {.raises: [KeyError],
@@ -124,7 +143,9 @@ proc emptyOrSpaces(text: string; start: Natural = 0): bool {.raises: [KeyError],
 
 <h3 id="matchEqualSign">matchEqualSign</h3>
 
-<p>Match an equal sign or &quot;&amp;=&quot; and the optional trailing whitespace. Return the operator in the group, &quot;=&quot; or &quot;&amp;=&quot;.</p>
+<p>Match an equal sign or &quot;&amp;=&quot; and the optional trailing
+whitespace. Return the operator in the group, &quot;=&quot; or &quot;&amp;=&quot;.
+</p>
 
 <pre class="nim-code">
 proc matchEqualSign(line: string; start: Natural = 0): Option[Matches] {.
@@ -133,7 +154,8 @@ proc matchEqualSign(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchCommaParentheses">matchCommaParentheses</h3>
 
-<p>Match a comma or right parentheses and the optional trailing whitespace.</p>
+<p>Match a comma or right parentheses and the optional trailing whitespace.
+</p>
 
 <pre class="nim-code">
 proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches] {.
@@ -142,7 +164,10 @@ proc matchCommaParentheses(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchNumber">matchNumber</h3>
 
-<p>Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer.</p>
+<p>Match a number and the optional trailing whitespace. Return the
+optional decimal point that tells whether the number is a float
+or integer.
+</p>
 
 <pre class="nim-code">
 proc matchNumber(line: string; start: Natural = 0): Option[Matches] {.
@@ -151,7 +176,11 @@ proc matchNumber(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchNumberNotCached">matchNumberNotCached</h3>
 
-<p>Match a number and the optional trailing whitespace. Return the optional decimal point that tells whether the number is a float or integer. &quot;Not cached&quot; allows it to be called by a function because it has no side effects.</p>
+<p>Match a number and the optional trailing whitespace. Return the
+optional decimal point that tells whether the number is a float
+or integer. &quot;Not cached&quot; allows it to be called by a function
+because it has no side effects.
+</p>
 
 <pre class="nim-code">
 func matchNumberNotCached(line: string; start: Natural = 0): Option[Matches]
@@ -177,7 +206,8 @@ proc matchUpToLeftBracket(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchFileLine">matchFileLine</h3>
 
-<p>Match a file and line number like: filename(234).</p>
+<p>Match a file and line number like: filename(234).
+</p>
 
 <pre class="nim-code">
 proc matchFileLine(line: string; start: Natural = 0): Option[Matches] {.
@@ -186,7 +216,8 @@ proc matchFileLine(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchVersion">matchVersion</h3>
 
-<p>Match a StaticTea version number.</p>
+<p>Match a StaticTea version number.
+</p>
 
 <pre class="nim-code">
 proc matchVersion(line: string; start: Natural = 0): Option[Matches] {.
@@ -195,7 +226,9 @@ proc matchVersion(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchVersionNotCached">matchVersionNotCached</h3>
 
-<p>Match a StaticTea version number. &quot;Not cached&quot; allows it to be called by a function because it has no side effects.</p>
+<p>Match a StaticTea version number. &quot;Not cached&quot; allows it to be
+called by a function because it has no side effects.
+</p>
 
 <pre class="nim-code">
 func matchVersionNotCached(line: string; start: Natural = 0;
@@ -204,7 +237,8 @@ func matchVersionNotCached(line: string; start: Natural = 0;
 
 <h3 id="GroupSymbol">GroupSymbol</h3>
 
-<p>Grouping symbols we search for in the statements.</p>
+<p>Grouping symbols we search for in the statements.
+</p>
 
 <pre class="nim-code">
 GroupSymbol = enum
@@ -214,7 +248,8 @@ GroupSymbol = enum
 
 <h3 id="matchCommaOrSymbol">matchCommaOrSymbol</h3>
 
-<p>Match a comma or the symbol and the optional trailing whitespace.</p>
+<p>Match a comma or the symbol and the optional trailing whitespace.
+</p>
 
 <pre class="nim-code">
 proc matchCommaOrSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
@@ -223,7 +258,8 @@ proc matchCommaOrSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): 
 
 <h3 id="matchSymbol">matchSymbol</h3>
 
-<p>Match the symbol and the optional trailing whitespace.</p>
+<p>Match the symbol and the optional trailing whitespace.
+</p>
 
 <pre class="nim-code">
 proc matchSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
@@ -232,7 +268,8 @@ proc matchSymbol(line: string; symbol: GroupSymbol; start: Natural = 0): Option[
 
 <h3 id="matchNotOrParen">matchNotOrParen</h3>
 
-<p>Match &quot;not &quot; or &quot;(&quot; and the trailing whitespace.</p>
+<p>Match &quot;not &quot; or &quot;(&quot; and the trailing whitespace.
+</p>
 
 <pre class="nim-code">
 proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches] {.
@@ -241,7 +278,11 @@ proc matchNotOrParen(line: string; start: Natural = 0): Option[Matches] {.
 
 <h3 id="matchBoolExprOperator">matchBoolExprOperator</h3>
 
-<p>Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.  The bool operators require a trailing space but it isn&#x27;t part of the operator name returned but still in the length.</p>
+<p>Match boolean expression operators (bool operators plus compareh
+operators) and the trailing whitespace.  The bool operators
+require a trailing space but it isn&#x27;t part of the operator name
+returned but still in the length.
+</p>
 
 <pre class="nim-code">
 proc matchBoolExprOperator(line: string; start: Natural): Option[Matches] {.
@@ -250,7 +291,8 @@ proc matchBoolExprOperator(line: string; start: Natural): Option[Matches] {.
 
 <h3 id="matchCompareOperator">matchCompareOperator</h3>
 
-<p>Match the compare operators and the trailing whitespace.</p>
+<p>Match the compare operators and the trailing whitespace.
+</p>
 
 <pre class="nim-code">
 proc matchCompareOperator(line: string; start: Natural): Option[Matches] {.
@@ -259,7 +301,9 @@ proc matchCompareOperator(line: string; start: Natural): Option[Matches] {.
 
 <h3 id="matchReplCmd">matchReplCmd</h3>
 
-<p>Match the REPL commands and the trailing optional whitespace. One space or end of line is required.</p>
+<p>Match the REPL commands and the trailing optional whitespace.
+One space or end of line is required.
+</p>
 
 <pre class="nim-code">
 proc matchReplCmd(line: string; start: Natural): Option[Matches] {.
@@ -268,7 +312,8 @@ proc matchReplCmd(line: string; start: Natural): Option[Matches] {.
 
 <h3 id="matchParameterType">matchParameterType</h3>
 
-<p>Match a parameter type and the trailing whitespace.</p>
+<p>Match a parameter type and the trailing whitespace.
+</p>
 
 <pre class="nim-code">
 proc matchParameterType(line: string; start: Natural): Option[Matches] {.
@@ -277,7 +322,8 @@ proc matchParameterType(line: string; start: Natural): Option[Matches] {.
 
 <h3 id="matchDocComment">matchDocComment</h3>
 
-<p>Match a doc comment.</p>
+<p>Match a doc comment.
+</p>
 
 <pre class="nim-code">
 proc matchDocComment(line: string; start: Natural): Option[Matches] {.
@@ -286,7 +332,8 @@ proc matchDocComment(line: string; start: Natural): Option[Matches] {.
 
 <h3 id="matchReturnStatement">matchReturnStatement</h3>
 
-<p>Match a return statement. a = return(...</p>
+<p>Match a return statement. a = return(...
+</p>
 
 <pre class="nim-code">
 proc matchReturnStatement(line: string; start: Natural): Option[Matches] {.

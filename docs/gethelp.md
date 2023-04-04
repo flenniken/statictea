@@ -2,6 +2,7 @@
 
 Get the command line help message.
 
+
 * [gethelp.nim](../src/gethelp.nim) &mdash; Nim source code.
 # Index
 
@@ -10,6 +11,7 @@ Get the command line help message.
 # getHelp
 
 Get the command line help message.
+
 
 ~~~nim
 func getHelp(): string

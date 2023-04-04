@@ -1,8 +1,8 @@
 ## OpResult holds either a value or a message.  It's similar to
-## @:the Option type but instead of returning nothing, you return a
-## @:message that tells why you cannot return the value.
-## @:
-## @:You use this to make particular OpResult objects. See @{OpResultId}@(opresultid.md).
+## the Option type but instead of returning nothing, you return a
+## message that tells why you cannot return the value.
+##
+## You use this to make particular OpResult objects. See @{OpResultId}@(opresultid.md).
 
 import messages
 
@@ -43,24 +43,24 @@ type
     ## OpResultWarn holds either a value or warning data.  It's similar to
     ## the Option type but instead of returning nothing, you return a
     ## warning that tells why you cannot return the value.
-    ## @:
-    ## @:Example Usage:
-    ## @:
-    ## @:~~~
-    ## @:import opresult
-    ## @:
-    ## @:proc get_string(): OpResultWarn[string] =
-    ## @:  if problem:
-    ## @:    result = opMessage@{string}@(newWarningData(wUnknownArg))
-    ## @:  else:
-    ## @:    result = opValue@{string}@("string of char")
-    ## @:
-    ## @:let strOr = get_string()
-    ## @:if strOr.isMessage:
-    ## @:  echo show_message(strOr.message)
-    ## @:else:
-    ## @:  echo "value = " & $strOr.value
-    ## @:~~~~
+    ##
+    ## Example Usage:
+    ##
+    ## ~~~ nim
+    ## import opresult
+    ##
+    ## proc get_string(): OpResultWarn[string] =
+    ##   if problem:
+    ##     result = opMessage@{string}@(newWarningData(wUnknownArg))
+    ##   else:
+    ##     result = opValue@{string}@("string of char")
+    ##
+    ## let strOr = get_string()
+    ## if strOr.isMessage:
+    ##   echo show_message(strOr.message)
+    ## else:
+    ##   echo "value = " & $strOr.value
+    ## ~~~
 
 func opValueW*[T](value: T): OpResultWarn[T] =
   ## Create a new OpResultWarn object containing a value T.
@@ -73,26 +73,26 @@ func opMessageW*[T](message: WarningData): OpResultWarn[T] =
 type
   OpResultId*[T] = OpResult[T, MessageId]
     ## OpResultId holds either a value or a message id.  It's similar to
-    ## @:the Option type but instead of returning nothing, you return a
-    ## @:message id that tells why you cannot return the value.
-    ## @:
-    ## @:Example Usage:
-    ## @:
-    ## @:~~~
-    ## @:import opresult
-    ## @:
-    ## @:proc get_string(): OpResultId[string] =
-    ## @:  if problem:
-    ## @:    result = opMessage@{string}@(wUnknownArg)
-    ## @:  else:
-    ## @:    result = opValue@{string}@("string of char")
-    ## @:
-    ## @:let strOr = get_string()
-    ## @:if strOr.isMessage:
-    ## @:  echo show_message(strOr.message)
-    ## @:else:
-    ## @:  echo "value = " & $strOr.value
-    ## @:~~~~
+    ## the Option type but instead of returning nothing, you return a
+    ## message id that tells why you cannot return the value.
+    ##
+    ## Example Usage:
+    ##
+    ## ~~~ nim
+    ## import opresult
+    ##
+    ## proc get_string(): OpResultId[string] =
+    ##   if problem:
+    ##     result = opMessage@{string}@(wUnknownArg)
+    ##   else:
+    ##     result = opValue@{string}@("string of char")
+    ##
+    ## let strOr = get_string()
+    ## if strOr.isMessage:
+    ##   echo show_message(strOr.message)
+    ## else:
+    ##   echo "value = " & $strOr.value
+    ## ~~~
 
 func opValue*[T](value: T): OpResultId[T] =
   ## Create a new OpResultId object containing a value T.

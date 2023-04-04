@@ -8,7 +8,8 @@
 <body>
 <h1>parseCmdLine.nim</h1>
 
-<p>Parse a StaticTea language command line.</p>
+<p>Parse a StaticTea language command line.
+</p>
 
 Nim source code: <a href="../../src/parseCmdLine.nim">parseCmdLine.nim</a>
 
@@ -38,13 +39,14 @@ prefix command  [code]   [comment] [continuation]
 |      |        |        |         |[postfix]
 |      |        |        |         ||  [ending]
 |      |        |        |         ||  |
-&lt;!--$  nextline var = 5  # comment +--&gt;n
+&lt;!--$  nextline var = 5  # comment +--&gt;\n
      |
      optional spaces
 </pre>
 <p>
 Whitespace must follow a command except on the last line of the file.
-codeStart is 0 when codeLen is 0.</p>
+codeStart is 0 when codeLen is 0.
+</p>
 
 <pre class="nim-code">
 LineParts = object
@@ -61,7 +63,8 @@ LineParts = object
 
 <h3 id="LinePartsOr">LinePartsOr</h3>
 
-<p>The line parts or a warning.</p>
+<p>The line parts or a warning.
+</p>
 
 <pre class="nim-code">
 LinePartsOr = OpResultWarn[LineParts]
@@ -69,7 +72,8 @@ LinePartsOr = OpResultWarn[LineParts]
 
 <h3 id="CmdLines">CmdLines</h3>
 
-<p>The collected command lines and their parts.</p>
+<p>The collected command lines and their parts.
+</p>
 
 <pre class="nim-code">
 CmdLines = object
@@ -82,9 +86,10 @@ CmdLines = object
 <p>The ExtraLine type.
 
 </p><ul>
-<li>elkNoLine -- there is no line here
-</li><li>elkOutOfLines -- no more lines in the template
-</li><li>elkNormalLine -- we have a line of some type</li></ul>
+<li>elkNoLine — there is no line here
+</li><li>elkOutOfLines — no more lines in the template
+</li><li>elkNormalLine — we have a line of some type
+</li></ul>
 
 
 <pre class="nim-code">
@@ -94,7 +99,9 @@ ExtraLineKind = enum
 
 <h3 id="ExtraLine">ExtraLine</h3>
 
-<p>The extra line and its type. The line is empty except for the elkNormalLine type.</p>
+<p>The extra line and its type. The line is empty except for the
+elkNormalLine type.
+</p>
 
 <pre class="nim-code">
 ExtraLine = object
@@ -104,7 +111,8 @@ ExtraLine = object
 
 <h3 id="newNormalLine">newNormalLine</h3>
 
-<p>Create a normal ExtraLine.</p>
+<p>Create a normal ExtraLine.
+</p>
 
 <pre class="nim-code">
 func newNormalLine(line: string): ExtraLine
@@ -112,7 +120,8 @@ func newNormalLine(line: string): ExtraLine
 
 <h3 id="newNoLine">newNoLine</h3>
 
-<p>Create a no line ExtraLine.</p>
+<p>Create a no line ExtraLine.
+</p>
 
 <pre class="nim-code">
 func newNoLine(): ExtraLine
@@ -120,7 +129,8 @@ func newNoLine(): ExtraLine
 
 <h3 id="newOutOfLines">newOutOfLines</h3>
 
-<p>Create an out of lines ExtraLine.</p>
+<p>Create an out of lines ExtraLine.
+</p>
 
 <pre class="nim-code">
 func newOutOfLines(): ExtraLine
@@ -128,7 +138,8 @@ func newOutOfLines(): ExtraLine
 
 <h3 id="newLinePartsOr">newLinePartsOr</h3>
 
-<p>Return a new LinePartsOr object containing a warning.</p>
+<p>Return a new LinePartsOr object containing a warning.
+</p>
 
 <pre class="nim-code">
 func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
@@ -136,7 +147,8 @@ func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
 
 <h3 id="newLinePartsOr-1">newLinePartsOr</h3>
 
-<p>Return a new LinePartsOr object containing a LineParts object.</p>
+<p>Return a new LinePartsOr object containing a LineParts object.
+</p>
 
 <pre class="nim-code">
 func newLinePartsOr(lineParts: LineParts): LinePartsOr
@@ -144,7 +156,11 @@ func newLinePartsOr(lineParts: LineParts): LinePartsOr
 
 <h3 id="getCodeLength">getCodeLength</h3>
 
-<p>Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.</p>
+<p>Return the length of the code in the line.  The code starts at
+codeStart and cannot exceed the given length. The code ends when
+there is a comment (a pound sign), or the end is reached.
+The input length is returned on errors.
+</p>
 
 <pre class="nim-code">
 func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
@@ -152,7 +168,9 @@ func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 
 <h3 id="parseCmdLine">parseCmdLine</h3>
 
-<p>Parse the line and return its parts. Return quickly when not a command line.</p>
+<p>Parse the line and return its parts. Return quickly when not a
+command line.
+</p>
 
 <pre class="nim-code">
 proc parseCmdLine(prepostTable: PrepostTable; line: string; lineNum: Natural): LinePartsOr {.

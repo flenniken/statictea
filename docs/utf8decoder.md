@@ -2,18 +2,21 @@
 
 Functions for decoding and validating UTF-8.
 
+
 * [utf8decoder.nim](../src/utf8decoder.nim) &mdash; Nim source code.
 # Index
 
 * [decode](#decode) &mdash; Interior part of a UTF-8 decoder.
 * [yieldUtf8Chars](#yieldutf8chars) &mdash; Iterate through the string's UTF-8 character byte sequences.
-* [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid UTF-8 byte in the string else return -1.
+* [validateUtf8String](#validateutf8string) &mdash; Return the position of the first invalid UTF-8 byte in the string
+else return -1.
 * [sanitizeUtf8](#sanitizeutf8) &mdash; Sanitize and return the UTF-8 string.
 * [utf8CharString](#utf8charstring) &mdash; Get the unicode character at pos.
 
 # decode
 
 Interior part of a UTF-8 decoder.
+
 
 ~~~nim
 proc decode(state: var uint32; codep: var uint32; sByte: char)
@@ -22,13 +25,21 @@ proc decode(state: var uint32; codep: var uint32; sByte: char)
 # yieldUtf8Chars
 
 Iterate through the string's UTF-8 character byte sequences.
+
 For each character set ixStartSeq, ixEndSeq, and codePoint.
+
 Return true when the bytes sequence is valid else return false.
 
+
+
 You can get the current byte sequence with:
+
 str[ixStartSeq .. ixEndSeq]
 
+
+
 A UTF-8 character is a one to four byte sequence.
+
 
 ~~~nim
 iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
@@ -37,7 +48,9 @@ iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
 
 # validateUtf8String
 
-Return the position of the first invalid UTF-8 byte in the string else return -1.
+Return the position of the first invalid UTF-8 byte in the string
+else return -1.
+
 
 ~~~nim
 func validateUtf8String(str: string): int
@@ -45,7 +58,10 @@ func validateUtf8String(str: string): int
 
 # sanitizeUtf8
 
-Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.
+Sanitize and return the UTF-8 string. The skipOrReplace parameter
+determines whether to skip or replace invalid bytes.  When
+replacing the U+FFFD character is used.
+
 
 ~~~nim
 func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
@@ -53,7 +69,9 @@ func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 
 # utf8CharString
 
-Get the unicode character at pos.  Return a one character string. Return "" when not a UTF-8 character.
+Get the unicode character at pos.  Return a one character
+string. Return "" when not a UTF-8 character.
+
 
 ~~~nim
 func utf8CharString(str: string; pos: Natural): string

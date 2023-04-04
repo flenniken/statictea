@@ -11,14 +11,15 @@
 <p>Create a temporary file.
 
 </p><p>Example:
+
 </p><pre class="plain-code">
 import tempFile
 var tempFileO = openTempFile()
 require tempFileO.isSome
 var tempFile = tempFileO.get()
 
-tempFile.file.write(&quot;this is a test\n&quot;)
-tempFile.file.write(&quot;line 2\n&quot;)
+tempFile.file.write(&quot;this is a test\\n&quot;)
+tempFile.file.write(&quot;line 2\\n&quot;)
 tempFile.file.close()
 
 var fh = open(tempFile.filename, fmRead)
@@ -40,15 +41,18 @@ Nim source code: <a href="../../src/tempFile.nim">tempFile.nim</a>
 <ul>
 <li>type:  <a href="#TempFile">TempFile</a> &mdash; Temporary filename and associated file object.</li>
 <li>type:  <a href="#TempFileStream">TempFileStream</a> &mdash; Temporary filename and associated stream object.</li>
-<li> <a href="#openTempFile">openTempFile</a> &mdash; Create an empty file in the temp directory open for read write.</li>
+<li> <a href="#openTempFile">openTempFile</a> &mdash; Create an empty file in the temp directory open for read
+write.</li>
 <li> <a href="#closeDeleteFile">closeDeleteFile</a> &mdash; Close and delete the temp file.</li>
-<li> <a href="#openTempFileStream">openTempFileStream</a> &mdash; Create an empty file stream in the temp directory open for read write.</li>
+<li> <a href="#openTempFileStream">openTempFileStream</a> &mdash; Create an empty file stream in the temp directory open for read
+write.</li>
 <li> <a href="#closeDeleteStream">closeDeleteStream</a> &mdash; Close the stream and delete the associated temp file.</li>
 </ul>
 
 <h3 id="TempFile">TempFile</h3>
 
-<p>Temporary filename and associated file object.</p>
+<p>Temporary filename and associated file object.
+</p>
 
 <pre class="nim-code">
 TempFile = object
@@ -58,7 +62,8 @@ TempFile = object
 
 <h3 id="TempFileStream">TempFileStream</h3>
 
-<p>Temporary filename and associated stream object.</p>
+<p>Temporary filename and associated stream object.
+</p>
 
 <pre class="nim-code">
 TempFileStream = object
@@ -68,7 +73,11 @@ TempFileStream = object
 
 <h3 id="openTempFile">openTempFile</h3>
 
-<p>Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.</p>
+<p>Create an empty file in the temp directory open for read
+write. Return a TempFile object containing the filename and
+file object.  Call closeDeleteFile when you are done with the
+file.
+</p>
 
 <pre class="nim-code">
 proc openTempFile(): Option[TempFile] {.raises: [ValueError],
@@ -77,7 +86,8 @@ proc openTempFile(): Option[TempFile] {.raises: [ValueError],
 
 <h3 id="closeDeleteFile">closeDeleteFile</h3>
 
-<p>Close and delete the temp file.</p>
+<p>Close and delete the temp file.
+</p>
 
 <pre class="nim-code">
 proc closeDeleteFile(tempFile: TempFile) {.raises: [], tags: [WriteDirEffect].}
@@ -85,7 +95,11 @@ proc closeDeleteFile(tempFile: TempFile) {.raises: [], tags: [WriteDirEffect].}
 
 <h3 id="openTempFileStream">openTempFileStream</h3>
 
-<p>Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.</p>
+<p>Create an empty file stream in the temp directory open for read
+write. Return a TempFileStream object containing the filename and
+stream object.  Call closeDeleteStream when you are done with the
+stream.
+</p>
 
 <pre class="nim-code">
 proc openTempFileStream(): Option[TempFileStream] {.
@@ -94,7 +108,8 @@ proc openTempFileStream(): Option[TempFileStream] {.
 
 <h3 id="closeDeleteStream">closeDeleteStream</h3>
 
-<p>Close the stream and delete the associated temp file.</p>
+<p>Close the stream and delete the associated temp file.
+</p>
 
 <pre class="nim-code">
 proc closeDeleteStream(tempFileStream: TempFileStream) {.

@@ -6,6 +6,7 @@ import lineBuffer
 
 type
   ElementTag* = enum
+    ## The supported markdown elements.
     nothing,
     p,
     code,
@@ -18,17 +19,17 @@ type
 
   FragmentType* = enum
     ## Hightlight fragments.
-    ## @:
-    ## @:* hlOther -- not one of the other types
-    ## @:* hlDotName -- a dot name
-    ## @:* hlFuncCall -- a dot name followed by a left parenthesis
-    ## @:* hlNumber -- a literal number
-    ## @:* hlStringType -- a literal string
-    ## @:* hlMultiline -- a multiline literal string
-    ## @:* hlDocComment -- a doc comment
-    ## @:* hlComment -- a comment
-    ## @:* hlParamName -- a parameter name
-    ## @:* hlParamType -- int, float, string, list, dict, bool, func, any and optional
+    ##
+    ## * hlOther — not one of the other types
+    ## * hlDotName — a dot name
+    ## * hlFuncCall — a dot name followed by a left parenthesis
+    ## * hlNumber — a literal number
+    ## * hlStringType — a literal string
+    ## * hlMultiline — a multiline literal string
+    ## * hlDocComment — a doc comment
+    ## * hlComment — a comment
+    ## * hlParamName — a parameter name
+    ## * hlParamType — int, float, string, list, dict, bool, func, any and optional
     hlOther = "other",
     hlDotName = "dotName",
     hlFuncCall = "funcCall",
@@ -42,9 +43,9 @@ type
 
   Fragment* = object
     ## A fragment of a string.
-    ## @:* fragmentType -- the type of fragment
-    ## @:* start -- the index in the string where the fragment starts
-    ## @:* fEnd -- the end of the fragment, [start, end) half-open interval
+    ## * fragmentType — the type of fragment
+    ## * start — the index in the string where the fragment starts
+    ## * fEnd — the end of the fragment, [start, end) half-open interval
     fragmentType*: FragmentType
     start*: Natural
     fEnd*: Natural
@@ -58,9 +59,11 @@ proc clear(list: var seq[string]) =
   list.setLen(0)
 
 func newFragment*(fragmentType: FragmentType, start: Natural, fEnd: Natural): Fragment =
+  ## Create a new Fragment from start and end values.
   result = Fragment(fragmentType: fragmentType, start: start, fEnd: fEnd)
 
 func newFragmentLen2*(fragmentType: FragmentType, start: Natural, length: Natural): Fragment =
+  ## Create a new Fragment from start and length values.
   result = Fragment(fragmentType: fragmentType, start: start, fEnd: start+length)
 
 func `$`*(f: Fragment): string =
@@ -77,21 +80,21 @@ func `$`*(fragments: seq[Fragment]): string =
 func parseMarkdown*(desc: string): seq[Element] =
   ## Parse the simple description markdown and return a list of
   ## elements.
-  ## @:
-  ## @:elements:
-  ## @:
-  ## @:* p -- A paragraph element is one string, possibly containing
-  ## @:newlines.
-  ## @:
-  ## @:* code -- A code element is three strings. The first string is
-  ## @:the code start line, for example “~~~” or “~~~nim”.  The second
-  ## @:string contains the contents of the block containing newlines,
-  ## @:when none it’s empty.  The third string is the ending line, for
-  ## @:example “~~~”.
-  ## @:
-  ## @:* bullets -- A bullets element contains a string for each
-  ## @:bullet point and it may contain newlines.  The leading “* “ is
-  ## @:not part of the string.
+  ##
+  ## elements:
+  ##
+  ## * p — A paragraph element is one string, possibly containing
+  ## newlines.
+  ##
+  ## * code — A code element is three strings. The first string is
+  ## the code start line, for example “~~~” or “~~~nim”.  The second
+  ## string contains the contents of the block containing newlines,
+  ## when none it’s empty.  The third string is the ending line, for
+  ## example “~~~”.
+  ##
+  ## * bullets — A bullets element contains a string for each
+  ## bullet point and it may contain newlines.  The leading “* “ is
+  ## not part of the string.
 
   # The current tag.
   var tag = nothing

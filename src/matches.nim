@@ -14,12 +14,12 @@ const
     "endblock",
   ]
     ## The StaticTea commands.
-    ## @:* nextline -- make substitutions in the next line
-    ## @:* block —- make substitutions in the next block of lines
-    ## @:* replace -— replace the block with a variable
-    ## @:* "#" -- code comment
-    ## @:* ":" -- continue a command
-    ## @:* endblock -- end the block and replace commands
+    ## * nextline — make substitutions in the next line
+    ## * block — make substitutions in the next block of lines
+    ## * replace — replace the block with a variable
+    ## * "#" — code comment
+    ## * ":" — continue a command
+    ## * endblock — end the block and replace commands
 
   numberPattern = r"-{0,1}[0-9][0-9_]*([\.]{0,1})[0-9_]*\s*"
     ## A number regular expression pattern. A number starts with an
@@ -136,14 +136,14 @@ func matchNumberNotCached*(line: string, start: Natural = 0): Option[Matches] =
 
 proc matchUpToLeftBracket*(line: string, start: Natural = 0): Option[Matches] =
   ## Match everything up to a left backet. The match length includes
-  ## @:the bracket.
-  ## @:
-  ## @:A replacement variable is inside brackets.
-  ## @:
-  ## @:~~~
-  ## @:text on the line {variable} more text {variable2} asdf
-  ## @:                  ^
-  ## @:~~~~
+  ## the bracket.
+  ##
+  ## A replacement variable is inside brackets.
+  ##
+  ## ~~~
+  ## text on the line {variable} more text {variable2} asdf
+  ##                   ^
+  ## ~~~
 
   let pattern = "[^{]*{"
   result = matchPatternCached(line, pattern, start, 0)

@@ -1,30 +1,38 @@
 # cmdline.nim
 
-<p>Parse the command line.</p>
-<p>Example:</p>
-<p>~~~nim import cmdline</p>
+Parse the command line.
 
-<h1><a class="toc-backref" id="define-the-supported-optionsdot" href="#define-the-supported-optionsdot">Define the supported options.</a></h1><p>var options = newSeq[CmlOption]() options.add(newCmlOption("help", 'h', cmlStopArgument)) options.add(newCmlOption("log", 'l', cmlOptionalArgument)) ...</p>
+Example:
 
-<h1><a class="toc-backref" id="parse-the-command-linedot" href="#parse-the-command-linedot">Parse the command line.</a></h1><p>let argsOrMessage = cmdline(options, collectArgs())</p>
-<dl class="docutils"><dt>if argsOrMessage.kind == cmlMessageKind:</dt>
-<dd>
-<h1><a class="toc-backref" id="display-the-messagedot" href="#display-the-messagedot">Display the message.</a></h1><dl class="docutils"><dt>echo getMessage(argsOrMessage.messageId,</dt>
-<dd>argsOrMessage.problemArg)</dd>
-</dl>
-</dd>
-<dt>else:</dt>
-<dd>
-<h1><a class="toc-backref" id="optionally-post-process-the-resulting-argumentsdot" href="#optionally-post-process-the-resulting-argumentsdot">Optionally post process the resulting arguments.</a></h1>
-<h1><a class="toc-backref" id="let-args-eq-newargs-argsormessagedotargs" href="#let-args-eq-newargs-argsormessagedotargs">let args = newArgs(argsOrMessage.args)</a></h1></dd>
-</dl>
-<p>For a complete example see the bottom of the file in the isMainModule section.</p>
+~~~nim
+import cmdline
+
+# Define the supported options.
+var options = newSeq[CmlOption]()
+options.add(newCmlOption("help", 'h', cmlStopArgument))
+options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+...
+
+# Parse the command line.
+let argsOrMessage = cmdline(options, collectArgs())
+if argsOrMessage.kind == cmlMessageKind:
+  # Display the message.
+  echo getMessage(argsOrMessage.messageId,
+    argsOrMessage.problemArg)
+else:
+  # Optionally post process the resulting arguments.
+  let args = newArgs(argsOrMessage.args)
+~~~
+
+For a complete example see the bottom of the file in the isMainModule
+section.
 
 
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
-* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.
+* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered
+dictionary.
 * type: [CmlMessageId](#cmlmessageid) &mdash; Possible message IDs returned by cmdline.
 * type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
@@ -32,11 +40,13 @@
 * type: [CmlOption](#cmloption) &mdash; An CmlOption holds its type, long name and short name.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
 * [newArgsOrMessage](#newargsormessage) &mdash; Create a new ArgsOrMessage object containing arguments.
-* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
+* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and
+optionally the problem argument.
 * [`$`](#) &mdash; Return a string representation of an CmlOption object.
 * [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessage object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
-* [collectArgs](#collectargs) &mdash; Get the command line arguments from the system and return a list.
+* [collectArgs](#collectargs) &mdash; Get the command line arguments from the system and return a
+list.
 * [cmdLine](#cmdline) &mdash; Parse the command line arguments.
 * const: [cmlMessages](#cmlmessages) &mdash; Messages used by this module.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.
@@ -44,7 +54,11 @@
 
 # CmlArgs
 
-CmlArgs holds the parsed command line arguments in an ordered dictionary. The keys are the supported options found on the command line and each value is a list of associated arguments. An option without arguments will have an empty list.
+CmlArgs holds the parsed command line arguments in an ordered
+dictionary. The keys are the supported options found on the
+command line and each value is a list of associated arguments.
+An option without arguments will have an empty list.
+
 
 ~~~nim
 CmlArgs = OrderedTable[string, seq[string]]
@@ -52,7 +66,14 @@ CmlArgs = OrderedTable[string, seq[string]]
 
 # CmlMessageId
 
-Possible message IDs returned by cmdline. The number in the name is the same as its ord value.  Since the message handling is left to the caller, it is important for these values to be stable. New values are added to the end and this is a minor version change. It is ok to leave unused values in the list and this is backward compatible. If items are removed or reordered, that is a major version change.
+Possible message IDs returned by cmdline. The number in the
+name is the same as its ord value.  Since the message handling
+is left to the caller, it is important for these values to be
+stable. New values are added to the end and this is a minor
+version change. It is ok to leave unused values in the list and
+this is backward compatible. If items are removed or reordered,
+that is a major version change.
+
 
 ~~~nim
 CmlMessageId = enum
@@ -67,6 +88,7 @@ CmlMessageId = enum
 
 The kind of an ArgsOrMessage object, either args or a message.
 
+
 ~~~nim
 ArgsOrMessageKind = enum
   cmlArgsKind, cmlMessageKind
@@ -75,6 +97,7 @@ ArgsOrMessageKind = enum
 # ArgsOrMessage
 
 Contains the command line args or a message.
+
 
 ~~~nim
 ArgsOrMessage = object
@@ -89,23 +112,18 @@ ArgsOrMessage = object
 
 # CmlOptionType
 
-The option type.<ul class="simple"><li>cmlArgument0or1 -- option with an argument, 0 or 1 times.</li>
-<li>cmlNoArgument -- option without an argument, 0 or 1 times.</li>
-<li><dl class="docutils"><dt>cmlOptionalArgument -- option with an optional argument, 0</dt>
-<dd>or 1 times.</dd>
-</dl>
-</li>
-<li>cmlBareArgument -- an argument without an option, 1 time.</li>
-<li>cmlArgumentOnce -- option with an argument, 1 time.</li>
-<li><dl class="docutils"><dt>cmlArgumentMany -- option with an argument, unlimited</dt>
-<dd>number of times.</dd>
-</dl>
-</li>
-<li><dl class="docutils"><dt>cmlStopArgument -- option without an argument, 0 or 1</dt>
-<dd>times. Stop and return this option by itself.</dd>
-</dl>
-</li>
-</ul>
+The option type.
+
+* cmlArgument0or1 — option with an argument, 0 or 1 times.
+* cmlNoArgument — option without an argument, 0 or 1 times.
+* cmlOptionalArgument — option with an optional argument, 0
+    or 1 times.
+* cmlBareArgument — an argument without an option, 1 time.
+* cmlArgumentOnce — option with an argument, 1 time.
+* cmlArgumentMany — option with an argument, unlimited
+    number of times.
+* cmlStopArgument — option without an argument, 0 or 1
+    times. Stop and return this option by itself.
 
 
 ~~~nim
@@ -118,6 +136,7 @@ CmlOptionType = enum
 
 An CmlOption holds its type, long name and short name.
 
+
 ~~~nim
 CmlOption = object
   optionType: CmlOptionType
@@ -129,6 +148,7 @@ CmlOption = object
 
 Create a new CmlOption object. For no short option use a dash.
 
+
 ~~~nim
 func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOption
 ~~~
@@ -137,13 +157,16 @@ func newCmlOption(long: string; short: char; optionType: CmlOptionType): CmlOpti
 
 Create a new ArgsOrMessage object containing arguments.
 
+
 ~~~nim
 func newArgsOrMessage(args: CmlArgs): ArgsOrMessage
 ~~~
 
 # newArgsOrMessage
 
-Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
+Create a new ArgsOrMessage object containing a message id and
+optionally the problem argument.
+
 
 ~~~nim
 func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
@@ -153,6 +176,7 @@ func newArgsOrMessage(messageId: CmlMessageId; problemArg = ""): ArgsOrMessage
 
 Return a string representation of an CmlOption object.
 
+
 ~~~nim
 func `$`(a: CmlOption): string {.raises: [ValueError], tags: [].}
 ~~~
@@ -160,6 +184,7 @@ func `$`(a: CmlOption): string {.raises: [ValueError], tags: [].}
 # `$`
 
 Return a string representation of a ArgsOrMessage object.
+
 
 ~~~nim
 func `$`(a: ArgsOrMessage): string {.raises: [ValueError], tags: [].}
@@ -169,13 +194,17 @@ func `$`(a: ArgsOrMessage): string {.raises: [ValueError], tags: [].}
 
 Show the command line arguments.
 
+
 ~~~nim
 proc commandLineEcho() {.raises: [ValueError], tags: [ReadIOEffect].}
 ~~~
 
 # collectArgs
 
-Get the command line arguments from the system and return a list. Don't return the first one which is the app name. This is the list that cmdLine expects.
+Get the command line arguments from the system and return a
+list. Don't return the first one which is the app name. This is
+the list that cmdLine expects.
+
 
 ~~~nim
 proc collectArgs(): seq[string] {.raises: [], tags: [ReadIOEffect].}
@@ -183,7 +212,12 @@ proc collectArgs(): seq[string] {.raises: [], tags: [ReadIOEffect].}
 
 # cmdLine
 
-Parse the command line arguments.  You pass in the list of supported options and the arguments to parse. The arguments found are returned. If there is a problem with the arguments, args contains a message telling the problem. Use collectArgs() to generate the arguments. Parse uses "arg value" not "arg=value".
+Parse the command line arguments.  You pass in the list of
+supported options and the arguments to parse. The arguments found
+are returned. If there is a problem with the arguments, args
+contains a message telling the problem. Use collectArgs() to
+generate the arguments. Parse uses "arg value" not "arg=value".
+
 
 ~~~nim
 func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage {.
@@ -193,6 +227,7 @@ func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsO
 # cmlMessages
 
 Messages used by this module.
+
 
 ~~~nim
 cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
@@ -212,6 +247,7 @@ cmlMessages: array[low(CmlMessageId) .. high(CmlMessageId), string] = [
 
 Return a message from a message id and problem argument.
 
+
 ~~~nim
 func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
     raises: [ValueError], tags: [].}
@@ -220,6 +256,7 @@ func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
 # `$`
 
 Return a string representation of an Args object.
+
 
 ~~~nim
 func `$`(a: Args): string {.raises: [ValueError], tags: [].}

@@ -12,7 +12,8 @@
 the Option type but instead of returning nothing, you return a
 message that tells why you cannot return the value.
 
-</p><p>You use this to make particular OpResult objects. See [OpResultId](opresultid.md).</p>
+</p><p>You use this to make particular OpResult objects. See [OpResultId](opresultid.md).
+</p>
 
 Nim source code: <a href="../../src/opresult.nim">opresult.nim</a>
 
@@ -34,7 +35,8 @@ Nim source code: <a href="../../src/opresult.nim">opresult.nim</a>
 
 <h3 id="OpResultKind">OpResultKind</h3>
 
-<p>The kind of OpResult object, either a message or a value.</p>
+<p>The kind of OpResult object, either a message or a value.
+</p>
 
 <pre class="nim-code">
 OpResultKind = enum
@@ -43,7 +45,9 @@ OpResultKind = enum
 
 <h3 id="OpResult">OpResult</h3>
 
-<p>Contains either a value or a message. Defaults to an empty message.</p>
+<p>Contains either a value or a message. Defaults to an empty
+message.
+</p>
 
 <pre class="nim-code">
 OpResult[T; T2] = object
@@ -57,7 +61,8 @@ OpResult[T; T2] = object
 
 <h3 id="isMessage">isMessage</h3>
 
-<p>Return true when the OpResult object contains a message.</p>
+<p>Return true when the OpResult object contains a message.
+</p>
 
 <pre class="nim-code">
 func isMessage(opResult: OpResult): bool
@@ -65,7 +70,8 @@ func isMessage(opResult: OpResult): bool
 
 <h3 id="isValue">isValue</h3>
 
-<p>Return true when the OpResult object contains a value.</p>
+<p>Return true when the OpResult object contains a value.
+</p>
 
 <pre class="nim-code">
 func isValue(opResult: OpResult): bool
@@ -73,7 +79,8 @@ func isValue(opResult: OpResult): bool
 
 <h3 id="a__">`$`</h3>
 
-<p>Return a string representation of an OpResult object.</p>
+<p>Return a string representation of an OpResult object.
+</p>
 
 <pre class="nim-code">
 func `$`(opResult: OpResult): string
@@ -81,7 +88,9 @@ func `$`(opResult: OpResult): string
 
 <h3 id="OpResultWarn">OpResultWarn</h3>
 
-<p>OpResultWarn holds either a value or warning data.  It&#x27;s similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
+<p>OpResultWarn holds either a value or warning data.  It&#x27;s similar to
+the Option type but instead of returning nothing, you return a
+warning that tells why you cannot return the value.
 
 </p><p>Example Usage:
 
@@ -108,7 +117,8 @@ OpResultWarn[T] = OpResult[T, WarningData]
 
 <h3 id="opValueW">opValueW</h3>
 
-<p>Create a new OpResultWarn object containing a value T.</p>
+<p>Create a new OpResultWarn object containing a value T.
+</p>
 
 <pre class="nim-code">
 func opValueW[T](value: T): OpResultWarn[T]
@@ -116,7 +126,8 @@ func opValueW[T](value: T): OpResultWarn[T]
 
 <h3 id="opMessageW">opMessageW</h3>
 
-<p>Create a new OpResultWarn object containing a warning.</p>
+<p>Create a new OpResultWarn object containing a warning.
+</p>
 
 <pre class="nim-code">
 func opMessageW[T](message: WarningData): OpResultWarn[T]
@@ -153,7 +164,8 @@ OpResultId[T] = OpResult[T, MessageId]
 
 <h3 id="opValue">opValue</h3>
 
-<p>Create a new OpResultId object containing a value T.</p>
+<p>Create a new OpResultId object containing a value T.
+</p>
 
 <pre class="nim-code">
 func opValue[T](value: T): OpResultId[T]
@@ -161,7 +173,8 @@ func opValue[T](value: T): OpResultId[T]
 
 <h3 id="opMessage">opMessage</h3>
 
-<p>Create a new OpResultId object containing a message id.</p>
+<p>Create a new OpResultId object containing a message id.
+</p>
 
 <pre class="nim-code">
 func opMessage[T](message: MessageId): OpResultId[T]

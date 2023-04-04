@@ -42,17 +42,17 @@ type
 
   SpecialFunction* {.pure.} = enum
     ## The special functions.
-    ## @:
-    ## @:* spNotSpecial -- not a special function
-    ## @:* spIf -- if function
-    ## @:* spIf0 -- if0 function
-    ## @:* spWarn -- warn function
-    ## @:* spLog -- log function
-    ## @:* spReturn -- return function
-    ## @:* spAnd -- and function
-    ## @:* spOr -- or function
-    ## @:* spFunc -- func function
-    ## @:* spListLoop -- list with callback function
+    ##
+    ## * spNotSpecial — not a special function
+    ## * spIf — if function
+    ## * spIf0 — if0 function
+    ## * spWarn — warn function
+    ## * spLog — log function
+    ## * spReturn — return function
+    ## * spAnd — and function
+    ## * spOr — or function
+    ## * spFunc — func function
+    ## * spListLoop — list with callback function
     spNotSpecial = "not-special",
     spIf = "if",
     spIf0 = "if0",
@@ -69,16 +69,16 @@ type
 
   Found* = enum
     ## The line endings found.
-    ## @:
-    ## @:* nothing = no special ending
-    ## @:* plus = +
-    ## @:* triple = """
-    ## @:* newline = \\n
-    ## @:* plus_n = +\\n
-    ## @:* triple_n = """\\n
-    ## @:* crlf = \\r\\n
-    ## @:* plus_crlf = +\\r\\n
-    ## @:* triple_crlf = """\\r\\n
+    ##
+    ## * nothing = no special ending
+    ## * plus = +
+    ## * triple = """
+    ## * newline = \\n
+    ## * plus_n = +\\n
+    ## * triple_n = """\\n
+    ## * crlf = \\r\\n
+    ## * plus_crlf = +\\r\\n
+    ## * triple_crlf = """\\r\\n
     nothing,
     plus,       # +
     triple,     # """
@@ -95,10 +95,10 @@ type
   LoopControl* = enum
     ## Controls whether to output the current replacement block
     ## iteration and whether to stop or not.
-    ## @:
-    ## @:* lcStop -- do not output this replacement block and stop iterating
-    ## @:* lcSkip -- do not output this replacement block and continue with the next iteration
-    ## @:* lcAdd -- output the replacment block and continue with the next iteration
+    ##
+    ## * lcStop — do not output this replacement block and stop iterating
+    ## * lcSkip — do not output this replacement block and continue with the next iteration
+    ## * lcAdd — output the replacment block and continue with the next iteration
     lcStop = "stop",
     lcSkip = "skip",
     lcAdd = "add",
@@ -159,20 +159,20 @@ func `!=`*(a: PosOr, b: PosOr): bool =
 type
   DotNameKind* = enum
     ## The variable name type.
-    ## @:
-    ## @:vtNormal -- a variable with whitespace following it
-    ## @:vtFunction -- a variable with ( following it
-    ## @:vtGet -- a variable with [ following it
+    ##
+    ## vtNormal — a variable with whitespace following it
+    ## vtFunction — a variable with ( following it
+    ## vtGet — a variable with [ following it
     vnkNormal,
     vnkFunction,
     vnkGet
 
   DotName* = object
     ## A variable name in a statement.
-    ## @:
-    ## @:* dotName -- the dot name string
-    ## @:* kind -- the kind of name defined by the character following the name
-    ## @:* pos -- the position after the trailing whitespace
+    ##
+    ## * dotName — the dot name string
+    ## * kind — the kind of name defined by the character following the name
+    ## * pos — the position after the trailing whitespace
     dotName*: string
     kind*: DotNameKind
     pos*: Natural
@@ -182,9 +182,9 @@ type
 
   ParameterName* = object
     ## A parameter name in a statement.
-    ## @:
-    ## @:* name -- the parameter name string
-    ## @:* pos -- the position after the trailing whitespace
+    ##
+    ## * name — the parameter name string
+    ## * pos — the position after the trailing whitespace
     name*: string
     pos*: Natural
 
@@ -193,15 +193,15 @@ type
 
   RightType* = enum
     ## The type of the right hand side of a statement.
-    ## @:
-    ## @:rtNothing -- not a valid right hand side
-    ## @:rtString -- a literal string starting with a quote
-    ## @:rtNumber -- a literal number starting with a digit or minus sign
-    ## @:rtVariable -- a variable starting with a-zA-Z
-    ## @:rtFunction -- a function variable calling a function: len(b)
-    ## @:rtList -- a literal list: [1, 2, 3, len(b), 5]
-    ## @:rtCondition -- a condition: (a < b)
-    ## @:rtGet -- a index into a list or dictionary: teas[2], teas["green"]
+    ##
+    ## * rtNothing — not a valid right hand side
+    ## * rtString — a literal string starting with a quote
+    ## * rtNumber — a literal number starting with a digit or minus sign
+    ## * rtVariable — a variable starting with a-zA-Z
+    ## * rtFunction — a function variable calling a function: len(b)
+    ## * rtList — a literal list: [1, 2, 3, len(b), 5]
+    ## * rtCondition — a condition: (a < b)
+    ## * rtGet — a index into a list or dictionary: teas[2], teas["green"]
     rtNothing,
     rtString,
     rtNumber,
@@ -244,11 +244,11 @@ func getRightType*(statement: Statement, start: Natural): RightType =
   ## start position.
 
   # The first character determines the type.
-  # * quote -- string
-  # * digit or minus sign -- number
-  # * a-zA-Z -- variable
-  # * [ -- a list
-  # * ( -- a condition expression
+  # * quote — string
+  # * digit or minus sign — number
+  # * a-zA-Z — variable
+  # * [ — a list
+  # * ( — a condition expression
 
   # Make sure start is pointing to something.
   if start >= statement.text.len:
@@ -270,12 +270,12 @@ func getRightType*(statement: Statement, start: Natural): RightType =
 
 proc getParameterNameOr*(text: string, startPos: Natural): ParameterNameOr =
   ## Get a parameter name from the statement and skip trailing
-  ## @:whitespace. Start points at a name.
-  ## @:
-  ## @:~~~statictea
-  ## @:a = func(var-name : int) dict
-  ## @:         ^        ^
-  ## @:~~~~
+  ## whitespace. Start points at a name.
+  ##
+  ## ~~~statictea
+  ## a = func(var-name : int) dict
+  ##          ^        ^
+  ## ~~~
   assert(startPos >= 0, "startPos is less than 0")
 
   if startPos >= text.len:
@@ -356,15 +356,15 @@ proc getParameterNameOr*(text: string, startPos: Natural): ParameterNameOr =
 
 proc getDotNameOr*(text: string, startPos: Natural): DotNameOr =
   ## Get a dot name from the statement. Start points at a name.
-  ## @:
-  ## @:~~~statictea
-  ## @:a = var-name( 1 )
-  ## @:    ^         ^
-  ## @:a = abc # comment
-  ## @:    ^   ^
-  ## @:a = o.def.bbb # comment
-  ## @:    ^         ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## a = var-name( 1 )
+  ##     ^         ^
+  ## a = abc # comment
+  ##     ^   ^
+  ## a = o.def.bbb # comment
+  ##     ^         ^
+  ## ~~~
   assert(startPos >= 0, "startPos is less than 0")
 
   if startPos >= text.len:
@@ -829,9 +829,9 @@ proc readStatement*(env: var Env, lb: var LineBuffer): Option[Statement] =
 
 func getMultilineStr*(text: string, start: Natural): ValuePosSiOr =
   ## Return the triple quoted string literal. The startPos points one
-  ## @:past the leading triple quote.  Return the parsed
-  ## @:string value and the ending position one past the trailing
-  ## @:whitespace.
+  ## past the leading triple quote.  Return the parsed
+  ## string value and the ending position one past the trailing
+  ## whitespace.
 
   # a = """\ntest string"""\n
   #         ^                ^
@@ -856,11 +856,11 @@ func getString*(str: string, start: Natural): ValuePosSiOr =
   ## parameter is the index of the first quote in the statement and
   ## the return position is after the optional trailing white space
   ## following the last quote.
-  ## @:
-  ## @:~~~statictea
-  ## @:var = "hello" # asdf
-  ## @:      ^       ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## var = "hello" # asdf
+  ##       ^       ^
+  ## ~~~
 
   # Parse the json string and remove escaping.
   result = parseJsonStr(str, start+1)
@@ -890,13 +890,13 @@ func skipArgument*(statement: Statement, startPos: Natural): PosOr =
   ## of a function argument.  Return the first non-whitespace
   ## character after the argument or a message when there is a
   ## problem.
-  ## @:~~~statictea
-  ## @:a = fn( 1 )
-  ## @:        ^ ^
-  ## @:          ^^
-  ## @:a = fn( 1 , 2 )
-  ## @:        ^ ^
-  ## @:~~~~
+  ## ~~~statictea
+  ## a = fn( 1 )
+  ##         ^ ^
+  ##           ^^
+  ## a = fn( 1 , 2 )
+  ##         ^ ^
+  ## ~~~
 
   let text = statement.text
   assert(startPos < text.len, "startPos is greater than the text len")
@@ -1115,15 +1115,15 @@ proc ifFunctions*(
   ## conditionally runs one of its arguments and skips the
   ## other. Start points at the first argument of the function. The
   ## position includes the trailing whitespace after the ending ).
-  ## @:
-  ## @:This handles the three parameter form with an assignment.
-  ## @:
-  ## @:~~~statictea
-  ## @:a = if(cond, then, else)
-  ## @:       ^                ^
-  ## @:a = if(cond, then)
-  ## @:       ^          ^
-  ## @:~~~~
+  ##
+  ## This handles the three parameter form with an assignment.
+  ##
+  ## ~~~statictea
+  ## a = if(cond, then, else)
+  ##        ^                ^
+  ## a = if(cond, then)
+  ##        ^          ^
+  ## ~~~
 
   # Get the condition's value.
   let vlcOr = getValuePosSi(env, statement, start, variables)
@@ -1217,13 +1217,13 @@ proc bareIfAndIf0*(
   ): ValuePosSiOr =
   ## Handle the bare if/if0. Return the resulting value and the
   ## position in the statement after the if.
-  ## @:
-  ## @:~~~statictea
-  ## @:if(cond, return("stop"))
-  ## @:   ^                    ^
-  ## @:if(c, warn("c is true"))
-  ## @:   ^                    ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## if(cond, return("stop"))
+  ##    ^                    ^
+  ## if(c, warn("c is true"))
+  ##    ^                    ^
+  ## ~~~
   var runningPos = start
 
   # Get the condition's value.
@@ -1399,12 +1399,12 @@ proc getArguments*(
   ## Get the function arguments and the position of each. If an
   ## argument has a side effect, the return value and pos and side
   ## effect is returned, else a 0 value and seNone is returned.
-  ## @:~~~statictea
-  ## @:newList = listLoop(list, callback, state)  # comment
-  ## @:                   ^                       ^
-  ## @:newList = listLoop(return(3), callback, state)  # comment
-  ## @:                          ^ ^
-  ## @:~~~~
+  ## ~~~statictea
+  ## newList = listLoop(list, callback, state)  # comment
+  ##                    ^                       ^
+  ## newList = listLoop(return(3), callback, state)  # comment
+  ##                           ^ ^
+  ## ~~~
 
   var runningPos = start
 
@@ -1469,13 +1469,13 @@ proc getFunctionValuePosSi*(
   ## Return the function's value and the position after it. Start points at the
   ## first argument of the function. The position includes the trailing
   ## whitespace after the ending ).
-  ## @:
-  ## @:~~~statictea
-  ## @:a = get(b, 2, c) # condition
-  ## @:        ^        ^
-  ## @:a = get(b, len("hi"), c)
-  ## @:               ^    ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## a = get(b, 2, c) # condition
+  ##         ^        ^
+  ## a = get(b, len("hi"), c)
+  ##                ^    ^
+  ## ~~~
 
   # Get all the function arguments.
   var runningPos = start
@@ -1587,11 +1587,11 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
   ## position after it.  The start index points at the ( left
   ## parentheses. The position includes the trailing whitespace after
   ## the ending ).
-  ## @:
-  ## @:~~~statictea
-  ## @:a = (5 < 3) # condition
-  ## @:    ^       ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## a = (5 < 3) # condition
+  ##     ^       ^
+  ## ~~~
   when showPos:
     showDebugPos(statement, start, "^ s condition")
 
@@ -1719,13 +1719,13 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
     container: Value, variables: Variables): ValuePosSiOr =
   ## Return the value of the bracketed variable and the position after
   ## the trailing whitespace.. Start points at the the first argument.
-  ## @:
-  ## @:~~~statictea
-  ## @:a = list[ 4 ]
-  ## @:          ^  ^
-  ## @:a = dict[ "abc" ]
-  ## @:          ^      ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## a = list[ 4 ]
+  ##           ^  ^
+  ## a = dict[ "abc" ]
+  ##           ^      ^
+  ## ~~~
   when showPos:
     showDebugPos(statement, start, "^ s bracketed")
   var runningPos = start
@@ -1849,16 +1849,16 @@ proc listLoop*(
   ## called for each item in the list and determines what goes in the
   ## new list.  See funList_lpoal in functions.nim for more
   ## information.
-  ## @:
-  ## @:Return the listLoop value and the ending position.  Start
-  ## @:points at the first parameter of the function. The position
-  ## @:includes the trailing whitespace after the ending right
-  ## @:parentheses.
-  ## @:
-  ## @:~~~statictea
-  ## @:stopped = listLoop(list, new, callback, state)
-  ## @:                   ^                          ^
-  ## @:~~~~
+  ##
+  ## Return the listLoop value and the ending position.  Start
+  ## points at the first parameter of the function. The position
+  ## includes the trailing whitespace after the ending right
+  ## parentheses.
+  ##
+  ## ~~~statictea
+  ## stopped = listLoop(list, new, callback, state)
+  ##                    ^                          ^
+  ## ~~~
   # Get all the function arguments.
   var runningPos = start
   var arguments: seq[Value]
@@ -1884,16 +1884,16 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
   ## Get the value, position and side effect from the statement. Start
   ## points at the right hand side of the statement. The return pos is
   ## the first character after trailing whitespace.
-  ## @:
-  ## @:~~~statictea
-  ## @:a = 5  # statement
-  ## @:    ^  ^
-  ## @:
-  ## @:a = cmp(len(c), 4)
-  ## @:        ^         ^
-  ## @:a = [1, 2, 3]
-  ## @:    ^        ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## a = 5  # statement
+  ##     ^  ^
+  ##
+  ## a = cmp(len(c), 4)
+  ##         ^         ^
+  ## a = [1, 2, 3]
+  ##     ^        ^
+  ## ~~~
 
   let rightType = getRightType(statement, start)
   case rightType:
@@ -1989,15 +1989,15 @@ proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variable
   ## after the argument. A true topLevel parameter means the item
   ## pointed to by start is the first item after the equal sign (not
   ## an argument).
-  ## @:
-  ## @:~~~statictea
-  ## @:a = "tea" # string
-  ## @:    ^     ^
-  ## @:a = cmp(b, c) # calling variable
-  ## @:    ^         ^
-  ## @:a = if( bool(len(b)), d, e) # if
-  ## @:        ^             ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## a = "tea" # string
+  ##     ^     ^
+  ## a = cmp(b, c) # calling variable
+  ##     ^         ^
+  ## a = if( bool(len(b)), d, e) # if
+  ##         ^             ^
+  ## ~~~
 
   when showPos:
     showDebugPos(statement, start, "^ s")
@@ -2016,13 +2016,13 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: DotName): ValuePosSiOr =
   ## Handle bare function: if, if0, return, warn, log and listLoop. A
   ## bare function does not assign a variable.
-  ## @:
-  ## @:~~~statictea
-  ## @:if( true, warn("tea time")) # test
-  ## @:^                           ^
-  ## @:return(5)
-  ## @:^        ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## if( true, warn("tea time")) # test
+  ## ^                           ^
+  ## return(5)
+  ## ^        ^
+  ## ~~~
   let runningPos = leftName.pos
 
   # Get the function variable.
@@ -2054,16 +2054,16 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
 proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: DotName): ValuePosSiOr =
   ## Convert var[key] to a dot name.
-  ## @:
-  ## @:~~~statictea
-  ## @:key = "hello"
-  ## @:name[key] = 20
-  ## @:^         ^
-  ## @:=> name.hello, pos
-  ## @:
-  ## @:name["hello"] = 20
-  ## @:^             ^
-  ## @:~~~~
+  ##
+  ## ~~~statictea
+  ## key = "hello"
+  ## name[key] = 20
+  ## ^         ^
+  ## => name.hello, pos
+  ##
+  ## name["hello"] = 20
+  ## ^             ^
+  ## ~~~
 
   # Get the index name.
   var runningPos = leftName.pos
@@ -2319,12 +2319,12 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
 
 proc parseSignature*(dotName: string, signature: string, start: Natural): SignatureOr =
   ## Parse the signature and return the list of parameters or a
-  ## @:message. Start points at the first parameter.
-  ## @:
-  ## @:~~~statictea
-  ## @:cmp = func(numStr1: string, numStr2: string) int
-  ## @:           ^
-  ## @:~~~~
+  ## message. Start points at the first parameter.
+  ##
+  ## ~~~statictea
+  ## cmp = func(numStr1: string, numStr2: string) int
+  ##            ^
+  ## ~~~
   var runningPos = start
 
   var optional = false
@@ -2340,7 +2340,7 @@ proc parseSignature*(dotName: string, signature: string, start: Natural): Signat
     let spaceMatchO = matchTabSpace(signature, runningPos)
     if isSome(spaceMatchO):
       runningPos += spaceMatchO.get().length
-    
+
     # One or more parameters.
 
     while true:

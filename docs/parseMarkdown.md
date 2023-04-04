@@ -1,28 +1,34 @@
 # parseMarkdown.nim
 
-Parse the simple markdown used in the function descriptions and highlight statictea code.
+Parse the simple markdown used in the function descriptions and
+highlight statictea code.
+
 
 * [parseMarkdown.nim](../src/parseMarkdown.nim) &mdash; Nim source code.
 # Index
 
-* type: [ElementTag](#elementtag) &mdash; 
+* type: [ElementTag](#elementtag) &mdash; The supported markdown elements.
 * type: [Element](#element) &mdash; Parse markdown elements (parseMarkdown).
 * type: [FragmentType](#fragmenttype) &mdash; Hightlight fragments.
 * type: [Fragment](#fragment) &mdash; A fragment of a string.
 * [newElement](#newelement) &mdash; Create an Element object.
-* [newFragment](#newfragment) &mdash; 
-* [newFragmentLen2](#newfragmentlen2) &mdash; 
+* [newFragment](#newfragment) &mdash; Create a new Fragment from start and end values.
+* [newFragmentLen2](#newfragmentlen2) &mdash; Create a new Fragment from start and length values.
 * [`$`](#) &mdash; Return a string representation of a Fragment.
 * [`$`](#-1) &mdash; Return a string representation of a sequence of fragments.
-* [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of elements.
+* [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of
+elements.
 * [`$`](#-2) &mdash; Return a string representation of an Element.
 * [`$`](#-3) &mdash; Return a string representation of a list of Elements.
-* [atMultiline](#atmultiline) &mdash; Determine whether the start index points a the start of a multiline string.
+* [atMultiline](#atmultiline) &mdash; Determine whether the start index points a the start of a
+multiline string.
 * [lineEnd](#lineend) &mdash; Find the end of the line.
-* [highlightCode](#highlightcode) &mdash; Identify all the fragments in the StaticTea code to highlight.
+* [highlightCode](#highlightcode) &mdash; Identify all the fragments in the StaticTea code to
+highlight.
 
 # ElementTag
 
+The supported markdown elements.
 
 
 ~~~nim
@@ -34,6 +40,7 @@ ElementTag = enum
 
 Parse markdown elements (parseMarkdown).
 
+
 ~~~nim
 Element = object
   tag*: ElementTag
@@ -44,16 +51,17 @@ Element = object
 
 Hightlight fragments.
 
-* hlOther -- not one of the other types
-* hlDotName -- a dot name
-* hlFuncCall -- a dot name followed by a left parenthesis
-* hlNumber -- a literal number
-* hlStringType -- a literal string
-* hlMultiline -- a multiline literal string
-* hlDocComment -- a doc comment
-* hlComment -- a comment
-* hlParamName -- a parameter name
-* hlParamType -- int, float, string, list, dict, bool, func, any and optional
+* hlOther — not one of the other types
+* hlDotName — a dot name
+* hlFuncCall — a dot name followed by a left parenthesis
+* hlNumber — a literal number
+* hlStringType — a literal string
+* hlMultiline — a multiline literal string
+* hlDocComment — a doc comment
+* hlComment — a comment
+* hlParamName — a parameter name
+* hlParamType — int, float, string, list, dict, bool, func, any and optional
+
 
 ~~~nim
 FragmentType = enum
@@ -66,9 +74,10 @@ FragmentType = enum
 # Fragment
 
 A fragment of a string.
-* fragmentType -- the type of fragment
-* start -- the index in the string where the fragment starts
-* fEnd -- the end of the fragment, [start, end) half-open interval
+* fragmentType — the type of fragment
+* start — the index in the string where the fragment starts
+* fEnd — the end of the fragment, [start, end) half-open interval
+
 
 ~~~nim
 Fragment = object
@@ -81,12 +90,14 @@ Fragment = object
 
 Create an Element object.
 
+
 ~~~nim
 proc newElement(tag: ElementTag; content: seq[string]): Element
 ~~~
 
 # newFragment
 
+Create a new Fragment from start and end values.
 
 
 ~~~nim
@@ -95,6 +106,7 @@ func newFragment(fragmentType: FragmentType; start: Natural; fEnd: Natural): Fra
 
 # newFragmentLen2
 
+Create a new Fragment from start and length values.
 
 
 ~~~nim
@@ -105,6 +117,7 @@ func newFragmentLen2(fragmentType: FragmentType; start: Natural; length: Natural
 
 Return a string representation of a Fragment.
 
+
 ~~~nim
 func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
 ~~~
@@ -113,28 +126,31 @@ func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
 
 Return a string representation of a sequence of fragments.
 
+
 ~~~nim
 func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
 ~~~
 
 # parseMarkdown
 
-Parse the simple description markdown and return a list of elements.
+Parse the simple description markdown and return a list of
+elements.
 
 elements:
 
-* p -- A paragraph element is one string, possibly containing
+* p — A paragraph element is one string, possibly containing
 newlines.
 
-* code -- A code element is three strings. The first string is
+* code — A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string contains the contents of the block containing newlines,
 when none it’s empty.  The third string is the ending line, for
 example “~~~”.
 
-* bullets -- A bullets element contains a string for each
+* bullets — A bullets element contains a string for each
 bullet point and it may contain newlines.  The leading “* “ is
 not part of the string.
+
 
 ~~~nim
 func parseMarkdown(desc: string): seq[Element]
@@ -142,7 +158,9 @@ func parseMarkdown(desc: string): seq[Element]
 
 # `$`
 
-Return a string representation of an Element. Each item in the content list starts with a colon on a new line.
+Return a string representation of an Element. Each item in the
+content list starts with a colon on a new line.
+
 
 ~~~nim
 func `$`(element: Element): string {.raises: [ValueError], tags: [].}
@@ -152,13 +170,18 @@ func `$`(element: Element): string {.raises: [ValueError], tags: [].}
 
 Return a string representation of a list of Elements.
 
+
 ~~~nim
 func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
 ~~~
 
 # atMultiline
 
-Determine whether the start index points a the start of a multiline string. Return 0 when it doesn't. Return the position after the triple quotes, either 4 or 5 depending on the line endings.
+Determine whether the start index points a the start of a
+multiline string. Return 0 when it doesn't. Return the position
+after the triple quotes, either 4 or 5 depending on the line
+endings.
+
 
 ~~~nim
 func atMultiline(codeText: string; start: Natural): int
@@ -166,7 +189,9 @@ func atMultiline(codeText: string; start: Natural): int
 
 # lineEnd
 
-Find the end of the line. It returns either one after the first newline or after the end of the string.
+Find the end of the line. It returns either one after the first
+newline or after the end of the string.
+
 
 ~~~nim
 func lineEnd(str: string; start: Natural): int
@@ -174,7 +199,11 @@ func lineEnd(str: string; start: Natural): int
 
 # highlightCode
 
-Identify all the fragments in the StaticTea code to highlight. Return a list of fragments that cover all the code. Unlighted areas are in "other" fragments. HighlightCode doesn't validate the code but it works for valid code.
+Identify all the fragments in the StaticTea code to
+highlight. Return a list of fragments that cover all the
+code. Unlighted areas are in "other" fragments. HighlightCode
+doesn't validate the code but it works for valid code.
+
 
 ~~~nim
 func highlightCode(codeText: string): seq[Fragment]

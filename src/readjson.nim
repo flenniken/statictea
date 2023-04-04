@@ -124,22 +124,22 @@ proc readJsonFile*(filename: string, mutable = Mutable.immutable): ValueOr =
 
 func unescapePopularChar*(popular: char): char =
   ## Unescape the popular char and return its value. If the char is
-  ## @:not a popular char, return 0.
-  ## @:
-  ## @: Popular characters and their escape values:
-  ## @:
-  ## @:~~~
-  ## @:@!char      @! name           @! unicode@!
-  ## @:@!----------@!----------------@!--------@!
-  ## @:@!"         @! quotation mark @! U+0022 @!
-  ## @:@!\\         @! reverse solidus@! U+005C @!
-  ## @:@!/         @! solidus        @! U+002F @!
-  ## @:@!b         @! backspace      @! U+0008 @!
-  ## @:@!f         @! form feed      @! U+000C @!
-  ## @:@!n         @! line feed      @! U+000A @!
-  ## @:@!r         @! carriage return@! U+000D @!
-  ## @:@!t         @! tab            @! U+0009 @!
-  ## @:~~~~
+  ## not a popular char, return 0.
+  ##
+  ## Popular characters and their escape values:
+  ##
+  ## ~~~
+  ## @!char      @! name           @! unicode@!
+  ## @!----------@!----------------@!--------@!
+  ## @!"         @! quotation mark @! U+0022 @!
+  ## @!\\        @! reverse solidus@! U+005C @!
+  ## @!/         @! solidus        @! U+002F @!
+  ## @!b         @! backspace      @! U+0008 @!
+  ## @!f         @! form feed      @! U+000C @!
+  ## @!n         @! line feed      @! U+000A @!
+  ## @!r         @! carriage return@! U+000D @!
+  ## @!t         @! tab            @! U+0009 @!
+  ## ~~~
 
   # Order by popularity: nr"t\bf/
   case popular
@@ -165,15 +165,15 @@ func unescapePopularChar*(popular: char): char =
 
 func parseJsonStr*(text: string, startPos: Natural): ValuePosSiOr =
   ## Parse the quoted json string literal. The startPos points one
-  ## @:past the leading double quote.  Return the parsed string value
-  ## @:and the ending position after the trailing quote. On
-  ## @:failure, the ending position points at the invalid character and
-  ## @:the message id tells what went wrong.
-  ## @:
-  ## @:~~~
-  ## @:a = "test string"  # test
-  ## @:     ^           ^
-  ## @:~~~~
+  ## past the leading double quote.  Return the parsed string value
+  ## and the ending position after the trailing quote. On
+  ## failure, the ending position points at the invalid character and
+  ## the message id tells what went wrong.
+  ##
+  ## ~~~statictea
+  ## a = "test string"  # test
+  ##      ^           ^
+  ## ~~~
 
   if startPos >= text.len:
     return newValuePosSiOr(wStartPosTooBig, "", startPos)

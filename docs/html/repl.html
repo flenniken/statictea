@@ -8,7 +8,9 @@
 <body>
 <h1>repl.nim</h1>
 
-<p>Run commands at a prompt. Run evaluate print loop (REPL).</p>
+<p>Run commands at a prompt.
+Run evaluate print loop (REPL).
+</p>
 
 Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 
@@ -17,7 +19,7 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 <ul>
 <li>type:  <a href="#ReplCommand">ReplCommand</a> &mdash; The REPL commands.</li>
 <li> <a href="#listInColumns">listInColumns</a> &mdash; Generate a string of names in columns.</li>
-<li> <a href="#stringToReplCommand">stringToReplCommand</a> &mdash; </li>
+<li> <a href="#stringToReplCommand">stringToReplCommand</a> &mdash; Use the wrap column for the max unless the terminal width is less.</li>
 <li> <a href="#handleReplLine">handleReplLine</a> &mdash; Handle the REPL line.</li>
 <li> <a href="#runEvaluatePrintLoop">runEvaluatePrintLoop</a> &mdash; Run commands at a prompt.</li>
 </ul>
@@ -25,16 +27,18 @@ Nim source code: <a href="../../src/repl.nim">repl.nim</a>
 <h3 id="ReplCommand">ReplCommand</h3>
 
 <p>The REPL commands.
+
 </p><ul>
-<li>not_cmd -- not a REPL command
-</li><li>h_cmd -- display help
-</li><li>p_cmd -- print variable
-</li><li>pd_cmd -- print dictionary
-</li><li>pf_cmd -- print f or function
-</li><li>plc_cmd -- print list in columns
-</li><li>plv_cmd -- print list one per line
-</li><li>v_cmd -- print number of variables in the one letter dictionaries
-</li><li>q_cmd -- quit (or Ctrl-d)</li></ul>
+<li>not_cmd — not a REPL command
+</li><li>h_cmd — display help
+</li><li>p_cmd — print variable
+</li><li>pd_cmd — print dictionary
+</li><li>pf_cmd — print f or function
+</li><li>plc_cmd — print list in columns
+</li><li>plv_cmd — print list one per line
+</li><li>v_cmd — print number of variables in the one letter dictionaries
+</li><li>q_cmd — quit (or Ctrl-d)
+</li></ul>
 
 
 <pre class="nim-code">
@@ -44,7 +48,10 @@ ReplCommand = enum
 
 <h3 id="listInColumns">listInColumns</h3>
 
-<p>Generate a string of names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.</p>
+<p>Generate a string of names in columns.  Width is the width of a
+row. The names are left justified and the columns are separated
+by 2 spaces.
+</p>
 
 <pre class="nim-code">
 proc listInColumns(names: seq[string]; width: Natural): string
@@ -52,7 +59,8 @@ proc listInColumns(names: seq[string]; width: Natural): string
 
 <h3 id="stringToReplCommand">stringToReplCommand</h3>
 
-
+<p>Use the wrap column for the max unless the terminal width is less.
+</p>
 
 <pre class="nim-code">
 func stringToReplCommand(str: string): ReplCommand
@@ -60,7 +68,8 @@ func stringToReplCommand(str: string): ReplCommand
 
 <h3 id="handleReplLine">handleReplLine</h3>
 
-<p>Handle the REPL line. Return true to end the loop.</p>
+<p>Handle the REPL line. Return true to end the loop.
+</p>
 
 <pre class="nim-code">
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
@@ -70,7 +79,8 @@ proc handleReplLine(env: var Env; variables: var Variables; line: string): bool 
 
 <h3 id="runEvaluatePrintLoop">runEvaluatePrintLoop</h3>
 
-<p>Run commands at a prompt.</p>
+<p>Run commands at a prompt.
+</p>
 
 <pre class="nim-code">
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.

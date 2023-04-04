@@ -8,27 +8,29 @@
 <body>
 <h1>messages.nim</h1>
 
-<p>Messages IDs and associated strings and routines to get them.</p>
+<p>Messages IDs and associated strings and routines to get them.
+</p>
 
 Nim source code: <a href="../../src/messages.nim">messages.nim</a>
 
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#MessageId">MessageId</a> &mdash; Message numbers.</li>
-<li>const:  <a href="#Messages">Messages</a> &mdash; The message text.</li>
+<li>type:  <a href="#MessageId">MessageId</a> &mdash; </li>
+<li>const:  <a href="#Messages">Messages</a> &mdash; </li>
 <li>type:  <a href="#WarningData">WarningData</a> &mdash; Warning data.</li>
 <li> <a href="#getWarning">getWarning</a> &mdash; Return the warning string.</li>
 <li> <a href="#getWarningLine">getWarningLine</a> &mdash; Return a formatted warning line.</li>
 <li> <a href="#getWarningLine-1">getWarningLine</a> &mdash; Return a formatted warning line.</li>
-<li> <a href="#newWarningData">newWarningData</a> &mdash; Create a WarningData object containing all the warning information.</li>
+<li> <a href="#newWarningData">newWarningData</a> &mdash; Create a WarningData object containing all the warning
+information.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of WarningData.</li>
-<li> <a href="#a___">`==`</a> &mdash; Return true when the two WarningData objects are equal.</li>
+<li> <a href="#a___">`==`</a> &mdash; </li>
 </ul>
 
 <h3 id="MessageId">MessageId</h3>
 
-<p>Message numbers.</p>
+
 
 <pre class="nim-code">
 MessageId = enum
@@ -102,12 +104,12 @@ MessageId = enum
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
   wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace, wNotDictVariable,
-  wSpecifyF, wNotListVariable
+  wSpecifyF, wNotListVariable, wVarNameNotDotName
 </pre>
 
 <h3 id="Messages">Messages</h3>
 
-<p>The message text.</p>
+
 
 <pre class="nim-code">
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
@@ -273,16 +275,18 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "You can only assign a user function variable to the u dictionary.",
     """Invalid html place, expected "body", or "attribute".""",
     "The variable is not a dictionary.", "Specify f or a function variable.",
-    "The variable is not a list."]
+    "The variable is not a list.", "Expected a variable name without dots."]
 </pre>
 
 <h3 id="WarningData">WarningData</h3>
 
-<p>Warning data.&lt;ul class=&quot;simple&quot;&gt;&lt;li&gt;messageId -- the message id&lt;/li&gt;
-&lt;li&gt;p1 -- the optional string substituted for the message&#x27;s $1.&lt;/li&gt;
-&lt;li&gt;pos -- the index in the statement where the warning was detected.&lt;/li&gt;
-&lt;/ul&gt;
-</p>
+<p>Warning data.
+</p><ul>
+<li>messageId -- the message id
+</li><li>p1 -- the optional string substituted for the message&#x27;s $1.
+</li><li>pos -- the index in the statement where the warning was detected.
+</li></ul>
+
 
 <pre class="nim-code">
 WarningData = object
@@ -293,7 +297,8 @@ WarningData = object
 
 <h3 id="getWarning">getWarning</h3>
 
-<p>Return the warning string.</p>
+<p>Return the warning string.
+</p>
 
 <pre class="nim-code">
 func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
@@ -329,7 +334,9 @@ func getWarningLine(filename: string; lineNum: int; warningData: WarningData): s
 
 <h3 id="newWarningData">newWarningData</h3>
 
-<p>Create a WarningData object containing all the warning information.</p>
+<p>Create a WarningData object containing all the warning
+information.
+</p>
 
 <pre class="nim-code">
 func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
@@ -351,7 +358,7 @@ func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}
 
 <h3 id="a___">`==`</h3>
 
-<p>Return true when the two WarningData objects are equal.</p>
+
 
 <pre class="nim-code">
 func `==`(w1: WarningData; w2: WarningData): bool

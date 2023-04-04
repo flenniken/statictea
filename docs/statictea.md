@@ -2,6 +2,7 @@
 
 StaticTea; A template processor and language.
 
+
 * [statictea.nim](../src/statictea.nim) &mdash; Nim source code.
 # Index
 
@@ -10,6 +11,7 @@ StaticTea; A template processor and language.
 # main
 
 Run statictea.
+
 
 ~~~nim
 proc main(env: var Env; argv: seq[string]) {.raises: [KeyError, OSError,

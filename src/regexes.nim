@@ -1,43 +1,43 @@
 ## Perl regular expression matching.
-## @:
-## @:Examples:
-## @:
-## @:Match a string with "abc" in it:
-## @:
-## @:~~~nim
-## @:let line = "123abc456"
-## @:let pattern = ".@.abc"
-## @:let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
-## @:
-## @:check matchesO.isSome == true
-## @:check matchesO.get().length == 6
-## @:~~~~
-## @:
-## @:Match a file and line number like: filename(234):
-## @:
-## @:~~~ nim
-## @:let line = "template.html(87)"
-## @:let pattern = r"^(.@.)\(([0-9]+)\)$"
-## @:let matchesO = matchPatternCached(line, pattern, 0, 2)
-## @:
-## @:check matchesO.isSome == true
-## @:let (filename, lineNum) = matchesO.get2Groups()
-## @:check filename == "template.html"
-## @:check lineNum == "87"
-## @:~~~~
-## @:
-## @:Replace the patterns in the string with their replacements:
-## @:
-## @:~~~ nim
-## @:var replacements: seq[Replacement]
-## @:replacements.add(newReplacement("abc", "456"))
-## @:replacements.add(newReplacement("def", ""))
-## @:
-## @:let resultStringO = replaceMany("abcdefabc", replacements)
-## @:
-## @:check resultStringO.isSome
-## @:check resultStringO.get() == "456456"
-## @:~~~~
+##
+## Examples:
+##
+## Match a string with "abc" in it:
+##
+## ~~~nim
+## let line = "123abc456"
+## let pattern = ".@.abc"
+## let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
+##
+## check matchesO.isSome == true
+## check matchesO.get().length == 6
+## ~~~
+##
+## Match a file and line number like: filename(234):
+##
+## ~~~ nim
+## let line = "template.html(87)"
+## let pattern = r"^(.@.)\(([0-9]+)\)$"
+## let matchesO = matchPatternCached(line, pattern, 0, 2)
+##
+## check matchesO.isSome == true
+## let (filename, lineNum) = matchesO.get2Groups()
+## check filename == "template.html"
+## check lineNum == "87"
+## ~~~
+##
+## Replace the patterns in the string with their replacements:
+##
+## ~~~ nim
+## var replacements: seq[Replacement]
+## replacements.add(newReplacement("abc", "456"))
+## replacements.add(newReplacement("def", ""))
+##
+## let resultStringO = replaceMany("abcdefabc", replacements)
+##
+## check resultStringO.isSome
+## check resultStringO.get() == "456456"
+## ~~~
 
 # The notice below is there because this module includes the re module.
 #[
@@ -90,10 +90,10 @@ var compliledPatterns = initTable[string, CompilePattern]()
 type
   Matches* = object
     ## Holds the result of a match.
-    ## @:* groups -- list of matching groups
-    ## @:* length -- length of the match
-    ## @:* start -- where the match started
-    ## @:* numGroups -- number of groups
+    ## * groups — list of matching groups
+    ## * length — length of the match
+    ## * start — where the match started
+    ## * numGroups — number of groups
     groups*: seq[string]
     length*: Natural
     start*: Natural
@@ -235,7 +235,7 @@ func getGroups*(matchesO: Option[Matches], numGroups: Natural): seq[string] =
   ## exist, "" is returned for it.
   assert(matchesO.isSome, "Not a match")
   result = matchesO.get().getGroups(numGroups)
-  
+
 func matchRegex*(str: string, regex: CompilePattern, start: Natural,
     numGroups: Natural): Option[Matches] =
   ## Match a regular expression pattern in a string. Start is the
@@ -270,10 +270,10 @@ func compilePattern*(pattern: string): Option[CompilePattern] =
 func matchPattern*(str: string, pattern: string,
     start: Natural, numGroups: Natural): Option[Matches] =
   ## Match a regular expression pattern in a string. Start is the
-  ## @:index in the string to start the search. NumGroups is the number
-  ## @:of groups in the pattern.
-  ## @:
-  ## @:Note: the pattern uses the anchored option.
+  ## index in the string to start the search. NumGroups is the number
+  ## of groups in the pattern.
+  ##
+  ## Note: the pattern uses the anchored option.
   let regexO = compilePattern(pattern)
   if not regexO.isSome:
     return
@@ -282,9 +282,9 @@ func matchPattern*(str: string, pattern: string,
 proc matchPatternCached*(str: string, pattern: string,
     start: Natural, numGroups: Natural): Option[Matches] =
   ## Match a pattern in a string and cache the compiled regular
-  ## @:expression pattern for next time. Start is the index in the
-  ## @:string to start the search. NumGroups is the number of groups in
-  ## @:the pattern.
+  ## expression pattern for next time. Start is the index in the
+  ## string to start the search. NumGroups is the number of groups in
+  ## the pattern.
 
   # Get the cached regex for the pattern or compile it and add it to
   # the cache.

@@ -2,22 +2,24 @@
 
 Messages IDs and associated strings and routines to get them.
 
+
 * [messages.nim](../src/messages.nim) &mdash; Nim source code.
 # Index
 
-* type: [MessageId](#messageid) &mdash; Message numbers.
-* const: [Messages](#messages) &mdash; The message text.
+* type: [MessageId](#messageid) &mdash; 
+* const: [Messages](#messages) &mdash; 
 * type: [WarningData](#warningdata) &mdash; Warning data.
 * [getWarning](#getwarning) &mdash; Return the warning string.
 * [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
 * [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
-* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
+* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning
+information.
 * [`$`](#) &mdash; Return a string representation of WarningData.
-* [`==`](#-1) &mdash; Return true when the two WarningData objects are equal.
+* [`==`](#-1) &mdash; 
 
 # MessageId
 
-Message numbers.
+
 
 ~~~nim
 MessageId = enum
@@ -91,12 +93,12 @@ MessageId = enum
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
   wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace, wNotDictVariable,
-  wSpecifyF, wNotListVariable
+  wSpecifyF, wNotListVariable, wVarNameNotDotName
 ~~~
 
 # Messages
 
-The message text.
+
 
 ~~~nim
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
@@ -262,15 +264,15 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "You can only assign a user function variable to the u dictionary.",
     """Invalid html place, expected "body", or "attribute".""",
     "The variable is not a dictionary.", "Specify f or a function variable.",
-    "The variable is not a list."]
+    "The variable is not a list.", "Expected a variable name without dots."]
 ~~~
 
 # WarningData
 
-Warning data.<ul class="simple"><li>messageId -- the message id</li>
-<li>p1 -- the optional string substituted for the message's $1.</li>
-<li>pos -- the index in the statement where the warning was detected.</li>
-</ul>
+Warning data.
+* messageId -- the message id
+* p1 -- the optional string substituted for the message's $1.
+* pos -- the index in the statement where the warning was detected.
 
 
 ~~~nim
@@ -283,6 +285,7 @@ WarningData = object
 # getWarning
 
 Return the warning string.
+
 
 ~~~nim
 func getWarning(warning: MessageId; p1 = ""): string {.raises: [ValueError],
@@ -297,6 +300,7 @@ Return a formatted warning line. For example:
 filename(line): wId: message.
 ~~~
 
+
 ~~~nim
 func getWarningLine(filename: string; lineNum: int; warning: MessageId; p1 = ""): string {.
     raises: [ValueError], tags: [].}
@@ -310,13 +314,16 @@ Return a formatted warning line. For example:
 filename(line): wId: message.
 ~~~
 
+
 ~~~nim
 func getWarningLine(filename: string; lineNum: int; warningData: WarningData): string
 ~~~
 
 # newWarningData
 
-Create a WarningData object containing all the warning information.
+Create a WarningData object containing all the warning
+information.
+
 
 ~~~nim
 func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
@@ -326,10 +333,11 @@ func newWarningData(messageId: MessageId; p1 = ""; pos = 0): WarningData
 
 Return a string representation of WarningData.
 
-~~~
+~~~nim
 let warning = newWarningData(wUnknownArg, "p1", 5)
 check $warning == "wUnknownArg(p1):5"
 ~~~
+
 
 ~~~nim
 func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}
@@ -337,7 +345,7 @@ func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}
 
 # `==`
 
-Return true when the two WarningData objects are equal.
+
 
 ~~~nim
 func `==`(w1: WarningData; w2: WarningData): bool

@@ -3,14 +3,15 @@
 Create a temporary file.
 
 Example:
-~~~
+
+~~~nim
 import tempFile
 var tempFileO = openTempFile()
 require tempFileO.isSome
 var tempFile = tempFileO.get()
 
-tempFile.file.write("this is a test\n")
-tempFile.file.write("line 2\n")
+tempFile.file.write("this is a test\\n")
+tempFile.file.write("line 2\\n")
 tempFile.file.close()
 
 var fh = open(tempFile.filename, fmRead)
@@ -24,19 +25,23 @@ check line1 == "this is a test"
 check line2 == "line 2"
 ~~~
 
+
 * [tempFile.nim](../src/tempFile.nim) &mdash; Nim source code.
 # Index
 
 * type: [TempFile](#tempfile) &mdash; Temporary filename and associated file object.
 * type: [TempFileStream](#tempfilestream) &mdash; Temporary filename and associated stream object.
-* [openTempFile](#opentempfile) &mdash; Create an empty file in the temp directory open for read write.
+* [openTempFile](#opentempfile) &mdash; Create an empty file in the temp directory open for read
+write.
 * [closeDeleteFile](#closedeletefile) &mdash; Close and delete the temp file.
-* [openTempFileStream](#opentempfilestream) &mdash; Create an empty file stream in the temp directory open for read write.
+* [openTempFileStream](#opentempfilestream) &mdash; Create an empty file stream in the temp directory open for read
+write.
 * [closeDeleteStream](#closedeletestream) &mdash; Close the stream and delete the associated temp file.
 
 # TempFile
 
 Temporary filename and associated file object.
+
 
 ~~~nim
 TempFile = object
@@ -48,6 +53,7 @@ TempFile = object
 
 Temporary filename and associated stream object.
 
+
 ~~~nim
 TempFileStream = object
   filename*: string
@@ -56,7 +62,11 @@ TempFileStream = object
 
 # openTempFile
 
-Create an empty file in the temp directory open for read write. Return a TempFile object containing the filename and file object.  Call closeDeleteFile when you are done with the file.
+Create an empty file in the temp directory open for read
+write. Return a TempFile object containing the filename and
+file object.  Call closeDeleteFile when you are done with the
+file.
+
 
 ~~~nim
 proc openTempFile(): Option[TempFile] {.raises: [ValueError],
@@ -67,13 +77,18 @@ proc openTempFile(): Option[TempFile] {.raises: [ValueError],
 
 Close and delete the temp file.
 
+
 ~~~nim
 proc closeDeleteFile(tempFile: TempFile) {.raises: [], tags: [WriteDirEffect].}
 ~~~
 
 # openTempFileStream
 
-Create an empty file stream in the temp directory open for read write. Return a TempFileStream object containing the filename and stream object.  Call closeDeleteStream when you are done with the stream.
+Create an empty file stream in the temp directory open for read
+write. Return a TempFileStream object containing the filename and
+stream object.  Call closeDeleteStream when you are done with the
+stream.
+
 
 ~~~nim
 proc openTempFileStream(): Option[TempFileStream] {.
@@ -83,6 +98,7 @@ proc openTempFileStream(): Option[TempFileStream] {.
 # closeDeleteStream
 
 Close the stream and delete the associated temp file.
+
 
 ~~~nim
 proc closeDeleteStream(tempFileStream: TempFileStream) {.

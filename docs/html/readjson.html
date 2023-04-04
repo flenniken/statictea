@@ -8,7 +8,8 @@
 <body>
 <h1>readjson.nim</h1>
 
-<p>Read json content.</p>
+<p>Read json content.
+</p>
 
 Nim source code: <a href="../../src/readjson.nim">readjson.nim</a>
 
@@ -17,16 +18,20 @@ Nim source code: <a href="../../src/readjson.nim">readjson.nim</a>
 <ul>
 <li>const:  <a href="#maxDepth">maxDepth</a> &mdash; The maximum depth you can nest items.</li>
 <li> <a href="#jsonToValue">jsonToValue</a> &mdash; Convert a Nim json node to a statictea value.</li>
-<li> <a href="#readJsonStream">readJsonStream</a> &mdash; Read a json stream and return the parsed data in a value object or return a warning.</li>
-<li> <a href="#readJsonString">readJsonString</a> &mdash; Read a json string and return the parsed data in a value object or return a warning.</li>
-<li> <a href="#readJsonFile">readJsonFile</a> &mdash; Read a json file and return the parsed data in a value object or return a warning.</li>
+<li> <a href="#readJsonStream">readJsonStream</a> &mdash; Read a json stream and return the parsed data in a value object
+or return a warning.</li>
+<li> <a href="#readJsonString">readJsonString</a> &mdash; Read a json string and return the parsed data in a value object
+or return a warning.</li>
+<li> <a href="#readJsonFile">readJsonFile</a> &mdash; Read a json file and return the parsed data in a value object or
+return a warning.</li>
 <li> <a href="#unescapePopularChar">unescapePopularChar</a> &mdash; Unescape the popular char and return its value.</li>
 <li> <a href="#parseJsonStr">parseJsonStr</a> &mdash; Parse the quoted json string literal.</li>
 </ul>
 
 <h3 id="maxDepth">maxDepth</h3>
 
-<p>The maximum depth you can nest items.</p>
+<p>The maximum depth you can nest items.
+</p>
 
 <pre class="nim-code">
 maxDepth = 16
@@ -34,7 +39,9 @@ maxDepth = 16
 
 <h3 id="jsonToValue">jsonToValue</h3>
 
-<p>Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.</p>
+<p>Convert a Nim json node to a statictea value. The mutable
+variable determines whether lists and dictionaries are mutable.
+</p>
 
 <pre class="nim-code">
 func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr
@@ -42,7 +49,10 @@ func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable
 
 <h3 id="readJsonStream">readJsonStream</h3>
 
-<p>Read a json stream and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.</p>
+<p>Read a json stream and return the parsed data in a value object
+or return a warning. The mutable variable determines whether
+lists and dictionaries are mutable.
+</p>
 
 <pre class="nim-code">
 func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
@@ -51,7 +61,10 @@ func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
 
 <h3 id="readJsonString">readJsonString</h3>
 
-<p>Read a json string and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.</p>
+<p>Read a json string and return the parsed data in a value object
+or return a warning. The mutable variable determines whether
+lists and dictionaries are mutable.
+</p>
 
 <pre class="nim-code">
 func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
@@ -60,7 +73,10 @@ func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
 
 <h3 id="readJsonFile">readJsonFile</h3>
 
-<p>Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.</p>
+<p>Read a json file and return the parsed data in a value object or
+return a warning. A warning is returned when the root object is
+not a dictionary.
+</p>
 
 <pre class="nim-code">
 proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr {.
@@ -73,13 +89,13 @@ proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr {.
 <p>Unescape the popular char and return its value. If the char is
 not a popular char, return 0.
 
-</p><p> Popular characters and their escape values:
+</p><p>Popular characters and their escape values:
 
 </p><pre class="plain-code">
 |char      | name           | unicode|
 |----------|----------------|--------|
 |&quot;         | quotation mark | U+0022 |
-|\         | reverse solidus| U+005C |
+|\\        | reverse solidus| U+005C |
 |/         | solidus        | U+002F |
 |b         | backspace      | U+0008 |
 |f         | form feed      | U+000C |
@@ -101,9 +117,9 @@ and the ending position after the trailing quote. On
 failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
-</p><pre class="plain-code">
-a = &quot;test string&quot;  # test
-     ^           ^
+</p><pre class="tea-code">
+<span class="t-dotName">a</span> = <span class="t-str">&quot;test string&quot;</span>  <span class="t-comment"># test
+</span>     ^           ^
 </pre>
 
 

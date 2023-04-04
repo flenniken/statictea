@@ -4,22 +4,25 @@ Time how long it takes something to run.
 
 Usage:
 
-~~~
+~~~nim
 timer = newTimer()
 # run something
 echo timer.seconds()
 ~~~
+
 
 * [timer.nim](../src/timer.nim) &mdash; Nim source code.
 # Index
 
 * type: [Timer](#timer) &mdash; Holds the start time in seconds.
 * [newTimer](#newtimer) &mdash; Create a new timer and set the start time.
-* [seconds](#seconds) &mdash; Return the elapsed seconds rounded to the specified number of digits.
+* [seconds](#seconds) &mdash; Return the elapsed seconds rounded to the specified number of
+digits.
 
 # Timer
 
 Holds the start time in seconds.
+
 
 ~~~nim
 Timer = object
@@ -30,13 +33,16 @@ Timer = object
 
 Create a new timer and set the start time.
 
+
 ~~~nim
 proc newTimer(): Timer {.raises: [], tags: [TimeEffect].}
 ~~~
 
 # seconds
 
-Return the elapsed seconds rounded to the specified number of digits.
+Return the elapsed seconds rounded to the specified number of
+digits.
+
 
 ~~~nim
 proc seconds(timer: Timer; digits: Natural = 3): float {.raises: [],

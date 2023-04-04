@@ -32,7 +32,8 @@ write out the ending newline or not to the result file.
 {var} not { var }.
 
 </p><p>To use a left bracket in a replacement block you use two left brackets, {{,
-{{ results in {.</p>
+{{ results in {.
+</p>
 
 Nim source code: <a href="../../src/replacement.nim">replacement.nim</a>
 
@@ -47,7 +48,8 @@ Nim source code: <a href="../../src/replacement.nim">replacement.nim</a>
 <li> <a href="#varSegment">varSegment</a> &mdash; Return a variable segment made from the dot name.</li>
 <li> <a href="#lineToSegments">lineToSegments</a> &mdash; Convert a line to a list of segments.</li>
 <li> <a href="#varSegmentDotName">varSegmentDotName</a> &mdash; Given a variable segment, return its dot name.</li>
-<li> <a href="#writeTempSegments">writeTempSegments</a> &mdash; Write the replacement block's stored segments to the result stream with the variables filled in.</li>
+<li> <a href="#writeTempSegments">writeTempSegments</a> &mdash; Write the replacement block's stored segments to the result
+stream with the variables filled in.</li>
 <li> <a href="#allocTempSegments">allocTempSegments</a> &mdash; Create a TempSegments object.</li>
 <li> <a href="#closeDeleteTempSegments">closeDeleteTempSegments</a> &mdash; Close the TempSegments and delete its backing temporary file.</li>
 <li> <a href="#storeLineSegments">storeLineSegments</a> &mdash; Divide the line into segments and write them to the TempSegments' temp file.</li>
@@ -59,10 +61,11 @@ Nim source code: <a href="../../src/replacement.nim">replacement.nim</a>
 <p>Line type returned by yieldReplacementLine.
 
 </p><ul>
-<li>rlNoLine -- Value when not initialized.
-</li><li>rlReplaceLine -- A replacement block line.
-</li><li>rlEndblockLine -- The endblock command line.
-</li><li>rlNormalLine -- The last line when maxLines was exceeded.</li></ul>
+<li>rlNoLine — Value when not initialized.
+</li><li>rlReplaceLine — A replacement block line.
+</li><li>rlEndblockLine — The endblock command line.
+</li><li>rlNormalLine — The last line when maxLines was exceeded.
+</li></ul>
 
 
 <pre class="nim-code">
@@ -72,7 +75,8 @@ ReplaceLineKind = enum
 
 <h3 id="ReplaceLine">ReplaceLine</h3>
 
-<p>Line information returned by yieldReplacementLine.</p>
+<p>Line information returned by yieldReplacementLine.
+</p>
 
 <pre class="nim-code">
 ReplaceLine = object
@@ -82,7 +86,8 @@ ReplaceLine = object
 
 <h3 id="newReplaceLine">newReplaceLine</h3>
 
-<p>Return a new ReplaceLine object.</p>
+<p>Return a new ReplaceLine object.
+</p>
 
 <pre class="nim-code">
 func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
@@ -90,7 +95,8 @@ func newReplaceLine(kind: ReplaceLineKind; line: string): ReplaceLine
 
 <h3 id="a__">`$`</h3>
 
-<p>Return a string representation of a ReplaceLine object.</p>
+<p>Return a string representation of a ReplaceLine object.
+</p>
 
 <pre class="nim-code">
 func `$`(replaceLine: ReplaceLine): string
@@ -98,7 +104,9 @@ func `$`(replaceLine: ReplaceLine): string
 
 <h3 id="stringSegment">stringSegment</h3>
 
-<p>Return a string segment made from the fragment. AtEnd is true when the fragment ends the line.</p>
+<p>Return a string segment made from the fragment. AtEnd is true
+when the fragment ends the line.
+</p>
 
 <pre class="nim-code">
 proc stringSegment(fragment: string; atEnd: bool): string {.
@@ -107,7 +115,9 @@ proc stringSegment(fragment: string; atEnd: bool): string {.
 
 <h3 id="varSegment">varSegment</h3>
 
-<p>Return a variable segment made from the dot name. AtEnd is true when the bracketed variable ends the line.</p>
+<p>Return a variable segment made from the dot name. AtEnd is true
+when the bracketed variable ends the line.
+</p>
 
 <pre class="nim-code">
 proc varSegment(dotName: string; atEnd: bool): string {.raises: [ValueError],
@@ -116,7 +126,8 @@ proc varSegment(dotName: string; atEnd: bool): string {.raises: [ValueError],
 
 <h3 id="lineToSegments">lineToSegments</h3>
 
-<p>Convert a line to a list of segments. No warnings.</p>
+<p>Convert a line to a list of segments. No warnings.
+</p>
 
 <pre class="nim-code">
 proc lineToSegments(line: string): seq[string] {.raises: [ValueError], tags: [].}
@@ -124,7 +135,8 @@ proc lineToSegments(line: string): seq[string] {.raises: [ValueError], tags: [].
 
 <h3 id="varSegmentDotName">varSegmentDotName</h3>
 
-<p>Given a variable segment, return its dot name.</p>
+<p>Given a variable segment, return its dot name.
+</p>
 
 <pre class="nim-code">
 func varSegmentDotName(segment: string): string
@@ -132,7 +144,10 @@ func varSegmentDotName(segment: string): string
 
 <h3 id="writeTempSegments">writeTempSegments</h3>
 
-<p>Write the replacement block&#x27;s stored segments to the result stream with the variables filled in.  The lineNum is the beginning line of the replacement block.</p>
+<p>Write the replacement block&#x27;s stored segments to the result
+stream with the variables filled in.  The lineNum is the
+beginning line of the replacement block.
+</p>
 
 <pre class="nim-code">
 proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
@@ -143,7 +158,11 @@ proc writeTempSegments(env: var Env; tempSegments: var TempSegments;
 
 <h3 id="allocTempSegments">allocTempSegments</h3>
 
-<p>Create a TempSegments object. This reserves memory for a line buffer and creates a backing temp file. Call the closeDeleteTempSegments procedure when done to free the memory and to close and delete the file.</p>
+<p>Create a TempSegments object. This reserves memory for a line
+buffer and creates a backing temp file. Call the closeDeleteTempSegments
+procedure when done to free the memory and to close and delete
+the file.
+</p>
 
 <pre class="nim-code">
 proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments] {.
@@ -153,7 +172,8 @@ proc allocTempSegments(env: var Env; lineNum: Natural): Option[TempSegments] {.
 
 <h3 id="closeDeleteTempSegments">closeDeleteTempSegments</h3>
 
-<p>Close the TempSegments and delete its backing temporary file.</p>
+<p>Close the TempSegments and delete its backing temporary file.
+</p>
 
 <pre class="nim-code">
 proc closeDeleteTempSegments(tempSegments: TempSegments) {.
@@ -162,7 +182,8 @@ proc closeDeleteTempSegments(tempSegments: TempSegments) {.
 
 <h3 id="storeLineSegments">storeLineSegments</h3>
 
-<p>Divide the line into segments and write them to the TempSegments&#x27; temp file.</p>
+<p>Divide the line into segments and write them to the TempSegments&#x27; temp file.
+</p>
 
 <pre class="nim-code">
 proc storeLineSegments(env: var Env; tempSegments: TempSegments; line: string) {.
@@ -171,7 +192,8 @@ proc storeLineSegments(env: var Env; tempSegments: TempSegments; line: string) {
 
 <h3 id="yieldReplacementLine">yieldReplacementLine</h3>
 
-<p>Yield all the replacement block lines and one line after.</p>
+<p>Yield all the replacement block lines and one line after.
+</p>
 
 <pre class="nim-code">
 iterator yieldReplacementLine(env: var Env; firstReplaceLine: string;

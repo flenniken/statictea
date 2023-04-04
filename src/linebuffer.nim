@@ -1,37 +1,41 @@
 ## Read lines from a stream without exceeding the maximum line
 ## length. The returned lines contain the line ending, either crlf or
 ## lf.
-## @:
-## @:Example:
-## @:
-## @:~~~ nim
-## @:let lbO = newLineBuffer(stream)
-## @:check lbO.isSome == true
-## @:var lb = lbO.get()
-## @:while line = lb.readLine():
-## @:  processLine(line)
-## @:~~~~
+##
+## Example:
+##
+## ~~~ nim
+## let lbO = newLineBuffer(stream)
+## check lbO.isSome == true
+## var lb = lbO.get()
+## while line = lb.readLine():
+##   processLine(line)
+## ~~~
 
 import std/streams
 import std/options
 
 const
-  minMaxLineLen* = 8           ## The minimum line length supported.
-  maxMaxLineLen* = 8*1024      ## The maximum line length supported.
-  defaultMaxLineLen* = 1024    ## The maximum line length.
-  defaultBufferSize* = 16*1024 ## The buffer size for reading lines.
+  minMaxLineLen* = 8
+    ## The minimum line length supported.
+  maxMaxLineLen* = 8*1024
+    ## The maximum line length supported.
+  defaultMaxLineLen* = 1024
+    ## The maximum line length.
+  defaultBufferSize* = 16*1024
+    ## The buffer size for reading lines.
 
 type
   LineBuffer* = object
     ## The LineBuffer holds information about reading lines from a buffer.
-    ## @:* stream -- a stream containing lines to read processed sequentially
-    ## @:* maxLineLen -- the maximum line length
-    ## @:* bufferSize -- the buffer size for reading lines
-    ## @:* lineNum -- he current line number in the file starting at 1
-    ## @:* pos -- current byte position in the buffer
-    ## @:* charsRead -- number of bytes in the buffer
-    ## @:* buffer -- memory allocated for the buffer
-    ## @:* filename -- the optional stream's filename
+    ## * stream — a stream containing lines to read processed sequentially
+    ## * maxLineLen — the maximum line length
+    ## * bufferSize — the buffer size for reading lines
+    ## * lineNum — he current line number in the file starting at 1
+    ## * pos — current byte position in the buffer
+    ## * charsRead — number of bytes in the buffer
+    ## * buffer — memory allocated for the buffer
+    ## * filename — the optional stream's filename
     stream: Stream
     maxLineLen: int
     bufferSize: int
@@ -88,16 +92,16 @@ proc reset*(lb: var LineBuffer) =
 
 proc readline*(lb: var LineBuffer): string =
   ## Return the next line from the LineBuffer. Reading starts from the
-  ## @:current position in the stream and advances the amount read.
-  ## @:
-  ## @:A line end is defined by either a crlf or lf and they get
-  ## @:returned with the line bytes. A line is returned when the line
-  ## @:ending is found, when the stream runs out of bytes or when the
-  ## @:maximum line length is reached.
-  ## @:
-  ## @:You cannot tell whether the line was truncated or not without
-  ## @:reading the next line. When no more data exists in the stream, an
-  ## @:empty string is returned.
+  ## current position in the stream and advances the amount read.
+  ##
+  ## A line end is defined by either a crlf or lf and they get
+  ## returned with the line bytes. A line is returned when the line
+  ## ending is found, when the stream runs out of bytes or when the
+  ## maximum line length is reached.
+  ##
+  ## You cannot tell whether the line was truncated or not without
+  ## reading the next line. When no more data exists in the stream, an
+  ## empty string is returned.
 
   if lb.stream == nil:
     return

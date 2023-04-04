@@ -11,6 +11,7 @@ import std/osproc
 import std/json
 import std/re
 import std/options
+import std/algorithm
 import comparelines
 import cmdline
 import tempFile
@@ -82,12 +83,17 @@ proc raiseError(msg: string) =
 proc readOneDesc*(srcLines: seq[string], start: int, finish: int): string =
   ## Return the doc comment found in the given range of line numbers.
 
+  if start > srcLines.len:
+    return
+
   let startIx = start - 1
   var endIx: int
   if finish == -1:
     endIx = srcLines.len - 1
   else:
     endIx = finish - 2
+  if endIx >= srcLines.len:
+    return
 
   # Add the discription as a sequence of lines with the leading spaces
   # and ## removed.
@@ -182,6 +188,7 @@ proc removePresentation*(args: Args) =
   var lineNums = newSeq[int]()
   for entry in jsonObj["entries"]:
     lineNums.add(entry["line"].getInt())
+  sort(lineNums)
 
   # Read all the descriptions from the source file and return a
   # mapping from line number to description.

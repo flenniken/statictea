@@ -2,6 +2,7 @@
 
 Update a template.
 
+
 * [updateTemplate.nim](../src/updateTemplate.nim) &mdash; Nim source code.
 # Index
 
@@ -11,7 +12,13 @@ Update a template.
 
 # collectReplaceCommand
 
-Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.
+Collect the replace commands.  Read template lines and write out
+non-command lines. When a replace command is found, return its
+lines.  This includes the command line and its continue lines.
+On input extraLine is the first line to use.  On exit extraLine
+is the line that caused the collection to stop which is commonly
+the first replacement block line.
+
 
 ~~~nim
 proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
@@ -22,7 +29,9 @@ proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
 
 # updateTemplate
 
-Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.
+Update the template and return 0 on success. Return 1 if a
+warning messages was written while processing the template.
+
 
 ~~~nim
 proc updateTemplate(env: var Env; args: Args) {.
@@ -33,6 +42,7 @@ proc updateTemplate(env: var Env; args: Args) {.
 # updateTemplateTop
 
 Update the template.
+
 
 ~~~nim
 proc updateTemplateTop(env: var Env; args: Args) {.raises: [ValueError, IOError,

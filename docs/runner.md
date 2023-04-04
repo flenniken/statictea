@@ -13,6 +13,7 @@ See the runner help message (get_help) for more information about stf
 files, or run the nimble task "runhelp" to show the help text with
 glow.
 
+
 * [runner.nim](../src/runner.nim) &mdash; Nim source code.
 # Index
 
@@ -46,15 +47,18 @@ glow.
 * [isExpectedLine](#isexpectedline) &mdash; Return true when the line is an expected line.
 * [parseRunFileLine](#parserunfileline) &mdash; Parse a file command line.
 * [parseExpectedLine](#parseexpectedline) &mdash; Parse an expected line.
-* [openNewFile](#opennewfile) &mdash; Create a new file in the given folder and return an open File object.
+* [openNewFile](#opennewfile) &mdash; Create a new file in the given folder and return an open File
+object.
 * [getAnyLine](#getanyline) &mdash; Return information about the stf line.
 * [makeDirAndFiles](#makedirandfiles) &mdash; Read the stf file and create its temp folder and files.
-* [runCommands](#runcommands) &mdash; Run the command files and return 0 when they all returned their expected return code.
+* [runCommands](#runcommands) &mdash; Run the command files and return 0 when they all returned their
+expected return code.
 * [runStfFilename](#runstffilename) &mdash; Run the stf file and leave the temp dir.
 
 # runnerId
 
 The first line of the stf file.
+
 
 ~~~nim
 runnerId = "stf file, version 0.1.0"
@@ -63,6 +67,7 @@ runnerId = "stf file, version 0.1.0"
 # RunArgs
 
 RunArgs holds the command line arguments.
+
 
 ~~~nim
 RunArgs = object
@@ -77,6 +82,7 @@ RunArgs = object
 
 Rc holds a return code where 0 is success.
 
+
 ~~~nim
 Rc = int
 ~~~
@@ -84,6 +90,7 @@ Rc = int
 # RunFileLine
 
 RunFileLine holds the file line options.
+
 
 ~~~nim
 RunFileLine = object
@@ -97,6 +104,7 @@ RunFileLine = object
 
 ExpectedLine holds the expected line options.
 
+
 ~~~nim
 ExpectedLine = object
   gotFilename*: string
@@ -107,6 +115,7 @@ ExpectedLine = object
 
 The kind of block line.
 
+
 ~~~nim
 BlockLineType = enum
   blTildes, blAccents
@@ -115,6 +124,7 @@ BlockLineType = enum
 # BlockLine
 
 BlockLine holds a line that starts with tildas or accents.
+
 
 ~~~nim
 BlockLine = object
@@ -126,6 +136,7 @@ BlockLine = object
 
 The kind of line in a stf file.
 
+
 ~~~nim
 LineKind = enum
   lkRunFileLine, lkExpectedLine, lkBlockLine, lkIdLine, lkCommentLine
@@ -134,6 +145,7 @@ LineKind = enum
 # AnyLine
 
 Contains the information about one line in a stf file.
+
 
 ~~~nim
 AnyLine = object
@@ -158,6 +170,7 @@ AnyLine = object
 
 DirAndFiles holds the file and compare lines of the stf file.
 
+
 ~~~nim
 DirAndFiles = object
   expectedLines*: seq[ExpectedLine]
@@ -168,6 +181,7 @@ DirAndFiles = object
 
 Create a new BlockLine type.
 
+
 ~~~nim
 func newBlockLine(blockLineType: BlockLineType; line: string): BlockLine
 ~~~
@@ -175,6 +189,7 @@ func newBlockLine(blockLineType: BlockLineType; line: string): BlockLine
 # newAnyLineRunFileLine
 
 Create a new AnyLine object for a file line.
+
 
 ~~~nim
 func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine
@@ -184,6 +199,7 @@ func newAnyLineRunFileLine(runFileLine: RunFileLine): AnyLine
 
 Create a new AnyLine object for a expected line.
 
+
 ~~~nim
 func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
 ~~~
@@ -191,6 +207,7 @@ func newAnyLineExpectedLine(expectedLine: ExpectedLine): AnyLine
 # newAnyLineBlockLine
 
 Create a new AnyLine object for a block line.
+
 
 ~~~nim
 func newAnyLineBlockLine(blockLine: BlockLine): AnyLine
@@ -200,6 +217,7 @@ func newAnyLineBlockLine(blockLine: BlockLine): AnyLine
 
 Create a new AnyLine object for a comment line.
 
+
 ~~~nim
 func newAnyLineCommentLine(commentLine: string): AnyLine
 ~~~
@@ -208,6 +226,7 @@ func newAnyLineCommentLine(commentLine: string): AnyLine
 
 Create a new AnyLine object for a id line.
 
+
 ~~~nim
 func newAnyLineIdLine(idLine: string): AnyLine
 ~~~
@@ -215,6 +234,7 @@ func newAnyLineIdLine(idLine: string): AnyLine
 # newRunArgs
 
 Create a new RunArgs object.
+
 
 ~~~nim
 func newRunArgs(help = false; version = false; leaveTempDir = false;
@@ -225,6 +245,7 @@ func newRunArgs(help = false; version = false; leaveTempDir = false;
 
 Create a new RunFileLine object.
 
+
 ~~~nim
 func newRunFileLine(filename: string; noLastEnding = false; command = false;
                     nonZeroReturn = false): RunFileLine
@@ -234,6 +255,7 @@ func newRunFileLine(filename: string; noLastEnding = false; command = false;
 
 Create a new ExpectedLine object.
 
+
 ~~~nim
 func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLine
 ~~~
@@ -241,6 +263,7 @@ func newExpectedLine(gotFilename: string; expectedFilename: string): ExpectedLin
 # newDirAndFiles
 
 Create a new DirAndFiles object.
+
 
 ~~~nim
 func newDirAndFiles(expectedLines: seq[ExpectedLine];
@@ -251,6 +274,7 @@ func newDirAndFiles(expectedLines: seq[ExpectedLine];
 
 Return a string representation of a ExpectedLine object.
 
+
 ~~~nim
 func `$`(r: ExpectedLine): string {.raises: [ValueError], tags: [].}
 ~~~
@@ -258,6 +282,7 @@ func `$`(r: ExpectedLine): string {.raises: [ValueError], tags: [].}
 # `$`
 
 Return a string representation of a RunFileLine object.
+
 
 ~~~nim
 func `$`(r: RunFileLine): string {.raises: [ValueError], tags: [].}
@@ -267,13 +292,16 @@ func `$`(r: RunFileLine): string {.raises: [ValueError], tags: [].}
 
 Write a message to stderr.
 
+
 ~~~nim
 proc writeErr(message: string) {.raises: [IOError], tags: [WriteIOEffect].}
 ~~~
 
 # createFolder
 
-Create a folder with the given name. When the folder cannot be created return a message telling why, else return "".
+Create a folder with the given name. When the folder cannot be
+created return a message telling why, else return "".
+
 
 ~~~nim
 proc createFolder(folder: string): string {.raises: [],
@@ -282,7 +310,9 @@ proc createFolder(folder: string): string {.raises: [],
 
 # deleteFolder
 
-Delete a folder with the given name. When the folder cannot be deleted return a message telling why, else return "".
+Delete a folder with the given name. When the folder cannot be
+deleted return a message telling why, else return "".
+
 
 ~~~nim
 proc deleteFolder(folder: string): string {.raises: [],
@@ -293,6 +323,7 @@ proc deleteFolder(folder: string): string {.raises: [],
 
 Parse the command line arguments.
 
+
 ~~~nim
 proc parseRunCommandLine(argv: seq[string]): OpResultStr[RunArgs] {.
     raises: [ValueError], tags: [ReadIOEffect].}
@@ -302,6 +333,7 @@ proc parseRunCommandLine(argv: seq[string]): OpResultStr[RunArgs] {.
 
 Return true when the line is a file line.
 
+
 ~~~nim
 proc isRunFileLine(line: string): bool {.raises: [KeyError], tags: [].}
 ~~~
@@ -310,6 +342,7 @@ proc isRunFileLine(line: string): bool {.raises: [KeyError], tags: [].}
 
 Return true when the line is an expected line.
 
+
 ~~~nim
 proc isExpectedLine(line: string): bool {.raises: [KeyError], tags: [].}
 ~~~
@@ -317,6 +350,7 @@ proc isExpectedLine(line: string): bool {.raises: [KeyError], tags: [].}
 # parseRunFileLine
 
 Parse a file command line.
+
 
 ~~~nim
 proc parseRunFileLine(line: string): OpResultStr[RunFileLine] {.
@@ -327,6 +361,7 @@ proc parseRunFileLine(line: string): OpResultStr[RunFileLine] {.
 
 Parse an expected line.
 
+
 ~~~nim
 proc parseExpectedLine(line: string): OpResultStr[ExpectedLine] {.
     raises: [KeyError, ValueError], tags: [].}
@@ -334,7 +369,9 @@ proc parseExpectedLine(line: string): OpResultStr[ExpectedLine] {.
 
 # openNewFile
 
-Create a new file in the given folder and return an open File object.
+Create a new file in the given folder and return an open File
+object.
+
 
 ~~~nim
 proc openNewFile(folder: string; filename: string): OpResultStr[File] {.
@@ -345,6 +382,7 @@ proc openNewFile(folder: string; filename: string): OpResultStr[File] {.
 
 Return information about the stf line.
 
+
 ~~~nim
 proc getAnyLine(line: string): OpResultStr[AnyLine] {.
     raises: [KeyError, ValueError], tags: [].}
@@ -352,7 +390,9 @@ proc getAnyLine(line: string): OpResultStr[AnyLine] {.
 
 # makeDirAndFiles
 
-Read the stf file and create its temp folder and files. Return the file lines and expected lines.
+Read the stf file and create its temp folder and files. Return the
+file lines and expected lines.
+
 
 ~~~nim
 proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles] {.
@@ -362,7 +402,9 @@ proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles] {.
 
 # runCommands
 
-Run the command files and return 0 when they all returned their expected return code.
+Run the command files and return 0 when they all returned their
+expected return code.
+
 
 ~~~nim
 proc runCommands(folder: string; runFileLines: seq[RunFileLine]): int {.
@@ -372,7 +414,9 @@ proc runCommands(folder: string; runFileLines: seq[RunFileLine]): int {.
 
 # runStfFilename
 
-Run the stf file and leave the temp dir. Return 0 when all the tests passed.
+Run the stf file and leave the temp dir. Return 0 when all the
+tests passed.
+
 
 ~~~nim
 proc runStfFilename(filename: string): int {.

@@ -32,24 +32,24 @@ else:
 type
   Env* = object
     ## Env holds the input and output streams.
-    ## @:
-    ## @:* errStream -- standard error stream; normally stderr but
-    ## @:might be a normal file for testing.
-    ## @:* outStream -- standard output stream; normally stdout but
-    ## @:might be a normal file for testing.
-    ## @:* logFile -- the open log file
-    ## @:* logFilename -- the log filename
-    ## @:* closeErrStream -- whether to close err stream. You don't
-    ## @:close stderr.
-    ## @:* closeOutStream -- whether to close out stream. You don't
-    ## @:close stdout.
-    ## @:* closeTemplateStream -- whether to close the template stream
-    ## @:* closeResultStream -- whether to close the result stream
-    ## @:* templateFilename -- name of the template file
-    ## @:* templateStream -- template stream, may be stdin
-    ## @:* resultFilename -- name of the result file
-    ## @:* resultStream -- result stream, may be stdout
-    ## @:* warningsWritten -- the total number of warnings
+    ##
+    ## * errStream — standard error stream; normally stderr but
+    ##   might be a normal file for testing.
+    ## * outStream — standard output stream; normally stdout but
+    ##   might be a normal file for testing.
+    ## * logFile — the open log file
+    ## * logFilename — the log filename
+    ## * closeErrStream — whether to close err stream. You don't
+    ##   close stderr.
+    ## * closeOutStream — whether to close out stream. You don't
+    ##   close stdout.
+    ## * closeTemplateStream — whether to close the template stream
+    ## * closeResultStream — whether to close the result stream
+    ## * templateFilename — name of the template file
+    ## * templateStream — template stream, may be stdin
+    ## * resultFilename — name of the result file
+    ## * resultStream — result stream, may be stdout
+    ## * warningsWritten — the total number of warnings
 
     # These get set at the start.
     errStream*: Stream

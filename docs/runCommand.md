@@ -2,6 +2,7 @@
 
 Run a command and fill in the variables dictionaries.
 
+
 * [runCommand.nim](../src/runCommand.nim) &mdash; Nim source code.
 # Index
 
@@ -12,7 +13,8 @@ Run a command and fill in the variables dictionaries.
 * type: [SpecialFunctionOr](#specialfunctionor) &mdash; A SpecialFunction or a warning message.
 * type: [Found](#found) &mdash; The line endings found.
 * type: [LinesOr](#linesor) &mdash; A list of lines or a warning.
-* type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
+* type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block
+iteration and whether to stop or not.
 * [newLinesOr](#newlinesor) &mdash; Return a new LinesOr object containing a warning.
 * [newLinesOr](#newlinesor-1) &mdash; Return a new LinesOr object containing a warning.
 * [newLinesOr](#newlinesor-2) &mdash; Return a new LinesOr object containing a list of lines.
@@ -36,7 +38,8 @@ Run a command and fill in the variables dictionaries.
 * [newParameterName](#newparametername) &mdash; Create a new ParameterName object.
 * [newParameterNameOr](#newparameternameor) &mdash; Create a new ParameterNameOr object.
 * [newParameterNameOr](#newparameternameor-1) &mdash; Create a warning.
-* [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the start position.
+* [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the
+start position.
 * [getParameterNameOr](#getparameternameor) &mdash; Get a parameter name from the statement and skip trailing
 whitespace.
 * [getDotNameOr](#getdotnameor) &mdash; Get a dot name from the statement.
@@ -45,11 +48,14 @@ whitespace.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
-* [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
+* [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of
+the problem.
 * [warnStatement](#warnstatement-1) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
-* [removeLineEnd](#removelineend) &mdash; Return a new string with the n or rn removed from the end of the line.
+* [removeLineEnd](#removelineend) &mdash; Return a new string with the \n or \r\n removed from the end of
+the line.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
-* [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines if needed.
+* [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines
+if needed.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [matchTabSpace2](#matchtabspace2) &mdash; Match one or more spaces or tabs starting at the given position.
 * [getString](#getstring) &mdash; Return a literal string value and position after it.
@@ -62,20 +68,27 @@ whitespace.
 * [getFunctionValuePosSi](#getfunctionvaluepossi) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
-* [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
-* [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
+* [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the
+position after it.
+* [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after
+the trailing whitespace.
 * [listLoop](#listloop) &mdash; Make a new list from an existing list.
-* [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
+* [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start
+parameter points at which is a string, number, variable, list, or
+condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn, log and listLoop.
 * [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
-* [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
+* [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string,
+operator and value.
 * [skipSpaces](#skipspaces) &mdash; Skip the leading spaces and tabs.
 * [callUserFunction](#calluserfunction) &mdash; Run the given user function.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
 * [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a
 message.
-* [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
-* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and assign the variable.
+* [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition,
+return true and fill in the return parameters.
+* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and
+assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.
@@ -83,6 +96,7 @@ message.
 # tripleQuotes
 
 Triple quotes for building strings.
+
 
 ~~~nim
 tripleQuotes = "\"\"\""
@@ -92,6 +106,7 @@ tripleQuotes = "\"\"\""
 
 The maximum length of a variable or dotname.
 
+
 ~~~nim
 maxNameLength = 64
 ~~~
@@ -99,6 +114,7 @@ maxNameLength = 64
 # PosOr
 
 A position in a string or a message.
+
 
 ~~~nim
 PosOr = OpResultWarn[Natural]
@@ -108,16 +124,17 @@ PosOr = OpResultWarn[Natural]
 
 The special functions.
 
-* spNotSpecial -- not a special function
-* spIf -- if function
-* spIf0 -- if0 function
-* spWarn -- warn function
-* spLog -- log function
-* spReturn -- return function
-* spAnd -- and function
-* spOr -- or function
-* spFunc -- func function
-* spListLoop -- list with callback function
+* spNotSpecial — not a special function
+* spIf — if function
+* spIf0 — if0 function
+* spWarn — warn function
+* spLog — log function
+* spReturn — return function
+* spAnd — and function
+* spOr — or function
+* spFunc — func function
+* spListLoop — list with callback function
+
 
 ~~~nim
 SpecialFunction {.pure.} = enum
@@ -130,6 +147,7 @@ SpecialFunction {.pure.} = enum
 
 A SpecialFunction or a warning message.
 
+
 ~~~nim
 SpecialFunctionOr = OpResultWarn[SpecialFunction]
 ~~~
@@ -141,12 +159,13 @@ The line endings found.
 * nothing = no special ending
 * plus = +
 * triple = """
-* newline = \n
-* plus_n = +\n
-* triple_n = """\n
-* crlf = \r\n
-* plus_crlf = +\r\n
-* triple_crlf = """\r\n
+* newline = \\n
+* plus_n = +\\n
+* triple_n = """\\n
+* crlf = \\r\\n
+* plus_crlf = +\\r\\n
+* triple_crlf = """\\r\\n
+
 
 ~~~nim
 Found = enum
@@ -157,17 +176,20 @@ Found = enum
 
 A list of lines or a warning.
 
+
 ~~~nim
 LinesOr = OpResultWarn[seq[string]]
 ~~~
 
 # LoopControl
 
-Controls whether to output the current replacement block iteration and whether to stop or not.
+Controls whether to output the current replacement block
+iteration and whether to stop or not.
 
-* lcStop -- do not output this replacement block and stop iterating
-* lcSkip -- do not output this replacement block and continue with the next iteration
-* lcAdd -- output the replacment block and continue with the next iteration
+* lcStop — do not output this replacement block and stop iterating
+* lcSkip — do not output this replacement block and continue with the next iteration
+* lcAdd — output the replacment block and continue with the next iteration
+
 
 ~~~nim
 LoopControl = enum
@@ -178,6 +200,7 @@ LoopControl = enum
 
 Return a new LinesOr object containing a warning.
 
+
 ~~~nim
 func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
 ~~~
@@ -185,6 +208,7 @@ func newLinesOr(warning: MessageId; p1: string = ""; pos = 0): LinesOr
 # newLinesOr
 
 Return a new LinesOr object containing a warning.
+
 
 ~~~nim
 func newLinesOr(warningData: WarningData): LinesOr
@@ -194,6 +218,7 @@ func newLinesOr(warningData: WarningData): LinesOr
 
 Return a new LinesOr object containing a list of lines.
 
+
 ~~~nim
 func newLinesOr(lines: seq[string]): LinesOr
 ~~~
@@ -201,6 +226,7 @@ func newLinesOr(lines: seq[string]): LinesOr
 # newPosOr
 
 Create a PosOr warning.
+
 
 ~~~nim
 func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
@@ -210,6 +236,7 @@ func newPosOr(warning: MessageId; p1 = ""; pos = 0): PosOr
 
 Create a PosOr value.
 
+
 ~~~nim
 func newPosOr(pos: Natural): PosOr
 ~~~
@@ -217,6 +244,7 @@ func newPosOr(pos: Natural): PosOr
 # newSpecialFunctionOr
 
 Create a PosOr warning.
+
 
 ~~~nim
 func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunctionOr
@@ -226,6 +254,7 @@ func newSpecialFunctionOr(warning: MessageId; p1 = ""; pos = 0): SpecialFunction
 
 Create a SpecialFunctionOr value.
 
+
 ~~~nim
 func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
 ~~~
@@ -233,6 +262,7 @@ func newSpecialFunctionOr(specialFunction: SpecialFunction): SpecialFunctionOr
 # `$`
 
 Return a string representation of a Statement.
+
 
 ~~~nim
 func `$`(s: Statement): string {.raises: [ValueError], tags: [].}
@@ -242,6 +272,7 @@ func `$`(s: Statement): string {.raises: [ValueError], tags: [].}
 
 Return true when the two statements are equal.
 
+
 ~~~nim
 func `==`(s1: Statement; s2: Statement): bool
 ~~~
@@ -249,6 +280,7 @@ func `==`(s1: Statement; s2: Statement): bool
 # `==`
 
 Return true when a equals b.
+
 
 ~~~nim
 func `==`(a: PosOr; b: PosOr): bool
@@ -258,6 +290,7 @@ func `==`(a: PosOr; b: PosOr): bool
 
 Compare whether two PosOr are not equal.
 
+
 ~~~nim
 func `!=`(a: PosOr; b: PosOr): bool
 ~~~
@@ -266,9 +299,10 @@ func `!=`(a: PosOr; b: PosOr): bool
 
 The variable name type.
 
-vtNormal -- a variable with whitespace following it
-vtFunction -- a variable with ( following it
-vtGet -- a variable with [ following it
+vtNormal — a variable with whitespace following it
+vtFunction — a variable with ( following it
+vtGet — a variable with [ following it
+
 
 ~~~nim
 DotNameKind = enum
@@ -279,9 +313,10 @@ DotNameKind = enum
 
 A variable name in a statement.
 
-* dotName -- the dot name string
-* kind -- the kind of name defined by the character following the name
-* pos -- the position after the trailing whitespace
+* dotName — the dot name string
+* kind — the kind of name defined by the character following the name
+* pos — the position after the trailing whitespace
+
 
 ~~~nim
 DotName = object
@@ -294,6 +329,7 @@ DotName = object
 
 A DotName or a warning.
 
+
 ~~~nim
 DotNameOr = OpResultWarn[DotName]
 ~~~
@@ -302,8 +338,9 @@ DotNameOr = OpResultWarn[DotName]
 
 A parameter name in a statement.
 
-* name -- the parameter name string
-* pos -- the position after the trailing whitespace
+* name — the parameter name string
+* pos — the position after the trailing whitespace
+
 
 ~~~nim
 ParameterName = object
@@ -315,6 +352,7 @@ ParameterName = object
 
 A parameter name or a warning.
 
+
 ~~~nim
 ParameterNameOr = OpResultWarn[ParameterName]
 ~~~
@@ -323,14 +361,15 @@ ParameterNameOr = OpResultWarn[ParameterName]
 
 The type of the right hand side of a statement.
 
-rtNothing -- not a valid right hand side
-rtString -- a literal string starting with a quote
-rtNumber -- a literal number starting with a digit or minus sign
-rtVariable -- a variable starting with a-zA-Z
-rtFunction -- a function variable calling a function: len(b)
-rtList -- a literal list: [1, 2, 3, len(b), 5]
-rtCondition -- a condition: (a < b)
-rtGet -- a index into a list or dictionary: teas[2], teas["green"]
+* rtNothing — not a valid right hand side
+* rtString — a literal string starting with a quote
+* rtNumber — a literal number starting with a digit or minus sign
+* rtVariable — a variable starting with a-zA-Z
+* rtFunction — a function variable calling a function: len(b)
+* rtList — a literal list: [1, 2, 3, len(b), 5]
+* rtCondition — a condition: (a < b)
+* rtGet — a index into a list or dictionary: teas[2], teas["green"]
+
 
 ~~~nim
 RightType = enum
@@ -341,6 +380,7 @@ RightType = enum
 
 Create a new DotName object.
 
+
 ~~~nim
 func newDotName(dotName: string; kind: DotNameKind; pos: Natural): DotName
 ~~~
@@ -348,6 +388,7 @@ func newDotName(dotName: string; kind: DotNameKind; pos: Natural): DotName
 # newDotNameOr
 
 Create a PosOr warning.
+
 
 ~~~nim
 func newDotNameOr(warning: MessageId; p1 = ""; pos = 0): DotNameOr
@@ -357,6 +398,7 @@ func newDotNameOr(warning: MessageId; p1 = ""; pos = 0): DotNameOr
 
 Create a new DotNameOr object.
 
+
 ~~~nim
 func newDotNameOr(dotName: string; kind: DotNameKind; pos: Natural): DotNameOr
 ~~~
@@ -364,6 +406,7 @@ func newDotNameOr(dotName: string; kind: DotNameKind; pos: Natural): DotNameOr
 # newParameterName
 
 Create a new ParameterName object.
+
 
 ~~~nim
 func newParameterName(name: string; pos: Natural): ParameterName
@@ -373,6 +416,7 @@ func newParameterName(name: string; pos: Natural): ParameterName
 
 Create a new ParameterNameOr object.
 
+
 ~~~nim
 func newParameterNameOr(name: string; pos: Natural): ParameterNameOr
 ~~~
@@ -381,13 +425,16 @@ func newParameterNameOr(name: string; pos: Natural): ParameterNameOr
 
 Create a warning.
 
+
 ~~~nim
 func newParameterNameOr(warning: MessageId; p1 = ""; pos = 0): ParameterNameOr
 ~~~
 
 # getRightType
 
-Return the type of the right hand side of the statement at the start position.
+Return the type of the right hand side of the statement at the
+start position.
+
 
 ~~~nim
 func getRightType(statement: Statement; start: Natural): RightType
@@ -402,6 +449,7 @@ whitespace. Start points at a name.
 a = func(var-name : int) dict
          ^        ^
 ~~~
+
 
 ~~~nim
 proc getParameterNameOr(text: string; startPos: Natural): ParameterNameOr
@@ -420,13 +468,16 @@ a = o.def.bbb # comment
     ^         ^
 ~~~
 
+
 ~~~nim
 proc getDotNameOr(text: string; startPos: Natural): DotNameOr
 ~~~
 
 # getDotName
 
-Get a variable name (dotname) from the statement. Skip leading whitespace.
+Get a variable name (dotname) from the statement. Skip leading
+whitespace.
+
 
 ~~~nim
 proc getDotName(text: string; start: Natural): DotNameOr {.raises: [KeyError],
@@ -435,7 +486,9 @@ proc getDotName(text: string; start: Natural): DotNameOr {.raises: [KeyError],
 
 # matchTripleOrPlusSign
 
-Match the optional """ or + at the end of the line. This tells whether the statement continues on the next line for code files.
+Match the optional """ or + at the end of the line. This tells
+whether the statement continues on the next line for code files.
+
 
 ~~~nim
 func matchTripleOrPlusSign(line: string): Found
@@ -445,13 +498,17 @@ func matchTripleOrPlusSign(line: string): Found
 
 Add the line up to the line-ending to the text string.
 
+
 ~~~nim
 func addText(line: string; found: Found; text: var string)
 ~~~
 
 # getFragmentAndPos
 
-Split up a long statement around the given position.  Return the statement fragment, and the position where the fragment starts in the statement.
+Split up a long statement around the given position.  Return the
+statement fragment, and the position where the fragment starts in
+the statement.
+
 
 ~~~nim
 func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
@@ -461,6 +518,7 @@ func getFragmentAndPos(statement: Statement; start: Natural): (string, Natural)
 
 Return a multiline error message.
 
+
 ~~~nim
 func getWarnStatement(filename: string; statement: Statement;
                       warningData: WarningData): string {.raises: [ValueError],
@@ -469,7 +527,9 @@ func getWarnStatement(filename: string; statement: Statement;
 
 # warnStatement
 
-Show an invalid statement with a pointer pointing at the start of the problem. Long statements are trimmed around the problem area.
+Show an invalid statement with a pointer pointing at the start of
+the problem. Long statements are trimmed around the problem area.
+
 
 ~~~nim
 proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
@@ -481,6 +541,7 @@ proc warnStatement(env: var Env; statement: Statement; warningData: WarningData;
 
 Show an invalid statement with a pointer pointing at the start of the problem.
 
+
 ~~~nim
 proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
                    p1: string; pos: Natural; sourceFilename = "") {.
@@ -489,7 +550,9 @@ proc warnStatement(env: var Env; statement: Statement; messageId: MessageId;
 
 # removeLineEnd
 
-Return a new string with the n or rn removed from the end of the line.
+Return a new string with the \n or \r\n removed from the end of
+the line.
+
 
 ~~~nim
 func removeLineEnd(s: string): string
@@ -497,7 +560,9 @@ func removeLineEnd(s: string): string
 
 # yieldStatements
 
-Iterate through the command's statements. A statement can be blank or all whitespace. A statement doesn't end with a newline.
+Iterate through the command's statements. A statement can be
+blank or all whitespace. A statement doesn't end with a newline.
+
 
 ~~~nim
 iterator yieldStatements(cmdLines: CmdLines): Statement {.raises: [KeyError],
@@ -506,7 +571,10 @@ iterator yieldStatements(cmdLines: CmdLines): Statement {.raises: [KeyError],
 
 # readStatement
 
-Read the next statement from the code file reading multiple lines if needed. When there is an error, show the warning and return nothing. When no more statements, return nothing.
+Read the next statement from the code file reading multiple lines
+if needed. When there is an error, show the warning and return
+nothing. When no more statements, return nothing.
+
 
 ~~~nim
 proc readStatement(env: var Env; lb: var LineBuffer): Option[Statement] {.
@@ -521,6 +589,7 @@ past the leading triple quote.  Return the parsed
 string value and the ending position one past the trailing
 whitespace.
 
+
 ~~~nim
 func getMultilineStr(text: string; start: Natural): ValuePosSiOr
 ~~~
@@ -529,18 +598,23 @@ func getMultilineStr(text: string; start: Natural): ValuePosSiOr
 
 Match one or more spaces or tabs starting at the given position.
 
+
 ~~~nim
 proc matchTabSpace2(line: string; start: Natural = 0): Option[Matches]
 ~~~
 
 # getString
 
-Return a literal string value and position after it. The start parameter is the index of the first quote in the statement and the return position is after the optional trailing white space following the last quote.
+Return a literal string value and position after it. The start
+parameter is the index of the first quote in the statement and
+the return position is after the optional trailing white space
+following the last quote.
 
 ~~~javascript
 var = "hello" # asdf
       ^       ^
 ~~~
+
 
 ~~~nim
 func getString(str: string; start: Natural): ValuePosSiOr
@@ -548,7 +622,10 @@ func getString(str: string; start: Natural): ValuePosSiOr
 
 # getNumber
 
-Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
+Return the literal number value and position after it.  The start
+index points at a digit or minus sign. The position includes the
+trailing whitespace.
+
 
 ~~~nim
 func getNumber(statement: Statement; start: Natural): ValuePosSiOr
@@ -556,7 +633,10 @@ func getNumber(statement: Statement; start: Natural): ValuePosSiOr
 
 # skipArgument
 
-Skip past the argument.  startPos points at the first character of a function argument.  Return the first non-whitespace character after the argument or a message when there is a problem.
+Skip past the argument.  startPos points at the first character
+of a function argument.  Return the first non-whitespace
+character after the argument or a message when there is a
+problem.
 ~~~javascript
 a = fn( 1 )
         ^ ^
@@ -565,13 +645,17 @@ a = fn( 1 , 2 )
         ^ ^
 ~~~
 
+
 ~~~nim
 func skipArgument(statement: Statement; startPos: Natural): PosOr
 ~~~
 
 # ifFunctions
 
-Return the if/if0 function's value and position after. It conditionally runs one of its arguments and skips the other. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
+Return the if/if0 function's value and position after. It
+conditionally runs one of its arguments and skips the
+other. Start points at the first argument of the function. The
+position includes the trailing whitespace after the ending ).
 
 This handles the three parameter form with an assignment.
 
@@ -582,6 +666,7 @@ a = if(cond, then)
        ^          ^
 ~~~
 
+
 ~~~nim
 proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
                  statement: Statement; start: Natural; variables: Variables;
@@ -591,7 +676,8 @@ proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
 
 # bareIfAndIf0
 
-Handle the bare if/if0. Return the resulting value and the position in the statement after the if.
+Handle the bare if/if0. Return the resulting value and the
+position in the statement after the if.
 
 ~~~javascript
 if(cond, return("stop"))
@@ -599,6 +685,7 @@ if(cond, return("stop"))
 if(c, warn("c is true"))
    ^                    ^
 ~~~
+
 
 ~~~nim
 proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
@@ -608,7 +695,12 @@ proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
 
 # andOrFunctions
 
-Return the and/or function's value and the position after. The and function stops on the first false. The or function stops on the first true. The rest of the arguments are skipped. Start points at the first parameter of the function. The position includes the trailing whitespace after the ending ).
+Return the and/or function's value and the position after. The and
+function stops on the first false. The or function stops on the
+first true. The rest of the arguments are skipped.
+Start points at the first parameter of the function. The position
+includes the trailing whitespace after the ending ).
+
 
 ~~~nim
 proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
@@ -619,13 +711,16 @@ proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
 
 # getArguments
 
-Get the function arguments and the position of each. If an argument has a side effect, the return value and pos and side effect is returned, else a 0 value and seNone is returned.
+Get the function arguments and the position of each. If an
+argument has a side effect, the return value and pos and side
+effect is returned, else a 0 value and seNone is returned.
 ~~~javascript
 newList = listLoop(list, callback, state)  # comment
                    ^                       ^
 newList = listLoop(return(3), callback, state)  # comment
                           ^ ^
 ~~~
+
 
 ~~~nim
 proc getArguments(env: var Env; statement: Statement; start: Natural;
@@ -636,7 +731,9 @@ proc getArguments(env: var Env; statement: Statement; start: Natural;
 
 # getFunctionValuePosSi
 
-Return the function's value and the position after it. Start points at the first argument of the function. The position includes the trailing whitespace after the ending ).
+Return the function's value and the position after it. Start points at the
+first argument of the function. The position includes the trailing
+whitespace after the ending ).
 
 ~~~javascript
 a = get(b, 2, c) # condition
@@ -644,6 +741,7 @@ a = get(b, 2, c) # condition
 a = get(b, len("hi"), c)
                ^    ^
 ~~~
+
 
 ~~~nim
 proc getFunctionValuePosSi(env: var Env; functionName: string;
@@ -657,6 +755,7 @@ proc getFunctionValuePosSi(env: var Env; functionName: string;
 
 Evaluate the bool expression and return a bool value.
 
+
 ~~~nim
 func runBoolOp(left: Value; op: string; right: Value): Value
 ~~~
@@ -665,18 +764,23 @@ func runBoolOp(left: Value; op: string; right: Value): Value
 
 Evaluate the comparison and return a bool value.
 
+
 ~~~nim
 func runCompareOp(left: Value; op: string; right: Value): Value
 ~~~
 
 # getCondition
 
-Return the bool value of the condition expression and the position after it.  The start index points at the ( left parentheses. The position includes the trailing whitespace after the ending ).
+Return the bool value of the condition expression and the
+position after it.  The start index points at the ( left
+parentheses. The position includes the trailing whitespace after
+the ending ).
 
 ~~~javascript
 a = (5 < 3) # condition
     ^       ^
 ~~~
+
 
 ~~~nim
 proc getCondition(env: var Env; statement: Statement; start: Natural;
@@ -686,7 +790,8 @@ proc getCondition(env: var Env; statement: Statement; start: Natural;
 
 # getBracketedVarValue
 
-Return the value of the bracketed variable and the position after the trailing whitespace.. Start points at the the first argument.
+Return the value of the bracketed variable and the position after
+the trailing whitespace.. Start points at the the first argument.
 
 ~~~javascript
 a = list[ 4 ]
@@ -694,6 +799,7 @@ a = list[ 4 ]
 a = dict[ "abc" ]
           ^      ^
 ~~~
+
 
 ~~~nim
 proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
@@ -703,7 +809,10 @@ proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
 
 # listLoop
 
-Make a new list from an existing list. The callback function is called for each item in the list and determines what goes in the new list.  See funList_lpoal in functions.nim for more information.
+Make a new list from an existing list. The callback function is
+called for each item in the list and determines what goes in the
+new list.  See funList_lpoal in functions.nim for more
+information.
 
 Return the listLoop value and the ending position.  Start
 points at the first parameter of the function. The position
@@ -715,6 +824,7 @@ stopped = listLoop(list, new, callback, state)
                    ^                          ^
 ~~~
 
+
 ~~~nim
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
               statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
@@ -723,7 +833,14 @@ proc listLoop(env: var Env; specialFunction: SpecialFunction;
 
 # getValuePosSi
 
-Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.  The position returned includes the trailing whitespace after the item. The ending position is pointing at the end of the statement, or at the first non-whitespace character after the argument. A true topLevel parameter means the item pointed to by start is the first item after the equal sign (not an argument).
+Return the value and position of the item that the start
+parameter points at which is a string, number, variable, list, or
+condition.  The position returned includes the trailing
+whitespace after the item. The ending position is pointing at the
+end of the statement, or at the first non-whitespace character
+after the argument. A true topLevel parameter means the item
+pointed to by start is the first item after the equal sign (not
+an argument).
 
 ~~~javascript
 a = "tea" # string
@@ -734,6 +851,7 @@ a = if( bool(len(b)), d, e) # if
         ^             ^
 ~~~
 
+
 ~~~nim
 proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
                    variables: Variables; topLevel = false): ValuePosSiOr {.
@@ -742,7 +860,8 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 
 # runBareFunction
 
-Handle bare function: if, if0, return, warn, log and listLoop. A bare function does not assign a variable.
+Handle bare function: if, if0, return, warn, log and listLoop. A
+bare function does not assign a variable.
 
 ~~~javascript
 if( true, warn("tea time")) # test
@@ -750,6 +869,7 @@ if( true, warn("tea time")) # test
 return(5)
 ^        ^
 ~~~
+
 
 ~~~nim
 proc runBareFunction(env: var Env; statement: Statement; start: Natural;
@@ -771,6 +891,7 @@ name["hello"] = 20
 ^             ^
 ~~~
 
+
 ~~~nim
 proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
                        variables: Variables; leftName: DotName): ValuePosSiOr {.
@@ -779,7 +900,9 @@ proc getBracketDotName(env: var Env; statement: Statement; start: Natural;
 
 # runStatement
 
-Run one statement and return the variable dot name string, operator and value.
+Run one statement and return the variable dot name string,
+operator and value.
+
 
 ~~~nim
 proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr {.
@@ -790,6 +913,7 @@ proc runStatement(env: var Env; statement: Statement; variables: Variables): Var
 
 Skip the leading spaces and tabs.
 
+
 ~~~nim
 proc skipSpaces(text: string): Natural {.raises: [KeyError], tags: [].}
 ~~~
@@ -797,6 +921,7 @@ proc skipSpaces(text: string): Natural {.raises: [KeyError], tags: [].}
 # callUserFunction
 
 Run the given user function.
+
 
 ~~~nim
 proc callUserFunction(env: var Env; funcVar: Value; variables: Variables;
@@ -807,7 +932,9 @@ proc callUserFunction(env: var Env; funcVar: Value; variables: Variables;
 
 # runStatementAssignVar
 
-Run a statement and assign the variable if appropriate. Return skip, stop or continue to control the loop.
+Run a statement and assign the variable if appropriate. Return
+skip, stop or continue to control the loop.
+
 
 ~~~nim
 proc runStatementAssignVar(env: var Env; statement: Statement;
@@ -826,6 +953,7 @@ cmp = func(numStr1: string, numStr2: string) int
            ^
 ~~~
 
+
 ~~~nim
 proc parseSignature(dotName: string; signature: string; start: Natural): SignatureOr {.
     raises: [KeyError], tags: [].}
@@ -833,7 +961,11 @@ proc parseSignature(dotName: string; signature: string; start: Natural): Signatu
 
 # isFunctionDefinition
 
-If the statement is the first line of a function definition, return true and fill in the return parameters.  Return quickly when not a function definition. The retPos points at the first non-whitespace after the "func(".
+If the statement is the first line of a function definition,
+return true and fill in the return parameters.  Return quickly
+when not a function definition. The retPos points at the first
+non-whitespace after the "func(".
+
 
 ~~~nim
 proc isFunctionDefinition(statement: Statement; retLeftName: var string;
@@ -843,7 +975,11 @@ proc isFunctionDefinition(statement: Statement; retLeftName: var string;
 
 # defineUserFunctionAssignVar
 
-If the statement starts a function definition, define it and assign the variable. A true return value means the statement(s) were processed and maybe errors output. A false means the statement should be processed as a regular statement.
+If the statement starts a function definition, define it and
+assign the variable. A true return value means the statement(s)
+were processed and maybe errors output. A false means the
+statement should be processed as a regular statement.
+
 
 ~~~nim
 proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
@@ -857,6 +993,7 @@ proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
 
 Run a command and fill in the variables dictionaries.
 
+
 ~~~nim
 proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
@@ -867,6 +1004,7 @@ proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): Loo
 
 Run the code file and fill in the variables.
 
+
 ~~~nim
 proc runCodeFile(env: var Env; variables: var Variables; filename: string) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError],
@@ -876,6 +1014,7 @@ proc runCodeFile(env: var Env; variables: var Variables; filename: string) {.
 # runCodeFiles
 
 Run each code file and populate the variables.
+
 
 ~~~nim
 proc runCodeFiles(env: var Env; variables: var Variables; codeList: seq[string]) {.

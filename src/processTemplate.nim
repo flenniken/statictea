@@ -19,12 +19,12 @@ import opresult
 proc collectCommand*(env: var Env, lb: var LineBuffer,
       prepostTable: PrepostTable, extraLine: var ExtraLine): CmdLines =
   ## Read template lines and write out non-command lines. When a
-  ## @:nextline, block or replace command is found, return its lines.
-  ## @:This includes the command line and its continue lines.
-  ## @:
-  ## @:On input extraLine is the first line to use.  On exit extraLine
-  ## @:is the line that caused the collection to stop which is commonly
-  ## @:the first replacement block line.
+  ## nextline, block or replace command is found, return its lines.
+  ## This includes the command line and its continue lines.
+  ## 
+  ## On input extraLine is the first line to use.  On exit extraLine
+  ## is the line that caused the collection to stop which is commonly
+  ## the first replacement block line.
 
   assert extraLine.kind != elkOutOfLines
 

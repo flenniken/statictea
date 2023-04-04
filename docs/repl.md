@@ -1,28 +1,32 @@
 # repl.nim
 
-Run commands at a prompt. Run evaluate print loop (REPL).
+Run commands at a prompt.
+Run evaluate print loop (REPL).
+
 
 * [repl.nim](../src/repl.nim) &mdash; Nim source code.
 # Index
 
 * type: [ReplCommand](#replcommand) &mdash; The REPL commands.
 * [listInColumns](#listincolumns) &mdash; Generate a string of names in columns.
-* [stringToReplCommand](#stringtoreplcommand) &mdash; 
+* [stringToReplCommand](#stringtoreplcommand) &mdash; Use the wrap column for the max unless the terminal width is less.
 * [handleReplLine](#handlereplline) &mdash; Handle the REPL line.
 * [runEvaluatePrintLoop](#runevaluateprintloop) &mdash; Run commands at a prompt.
 
 # ReplCommand
 
 The REPL commands.
-* not_cmd -- not a REPL command
-* h_cmd -- display help
-* p_cmd -- print variable
-* pd_cmd -- print dictionary
-* pf_cmd -- print f or function
-* plc_cmd -- print list in columns
-* plv_cmd -- print list one per line
-* v_cmd -- print number of variables in the one letter dictionaries
-* q_cmd -- quit (or Ctrl-d)
+
+* not_cmd — not a REPL command
+* h_cmd — display help
+* p_cmd — print variable
+* pd_cmd — print dictionary
+* pf_cmd — print f or function
+* plc_cmd — print list in columns
+* plv_cmd — print list one per line
+* v_cmd — print number of variables in the one letter dictionaries
+* q_cmd — quit (or Ctrl-d)
+
 
 ~~~nim
 ReplCommand = enum
@@ -31,7 +35,10 @@ ReplCommand = enum
 
 # listInColumns
 
-Generate a string of names in columns.  Width is the width of a row. The names are left justified and the columns are separated by 2 spaces.
+Generate a string of names in columns.  Width is the width of a
+row. The names are left justified and the columns are separated
+by 2 spaces.
+
 
 ~~~nim
 proc listInColumns(names: seq[string]; width: Natural): string
@@ -39,6 +46,7 @@ proc listInColumns(names: seq[string]; width: Natural): string
 
 # stringToReplCommand
 
+Use the wrap column for the max unless the terminal width is less.
 
 
 ~~~nim
@@ -49,6 +57,7 @@ func stringToReplCommand(str: string): ReplCommand
 
 Handle the REPL line. Return true to end the loop.
 
+
 ~~~nim
 proc handleReplLine(env: var Env; variables: var Variables; line: string): bool {.
     raises: [KeyError, IOError, OSError, ValueError, Exception],
@@ -58,6 +67,7 @@ proc handleReplLine(env: var Env; variables: var Variables; line: string): bool 
 # runEvaluatePrintLoop
 
 Run commands at a prompt.
+
 
 ~~~nim
 proc runEvaluatePrintLoop(env: var Env; args: Args) {.

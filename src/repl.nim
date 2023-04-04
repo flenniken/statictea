@@ -27,15 +27,16 @@ const
 type
   ReplCommand* = enum
     ## The REPL commands.
-    ## @:* not_cmd -- not a REPL command
-    ## @:* h_cmd -- display help
-    ## @:* p_cmd -- print variable
-    ## @:* pd_cmd -- print dictionary
-    ## @:* pf_cmd -- print f or function
-    ## @:* plc_cmd -- print list in columns
-    ## @:* plv_cmd -- print list one per line
-    ## @:* v_cmd -- print number of variables in the one letter dictionaries
-    ## @:* q_cmd -- quit (or Ctrl-d)
+    ##
+    ## * not_cmd — not a REPL command
+    ## * h_cmd — display help
+    ## * p_cmd — print variable
+    ## * pd_cmd — print dictionary
+    ## * pf_cmd — print f or function
+    ## * plc_cmd — print list in columns
+    ## * plv_cmd — print list one per line
+    ## * v_cmd — print number of variables in the one letter dictionaries
+    ## * q_cmd — quit (or Ctrl-d)
     not_cmd
     h_cmd
     p_cmd
@@ -84,7 +85,7 @@ proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
 # fgBlack, fgRed, fgGreen
 # fgYellow, fgBlue, fgMagenta
 # fgCyan, fgWhite
-# fgDefault -- default terminal foreground color
+# fgDefault — default terminal foreground color
 
 proc echoColorFragments(codeString: string, fragments: seq[Fragment]) =
   ## Write the fragment to standard out with the fragments colored.

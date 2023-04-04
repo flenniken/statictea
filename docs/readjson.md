@@ -2,14 +2,18 @@
 
 Read json content.
 
+
 * [readjson.nim](../src/readjson.nim) &mdash; Nim source code.
 # Index
 
 * const: [maxDepth](#maxdepth) &mdash; The maximum depth you can nest items.
 * [jsonToValue](#jsontovalue) &mdash; Convert a Nim json node to a statictea value.
-* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the parsed data in a value object or return a warning.
-* [readJsonString](#readjsonstring) &mdash; Read a json string and return the parsed data in a value object or return a warning.
-* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the parsed data in a value object or return a warning.
+* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the parsed data in a value object
+or return a warning.
+* [readJsonString](#readjsonstring) &mdash; Read a json string and return the parsed data in a value object
+or return a warning.
+* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the parsed data in a value object or
+return a warning.
 * [unescapePopularChar](#unescapepopularchar) &mdash; Unescape the popular char and return its value.
 * [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
 
@@ -17,13 +21,16 @@ Read json content.
 
 The maximum depth you can nest items.
 
+
 ~~~nim
 maxDepth = 16
 ~~~
 
 # jsonToValue
 
-Convert a Nim json node to a statictea value. The mutable variable determines whether lists and dictionaries are mutable.
+Convert a Nim json node to a statictea value. The mutable
+variable determines whether lists and dictionaries are mutable.
+
 
 ~~~nim
 func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable): ValueOr
@@ -31,7 +38,10 @@ func jsonToValue(jsonNode: JsonNode; depth: int = 0; mutable = Mutable.immutable
 
 # readJsonStream
 
-Read a json stream and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
+Read a json stream and return the parsed data in a value object
+or return a warning. The mutable variable determines whether
+lists and dictionaries are mutable.
+
 
 ~~~nim
 func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
@@ -40,7 +50,10 @@ func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
 
 # readJsonString
 
-Read a json string and return the parsed data in a value object or return a warning. The mutable variable determines whether lists and dictionaries are mutable.
+Read a json string and return the parsed data in a value object
+or return a warning. The mutable variable determines whether
+lists and dictionaries are mutable.
+
 
 ~~~nim
 func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
@@ -49,7 +62,10 @@ func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
 
 # readJsonFile
 
-Read a json file and return the parsed data in a value object or return a warning. A warning is returned when the root object is not a dictionary.
+Read a json file and return the parsed data in a value object or
+return a warning. A warning is returned when the root object is
+not a dictionary.
+
 
 ~~~nim
 proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr {.
@@ -62,13 +78,13 @@ proc readJsonFile(filename: string; mutable = Mutable.immutable): ValueOr {.
 Unescape the popular char and return its value. If the char is
 not a popular char, return 0.
 
- Popular characters and their escape values:
+Popular characters and their escape values:
 
 ~~~
 |char      | name           | unicode|
 |----------|----------------|--------|
 |"         | quotation mark | U+0022 |
-|\         | reverse solidus| U+005C |
+|\\        | reverse solidus| U+005C |
 |/         | solidus        | U+002F |
 |b         | backspace      | U+0008 |
 |f         | form feed      | U+000C |
@@ -76,6 +92,7 @@ not a popular char, return 0.
 |r         | carriage return| U+000D |
 |t         | tab            | U+0009 |
 ~~~
+
 
 ~~~nim
 func unescapePopularChar(popular: char): char
@@ -89,10 +106,11 @@ and the ending position after the trailing quote. On
 failure, the ending position points at the invalid character and
 the message id tells what went wrong.
 
-~~~
+~~~javascript
 a = "test string"  # test
      ^           ^
 ~~~
+
 
 ~~~nim
 func parseJsonStr(text: string; startPos: Natural): ValuePosSiOr

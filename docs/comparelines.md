@@ -2,6 +2,7 @@
 
 Compare lines of text.
 
+
 * [comparelines.nim](../src/comparelines.nim) &mdash; Nim source code.
 # Index
 
@@ -10,12 +11,14 @@ Compare lines of text.
 * [opMessageStr](#opmessagestr) &mdash; Return an OpResultStr with a message why the value cannot be returned.
 * [splitNewLines](#splitnewlines) &mdash; Split lines and keep the line endings.
 * [linesSideBySide](#linessidebyside) &mdash; Show the two sets of lines side by side (above and below).
-* [testLinesSideBySide](#testlinessidebyside) &mdash; If the two strings are equal, return true, else show the differences and return false.
+* [testLinesSideBySide](#testlinessidebyside) &mdash; If the two strings are equal, return true, else show the
+differences and return false.
 * [compareFiles](#comparefiles) &mdash; Compare two files and return the differences.
 
 # OpResultStr
 
 On success return T, otherwise return a message telling what went wrong.
+
 
 ~~~nim
 OpResultStr[T] = OpResult[T, string]
@@ -25,6 +28,7 @@ OpResultStr[T] = OpResult[T, string]
 
 Return an OpResultStr with a value.
 
+
 ~~~nim
 func opValueStr[T](value: T): OpResultStr[T]
 ~~~
@@ -33,13 +37,16 @@ func opValueStr[T](value: T): OpResultStr[T]
 
 Return an OpResultStr with a message why the value cannot be returned.
 
+
 ~~~nim
 func opMessageStr[T](message: string): OpResultStr[T]
 ~~~
 
 # splitNewLines
 
-Split lines and keep the line endings. Works with n and rn type endings. keyword: splitLines
+Split lines and keep the line endings. Works with \n and \r\n
+type endings. keyword: splitLines
+
 
 ~~~nim
 func splitNewLines(content: string): seq[string]
@@ -49,6 +56,7 @@ func splitNewLines(content: string): seq[string]
 
 Show the two sets of lines side by side (above and below).
 
+
 ~~~nim
 proc linesSideBySide(gotContent: string; expectedContent: string;
                      spacesToo = false): string {.raises: [ValueError], tags: [].}
@@ -56,7 +64,9 @@ proc linesSideBySide(gotContent: string; expectedContent: string;
 
 # testLinesSideBySide
 
-If the two strings are equal, return true, else show the differences and return false.
+If the two strings are equal, return true, else show the
+differences and return false.
+
 
 ~~~nim
 proc testLinesSideBySide(got: string; expected: string): bool {.
@@ -65,7 +75,9 @@ proc testLinesSideBySide(got: string; expected: string): bool {.
 
 # compareFiles
 
-Compare two files and return the differences. When they are equal return "".
+Compare two files and return the differences. When they are equal
+return "".
+
 
 ~~~nim
 proc compareFiles(gotFilename: string; expectedFilename: string): OpResultStr[

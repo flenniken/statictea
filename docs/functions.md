@@ -1,6 +1,9 @@
 # functions.nim
 
-StaticTea functions and supporting types. The StaticTea language functions start with "<a class="reference external" href="#fun">fun</a>", for example, the "fun_cmp_ffi" function implements the "cmp" function for floats.
+StaticTea functions and supporting types. The StaticTea language
+functions start with "fun_", for example, the "fun_cmp_ffi"
+function implements the "cmp" function for floats.
+
 
 * [functions.nim](../src/functions.nim) &mdash; Nim source code.
 # Index
@@ -15,7 +18,8 @@ StaticTea functions and supporting types. The StaticTea language functions start
 * [functionDetails](#functiondetails) &mdash; Convert the function spec to a dictionary value.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [parseNumber](#parsenumber) &mdash; Return the literal number value and position after it.
-* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with their values.
+* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with
+their values.
 * [fun_cmp_iii](#fun_cmp_iii) &mdash; Compare two ints.
 * [fun_cmp_ffi](#fun_cmp_ffi) &mdash; Compare two floats.
 * [fun_cmp_ssobi](#fun_cmp_ssobi) &mdash; Compare two strings.
@@ -107,14 +111,18 @@ syntax highlighting.
 * [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
-* [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
-* [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
+* [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a
+list of arguments, return the one that best matches the
+arguments.
+* [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like:
+"cmp" and "ffi".
 * [makeFuncDictionary](#makefuncdictionary) &mdash; Create the f dictionary from the built in functions.
 * [funcsVarDict](#funcsvardict) &mdash; The f dictionary of built-in functions.
 
 # StringOr
 
 StringOr holds a string or a warning.
+
 
 ~~~nim
 StringOr = OpResultWarn[string]
@@ -123,6 +131,7 @@ StringOr = OpResultWarn[string]
 # PathComponents
 
 PathComponents holds the components of the file path components.
+
 
 ~~~nim
 PathComponents = object
@@ -136,6 +145,7 @@ PathComponents = object
 
 Create a new StringOr object containing a warning.
 
+
 ~~~nim
 func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 ~~~
@@ -143,6 +153,7 @@ func newStringOr(warning: MessageId; p1: string = ""; pos = 0): StringOr
 # newStringOr
 
 Create a new StringOr object containing a warning.
+
 
 ~~~nim
 func newStringOr(warningData: WarningData): StringOr
@@ -152,6 +163,7 @@ func newStringOr(warningData: WarningData): StringOr
 
 Create a new StringOr object containing a string.
 
+
 ~~~nim
 func newStringOr(str: string): StringOr
 ~~~
@@ -159,6 +171,7 @@ func newStringOr(str: string): StringOr
 # newPathComponents
 
 Create a new PathComponents object from its pieces.
+
 
 ~~~nim
 func newPathComponents(dir, filename, basename, ext: string): PathComponents
@@ -168,6 +181,7 @@ func newPathComponents(dir, filename, basename, ext: string): PathComponents
 
 Convert the signature object to a dictionary value.
 
+
 ~~~nim
 func signatureDetails(signature: Signature): Value
 ~~~
@@ -176,13 +190,17 @@ func signatureDetails(signature: Signature): Value
 
 Convert the function spec to a dictionary value.
 
+
 ~~~nim
 func functionDetails(fs: FunctionSpec): Value
 ~~~
 
 # cmpBaseValues
 
-Compares two values a and b.  When a equals b return 0, when a is greater than b return 1 and when a is less than b return -1. The values must be the same kind and either int, float or string.
+Compares two values a and b.  When a equals b return 0, when a is
+greater than b return 1 and when a is less than b return -1.
+The values must be the same kind and either int, float or string.
+
 
 ~~~nim
 func cmpBaseValues(a, b: Value; insensitive: bool = false): int
@@ -190,7 +208,10 @@ func cmpBaseValues(a, b: Value; insensitive: bool = false): int
 
 # parseNumber
 
-Return the literal number value and position after it.  The start index points at a digit or minus sign. The position includes the trailing whitespace.
+Return the literal number value and position after it.  The start
+index points at a digit or minus sign. The position includes the
+trailing whitespace.
+
 
 ~~~nim
 func parseNumber(line: string; start: Natural): ValuePosSiOr
@@ -198,7 +219,9 @@ func parseNumber(line: string; start: Natural): ValuePosSiOr
 
 # formatString
 
-Format a string by filling in the variable placeholders with their values. Generate a warning when the variable doesn't exist. No space around the bracketed variables.
+Format a string by filling in the variable placeholders with
+their values. Generate a warning when the variable doesn't
+exist. No space around the bracketed variables.
 
 ~~~javascript
 let first = "Earl"
@@ -211,6 +234,7 @@ To enter a left bracket use two in a row.
 ~~~javascript
 "{{" => "{"
 ~~~
+
 
 ~~~nim
 proc formatString(variables: Variables; text: string): StringOr {.
@@ -234,6 +258,7 @@ cmp(8, 8) => 0
 cmp(9, 2) => 1
 ~~~
 
+
 ~~~nim
 func fun_cmp_iii(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -255,6 +280,7 @@ cmp(7.8, 9.1) => -1
 cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
 ~~~
+
 
 ~~~nim
 func fun_cmp_ffi(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -283,6 +309,7 @@ cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
 ~~~
 
+
 ~~~nim
 func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -303,6 +330,7 @@ concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
 ~~~
 
+
 ~~~nim
 func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -322,6 +350,7 @@ Examples:
 len("tea") => 3
 len("añyóng") => 6
 ~~~
+
 
 ~~~nim
 func fun_len_si(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -344,6 +373,7 @@ len(list(1)) => 1
 len(list(4, 5)) => 2
 ~~~
 
+
 ~~~nim
 func fun_len_li(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -364,6 +394,7 @@ len(dict()) => 0
 len(dict("a", 4)) => 1
 len(dict("a", 4, "b", 3)) => 2
 ~~~
+
 
 ~~~nim
 func fun_len_di(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -402,6 +433,7 @@ You can also use bracket notation to access list items.
 a = teas[0]
 ~~~
 
+
 ~~~nim
 func fun_get_lioaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -434,6 +466,7 @@ d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 ~~~
 
+
 ~~~nim
 func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -448,13 +481,13 @@ length is 0.
 
 The condition types and what is considered 0:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always 0
+* bool — false
+* int — 0
+* float — 0.0
+* string — when the length of the string is 0
+* list — when the length of the list is 0
+* dict — when the length of the dictionary is 0
+* func — always 0
 
 The IF functions are special in a couple of ways, see
 the If Functions section.
@@ -488,6 +521,7 @@ The if takes two arguments when there is no assignment.
 ~~~javascript
 if0(c, warn("got zero value"))
 ~~~
+
 
 ~~~nim
 func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
@@ -525,6 +559,7 @@ if(c, warn("c is true"))
 if(c, return("skip"))
 ~~~
 
+
 ~~~nim
 func fun_if_baoaa(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
@@ -545,6 +580,7 @@ add(3, -2) => 1
 add(-2, -5) => -7
 ~~~
 
+
 ~~~nim
 func fun_add_iii(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -564,6 +600,7 @@ Examples:
 add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
 ~~~
+
 
 ~~~nim
 func fun_add_fff(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -586,6 +623,7 @@ add(3, -2) => 5
 add(1, 5) => -4
 ~~~
 
+
 ~~~nim
 func fun_sub_iii(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -605,6 +643,7 @@ Examples:
 sub(4.5, 2.3) => 2.2
 sub(1.0, 2.2) => -1.2
 ~~~
+
 
 ~~~nim
 func fun_sub_fff(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -627,6 +666,7 @@ d = dict("tea", "Earl")
 exists(d, "tea") => true
 exists(d, "coffee") => false
 ~~~
+
 
 ~~~nim
 func fun_exists_dsb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -664,6 +704,7 @@ case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
 ~~~
 
+
 ~~~nim
 func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -699,6 +740,7 @@ case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
 ~~~
 
+
 ~~~nim
 func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -707,6 +749,7 @@ func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
 # parseVersion
 
 Parse a StaticTea version number and return its three components.
+
 
 ~~~nim
 func parseVersion(version: string): Option[(int, int, int)]
@@ -721,7 +764,7 @@ equal and 1 for greater than.
 cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
-StaticTea uses [[https://semver.org/][Semantic Versioning]]
+StaticTea uses Semantic Versioning [https://semver.org/](https://semver.org/)
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -732,6 +775,7 @@ cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
+
 
 ~~~nim
 func fun_cmpVersion_ssi(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -752,6 +796,7 @@ Examples:
 float(2) => 2.0
 float(-33) => -33.0
 ~~~
+
 
 ~~~nim
 func fun_float_if(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -774,6 +819,7 @@ float("2.4") => 2.4
 float("33") => 33.0
 ~~~
 
+
 ~~~nim
 func fun_float_sf(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -794,6 +840,7 @@ Examples:
 float("2") => 2.0
 float("notnum", "nan") => nan
 ~~~
+
 
 ~~~nim
 func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -831,6 +878,7 @@ int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
 ~~~
 
+
 ~~~nim
 func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -867,6 +915,7 @@ int("6.3456", "truncate") => 6
 int("-6.3456", "truncate") => -6
 ~~~
 
+
 ~~~nim
 func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -895,6 +944,7 @@ int("2", "round", "nan") => 2
 int("notnum", "round", "nan") => nan
 ~~~
 
+
 ~~~nim
 func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -903,6 +953,7 @@ func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
 # if0Condition
 
 Convert the value to a boolean.
+
 
 ~~~nim
 func if0Condition(cond: Value): bool
@@ -918,13 +969,13 @@ bool = func(value: Value) bool
 
 False values by variable types:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always false
+* bool — false
+* int — 0
+* float — 0.0
+* string — when the length of the string is 0
+* list — when the length of the list is 0
+* dict — when the length of the dictionary is 0
+* func — always false
 
 Examples:
 
@@ -941,6 +992,7 @@ bool([8]) => true
 bool("tea") => true
 bool(dict("tea", 2)) => true
 ~~~
+
 
 ~~~nim
 func fun_bool_ab(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -971,6 +1023,7 @@ find(msg, "party", len(msg)) = 17
 find(msg, "party", 0) = 0
 ~~~
 
+
 ~~~nim
 func fun_find_ssoaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -997,6 +1050,7 @@ slice("Earl Grey", 6) => "rey"
 slice("añyóng", 0, 3) => "añy"
 ~~~
 
+
 ~~~nim
 func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1021,6 +1075,7 @@ dup("abc", 2) => "abcabc"
 dup("", 3) => ""
 ~~~
 
+
 ~~~nim
 func fun_dup_sis(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1043,6 +1098,7 @@ dict(["a", 5]) => {"a": 5}
 dict(["a", 5, "b", 33, "c", 0]) =>
   {"a": 5, "b": 33, "c": 0}
 ~~~
+
 
 ~~~nim
 func fun_dict_old(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1069,6 +1125,7 @@ a = [1]
 a = [1, 2, 3]
 a = ["a", 5, "b"]
 ~~~
+
 
 ~~~nim
 func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
@@ -1116,6 +1173,7 @@ b5 = func(ix: int, value: int, container: list) bool
   container &= if( (value > 5), value)
   return(false)
 ~~~
+
 
 ~~~nim
 func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
@@ -1181,6 +1239,7 @@ replace("", 0, 0, "abc") => abc
 replace("", 0, 0, "abcd") => abcd
 ~~~
 
+
 ~~~nim
 func fun_replace_siiss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1206,7 +1265,8 @@ replaceRe("abcdefabc", list))
 ~~~
 
 For developing and debugging regular expressions see the
-website: https://regex101.com/
+website: [https://regex101.com/](https://regex101.com/)
+
 
 ~~~nim
 func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1216,6 +1276,7 @@ func fun_replaceRe_sls(variables: Variables; arguments: seq[Value]): FunResult {
 # parsePath
 
 Parse the given file path into its component pieces.
+
 
 ~~~nim
 func parsePath(path: string; separator = '/'): PathComponents
@@ -1244,13 +1305,14 @@ path("src/functions.nim") => {
   "dir": "src/",
 }
 
-path("src\functions.nim", "\") => {
+path("src\\functions.nim", "\\") => {
   "filename": "functions.nim",
   "basename": "functions",
   "ext": ".nim",
-  "dir": "src\",
+  "dir": "src\\",
 }
 ~~~
+
 
 ~~~nim
 func fun_path_sosd(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1273,6 +1335,7 @@ lower("TEA") => "tea"
 lower("TEĀ") => "teā"
 ~~~
 
+
 ~~~nim
 func fun_lower_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1294,6 +1357,7 @@ keys(d) => ["a", "b", "c"]
 values(d) => [1, 2, 3]
 ~~~
 
+
 ~~~nim
 func fun_keys_dl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1314,6 +1378,7 @@ d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
 ~~~
+
 
 ~~~nim
 func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1351,6 +1416,7 @@ sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
 sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
 
+
 ~~~nim
 func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1382,6 +1448,7 @@ listOfLists = list(l1, l2)
 sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
 sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~
+
 
 ~~~nim
 func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1415,6 +1482,7 @@ sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
 sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~
 
+
 ~~~nim
 func fun_sort_lsssl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1432,16 +1500,17 @@ anchors = func(names: list, type: string) list
 
 type:
 
-* html -- HTML class names
-* github -- GitHub markdown anchor links
+* html — HTML class names
+* github — GitHub markdown anchor links
 
 Examples:
 
 ~~~javascript
 list = list("Tea", "Water", "Tea")
-anchores(list, "github") =>
+anchors(list, "github") =>
   ["tea", "water", "tea-1"]
 ~~~
+
 
 ~~~nim
 func fun_anchors_lsl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1469,6 +1538,7 @@ type(true) => "bool"
 type(f.cmp[0]) => "func"
 ~~~
 
+
 ~~~nim
 func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1479,7 +1549,7 @@ func fun_type_as(variables: Variables; arguments: seq[Value]): FunResult {.
 Join the path components with a path separator.
 
 You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either "/", "" or
+parameter you specify the separator to use, either "/", "\" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
@@ -1500,8 +1570,8 @@ joinPath(["images", "tea"]) =>
 joinPath(["images", "tea"], "/") =>
   "images/tea"
 
-joinPath(["images", "tea"], "\") =>
-  "images\tea"
+joinPath(["images", "tea"], "\\") =>
+  "images\\tea"
 
 joinPath(["images/", "tea"]) =>
   "images/tea"
@@ -1512,6 +1582,7 @@ joinPath(["", "tea"]) =>
 joinPath(["/", "tea"]) =>
   "/tea"
 ~~~
+
 
 ~~~nim
 func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1541,6 +1612,7 @@ join(["a", "", "c"], "|") => "a||c"
 join(["a", "", "c"], "|", true) => "a|c"
 ~~~
 
+
 ~~~nim
 func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1567,6 +1639,7 @@ You can warn unconditionally using a bare warn statement:
 warn("always warn")
 ~~~
 
+
 ~~~nim
 func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1592,6 +1665,7 @@ You can log unconditionally using a bare log statement:
 ~~~javascript
 log("always log")
 ~~~
+
 
 ~~~nim
 func fun_log_ss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1632,7 +1706,8 @@ if(c, return("skip"))
 * “stop” – stops processing the command
 * “skip” – skips this replacement block and continues with the next iteration
 
-The following block command repeats 4 times but skips when t.row is 2.
+The following block command repeats 4 times but skips when
+t.row is 2.
 
 ~~~javascript
 $$ block t.repeat = 4
@@ -1646,6 +1721,7 @@ output:
 1
 3
 ~~~
+
 
 ~~~nim
 func fun_return_aa(variables: Variables; arguments: seq[Value]): FunResult
@@ -1664,12 +1740,12 @@ The default stype is "rb" which is used for replacement blocks.
 
 stype:
 
-* json -- returns JSON
+* json — returns JSON
 * rb — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
-* dn -- dot name (dn) returns JSON except dictionary elements
+* dn — dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
-* vl -- vertical list (vl) returns JSON except list elements
+* vl — vertical list (vl) returns JSON except list elements
 are printed one per line as "ix: value".
 
 Examples variables:
@@ -1726,6 +1802,7 @@ a =>
 2: "blue"
 ~~~
 
+
 ~~~nim
 func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
@@ -1750,6 +1827,7 @@ teas.x = 1
 teas.y = "tea"
 teas.z.a = 8
 ~~~
+
 
 ~~~nim
 func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1783,6 +1861,7 @@ str = format("use two {{ to get one")
 str => "use two { to get one"
 ~~~
 
+
 ~~~nim
 func fun_format_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception], tags: [RootEffect].}
@@ -1806,6 +1885,7 @@ mycmp = func(numStr1: string, numStr2: string) int
   num2 = int(numStr2)
   return(cmp(num1, num2))
 ~~~
+
 
 ~~~nim
 func fun_func_sp(variables: Variables; arguments: seq[Value]): FunResult
@@ -1836,12 +1916,13 @@ fd.signature.name = "mycmp"
 fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
-fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
+fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\\n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 ~~~
+
 
 ~~~nim
 func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1867,6 +1948,7 @@ a => true
 b => false
 ~~~
 
+
 ~~~nim
 func fun_startsWith_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -1886,6 +1968,7 @@ Examples:
 not(true) => false
 not(false) => true
 ~~~
+
 
 ~~~nim
 func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1911,6 +1994,7 @@ and(false, false) => false
 and(false, warn("not hit")) => false
 ~~~
 
+
 ~~~nim
 func fun_and_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
@@ -1934,6 +2018,7 @@ or(false, false) => false
 or(true, warn("not hit")) => true
 ~~~
 
+
 ~~~nim
 func fun_or_bbb(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
@@ -1952,6 +2037,7 @@ Examples:
 eq(1, 1) => true
 eq(2, 3) => false
 ~~~
+
 
 ~~~nim
 func fun_eq_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1972,6 +2058,7 @@ Examples:
 eq(1.2, 1.2) => true
 eq(1.2, 3.2) => false
 ~~~
+
 
 ~~~nim
 func fun_eq_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -1994,6 +2081,7 @@ eq("tea", "tea") => true
 eq("1.2", "3.2") => false
 ~~~
 
+
 ~~~nim
 func fun_eq_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2013,6 +2101,7 @@ Examples:
 ne(1, 1) => false
 ne(2, 3) => true
 ~~~
+
 
 ~~~nim
 func fun_ne_iib(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2034,6 +2123,7 @@ ne(1.2, 1.2) => false
 ne(1.2, 3.2) => true
 ~~~
 
+
 ~~~nim
 func fun_ne_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2053,6 +2143,7 @@ Examples:
 ne("tea", "tea") => false
 ne("earl", "grey") => true
 ~~~
+
 
 ~~~nim
 func fun_ne_ssb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2074,6 +2165,7 @@ gt(2, 4) => false
 gt(3, 2) => true
 ~~~
 
+
 ~~~nim
 func fun_gt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2093,6 +2185,7 @@ Examples:
 gt(2.8, 4.3) => false
 gt(3.1, 2.5) => true
 ~~~
+
 
 ~~~nim
 func fun_gt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2114,6 +2207,7 @@ gte(2, 4) => false
 gte(3, 3) => true
 ~~~
 
+
 ~~~nim
 func fun_gte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2133,6 +2227,7 @@ Examples:
 gte(2.8, 4.3) => false
 gte(3.1, 3.1) => true
 ~~~
+
 
 ~~~nim
 func fun_gte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2154,6 +2249,7 @@ gt(2, 4) => true
 gt(3, 2) => false
 ~~~
 
+
 ~~~nim
 func fun_lt_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2173,6 +2269,7 @@ Examples:
 lt(2.8, 4.3) => true
 lt(3.1, 2.5) => false
 ~~~
+
 
 ~~~nim
 func fun_lt_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2195,6 +2292,7 @@ lte(3, 3) => true
 lte(4, 3) => false
 ~~~
 
+
 ~~~nim
 func fun_lte_iib(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2216,6 +2314,7 @@ lte(3.0, 3.0) => true
 lte(4.0, 3.0) => false
 ~~~
 
+
 ~~~nim
 func fun_lte_ffb(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2232,12 +2331,13 @@ readJson = func(json: string) any
 Examples:
 
 ~~~javascript
-a = readJson("\"tea\"") => "tea"
+a = readJson("\\"tea\\"") => "tea"
 b = readJson("4.5") => 4.5
 c = readJson("[1,2,3]") => [1, 2, 3]
-d = readJson("{\"a\":1, \"b\": 2}")
+d = readJson("{\\"a\\":1, \\"b\\": 2}")
   => {"a": 1, "b", 2}
 ~~~
+
 
 ~~~nim
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2256,15 +2356,15 @@ markdownLite = func(mdText: string) list
 
 list elements:
 
-* p -- A paragraph element is one string, possibly containing
+* p — A paragraph element is one string, possibly containing
 newlines.
 
-* code -- A code element is three strings. The first string is
+* code — A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string (with newlines) contains the text of the block.  The third
 string is the ending line, for example “~~~”.
 
-* bullets -- A bullets element contains a string (with newlines)
+* bullets — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
 
@@ -2276,6 +2376,7 @@ elements => [
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
 ]
 ~~~
+
 
 ~~~nim
 func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2293,16 +2394,16 @@ highlight = func(code: string) list
 
 Tags:
 
-* other -- not one of the other types
-* dotName -- a dot name
-* funcCall -- a function call; a dot name followed by a left parenthesis
-* num -- a literal number
-* str -- a literal string
-* multiline -- a multiline literal string
-* doc -- a doc comment
-* comment -- a comment
-* param -- a parameter name
-* type -- int, float, string, list, dict, bool, func, any and optional
+* other — not one of the other types
+* dotName — a dot name
+* funcCall — a function call; a dot name followed by a left parenthesis
+* num — a literal number
+* str — a literal string
+* multiline — a multiline literal string
+* doc — a doc comment
+* comment — a comment
+* param — a parameter name
+* type — int, float, string, list, dict, bool, func, any and optional
 
 Example:
 
@@ -2315,6 +2416,7 @@ frags => [
 ]
 ~~~
 
+
 ~~~nim
 func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2324,6 +2426,7 @@ func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 Excape text for placing in body html.
 
+
 ~~~nim
 proc escapeHtmlBody(text: string): string
 ~~~
@@ -2331,6 +2434,7 @@ proc escapeHtmlBody(text: string): string
 # escapeHtmlAttribute
 
 Excape text for placing in an html attribute.
+
 
 ~~~nim
 proc escapeHtmlAttribute(text: string): string
@@ -2346,16 +2450,17 @@ html = func(text: string, place: string) string
 
 places:
 
-* body -- in the html body
-* attribute -- in an html attribute
+* body — in the html body
+* attribute — in an html attribute
 
 ~~~javascript
 name = html("Mad <Hatter>", "body")
-  => "Mad &lt;Hatter&gt;"
+  => "Mad <Hatter>"
 ~~~
 
 For more information about how to escape and what is safe see:
-[[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]
+[XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
+
 
 ~~~nim
 func fun_html_sss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2366,6 +2471,7 @@ func fun_html_sss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 Maps a built-in function name to a function pointer you can call.
 
+
 ~~~nim
 functionsDict = newTable(32)
 ~~~
@@ -2374,9 +2480,10 @@ functionsDict = newTable(32)
 
 The built-in function information.
 
-* funcName -- the function name in the nim file, e.g.: fun_add_ii
-* docComment -- the function documentation
-* numLines -- the number of function code lines
+* funcName — the function name in the nim file, e.g.: fun_add_ii
+* docComment — the function documentation
+* numLines — the number of function code lines
+
 
 ~~~nim
 BuiltInInfo = object
@@ -2389,13 +2496,17 @@ BuiltInInfo = object
 
 Return a BuiltInInfo object.
 
+
 ~~~nim
 func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo
 ~~~
 
 # getBestFunction
 
-Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
+Given a function variable or a list of function variables and a
+list of arguments, return the one that best matches the
+arguments.
+
 
 ~~~nim
 proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
@@ -2403,7 +2514,9 @@ proc getBestFunction(funcValue: Value; arguments: seq[Value]): ValueOr
 
 # splitFuncName
 
-Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
+Split a funcName like "fun_cmp_ffi" to its name and signature like:
+"cmp" and "ffi".
+
 
 ~~~nim
 func splitFuncName(funcName: string): (string, string)
@@ -2413,6 +2526,7 @@ func splitFuncName(funcName: string): (string, string)
 
 Create the f dictionary from the built in functions.
 
+
 ~~~nim
 proc makeFuncDictionary(): VarsDict {.raises: [ValueError, KeyError, Exception],
                                       tags: [RootEffect].}
@@ -2421,6 +2535,7 @@ proc makeFuncDictionary(): VarsDict {.raises: [ValueError, KeyError, Exception],
 # funcsVarDict
 
 The f dictionary of built-in functions.
+
 
 ~~~nim
 funcsVarDict = makeFuncDictionary()

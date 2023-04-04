@@ -1,16 +1,25 @@
 # parseNumber.nim
 
-Parse an int or float number string.  Return the number and position after the number.
+Parse an int or float number string.  Return the number and
+position after the number.
+
 
 * [parseNumber.nim](../src/parseNumber.nim) &mdash; Nim source code.
 # Index
 
-* [parseFloat](#parsefloat) &mdash; Parse the string and return the 64 bit float number and the position after the number.
-* [parseInteger](#parseinteger) &mdash; Parse the string and return the 64 bit signed integer and the position after the number.
+* [parseFloat](#parsefloat) &mdash; Parse the string and return the 64 bit float number and the
+position after the number.
+* [parseInteger](#parseinteger) &mdash; Parse the string and return the 64 bit signed integer and the
+position after the number.
 
 # parseFloat
 
-Parse the string and return the 64 bit float number and the position after the number. The number starts at the start index. Nothing is returned when the float is out of range or the str is not a float number.  Processing stops at the first non-number character.
+Parse the string and return the 64 bit float number and the
+position after the number. The number starts at the start
+index. Nothing is returned when the float is out of range or the
+str is not a float number.  Processing stops at the first
+non-number character.
+
 
 ~~~nim
 proc parseFloat(str: string; start: Natural = 0): Option[
@@ -19,11 +28,16 @@ proc parseFloat(str: string; start: Natural = 0): Option[
 
 # parseInteger
 
-Parse the string and return the 64 bit signed integer and the position after the number. The number starts at the start index. Parsing stops at the first non-number character.  Nothing is returned when the integer is out of range or the str is not a number.
+Parse the string and return the 64 bit signed integer and the
+position after the number. The number starts at the start
+index. Parsing stops at the first non-number character.  Nothing
+is returned when the integer is out of range or the str is not a
+number.
 
 An integer starts with an optional minus sign, followed by a
 digit, followed by digits or underscores. The underscores are
 skipped.
+
 
 ~~~nim
 proc parseInteger(s: string; start: Natural = 0): Option[

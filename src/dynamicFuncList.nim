@@ -16,6 +16,7 @@ Examples:
 add(1.5, 2.3) => 3.8
 add(3.2, -2.2) => 1.0
 ~~~
+
 """
 
   dc_fun_add_iii = """
@@ -32,6 +33,7 @@ add(1, 2) => 3
 add(3, -2) => 1
 add(-2, -5) => -7
 ~~~
+
 """
 
   dc_fun_anchors_lsl = """
@@ -45,16 +47,17 @@ anchors = func(names: list, type: string) list
 
 type:
 
-* html -- HTML class names
-* github -- GitHub markdown anchor links
+* html — HTML class names
+* github — GitHub markdown anchor links
 
 Examples:
 
 ~~~statictea
 list = list("Tea", "Water", "Tea")
-anchores(list, "github") =>
+anchors(list, "github") =>
   ["tea", "water", "tea-1"]
 ~~~
+
 """
 
   dc_fun_and_bbb = """
@@ -74,6 +77,7 @@ and(true, false) => false
 and(false, false) => false
 and(false, warn("not hit")) => false
 ~~~
+
 """
 
   dc_fun_bool_ab = """
@@ -85,13 +89,13 @@ bool = func(value: Value) bool
 
 False values by variable types:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always false
+* bool — false
+* int — 0
+* float — 0.0
+* string — when the length of the string is 0
+* list — when the length of the list is 0
+* dict — when the length of the dictionary is 0
+* func — always false
 
 Examples:
 
@@ -108,6 +112,7 @@ bool([8]) => true
 bool("tea") => true
 bool(dict("tea", 2)) => true
 ~~~
+
 """
 
   dc_fun_case_iloaa = """
@@ -139,6 +144,7 @@ case(2, cases) => "beer"
 case(2, cases, "wine") => "beer"
 case(3, cases, "wine") => "wine"
 ~~~
+
 """
 
   dc_fun_case_sloaa = """
@@ -169,6 +175,7 @@ case("water", cases) => 2.3
 case("beer", cases) => "cold"
 case("bunch", cases, "other") => "other"
 ~~~
+
 """
 
   dc_fun_cmp_ffi = """
@@ -186,6 +193,7 @@ cmp(7.8, 9.1) => -1
 cmp(8.4, 8.4) => 0
 cmp(9.3, 2.2) => 1
 ~~~
+
 """
 
   dc_fun_cmp_iii = """
@@ -203,6 +211,7 @@ cmp(7, 9) => -1
 cmp(8, 8) => 0
 cmp(9, 2) => 1
 ~~~
+
 """
 
   dc_fun_cmp_ssobi = """
@@ -225,6 +234,7 @@ cmp("Tea", "tea") => 1
 cmp("Tea", "tea", true) => 1
 cmp("Tea", "tea", false) => 0
 ~~~
+
 """
 
   dc_fun_cmpVersion_ssi = """
@@ -235,7 +245,7 @@ equal and 1 for greater than.
 cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
-StaticTea uses [[https://semver.org/][Semantic Versioning]]
+StaticTea uses Semantic Versioning [https://semver.org/](https://semver.org/)
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -246,6 +256,7 @@ cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
+
 """
 
   dc_fun_concat_sss = """
@@ -261,6 +272,7 @@ Examples:
 concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
 ~~~
+
 """
 
   dc_fun_dict_old = """
@@ -279,6 +291,7 @@ dict(["a", 5]) => {"a": 5}
 dict(["a", 5, "b", 33, "c", 0]) =>
   {"a": 5, "b": 33, "c": 0}
 ~~~
+
 """
 
   dc_fun_dup_sis = """
@@ -298,6 +311,7 @@ dup("abc", 1) => "abc"
 dup("abc", 2) => "abcabc"
 dup("", 3) => ""
 ~~~
+
 """
 
   dc_fun_eq_ffb = """
@@ -313,6 +327,7 @@ Examples:
 eq(1.2, 1.2) => true
 eq(1.2, 3.2) => false
 ~~~
+
 """
 
   dc_fun_eq_iib = """
@@ -328,6 +343,7 @@ Examples:
 eq(1, 1) => true
 eq(2, 3) => false
 ~~~
+
 """
 
   dc_fun_eq_ssb = """
@@ -344,6 +360,7 @@ Examples:
 eq("tea", "tea") => true
 eq("1.2", "3.2") => false
 ~~~
+
 """
 
   dc_fun_exists_dsb = """
@@ -361,6 +378,7 @@ d = dict("tea", "Earl")
 exists(d, "tea") => true
 exists(d, "coffee") => false
 ~~~
+
 """
 
   dc_fun_find_ssoaa = """
@@ -385,6 +403,7 @@ find(msg, "party", -1) = -1
 find(msg, "party", len(msg)) = 17
 find(msg, "party", 0) = 0
 ~~~
+
 """
 
   dc_fun_float_if = """
@@ -400,6 +419,7 @@ Examples:
 float(2) => 2.0
 float(-33) => -33.0
 ~~~
+
 """
 
   dc_fun_float_saa = """
@@ -416,6 +436,7 @@ Examples:
 float("2") => 2.0
 float("notnum", "nan") => nan
 ~~~
+
 """
 
   dc_fun_float_sf = """
@@ -432,6 +453,7 @@ float("2") => 2.0
 float("2.4") => 2.4
 float("33") => 33.0
 ~~~
+
 """
 
   dc_fun_format_ss = """
@@ -459,6 +481,7 @@ str = format("use two {{ to get one")
 
 str => "use two { to get one"
 ~~~
+
 """
 
   dc_fun_func_sp = """
@@ -478,6 +501,7 @@ mycmp = func(numStr1: string, numStr2: string) int
   num2 = int(numStr2)
   return(cmp(num1, num2))
 ~~~
+
 """
 
   dc_fun_functionDetails_pd = """
@@ -504,12 +528,13 @@ fd.signature.name = "mycmp"
 fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
-fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
+fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\\n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 ~~~
+
 """
 
   dc_fun_get_dsoaa = """
@@ -537,6 +562,7 @@ Using dot notation:
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 ~~~
+
 """
 
   dc_fun_get_lioaa = """
@@ -569,6 +595,7 @@ You can also use bracket notation to access list items.
 ~~~statictea
 a = teas[0]
 ~~~
+
 """
 
   dc_fun_gt_ffb = """
@@ -584,6 +611,7 @@ Examples:
 gt(2.8, 4.3) => false
 gt(3.1, 2.5) => true
 ~~~
+
 """
 
   dc_fun_gt_iib = """
@@ -599,6 +627,7 @@ Examples:
 gt(2, 4) => false
 gt(3, 2) => true
 ~~~
+
 """
 
   dc_fun_gte_ffb = """
@@ -614,6 +643,7 @@ Examples:
 gte(2.8, 4.3) => false
 gte(3.1, 3.1) => true
 ~~~
+
 """
 
   dc_fun_gte_iib = """
@@ -629,6 +659,7 @@ Examples:
 gte(2, 4) => false
 gte(3, 3) => true
 ~~~
+
 """
 
   dc_fun_highlight_sl = """
@@ -641,16 +672,16 @@ highlight = func(code: string) list
 
 Tags:
 
-* other -- not one of the other types
-* dotName -- a dot name
-* funcCall -- a function call; a dot name followed by a left parenthesis
-* num -- a literal number
-* str -- a literal string
-* multiline -- a multiline literal string
-* doc -- a doc comment
-* comment -- a comment
-* param -- a parameter name
-* type -- int, float, string, list, dict, bool, func, any and optional
+* other — not one of the other types
+* dotName — a dot name
+* funcCall — a function call; a dot name followed by a left parenthesis
+* num — a literal number
+* str — a literal string
+* multiline — a multiline literal string
+* doc — a doc comment
+* comment — a comment
+* param — a parameter name
+* type — int, float, string, list, dict, bool, func, any and optional
 
 Example:
 
@@ -662,6 +693,7 @@ frags => [
   ["num", "5"],
 ]
 ~~~
+
 """
 
   dc_fun_html_sss = """
@@ -673,16 +705,17 @@ html = func(text: string, place: string) string
 
 places:
 
-* body -- in the html body
-* attribute -- in an html attribute
+* body — in the html body
+* attribute — in an html attribute
 
 ~~~statictea
 name = html("Mad <Hatter>", "body")
-  => "Mad &lt;Hatter&gt;"
+  => "Mad <Hatter>"
 ~~~
 
 For more information about how to escape and what is safe see:
-[[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]
+[XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
+
 """
 
   dc_fun_if0_iaoaa = """
@@ -693,13 +726,13 @@ length is 0.
 
 The condition types and what is considered 0:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always 0
+* bool — false
+* int — 0
+* float — 0.0
+* string — when the length of the string is 0
+* list — when the length of the list is 0
+* dict — when the length of the dictionary is 0
+* func — always 0
 
 The IF functions are special in a couple of ways, see
 the If Functions section.
@@ -733,6 +766,7 @@ The if takes two arguments when there is no assignment.
 ~~~statictea
 if0(c, warn("got zero value"))
 ~~~
+
 """
 
   dc_fun_if_baoaa = """
@@ -765,6 +799,7 @@ The if takes two arguments when there is no assignment.
 if(c, warn("c is true"))
 if(c, return("skip"))
 ~~~
+
 """
 
   dc_fun_int_fosi = """
@@ -796,6 +831,7 @@ int(-6.3, "ceiling") => -6
 int(6.3456, "truncate") => 6
 int(-6.3456, "truncate") => -6
 ~~~
+
 """
 
   dc_fun_int_sosi = """
@@ -827,6 +863,7 @@ int("-6.3", "ceiling") => -6
 int("6.3456", "truncate") => 6
 int("-6.3456", "truncate") => -6
 ~~~
+
 """
 
   dc_fun_int_ssaa = """
@@ -850,6 +887,7 @@ Examples:
 int("2", "round", "nan") => 2
 int("notnum", "round", "nan") => nan
 ~~~
+
 """
 
   dc_fun_join_lsois = """
@@ -873,13 +911,14 @@ join(["a", "b"], "") => "ab"
 join(["a", "", "c"], "|") => "a||c"
 join(["a", "", "c"], "|", true) => "a|c"
 ~~~
+
 """
 
   dc_fun_joinPath_loss = """
 Join the path components with a path separator.
 
 You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either "/", "" or
+parameter you specify the separator to use, either "/", "\" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
@@ -900,8 +939,8 @@ joinPath(["images", "tea"]) =>
 joinPath(["images", "tea"], "/") =>
   "images/tea"
 
-joinPath(["images", "tea"], "\") =>
-  "images\tea"
+joinPath(["images", "tea"], "\\") =>
+  "images\\tea"
 
 joinPath(["images/", "tea"]) =>
   "images/tea"
@@ -912,6 +951,7 @@ joinPath(["", "tea"]) =>
 joinPath(["/", "tea"]) =>
   "/tea"
 ~~~
+
 """
 
   dc_fun_keys_dl = """
@@ -928,6 +968,7 @@ d = dict("a", 1, "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => [1, 2, 3]
 ~~~
+
 """
 
   dc_fun_len_di = """
@@ -944,6 +985,7 @@ len(dict()) => 0
 len(dict("a", 4)) => 1
 len(dict("a", 4, "b", 3)) => 2
 ~~~
+
 """
 
   dc_fun_len_li = """
@@ -960,6 +1002,7 @@ len(list()) => 0
 len(list(1)) => 1
 len(list(4, 5)) => 2
 ~~~
+
 """
 
   dc_fun_len_si = """
@@ -975,6 +1018,7 @@ Examples:
 len("tea") => 3
 len("añyóng") => 6
 ~~~
+
 """
 
   dc_fun_list_al = """
@@ -996,6 +1040,7 @@ a = [1]
 a = [1, 2, 3]
 a = ["a", 5, "b"]
 ~~~
+
 """
 
   dc_fun_listLoop_lapoab = """
@@ -1039,6 +1084,7 @@ b5 = func(ix: int, value: int, container: list) bool
   container &= if( (value > 5), value)
   return(false)
 ~~~
+
 """
 
   dc_fun_log_ss = """
@@ -1060,6 +1106,7 @@ You can log unconditionally using a bare log statement:
 ~~~statictea
 log("always log")
 ~~~
+
 """
 
   dc_fun_lower_ss = """
@@ -1076,6 +1123,7 @@ lower("Tea") => "tea"
 lower("TEA") => "tea"
 lower("TEĀ") => "teā"
 ~~~
+
 """
 
   dc_fun_lt_ffb = """
@@ -1091,6 +1139,7 @@ Examples:
 lt(2.8, 4.3) => true
 lt(3.1, 2.5) => false
 ~~~
+
 """
 
   dc_fun_lt_iib = """
@@ -1106,6 +1155,7 @@ Examples:
 gt(2, 4) => true
 gt(3, 2) => false
 ~~~
+
 """
 
   dc_fun_lte_ffb = """
@@ -1122,6 +1172,7 @@ lte(2.3, 4.4) => true
 lte(3.0, 3.0) => true
 lte(4.0, 3.0) => false
 ~~~
+
 """
 
   dc_fun_lte_iib = """
@@ -1138,6 +1189,7 @@ lte(2, 4) => true
 lte(3, 3) => true
 lte(4, 3) => false
 ~~~
+
 """
 
   dc_fun_markdownLite_sl = """
@@ -1151,15 +1203,15 @@ markdownLite = func(mdText: string) list
 
 list elements:
 
-* p -- A paragraph element is one string, possibly containing
+* p — A paragraph element is one string, possibly containing
 newlines.
 
-* code -- A code element is three strings. The first string is
+* code — A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string (with newlines) contains the text of the block.  The third
 string is the ending line, for example “~~~”.
 
-* bullets -- A bullets element contains a string (with newlines)
+* bullets — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
 
@@ -1171,6 +1223,7 @@ elements => [
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
 ]
 ~~~
+
 """
 
   dc_fun_ne_ffb = """
@@ -1186,6 +1239,7 @@ Examples:
 ne(1.2, 1.2) => false
 ne(1.2, 3.2) => true
 ~~~
+
 """
 
   dc_fun_ne_iib = """
@@ -1201,6 +1255,7 @@ Examples:
 ne(1, 1) => false
 ne(2, 3) => true
 ~~~
+
 """
 
   dc_fun_ne_ssb = """
@@ -1216,6 +1271,7 @@ Examples:
 ne("tea", "tea") => false
 ne("earl", "grey") => true
 ~~~
+
 """
 
   dc_fun_not_bb = """
@@ -1231,6 +1287,7 @@ Examples:
 not(true) => false
 not(false) => true
 ~~~
+
 """
 
   dc_fun_or_bbb = """
@@ -1250,6 +1307,7 @@ or(true, false) => true
 or(false, false) => false
 or(true, warn("not hit")) => true
 ~~~
+
 """
 
   dc_fun_path_sosd = """
@@ -1274,13 +1332,14 @@ path("src/functions.nim") => {
   "dir": "src/",
 }
 
-path("src\functions.nim", "\") => {
+path("src\\functions.nim", "\\") => {
   "filename": "functions.nim",
   "basename": "functions",
   "ext": ".nim",
-  "dir": "src\",
+  "dir": "src\\",
 }
 ~~~
+
 """
 
   dc_fun_readJson_sa = """
@@ -1293,12 +1352,13 @@ readJson = func(json: string) any
 Examples:
 
 ~~~statictea
-a = readJson("\"tea\"") => "tea"
+a = readJson("\\"tea\\"") => "tea"
 b = readJson("4.5") => 4.5
 c = readJson("[1,2,3]") => [1, 2, 3]
-d = readJson("{\"a\":1, \"b\": 2}")
+d = readJson("{\\"a\\":1, \\"b\\": 2}")
   => {"a": 1, "b", 2}
 ~~~
+
 """
 
   dc_fun_replace_siiss = """
@@ -1359,6 +1419,7 @@ replace("", 0, 0, "ab") => ab
 replace("", 0, 0, "abc") => abc
 replace("", 0, 0, "abcd") => abcd
 ~~~
+
 """
 
   dc_fun_replaceRe_sls = """
@@ -1380,7 +1441,8 @@ replaceRe("abcdefabc", list))
 ~~~
 
 For developing and debugging regular expressions see the
-website: https://regex101.com/
+website: [https://regex101.com/](https://regex101.com/)
+
 """
 
   dc_fun_return_aa = """
@@ -1416,7 +1478,8 @@ if(c, return("skip"))
 * “stop” – stops processing the command
 * “skip” – skips this replacement block and continues with the next iteration
 
-The following block command repeats 4 times but skips when t.row is 2.
+The following block command repeats 4 times but skips when
+t.row is 2.
 
 ~~~statictea
 $$ block t.repeat = 4
@@ -1430,6 +1493,7 @@ output:
 1
 3
 ~~~
+
 """
 
   dc_fun_slice_siois = """
@@ -1451,6 +1515,7 @@ slice("Earl Grey", 1, 3) => "arl"
 slice("Earl Grey", 6) => "rey"
 slice("añyóng", 0, 3) => "añy"
 ~~~
+
 """
 
   dc_fun_sort_lsosl = """
@@ -1482,6 +1547,7 @@ sort(strs, "ascending") => ["T", "a", "e"]
 sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
 sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
+
 """
 
   dc_fun_sort_lssil = """
@@ -1509,6 +1575,7 @@ listOfLists = list(l1, l2)
 sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
 sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~
+
 """
 
   dc_fun_sort_lsssl = """
@@ -1536,6 +1603,7 @@ dicts = list(d1, d2)
 sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
 sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~
+
 """
 
   dc_fun_startsWith_ssb = """
@@ -1555,6 +1623,7 @@ b = startsWith("abcdef", "abf")
 a => true
 b => false
 ~~~
+
 """
 
   dc_fun_string_aoss = """
@@ -1569,12 +1638,12 @@ The default stype is "rb" which is used for replacement blocks.
 
 stype:
 
-* json -- returns JSON
+* json — returns JSON
 * rb — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
-* dn -- dot name (dn) returns JSON except dictionary elements
+* dn — dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
-* vl -- vertical list (vl) returns JSON except list elements
+* vl — vertical list (vl) returns JSON except list elements
 are printed one per line as "ix: value".
 
 Examples variables:
@@ -1630,6 +1699,7 @@ a =>
 1: "green"
 2: "blue"
 ~~~
+
 """
 
   dc_fun_string_sds = """
@@ -1650,6 +1720,7 @@ teas.x = 1
 teas.y = "tea"
 teas.z.a = 8
 ~~~
+
 """
 
   dc_fun_sub_fff = """
@@ -1665,6 +1736,7 @@ Examples:
 sub(4.5, 2.3) => 2.2
 sub(1.0, 2.2) => -1.2
 ~~~
+
 """
 
   dc_fun_sub_iii = """
@@ -1681,6 +1753,7 @@ sub(3, 1) => 2
 add(3, -2) => 5
 add(1, 5) => -4
 ~~~
+
 """
 
   dc_fun_type_as = """
@@ -1702,6 +1775,7 @@ type(dict("a", 1)) => "dict"
 type(true) => "bool"
 type(f.cmp[0]) => "func"
 ~~~
+
 """
 
   dc_fun_values_dl = """
@@ -1718,6 +1792,7 @@ d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
 ~~~
+
 """
 
   dc_fun_warn_ss = """
@@ -1739,6 +1814,7 @@ You can warn unconditionally using a bare warn statement:
 ~~~statictea
 warn("always warn")
 ~~~
+
 """
 
   info = newBuiltInInfo

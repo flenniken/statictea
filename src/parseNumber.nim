@@ -22,10 +22,10 @@ proc parseInteger*(s: string, start: Natural = 0): Option[tuple[number: int64, p
   ## index. Parsing stops at the first non-number character.  Nothing
   ## is returned when the integer is out of range or the str is not a
   ## number.
-  ## @:
-  ## @:An integer starts with an optional minus sign, followed by a
-  ## @:digit, followed by digits or underscores. The underscores are
-  ## @:skipped.
+  ##
+  ## An integer starts with an optional minus sign, followed by a
+  ## digit, followed by digits or underscores. The underscores are
+  ## skipped.
   # This version is used instead of the nim version because of leading
   # underscores, plus signs and start position.
   var

@@ -26,26 +26,27 @@ type
 
   Mutable* {.pure.} = enum
     ## The mutable state of lists and dictionaries.
-    ## @:* immutable -- you cannot change it
-    ## @:* append -- you can append to the end
-    ## @:* full -- you can change everything
+    ##
+    ## * immutable — you cannot change it
+    ## * append — you can append to the end
+    ## * full — you can change everything
     immutable,
     append,
     full
 
   DictType* = object
     ## The statictea dictionary type.
-    ## @:
-    ## @:* dict -- an ordered dictionary.
-    ## @:* mutable -- whether you can append to the dictionary or not.
+    ##
+    ## * dict — an ordered dictionary.
+    ## * mutable — whether you can append to the dictionary or not.
     dict*: VarsDict
     mutable*: Mutable
 
   ListType* = object
     ## The statictea list type.
-    ## @:
-    ## @:* list -- a list of values.
-    ## @:* mutable -- whether you can append to the dictionary or not.
+    ##
+    ## * list — a list of values.
+    ## * mutable — whether you can append to the dictionary or not.
     list*: seq[Value]
     mutable*: Mutable
 
@@ -58,13 +59,14 @@ type
 
   ValueKind* = enum
     ## The statictea variable types.
-    ## @:* vkString -- string of UTF-8 characters
-    ## @:* vkInt -- 64 bit signed integer
-    ## @:* vkFloat -- 64 bit floating point number
-    ## @:* vkDict -- hash table mapping strings to any value
-    ## @:* vkList -- a list of values of any type
-    ## @:* vkBool -- true or false
-    ## @:* vkFunc -- reference to a function
+    ##
+    ## * vkString — string of UTF-8 characters
+    ## * vkInt — 64 bit signed integer
+    ## * vkFloat — 64 bit floating point number
+    ## * vkDict — hash table mapping strings to any value
+    ## * vkList — a list of values of any type
+    ## * vkBool — true or false
+    ## * vkFunc — reference to a function
     vkString = "string"
     vkInt = "int"
     vkFloat = "float"
@@ -99,11 +101,11 @@ type
 
   Statement* = object
     ## Statement object stores the statement text, the line number and its line ending.
-    ## @:
-    ## @:* text -- a line containing a statement without the line ending
-    ## @:* lineNum -- line number in the file where the statement starts (the first line is 1)
-    ## @:statement starts.
-    ## @:* ending -- the line ending, either linefeed (\\n) or carriage return and linefeed (\\r\\n).
+    ##
+    ## * text — a line containing a statement without the line ending
+    ## * lineNum — line number in the file where the statement starts (the first line is 1)
+    ## statement starts.
+    ## * ending — the line ending, either linefeed (\\n) or carriage return and linefeed (\\r\\n).
     text*: string
     lineNum*: Natural
     ending*: string
@@ -120,14 +122,15 @@ type
   ParamType* = enum
     ## The statictea parameter types. The same as the variable types
     ## ValueKind with an extra for "any".
-    ## @:* ptString -- string parameter type
-    ## @:* ptInt -- integer
-    ## @:* ptFloat -- floating point number
-    ## @:* ptDict -- dictionary
-    ## @:* ptList -- list
-    ## @:* ptBool -- boolean
-    ## @:* ptFunc -- function pointer
-    ## @:* ptAny -- any parameter type
+    ##
+    ## * ptString — string parameter type
+    ## * ptInt — integer
+    ## * ptFloat — floating point number
+    ## * ptDict — dictionary
+    ## * ptList — list
+    ## * ptBool — boolean
+    ## * ptFunc — function pointer
+    ## * ptAny — any parameter type
     ptString = "string"
     ptInt = "int"
     ptFloat = "float"
@@ -139,17 +142,19 @@ type
 
   Param* = object
     ## Holds attributes for one parameter.
-    ## @:* name -- the parameter name
-    ## @:* paramType -- the parameter type
+    ##
+    ## * name — the parameter name
+    ## * paramType — the parameter type
     name*: string
     paramType*: ParamType
 
   Signature* = object
     ## Holds the function signature.
-    ## @:* optional -- true when the last parameter is optional
-    ## @:* name -- the function name
-    ## @:* params -- a list of the function parameter names and types
-    ## @:* returnType -- the function return type
+    ##
+    ## * optional — true when the last parameter is optional
+    ## * name — the function name
+    ## * params — a list of the function parameter names and types
+    ## * returnType — the function return type
     optional*: bool
     name*: string
     params*: seq[Param]
@@ -160,15 +165,15 @@ type
 
   FunctionSpec* = object
     ## Holds the function details.
-    ## @:
-    ## @:* builtIn -- true for the built-in functions, false for user functions
-    ## @:* signature -- the function signature
-    ## @:* docComment -- the function document comment
-    ## @:* filename -- the filename where the function is defined either the code file or functions.nim
-    ## @:* lineNum -- the line number where the function definition starts
-    ## @:* numLines -- the number of lines to define the function
-    ## @:* statements -- a list of the function statements for user functions
-    ## @:* functionPtr -- pointer to the function for built-in functions
+    ##
+    ## * builtIn — true for the built-in functions, false for user functions
+    ## * signature — the function signature
+    ## * docComment — the function document comment
+    ## * filename — the filename where the function is defined either the code file or functions.nim
+    ## * lineNum — the line number where the function definition starts
+    ## * numLines — the number of lines to define the function
+    ## * statements — a list of the function statements for user functions
+    ## * functionPtr — pointer to the function for built-in functions
     builtIn*: bool
     signature*: Signature
     docComment*: string
@@ -180,17 +185,18 @@ type
 
   FunResultKind* = enum
     ## The kind of a FunResult object, either a value or warning.
-    ## @:* frValue -- a value
-    ## @:* frWarning -- a warning message
+    ##
+    ## * frValue — a value
+    ## * frWarning — a warning message
     frValue,
     frWarning
 
   FunResult* = object
     ## Contains the result of calling a function, either a value or a
     ## warning.
-    ## @:
-    ## @:The parameter field is the index of the problem argument or
-    ## @:-1 to point at the function itself.
+    ##
+    ## The parameter field is the index of the problem argument or
+    ## -1 to point at the function itself.
     case kind*: FunResultKind
       of frValue:
         value*: Value
@@ -200,12 +206,12 @@ type
 
   SideEffect* = enum
     ## The kind of side effect for a statement.
-    ## @:
-    ## @:* seNone -- no side effect, the normal case
-    ## @:* seReturn -- the return function; stop the command and
-    ## @:either skip the replacement block or stop iterating
-    ## @:* seLogMessage -- the log function; write a message to the log file
-    ## @:* seIf2False -- the two parameter IF condition was false
+    ##
+    ## * seNone — no side effect, the normal case
+    ## * seReturn — the return function; stop the command and
+    ## either skip the replacement block or stop iterating
+    ## * seLogMessage — the log function; write a message to the log file
+    ## * seIf2False — the two parameter IF condition was false
     seNone = "none",
     seReturn = "return",
     seLogMessage = "log",
@@ -216,15 +222,15 @@ type
     ## with the side effect, if any. The position includes the trailing
     ## whitespace.  For the example statement below, the value 567
     ## starts at index 6 and ends at position 10.
-    ## @:
-    ## @:Example:
-    ## @:
-    ## @:~~~
-    ## @:0123456789 123456789
-    ## @:var = 567 # test
-    ## @:      ^ start
-    ## @:          ^ end position
-    ## @:~~~~
+    ##
+    ## Example:
+    ##
+    ## ~~~
+    ## 0123456789 123456789
+    ## var = 567 # test
+    ##       ^ start
+    ##           ^ end position
+    ## ~~~
     value*: Value
     pos*: Natural
     sideEffect*: SideEffect
@@ -314,14 +320,14 @@ proc newValue*(value: Value): Value =
 
 proc newValue*[T](list: openArray[T], mutable = Mutable.immutable): Value =
   ## Create a new list value from an array of items of the same kind.
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @:let listValue = newValue([1, 2, 3])
-  ## @:let listValue = newValue(["a", "b", "c"])
-  ## @:let listValue = newValue([newValue(1), newValue("b")])
-  ## @:~~~~
+  ##
+  ## Examples:
+  ##
+  ## ~~~nim
+  ## let listValue = newValue([1, 2, 3])
+  ## let listValue = newValue(["a", "b", "c"])
+  ## let listValue = newValue([newValue(1), newValue("b")])
+  ## ~~~
   var valueList: seq[Value]
   for num in list:
     valueList.add(newValue(num))
@@ -331,14 +337,14 @@ proc newValue*[T](list: openArray[T], mutable = Mutable.immutable): Value =
 proc newValue*[T](dictPairs: openArray[(string, T)], mutable = Mutable.immutable): Value =
   ## Create a new dict value from an array of pairs where the pairs
   ## are the same type which may be Value type.
-  ## @:
-  ## @:Examples:
-  ## @:
-  ## @:~~~
-  ## @: let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
-  ## @: let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
-  ## @: let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
-  ## @:~~~~
+  ##
+  ## Examples:
+  ##
+  ## ~~~nim
+  ##  let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+  ##  let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
+  ##  let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
+  ## ~~~
   var varsDict = newVarsDict()
   for tup in dictPairs:
     let (a, b) = tup
@@ -781,15 +787,15 @@ func newSignatureO*(functionName: string, signatureCode: string): Option[Signatu
   ## The parameter names come from the shortName function for letters
   ## a through z in order. The last letter in the code is the
   ## function's return type.
-  ## @:
-  ## @:Example:
-  ## @:
-  ## @:~~~
-  ## @:var signatureO = newSignatureO("myname", "ifss")
-  ## @:echo $signatureO.get()
-  ## @:=>
-  ## @:myname(a: int, b: float, c: string) string
-  ## @:~~~~
+  ##
+  ## Example:
+  ##
+  ## ~~~nim
+  ## var signatureO = newSignatureO("myname", "ifss")
+  ## echo $signatureO.get()
+  ##
+  ## # => myname(a: int, b: float, c: string) string
+  ## ~~~
 
   var params: seq[Param]
   var nameIx = 0

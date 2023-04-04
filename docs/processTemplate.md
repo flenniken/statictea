@@ -2,6 +2,7 @@
 
 Process the template.
 
+
 * [processTemplate.nim](../src/processTemplate.nim) &mdash; Nim source code.
 # Index
 
@@ -19,6 +20,7 @@ On input extraLine is the first line to use.  On exit extraLine
 is the line that caused the collection to stop which is commonly
 the first replacement block line.
 
+
 ~~~nim
 proc collectCommand(env: var Env; lb: var LineBuffer;
                     prepostTable: PrepostTable; extraLine: var ExtraLine): CmdLines {.
@@ -30,6 +32,7 @@ proc collectCommand(env: var Env; lb: var LineBuffer;
 
 Process the template.
 
+
 ~~~nim
 proc processTemplate(env: var Env; args: Args) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
@@ -40,6 +43,7 @@ proc processTemplate(env: var Env; args: Args) {.
 # processTemplateTop
 
 Setup the environment streams then process the template.
+
 
 ~~~nim
 proc processTemplateTop(env: var Env; args: Args) {.

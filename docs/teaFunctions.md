@@ -110,6 +110,7 @@ add(3.2, -2.2) => 1.0
 ~~~
 
 
+
 # add
 
 Add two integers. A warning is generated on overflow.
@@ -127,6 +128,7 @@ add(-2, -5) => -7
 ~~~
 
 
+
 # anchors
 
 Create anchor names from heading names. Use it for HTML class
@@ -139,16 +141,17 @@ anchors = func(names: list, type: string) list
 
 type:
 
-* html -- HTML class names
-* github -- GitHub markdown anchor links
+* html — HTML class names
+* github — GitHub markdown anchor links
 
 Examples:
 
 ~~~javascript
 list = list("Tea", "Water", "Tea")
-anchores(list, "github") =>
+anchors(list, "github") =>
   ["tea", "water", "tea-1"]
 ~~~
+
 
 
 # and
@@ -171,6 +174,7 @@ and(false, warn("not hit")) => false
 ~~~
 
 
+
 # bool
 
 Create an bool from a value.
@@ -181,13 +185,13 @@ bool = func(value: Value) bool
 
 False values by variable types:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always false
+* bool — false
+* int — 0
+* float — 0.0
+* string — when the length of the string is 0
+* list — when the length of the list is 0
+* dict — when the length of the dictionary is 0
+* func — always false
 
 Examples:
 
@@ -204,6 +208,7 @@ bool([8]) => true
 bool("tea") => true
 bool(dict("tea", 2)) => true
 ~~~
+
 
 
 # case
@@ -238,6 +243,7 @@ case(3, cases, "wine") => "wine"
 ~~~
 
 
+
 # case
 
 Compare string cases and return the matching value.  It takes a
@@ -269,6 +275,7 @@ case("bunch", cases, "other") => "other"
 ~~~
 
 
+
 # cmp
 
 Compare two floats. Returns -1 for less, 0 for equal and 1 for
@@ -287,6 +294,7 @@ cmp(9.3, 2.2) => 1
 ~~~
 
 
+
 # cmp
 
 Compare two ints. Returns -1 for less, 0 for equal and 1 for
@@ -303,6 +311,7 @@ cmp(7, 9) => -1
 cmp(8, 8) => 0
 cmp(9, 2) => 1
 ~~~
+
 
 
 # cmp
@@ -328,6 +337,7 @@ cmp("Tea", "tea", false) => 0
 ~~~
 
 
+
 # cmpVersion
 
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
@@ -337,7 +347,7 @@ equal and 1 for greater than.
 cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
-StaticTea uses [[https://semver.org/][Semantic Versioning]]
+StaticTea uses Semantic Versioning [https://semver.org/](https://semver.org/)
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -348,6 +358,7 @@ cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
 ~~~
+
 
 
 # concat
@@ -364,6 +375,7 @@ Examples:
 concat("tea", " time") => "tea time"
 concat("a", "b") => "ab"
 ~~~
+
 
 
 # dict
@@ -383,6 +395,7 @@ dict(["a", 5]) => {"a": 5}
 dict(["a", 5, "b", 33, "c", 0]) =>
   {"a": 5, "b": 33, "c": 0}
 ~~~
+
 
 
 # dup
@@ -405,6 +418,7 @@ dup("", 3) => ""
 ~~~
 
 
+
 # eq
 
 Return true when two floats are equal.
@@ -421,6 +435,7 @@ eq(1.2, 3.2) => false
 ~~~
 
 
+
 # eq
 
 Return true when the two ints are equal.
@@ -435,6 +450,7 @@ Examples:
 eq(1, 1) => true
 eq(2, 3) => false
 ~~~
+
 
 
 # eq
@@ -454,6 +470,7 @@ eq("1.2", "3.2") => false
 ~~~
 
 
+
 # exists
 
 Determine whether a key exists in a dictionary. Return true when it
@@ -470,6 +487,7 @@ d = dict("tea", "Earl")
 exists(d, "tea") => true
 exists(d, "coffee") => false
 ~~~
+
 
 
 # find
@@ -497,6 +515,7 @@ find(msg, "party", 0) = 0
 ~~~
 
 
+
 # float
 
 Create a float from an int.
@@ -511,6 +530,7 @@ Examples:
 float(2) => 2.0
 float(-33) => -33.0
 ~~~
+
 
 
 # float
@@ -530,6 +550,7 @@ float("notnum", "nan") => nan
 ~~~
 
 
+
 # float
 
 Create a float from a number string.
@@ -545,6 +566,7 @@ float("2") => 2.0
 float("2.4") => 2.4
 float("33") => 33.0
 ~~~
+
 
 
 # format
@@ -575,6 +597,7 @@ str => "use two { to get one"
 ~~~
 
 
+
 # func
 
 Define a function.
@@ -593,6 +616,7 @@ mycmp = func(numStr1: string, numStr2: string) int
   num2 = int(numStr2)
   return(cmp(num1, num2))
 ~~~
+
 
 
 # functionDetails
@@ -620,12 +644,13 @@ fd.signature.name = "mycmp"
 fd.signature.paramNames = ["numStr1","numStr2"]
 fd.signature.paramTypes = ["string","string"]
 fd.signature.returnType = "int"
-fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\n"
+fd.docComment = "  ## Compare two number strings and return 1, 0, or -1.\\n"
 fd.filename = "testcode.tea"
 fd.lineNum = 3
 fd.numLines = 2
 fd.statements = ["  return(cmp(int(numStr1), int(numStr2)))"]
 ~~~
+
 
 
 # get
@@ -654,6 +679,7 @@ Using dot notation:
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
 ~~~
+
 
 
 # get
@@ -689,6 +715,7 @@ a = teas[0]
 ~~~
 
 
+
 # gt
 
 Return true when one float is greater than another float.
@@ -703,6 +730,7 @@ Examples:
 gt(2.8, 4.3) => false
 gt(3.1, 2.5) => true
 ~~~
+
 
 
 # gt
@@ -721,6 +749,7 @@ gt(3, 2) => true
 ~~~
 
 
+
 # gte
 
 Return true when a float is greater than or equal to another float.
@@ -735,6 +764,7 @@ Examples:
 gte(2.8, 4.3) => false
 gte(3.1, 3.1) => true
 ~~~
+
 
 
 # gte
@@ -753,6 +783,7 @@ gte(3, 3) => true
 ~~~
 
 
+
 # highlight
 
 Divide a string of StaticTea code into fragments useful for
@@ -764,16 +795,16 @@ highlight = func(code: string) list
 
 Tags:
 
-* other -- not one of the other types
-* dotName -- a dot name
-* funcCall -- a function call; a dot name followed by a left parenthesis
-* num -- a literal number
-* str -- a literal string
-* multiline -- a multiline literal string
-* doc -- a doc comment
-* comment -- a comment
-* param -- a parameter name
-* type -- int, float, string, list, dict, bool, func, any and optional
+* other — not one of the other types
+* dotName — a dot name
+* funcCall — a function call; a dot name followed by a left parenthesis
+* num — a literal number
+* str — a literal string
+* multiline — a multiline literal string
+* doc — a doc comment
+* comment — a comment
+* param — a parameter name
+* type — int, float, string, list, dict, bool, func, any and optional
 
 Example:
 
@@ -787,6 +818,7 @@ frags => [
 ~~~
 
 
+
 # html
 
 Escape text for placing it in an html page.
@@ -797,16 +829,17 @@ html = func(text: string, place: string) string
 
 places:
 
-* body -- in the html body
-* attribute -- in an html attribute
+* body — in the html body
+* attribute — in an html attribute
 
 ~~~javascript
 name = html("Mad <Hatter>", "body")
-  => "Mad &lt;Hatter&gt;"
+  => "Mad <Hatter>"
 ~~~
 
 For more information about how to escape and what is safe see:
-[[https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts][XSS]]
+[XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
+
 
 
 # if0
@@ -818,13 +851,13 @@ length is 0.
 
 The condition types and what is considered 0:
 
-* bool -- false
-* int -- 0
-* float -- 0.0
-* string -- when the length of the string is 0
-* list -- when the length of the list is 0
-* dict -- when the length of the dictionary is 0
-* func -- always 0
+* bool — false
+* int — 0
+* float — 0.0
+* string — when the length of the string is 0
+* list — when the length of the list is 0
+* dict — when the length of the dictionary is 0
+* func — always 0
 
 The IF functions are special in a couple of ways, see
 the If Functions section.
@@ -860,6 +893,7 @@ if0(c, warn("got zero value"))
 ~~~
 
 
+
 # if
 
 If the condition is true, return the second argument, else return
@@ -891,6 +925,7 @@ The if takes two arguments when there is no assignment.
 if(c, warn("c is true"))
 if(c, return("skip"))
 ~~~
+
 
 
 # int
@@ -925,6 +960,7 @@ int(-6.3456, "truncate") => -6
 ~~~
 
 
+
 # int
 
 Create an int from a number string.
@@ -957,6 +993,7 @@ int("-6.3456", "truncate") => -6
 ~~~
 
 
+
 # int
 
 Create an int from a number string. If the string is not a number,
@@ -979,6 +1016,7 @@ Examples:
 int("2", "round", "nan") => 2
 int("notnum", "round", "nan") => nan
 ~~~
+
 
 
 # join
@@ -1005,12 +1043,13 @@ join(["a", "", "c"], "|", true) => "a|c"
 ~~~
 
 
+
 # joinPath
 
 Join the path components with a path separator.
 
 You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either "/", "" or
+parameter you specify the separator to use, either "/", "\" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
@@ -1031,8 +1070,8 @@ joinPath(["images", "tea"]) =>
 joinPath(["images", "tea"], "/") =>
   "images/tea"
 
-joinPath(["images", "tea"], "\") =>
-  "images\tea"
+joinPath(["images", "tea"], "\\") =>
+  "images\\tea"
 
 joinPath(["images/", "tea"]) =>
   "images/tea"
@@ -1043,6 +1082,7 @@ joinPath(["", "tea"]) =>
 joinPath(["/", "tea"]) =>
   "/tea"
 ~~~
+
 
 
 # keys
@@ -1062,6 +1102,7 @@ values(d) => [1, 2, 3]
 ~~~
 
 
+
 # len
 
 Number of elements in a dictionary.
@@ -1077,6 +1118,7 @@ len(dict()) => 0
 len(dict("a", 4)) => 1
 len(dict("a", 4, "b", 3)) => 2
 ~~~
+
 
 
 # len
@@ -1096,6 +1138,7 @@ len(list(4, 5)) => 2
 ~~~
 
 
+
 # len
 
 Number of unicode characters in a string.
@@ -1110,6 +1153,7 @@ Examples:
 len("tea") => 3
 len("añyóng") => 6
 ~~~
+
 
 
 # list
@@ -1132,6 +1176,7 @@ a = [1]
 a = [1, 2, 3]
 a = ["a", 5, "b"]
 ~~~
+
 
 
 # listLoop
@@ -1178,6 +1223,7 @@ b5 = func(ix: int, value: int, container: list) bool
 ~~~
 
 
+
 # log
 
 Log a message to the log file.  You can call the log function
@@ -1200,6 +1246,7 @@ log("always log")
 ~~~
 
 
+
 # lower
 
 Lowercase a string.
@@ -1215,6 +1262,7 @@ lower("Tea") => "tea"
 lower("TEA") => "tea"
 lower("TEĀ") => "teā"
 ~~~
+
 
 
 # lt
@@ -1233,6 +1281,7 @@ lt(3.1, 2.5) => false
 ~~~
 
 
+
 # lt
 
 Return true when an int is less than another int.
@@ -1247,6 +1296,7 @@ Examples:
 gt(2, 4) => true
 gt(3, 2) => false
 ~~~
+
 
 
 # lte
@@ -1266,6 +1316,7 @@ lte(4.0, 3.0) => false
 ~~~
 
 
+
 # lte
 
 Return true when an int is less than or equal to another int.
@@ -1283,6 +1334,7 @@ lte(4, 3) => false
 ~~~
 
 
+
 # markdownLite
 
 Parse a simple subset of markdown which contains paragraphs,
@@ -1295,15 +1347,15 @@ markdownLite = func(mdText: string) list
 
 list elements:
 
-* p -- A paragraph element is one string, possibly containing
+* p — A paragraph element is one string, possibly containing
 newlines.
 
-* code -- A code element is three strings. The first string is
+* code — A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string (with newlines) contains the text of the block.  The third
 string is the ending line, for example “~~~”.
 
-* bullets -- A bullets element contains a string (with newlines)
+* bullets — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
 
@@ -1315,6 +1367,7 @@ elements => [
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
 ]
 ~~~
+
 
 
 # ne
@@ -1333,6 +1386,7 @@ ne(1.2, 3.2) => true
 ~~~
 
 
+
 # ne
 
 Return true when two ints are not equal.
@@ -1347,6 +1401,7 @@ Examples:
 ne(1, 1) => false
 ne(2, 3) => true
 ~~~
+
 
 
 # ne
@@ -1365,6 +1420,7 @@ ne("earl", "grey") => true
 ~~~
 
 
+
 # not
 
 Boolean not.
@@ -1379,6 +1435,7 @@ Examples:
 not(true) => false
 not(false) => true
 ~~~
+
 
 
 # or
@@ -1399,6 +1456,7 @@ or(true, false) => true
 or(false, false) => false
 or(true, warn("not hit")) => true
 ~~~
+
 
 
 # path
@@ -1424,13 +1482,14 @@ path("src/functions.nim") => {
   "dir": "src/",
 }
 
-path("src\functions.nim", "\") => {
+path("src\\functions.nim", "\\") => {
   "filename": "functions.nim",
   "basename": "functions",
   "ext": ".nim",
-  "dir": "src\",
+  "dir": "src\\",
 }
 ~~~
+
 
 
 # readJson
@@ -1444,12 +1503,13 @@ readJson = func(json: string) any
 Examples:
 
 ~~~javascript
-a = readJson("\"tea\"") => "tea"
+a = readJson("\\"tea\\"") => "tea"
 b = readJson("4.5") => 4.5
 c = readJson("[1,2,3]") => [1, 2, 3]
-d = readJson("{\"a\":1, \"b\": 2}")
+d = readJson("{\\"a\\":1, \\"b\\": 2}")
   => {"a": 1, "b", 2}
 ~~~
+
 
 
 # replace
@@ -1513,6 +1573,7 @@ replace("", 0, 0, "abcd") => abcd
 ~~~
 
 
+
 # replaceRe
 
 Replace multiple parts of a string using regular expressions.
@@ -1533,7 +1594,8 @@ replaceRe("abcdefabc", list))
 ~~~
 
 For developing and debugging regular expressions see the
-website: https://regex101.com/
+website: [https://regex101.com/](https://regex101.com/)
+
 
 
 # return
@@ -1570,7 +1632,8 @@ if(c, return("skip"))
 * “stop” – stops processing the command
 * “skip” – skips this replacement block and continues with the next iteration
 
-The following block command repeats 4 times but skips when t.row is 2.
+The following block command repeats 4 times but skips when
+t.row is 2.
 
 ~~~javascript
 $$ block t.repeat = 4
@@ -1584,6 +1647,7 @@ output:
 1
 3
 ~~~
+
 
 
 # slice
@@ -1606,6 +1670,7 @@ slice("Earl Grey", 1, 3) => "arl"
 slice("Earl Grey", 6) => "rey"
 slice("añyóng", 0, 3) => "añy"
 ~~~
+
 
 
 # sort
@@ -1640,6 +1705,7 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
 ~~~
 
 
+
 # sort
 
 Sort a list of lists.
@@ -1666,6 +1732,7 @@ listOfLists = list(l1, l2)
 sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
 sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
 ~~~
+
 
 
 # sort
@@ -1696,6 +1763,7 @@ sort(dicts, "descending", "sensitive", "name") => [d2, d1]
 ~~~
 
 
+
 # startsWith
 
 Check whether a strings starts with the given prefix. Return true
@@ -1716,6 +1784,7 @@ b => false
 ~~~
 
 
+
 # string
 
 Convert a variable to a string. You specify the variable and
@@ -1729,12 +1798,12 @@ The default stype is "rb" which is used for replacement blocks.
 
 stype:
 
-* json -- returns JSON
+* json — returns JSON
 * rb — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
-* dn -- dot name (dn) returns JSON except dictionary elements
+* dn — dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
-* vl -- vertical list (vl) returns JSON except list elements
+* vl — vertical list (vl) returns JSON except list elements
 are printed one per line as "ix: value".
 
 Examples variables:
@@ -1792,6 +1861,7 @@ a =>
 ~~~
 
 
+
 # string
 
 Convert the dictionary variable to dot names. You specify the
@@ -1813,6 +1883,7 @@ teas.z.a = 8
 ~~~
 
 
+
 # sub
 
 Subtract two floats. A warning is generated on overflow.
@@ -1827,6 +1898,7 @@ Examples:
 sub(4.5, 2.3) => 2.2
 sub(1.0, 2.2) => -1.2
 ~~~
+
 
 
 # sub
@@ -1844,6 +1916,7 @@ sub(3, 1) => 2
 add(3, -2) => 5
 add(1, 5) => -4
 ~~~
+
 
 
 # type
@@ -1868,6 +1941,7 @@ type(f.cmp[0]) => "func"
 ~~~
 
 
+
 # values
 
 Create a list out of the values in the specified dictionary.
@@ -1883,6 +1957,7 @@ d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) => ["a", "b", "c"]
 values(d) => ["apple", 2, 3]
 ~~~
+
 
 
 # warn
@@ -1905,6 +1980,7 @@ You can warn unconditionally using a bare warn statement:
 ~~~javascript
 warn("always warn")
 ~~~
+
 
 
 

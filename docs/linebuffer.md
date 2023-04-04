@@ -1,6 +1,8 @@
 # linebuffer.nim
 
-Read lines from a stream without exceeding the maximum line length. The returned lines contain the line ending, either crlf or lf.
+Read lines from a stream without exceeding the maximum line
+length. The returned lines contain the line ending, either crlf or
+lf.
 
 Example:
 
@@ -11,6 +13,7 @@ var lb = lbO.get()
 while line = lb.readLine():
   processLine(line)
 ~~~
+
 
 * [linebuffer.nim](../src/linebuffer.nim) &mdash; Nim source code.
 # Index
@@ -25,13 +28,16 @@ while line = lb.readLine():
 * [getFilename](#getfilename) &mdash; Return the filename of the stream, if there is one.
 * [getStream](#getstream) &mdash; Return the associated stream.
 * [newLineBuffer](#newlinebuffer) &mdash; Return a new LineBuffer for the given stream.
-* [reset](#reset) &mdash; Clear the buffer and set the read position at the start of the stream.
+* [reset](#reset) &mdash; Clear the buffer and set the read position at the start of the
+stream.
 * [readline](#readline) &mdash; Return the next line from the LineBuffer.
-* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time from the content string and keep the line endings.
+* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time from the content string and keep the
+line endings.
 
 # minMaxLineLen
 
 The minimum line length supported.
+
 
 ~~~nim
 minMaxLineLen = 8
@@ -41,6 +47,7 @@ minMaxLineLen = 8
 
 The maximum line length supported.
 
+
 ~~~nim
 maxMaxLineLen = 8192
 ~~~
@@ -48,6 +55,7 @@ maxMaxLineLen = 8192
 # defaultMaxLineLen
 
 The maximum line length.
+
 
 ~~~nim
 defaultMaxLineLen = 1024
@@ -57,6 +65,7 @@ defaultMaxLineLen = 1024
 
 The buffer size for reading lines.
 
+
 ~~~nim
 defaultBufferSize = 16384
 ~~~
@@ -64,14 +73,15 @@ defaultBufferSize = 16384
 # LineBuffer
 
 The LineBuffer holds information about reading lines from a buffer.
-* stream -- a stream containing lines to read processed sequentially
-* maxLineLen -- the maximum line length
-* bufferSize -- the buffer size for reading lines
-* lineNum -- he current line number in the file starting at 1
-* pos -- current byte position in the buffer
-* charsRead -- number of bytes in the buffer
-* buffer -- memory allocated for the buffer
-* filename -- the optional stream's filename
+* stream — a stream containing lines to read processed sequentially
+* maxLineLen — the maximum line length
+* bufferSize — the buffer size for reading lines
+* lineNum — he current line number in the file starting at 1
+* pos — current byte position in the buffer
+* charsRead — number of bytes in the buffer
+* buffer — memory allocated for the buffer
+* filename — the optional stream's filename
+
 
 ~~~nim
 LineBuffer = object
@@ -89,6 +99,7 @@ LineBuffer = object
 
 Return the current line number.
 
+
 ~~~nim
 proc getLineNum(lineBuffer: LineBuffer): int
 ~~~
@@ -96,6 +107,7 @@ proc getLineNum(lineBuffer: LineBuffer): int
 # getMaxLineLen
 
 Return the maximum line length.
+
 
 ~~~nim
 proc getMaxLineLen(lineBuffer: LineBuffer): int
@@ -105,6 +117,7 @@ proc getMaxLineLen(lineBuffer: LineBuffer): int
 
 Return the filename of the stream, if there is one.
 
+
 ~~~nim
 proc getFilename(lineBuffer: LineBuffer): string
 ~~~
@@ -112,6 +125,7 @@ proc getFilename(lineBuffer: LineBuffer): string
 # getStream
 
 Return the associated stream.
+
 
 ~~~nim
 proc getStream(lineBuffer: LineBuffer): Stream
@@ -121,6 +135,7 @@ proc getStream(lineBuffer: LineBuffer): Stream
 
 Return a new LineBuffer for the given stream.
 
+
 ~~~nim
 proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
                    bufferSize: int = defaultBufferSize; filename: string = ""): Option[
@@ -129,7 +144,9 @@ proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
 
 # reset
 
-Clear the buffer and set the read position at the start of the stream.
+Clear the buffer and set the read position at the start of the
+stream.
+
 
 ~~~nim
 proc reset(lb: var LineBuffer) {.raises: [IOError, OSError], tags: [].}
@@ -149,6 +166,7 @@ You cannot tell whether the line was truncated or not without
 reading the next line. When no more data exists in the stream, an
 empty string is returned.
 
+
 ~~~nim
 proc readline(lb: var LineBuffer): string {.raises: [IOError, OSError],
     tags: [ReadIOEffect].}
@@ -156,7 +174,9 @@ proc readline(lb: var LineBuffer): string {.raises: [IOError, OSError],
 
 # yieldContentLine
 
-Yield one line at a time from the content string and keep the line endings.
+Yield one line at a time from the content string and keep the
+line endings.
+
 
 ~~~nim
 iterator yieldContentLine(content: string): string

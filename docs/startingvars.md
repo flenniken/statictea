@@ -2,6 +2,7 @@
 
 Get the starting variables.
 
+
 * [startingvars.nim](../src/startingvars.nim) &mdash; Nim source code.
 # Index
 
@@ -12,7 +13,9 @@ Get the starting variables.
 
 # readJsonFiles
 
-Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.
+Read json files and return a variable dictionary.  Skip a
+duplicate variable and generate a warning.
+
 
 ~~~nim
 proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict {.
@@ -24,6 +27,7 @@ proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict {.
 
 Create a prepost list of lists for t args.
 
+
 ~~~nim
 func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
 ~~~
@@ -32,13 +36,16 @@ func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
 
 Create the t args dictionary from the statictea arguments.
 
+
 ~~~nim
 func getTeaArgs(args: Args): Value
 ~~~
 
 # getStartVariables
 
-Return the starting variables.  Read the server json files, run the code files and setup the initial tea variables.
+Return the starting variables.  Read the server json files, run
+the code files and setup the initial tea variables.
+
 
 ~~~nim
 proc getStartVariables(env: var Env; args: Args): Variables {.

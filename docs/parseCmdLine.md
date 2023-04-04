@@ -2,6 +2,7 @@
 
 Parse a StaticTea language command line.
 
+
 * [parseCmdLine.nim](../src/parseCmdLine.nim) &mdash; Nim source code.
 # Index
 
@@ -27,13 +28,14 @@ prefix command  [code]   [comment] [continuation]
 |      |        |        |         |[postfix]
 |      |        |        |         ||  [ending]
 |      |        |        |         ||  |
-<!--$  nextline var = 5  # comment +-->n
+<!--$  nextline var = 5  # comment +-->\n
      |
      optional spaces
 ~~~
 
 Whitespace must follow a command except on the last line of the file.
 codeStart is 0 when codeLen is 0.
+
 
 ~~~nim
 LineParts = object
@@ -52,6 +54,7 @@ LineParts = object
 
 The line parts or a warning.
 
+
 ~~~nim
 LinePartsOr = OpResultWarn[LineParts]
 ~~~
@@ -59,6 +62,7 @@ LinePartsOr = OpResultWarn[LineParts]
 # CmdLines
 
 The collected command lines and their parts.
+
 
 ~~~nim
 CmdLines = object
@@ -70,9 +74,10 @@ CmdLines = object
 
 The ExtraLine type.
 
-* elkNoLine -- there is no line here
-* elkOutOfLines -- no more lines in the template
-* elkNormalLine -- we have a line of some type
+* elkNoLine — there is no line here
+* elkOutOfLines — no more lines in the template
+* elkNormalLine — we have a line of some type
+
 
 ~~~nim
 ExtraLineKind = enum
@@ -81,7 +86,9 @@ ExtraLineKind = enum
 
 # ExtraLine
 
-The extra line and its type. The line is empty except for the elkNormalLine type.
+The extra line and its type. The line is empty except for the
+elkNormalLine type.
+
 
 ~~~nim
 ExtraLine = object
@@ -93,6 +100,7 @@ ExtraLine = object
 
 Create a normal ExtraLine.
 
+
 ~~~nim
 func newNormalLine(line: string): ExtraLine
 ~~~
@@ -100,6 +108,7 @@ func newNormalLine(line: string): ExtraLine
 # newNoLine
 
 Create a no line ExtraLine.
+
 
 ~~~nim
 func newNoLine(): ExtraLine
@@ -109,6 +118,7 @@ func newNoLine(): ExtraLine
 
 Create an out of lines ExtraLine.
 
+
 ~~~nim
 func newOutOfLines(): ExtraLine
 ~~~
@@ -116,6 +126,7 @@ func newOutOfLines(): ExtraLine
 # newLinePartsOr
 
 Return a new LinePartsOr object containing a warning.
+
 
 ~~~nim
 func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
@@ -125,13 +136,18 @@ func newLinePartsOr(warning: MessageId; p1: string = ""; pos = 0): LinePartsOr
 
 Return a new LinePartsOr object containing a LineParts object.
 
+
 ~~~nim
 func newLinePartsOr(lineParts: LineParts): LinePartsOr
 ~~~
 
 # getCodeLength
 
-Return the length of the code in the line.  The code starts at codeStart and cannot exceed the given length. The code ends when there is a comment (a pound sign), or the end is reached. The input length is returned on errors.
+Return the length of the code in the line.  The code starts at
+codeStart and cannot exceed the given length. The code ends when
+there is a comment (a pound sign), or the end is reached.
+The input length is returned on errors.
+
 
 ~~~nim
 func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
@@ -139,7 +155,9 @@ func getCodeLength(line: string; codeStart: Natural; length: Natural): Natural
 
 # parseCmdLine
 
-Parse the line and return its parts. Return quickly when not a command line.
+Parse the line and return its parts. Return quickly when not a
+command line.
+
 
 ~~~nim
 proc parseCmdLine(prepostTable: PrepostTable; line: string; lineNum: Natural): LinePartsOr {.

@@ -75,15 +75,15 @@ type
   CmlOptionType* = enum
     ## The option type.
     ##
-    ## * cmlArgument0or1 -- option with an argument, 0 or 1 times.
-    ## * cmlNoArgument -- option without an argument, 0 or 1 times.
-    ## * cmlOptionalArgument -- option with an optional argument, 0
+    ## * cmlArgument0or1 — option with an argument, 0 or 1 times.
+    ## * cmlNoArgument — option without an argument, 0 or 1 times.
+    ## * cmlOptionalArgument — option with an optional argument, 0
     ##     or 1 times.
-    ## * cmlBareArgument -- an argument without an option, 1 time.
-    ## * cmlArgumentOnce -- option with an argument, 1 time.
-    ## * cmlArgumentMany -- option with an argument, unlimited
+    ## * cmlBareArgument — an argument without an option, 1 time.
+    ## * cmlArgumentOnce — option with an argument, 1 time.
+    ## * cmlArgumentMany — option with an argument, unlimited
     ##     number of times.
-    ## * cmlStopArgument -- option without an argument, 0 or 1
+    ## * cmlStopArgument — option without an argument, 0 or 1
     ##     times. Stop and return this option by itself.
     cmlArgument0or1
     cmlNoArgument
@@ -141,9 +141,9 @@ func `$`*(a: ArgsOrMessage): string =
 proc commandLineEcho*() =
   ## Show the command line arguments.
   # The nim os module has two methods to access the command line options:
-  # * paramCount() -- return one less than the number of args.  The first
+  # * paramCount() — return one less than the number of args.  The first
   #   arg is the program being run.
-  # * paramStr(index) -- return one of the args.
+  # * paramStr(index) — return one of the args.
   echo "Command line arguments:"
   echo ""
   let count = paramCount() + 1

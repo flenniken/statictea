@@ -6,6 +6,7 @@ message that tells why you cannot return the value.
 
 You use this to make particular OpResult objects. See [OpResultId](opresultid.md).
 
+
 * [opresult.nim](../src/opresult.nim) &mdash; Nim source code.
 # Index
 
@@ -25,6 +26,7 @@ You use this to make particular OpResult objects. See [OpResultId](opresultid.md
 
 The kind of OpResult object, either a message or a value.
 
+
 ~~~nim
 OpResultKind = enum
   orMessage, orValue
@@ -32,7 +34,9 @@ OpResultKind = enum
 
 # OpResult
 
-Contains either a value or a message. Defaults to an empty message.
+Contains either a value or a message. Defaults to an empty
+message.
+
 
 ~~~nim
 OpResult[T; T2] = object
@@ -48,6 +52,7 @@ OpResult[T; T2] = object
 
 Return true when the OpResult object contains a message.
 
+
 ~~~nim
 func isMessage(opResult: OpResult): bool
 ~~~
@@ -55,6 +60,7 @@ func isMessage(opResult: OpResult): bool
 # isValue
 
 Return true when the OpResult object contains a value.
+
 
 ~~~nim
 func isValue(opResult: OpResult): bool
@@ -64,17 +70,20 @@ func isValue(opResult: OpResult): bool
 
 Return a string representation of an OpResult object.
 
+
 ~~~nim
 func `$`(opResult: OpResult): string
 ~~~
 
 # OpResultWarn
 
-OpResultWarn holds either a value or warning data.  It's similar to the Option type but instead of returning nothing, you return a warning that tells why you cannot return the value.
+OpResultWarn holds either a value or warning data.  It's similar to
+the Option type but instead of returning nothing, you return a
+warning that tells why you cannot return the value.
 
 Example Usage:
 
-~~~
+~~~ nim
 import opresult
 
 proc get_string(): OpResultWarn[string] =
@@ -90,6 +99,7 @@ else:
   echo "value = " & $strOr.value
 ~~~
 
+
 ~~~nim
 OpResultWarn[T] = OpResult[T, WarningData]
 ~~~
@@ -98,6 +108,7 @@ OpResultWarn[T] = OpResult[T, WarningData]
 
 Create a new OpResultWarn object containing a value T.
 
+
 ~~~nim
 func opValueW[T](value: T): OpResultWarn[T]
 ~~~
@@ -105,6 +116,7 @@ func opValueW[T](value: T): OpResultWarn[T]
 # opMessageW
 
 Create a new OpResultWarn object containing a warning.
+
 
 ~~~nim
 func opMessageW[T](message: WarningData): OpResultWarn[T]
@@ -118,7 +130,7 @@ message id that tells why you cannot return the value.
 
 Example Usage:
 
-~~~
+~~~ nim
 import opresult
 
 proc get_string(): OpResultId[string] =
@@ -134,6 +146,7 @@ else:
   echo "value = " & $strOr.value
 ~~~
 
+
 ~~~nim
 OpResultId[T] = OpResult[T, MessageId]
 ~~~
@@ -142,6 +155,7 @@ OpResultId[T] = OpResult[T, MessageId]
 
 Create a new OpResultId object containing a value T.
 
+
 ~~~nim
 func opValue[T](value: T): OpResultId[T]
 ~~~
@@ -149,6 +163,7 @@ func opValue[T](value: T): OpResultId[T]
 # opMessage
 
 Create a new OpResultId object containing a message id.
+
 
 ~~~nim
 func opMessage[T](message: MessageId): OpResultId[T]
