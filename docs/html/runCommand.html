@@ -23,8 +23,7 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li>type:  <a href="#SpecialFunctionOr">SpecialFunctionOr</a> &mdash; A SpecialFunction or a warning message.</li>
 <li>type:  <a href="#Found">Found</a> &mdash; The line endings found.</li>
 <li>type:  <a href="#LinesOr">LinesOr</a> &mdash; A list of lines or a warning.</li>
-<li>type:  <a href="#LoopControl">LoopControl</a> &mdash; Controls whether to output the current replacement block
-iteration and whether to stop or not.</li>
+<li>type:  <a href="#LoopControl">LoopControl</a> &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.</li>
 <li> <a href="#newLinesOr">newLinesOr</a> &mdash; Return a new LinesOr object containing a warning.</li>
 <li> <a href="#newLinesOr-1">newLinesOr</a> &mdash; Return a new LinesOr object containing a warning.</li>
 <li> <a href="#newLinesOr-2">newLinesOr</a> &mdash; Return a new LinesOr object containing a list of lines.</li>
@@ -48,24 +47,19 @@ iteration and whether to stop or not.</li>
 <li> <a href="#newParameterName">newParameterName</a> &mdash; Create a new ParameterName object.</li>
 <li> <a href="#newParameterNameOr">newParameterNameOr</a> &mdash; Create a new ParameterNameOr object.</li>
 <li> <a href="#newParameterNameOr-1">newParameterNameOr</a> &mdash; Create a warning.</li>
-<li> <a href="#getRightType">getRightType</a> &mdash; Return the type of the right hand side of the statement at the
-start position.</li>
-<li> <a href="#getParameterNameOr">getParameterNameOr</a> &mdash; Get a parameter name from the statement and skip trailing
-whitespace.</li>
+<li> <a href="#getRightType">getRightType</a> &mdash; Return the type of the right hand side of the statement at the start position.</li>
+<li> <a href="#getParameterNameOr">getParameterNameOr</a> &mdash; Get a parameter name from the statement and skip trailing whitespace.</li>
 <li> <a href="#getDotNameOr">getDotNameOr</a> &mdash; Get a dot name from the statement.</li>
 <li> <a href="#getDotName">getDotName</a> &mdash; Get a variable name (dotname) from the statement.</li>
 <li> <a href="#matchTripleOrPlusSign">matchTripleOrPlusSign</a> &mdash; Match the optional """ or + at the end of the line.</li>
 <li> <a href="#addText">addText</a> &mdash; Add the line up to the line-ending to the text string.</li>
 <li> <a href="#getFragmentAndPos">getFragmentAndPos</a> &mdash; Split up a long statement around the given position.</li>
 <li> <a href="#getWarnStatement">getWarnStatement</a> &mdash; Return a multiline error message.</li>
-<li> <a href="#warnStatement">warnStatement</a> &mdash; Show an invalid statement with a pointer pointing at the start of
-the problem.</li>
+<li> <a href="#warnStatement">warnStatement</a> &mdash; Show an invalid statement with a pointer pointing at the start of the problem.</li>
 <li> <a href="#warnStatement-1">warnStatement</a> &mdash; Show an invalid statement with a pointer pointing at the start of the problem.</li>
-<li> <a href="#removeLineEnd">removeLineEnd</a> &mdash; Return a new string with the \n or \r\n removed from the end of
-the line.</li>
+<li> <a href="#removeLineEnd">removeLineEnd</a> &mdash; Return a new string with the \n or \r\n removed from the end of the line.</li>
 <li> <a href="#yieldStatements">yieldStatements</a> &mdash; Iterate through the command's statements.</li>
-<li> <a href="#readStatement">readStatement</a> &mdash; Read the next statement from the code file reading multiple lines
-if needed.</li>
+<li> <a href="#readStatement">readStatement</a> &mdash; Read the next statement from the code file reading multiple lines if needed.</li>
 <li> <a href="#getMultilineStr">getMultilineStr</a> &mdash; Return the triple quoted string literal.</li>
 <li> <a href="#matchTabSpace2">matchTabSpace2</a> &mdash; Match one or more spaces or tabs starting at the given position.</li>
 <li> <a href="#getString">getString</a> &mdash; Return a literal string value and position after it.</li>
@@ -78,27 +72,19 @@ if needed.</li>
 <li> <a href="#getFunctionValuePosSi">getFunctionValuePosSi</a> &mdash; Return the function's value and the position after it.</li>
 <li> <a href="#runBoolOp">runBoolOp</a> &mdash; Evaluate the bool expression and return a bool value.</li>
 <li> <a href="#runCompareOp">runCompareOp</a> &mdash; Evaluate the comparison and return a bool value.</li>
-<li> <a href="#getCondition">getCondition</a> &mdash; Return the bool value of the condition expression and the
-position after it.</li>
-<li> <a href="#getBracketedVarValue">getBracketedVarValue</a> &mdash; Return the value of the bracketed variable and the position after
-the trailing whitespace.</li>
+<li> <a href="#getCondition">getCondition</a> &mdash; Return the bool value of the condition expression and the position after it.</li>
+<li> <a href="#getBracketedVarValue">getBracketedVarValue</a> &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.</li>
 <li> <a href="#listLoop">listLoop</a> &mdash; Make a new list from an existing list.</li>
-<li> <a href="#getValuePosSi">getValuePosSi</a> &mdash; Return the value and position of the item that the start
-parameter points at which is a string, number, variable, list, or
-condition.</li>
+<li> <a href="#getValuePosSi">getValuePosSi</a> &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.</li>
 <li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, if0, return, warn, log and listLoop.</li>
 <li> <a href="#getBracketDotName">getBracketDotName</a> &mdash; Convert var[key] to a dot name.</li>
-<li> <a href="#runStatement">runStatement</a> &mdash; Run one statement and return the variable dot name string,
-operator and value.</li>
+<li> <a href="#runStatement">runStatement</a> &mdash; Run one statement and return the variable dot name string, operator and value.</li>
 <li> <a href="#skipSpaces">skipSpaces</a> &mdash; Skip the leading spaces and tabs.</li>
 <li> <a href="#callUserFunction">callUserFunction</a> &mdash; Run the given user function.</li>
 <li> <a href="#runStatementAssignVar">runStatementAssignVar</a> &mdash; Run a statement and assign the variable if appropriate.</li>
-<li> <a href="#parseSignature">parseSignature</a> &mdash; Parse the signature and return the list of parameters or a
-message.</li>
-<li> <a href="#isFunctionDefinition">isFunctionDefinition</a> &mdash; If the statement is the first line of a function definition,
-return true and fill in the return parameters.</li>
-<li> <a href="#defineUserFunctionAssignVar">defineUserFunctionAssignVar</a> &mdash; If the statement starts a function definition, define it and
-assign the variable.</li>
+<li> <a href="#parseSignature">parseSignature</a> &mdash; Parse the signature and return the list of parameters or a message.</li>
+<li> <a href="#isFunctionDefinition">isFunctionDefinition</a> &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.</li>
+<li> <a href="#defineUserFunctionAssignVar">defineUserFunctionAssignVar</a> &mdash; If the statement starts a function definition, define it and assign the variable.</li>
 <li> <a href="#runCommand">runCommand</a> &mdash; Run a command and fill in the variables dictionaries.</li>
 <li> <a href="#runCodeFile">runCodeFile</a> &mdash; Run the code file and fill in the variables.</li>
 <li> <a href="#runCodeFiles">runCodeFiles</a> &mdash; Run each code file and populate the variables.</li>

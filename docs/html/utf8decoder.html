@@ -8,7 +8,8 @@
 <body>
 <h1>utf8decoder.nim</h1>
 
-<p>Functions for decoding and validating UTF-8.</p>
+<p>Functions for decoding and validating UTF-8.
+</p>
 
 Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 
@@ -24,7 +25,8 @@ Nim source code: <a href="../../src/utf8decoder.nim">utf8decoder.nim</a>
 
 <h3 id="decode">decode</h3>
 
-<p>Interior part of a UTF-8 decoder.</p>
+<p>Interior part of a UTF-8 decoder.
+</p>
 
 <pre class="nim-code">
 proc decode(state: var uint32; codep: var uint32; sByte: char)
@@ -33,13 +35,14 @@ proc decode(state: var uint32; codep: var uint32; sByte: char)
 <h3 id="yieldUtf8Chars">yieldUtf8Chars</h3>
 
 <p>Iterate through the string&#x27;s UTF-8 character byte sequences.
-For each character set ixStartSeq, ixEndSeq, and codePoint.
-Return true when the bytes sequence is valid else return false.
-
-</p><p>You can get the current byte sequence with:
-str[ixStartSeq .. ixEndSeq]
-
-</p><p>A UTF-8 character is a one to four byte sequence.</p>
+@:For each character set ixStartSeq, ixEndSeq, and codePoint.
+@:Return true when the bytes sequence is valid else return false.
+@:
+@:You can get the current byte sequence with:
+@:str[ixStartSeq .. ixEndSeq]
+@:
+@:A UTF-8 character is a one to four byte sequence.
+</p>
 
 <pre class="nim-code">
 iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
@@ -48,7 +51,9 @@ iterator yieldUtf8Chars(str: string; ixStartSeq: var int; ixEndSeq: var int;
 
 <h3 id="validateUtf8String">validateUtf8String</h3>
 
-<p>Return the position of the first invalid UTF-8 byte in the string else return -1.</p>
+<p>Return the position of the first invalid UTF-8 byte in the string
+else return -1.
+</p>
 
 <pre class="nim-code">
 func validateUtf8String(str: string): int
@@ -56,7 +61,10 @@ func validateUtf8String(str: string): int
 
 <h3 id="sanitizeUtf8">sanitizeUtf8</h3>
 
-<p>Sanitize and return the UTF-8 string. The skipOrReplace parameter determines whether to skip or replace invalid bytes.  When replacing the U+FFFD character is used.</p>
+<p>Sanitize and return the UTF-8 string. The skipOrReplace parameter
+determines whether to skip or replace invalid bytes.  When
+replacing the U+FFFD character is used.
+</p>
 
 <pre class="nim-code">
 func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
@@ -64,7 +72,9 @@ func sanitizeUtf8(str: string; skipOrReplace: string = "replace"): string
 
 <h3 id="utf8CharString">utf8CharString</h3>
 
-<p>Get the unicode character at pos.  Return a one character string. Return &quot;&quot; when not a UTF-8 character.</p>
+<p>Get the unicode character at pos.  Return a one character
+string. Return &quot;&quot; when not a UTF-8 character.
+</p>
 
 <pre class="nim-code">
 func utf8CharString(str: string; pos: Natural): string

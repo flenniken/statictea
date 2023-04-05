@@ -25,11 +25,11 @@ LineParts holds parsed components of a line.
 
 ~~~
 prefix command  [code]   [comment] [continuation]
-|      |        |        |         |[postfix]
-|      |        |        |         ||  [ending]
-|      |        |        |         ||  |
+│      │        │        │         │[postfix]
+│      │        │        │         ││  [ending]
+│      │        │        │         ││  │
 <!--$  nextline var = 5  # comment +-->\n
-     |
+     │
      optional spaces
 ~~~
 

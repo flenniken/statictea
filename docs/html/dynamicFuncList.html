@@ -42,8 +42,7 @@
   <span class="t-dotName">newEntry.funcName</span> = <span class="t-dotName">entry.name</span>
 
   <span class="t-comment"># Remove the formatting from the description.
-</span>  <span class="t-dotName">desc</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
-  <span class="t-dotName">newEntry.docComment</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">desc</span>, <span class="t-dotName">state.patterns</span>)
+</span>  <span class="t-dotName">newEntry.docComment</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
 
   <span class="t-dotName">newEntry.lineNum</span> = <span class="t-dotName">entry.line</span>
   <span class="t-dotName">newEntry.numLines</span> = <span class="t-dotName">state.starts</span>[<span class="t-funcCall">concat</span>(<span class="t-str">&quot;k&quot;</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">entry.line</span>))]
@@ -54,24 +53,8 @@
 </span><span class="t-dotName">starts</span> = <span class="t-funcCall">dict</span>()
 <span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
 
-<span class="t-comment"># Define replacement patterns to remove formatting from the doc
-</span><span class="t-comment"># comments (descriptions).
-</span><span class="t-dotName">patterns</span> = <span class="t-funcCall">list</span>( +
-  <span class="t-str">&quot;~~~~&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>, +
-  <span class="t-str">&quot;@@&quot;</span>, <span class="t-str">&quot;&quot;</span>, +
-  <span class="t-str">&quot;@{&quot;</span>, <span class="t-str">&quot;[&quot;</span>, +
-  <span class="t-str">&quot;}@&quot;</span>, <span class="t-str">&quot;]&quot;</span>, +
-  <span class="t-str">&quot;@!&quot;</span>, <span class="t-str">&quot;|&quot;</span>, +
-  <span class="t-str">&quot;[ ]*@:&quot;</span>, <span class="t-str">&quot;\n&quot;</span>, +
-  <span class="t-str">&quot;@\\.&quot;</span>, <span class="t-str">&quot;*&quot;</span>, +
-  <span class="t-str">&quot;&amp;quot;&quot;</span>, <span class="t-str">&quot;\&quot;&quot;</span>, +
-  <span class="t-str">&quot;&amp;gt;&quot;</span>, <span class="t-str">&quot;&gt;&quot;</span>, +
-  <span class="t-str">&quot;&amp;lt;&quot;</span>, <span class="t-str">&quot;&lt;&quot;</span>, +
-  <span class="t-str">&quot;&amp;amp;&quot;</span>, <span class="t-str">&quot;&amp;&quot;</span>)
-
 <span class="t-comment"># Create a list of dictionaries, one dictionary per statictea function.
 </span><span class="t-dotName">state</span> = <span class="t-funcCall">dict</span>()
-<span class="t-dotName">state.patterns</span> = <span class="t-dotName">patterns</span>
 <span class="t-dotName">state.starts</span> = <span class="t-dotName">starts</span>
 <span class="t-dotName">entries</span> = []
 <span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">get-entry</span>, <span class="t-dotName">state</span>)

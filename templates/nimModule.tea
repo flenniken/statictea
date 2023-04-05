@@ -72,18 +72,15 @@ u.get-name = func(ix: int, entry: dict, newList: list) bool
   newList &= entry.name
   return(false)
 
-u.fixup-description = func(rawDescripton: string, templateType: string, patterns: list) dict
-  ## Fix up the description for html or markdown. Remove the special
-  ## patterns from the description resulting in markdown.  For the
-  ## html template convert the markdown to html. For the md template
+u.fixup-description = func(mdDescription: string, templateType: string) dict
+  ## Fix up the description for html or markdown.  For the html
+  ## template convert the markdown to html. For the md template
   ## replace the statictea code blocks with javascript so the code is
   ## highlighted by github.
 
-  # Remove the special markup resulting in markdown text.
-  mdDescription = replaceRe(rawDescripton, patterns)
-
   # Use the first sentence for the short description.
-  short = slice(mdDescription, 0, add(find(mdDescription, ".", -1), 1))
+  first = slice(mdDescription, 0, add(find(mdDescription, ".", -1), 1))
+  short = replaceRe(first, ["\n", " "])
 
   # Convert the markdown description to html for the html
   # template. For md switch statictea code blocks to javascript.
@@ -112,7 +109,7 @@ u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   # Remove the special formatting from the description and encode it
   # for html or markdown.
   rawDescription = get(entry, "description", "")
-  ret = u.fixup-description(rawDescription, state.templateType, state.patterns)
+  ret = u.fixup-description(rawDescription, state.templateType)
   newEntry.description = ret.description
   newEntry.short = ret.short
 
@@ -124,22 +121,6 @@ u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   newEntry.anchor = state.anchors[ix]
   newList &= newEntry
   return(false)
-
-# Define replacement patterns to remove special formatting from the
-# descriptions.
-patterns = [ +
-  "~~~~", "~~~", +
-  "@@", "", +
-  "@{", "[", +
-  "}@", "]", +
-  "@!", "|", +
-  "[ ]*@:", "\n", +
-  "@\\.", "*", +
-  "&quot;", "\"", +
-  "&gt;", ">", +
-  "&lt;", "<", +
-  "&amp;", "&" +
-]
 
 # Determine the template type from the template's extension.
 path = path(t.args.resultFilename)
@@ -155,12 +136,11 @@ origPath = path(s.orig)
 o.moduleName = origPath.filename
 
 # Format the description for html or markdown.
-ret = u.fixup-description(s.moduleDescription, templateType, patterns)
+ret = u.fixup-description(s.moduleDescription, templateType)
 o.moduleDescription = ret.description
 
 # Reformat the server entries list and store it in o.entries.
 state = dict()
-state.patterns = patterns
 state.anchors = anchors
 state.templateType = templateType
 o.entries = []

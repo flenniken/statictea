@@ -1858,8 +1858,8 @@ func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## ~~~statictea
   ## list = list("Tea", "Water", "Tea")
-  ## anchors(list, "github") =>
-  ##   ["tea", "water", "tea-1"]
+  ## a = anchors(list, "github")
+  ## # a => ["tea", "water", "tea-1"]
   ## ~~~
 
   tMapParameters("anchors", "lsl")

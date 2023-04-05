@@ -8,10 +8,8 @@ Statictea function signatures and parameter checking.
 
 * [paramCodeString](#paramcodestring) &mdash; Return a string representation of a ParamCode object.
 * [kindToParamCode](#kindtoparamcode) &mdash; Convert a value type to a parameter type.
-* [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with
-the value.
-* [sameType](#sametype-1) &mdash; Check whether the param type is the same type or compatible with
-the value.
+* [sameType](#sametype) &mdash; Check whether the param type is the same type or compatible with the value.
+* [sameType](#sametype-1) &mdash; Check whether the param type is the same type or compatible with the value.
 * [mapParameters](#mapparameters) &mdash; Create a dictionary of the parameters and arguments.
 
 # paramCodeString

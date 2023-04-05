@@ -7,11 +7,32 @@ Run evaluate print loop (REPL).
 * [repl.nim](../src/repl.nim) &mdash; Nim source code.
 # Index
 
+* const: [replHelp](#replhelp) &mdash; Help text.
 * type: [ReplCommand](#replcommand) &mdash; The REPL commands.
 * [listInColumns](#listincolumns) &mdash; Generate a string of names in columns.
 * [stringToReplCommand](#stringtoreplcommand) &mdash; Use the wrap column for the max unless the terminal width is less.
 * [handleReplLine](#handlereplline) &mdash; Handle the REPL line.
 * [runEvaluatePrintLoop](#runevaluateprintloop) &mdash; Run commands at a prompt.
+
+# replHelp
+
+Help text.
+
+
+~~~nim
+replHelp = """Enter statements or commands at the prompt.
+
+Available commands:
+
+* h — this help text
+* p — print a variable like in a replacement block
+* pd — print a dictionary as dot names
+* pf - print function names, signatures or docs, e.g. f, f.cmp, f.cmp[0]
+* plc - print a list in columns
+* plv - print a list vertical, one element per line
+* v — print the number of variables in the one letter dictionaries
+* q — quit (ctrl-d too)"""
+~~~
 
 # ReplCommand
 

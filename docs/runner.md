@@ -47,12 +47,10 @@ glow.
 * [isExpectedLine](#isexpectedline) &mdash; Return true when the line is an expected line.
 * [parseRunFileLine](#parserunfileline) &mdash; Parse a file command line.
 * [parseExpectedLine](#parseexpectedline) &mdash; Parse an expected line.
-* [openNewFile](#opennewfile) &mdash; Create a new file in the given folder and return an open File
-object.
+* [openNewFile](#opennewfile) &mdash; Create a new file in the given folder and return an open File object.
 * [getAnyLine](#getanyline) &mdash; Return information about the stf line.
 * [makeDirAndFiles](#makedirandfiles) &mdash; Read the stf file and create its temp folder and files.
-* [runCommands](#runcommands) &mdash; Run the command files and return 0 when they all returned their
-expected return code.
+* [runCommands](#runcommands) &mdash; Run the command files and return 0 when they all returned their expected return code.
 * [runStfFilename](#runstffilename) &mdash; Run the stf file and leave the temp dir.
 
 # runnerId

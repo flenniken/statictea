@@ -2514,34 +2514,10 @@ The nim jsondoc command produces html formatted json data.  Our
 desired final format is Github markdown so having html
 presentation data in the json is a problem.
 
-It was discovered that single paragraph comments are mostly
-unformatted.  This is the basis for a workaround. You avoid the
-formatting by making all the documentation look like one
-paragraph by inserting some symbols in strategic places.
-
-Workaround Rules:
-
-- use @: at the beginning of lines, except the first line.
-- use ~~~ to begin a code block
-- use ~~~~ to end a code block
-- use @{ for [ in an http link
-- use }@ for ] in an http link
-- use @@: for a : in an http link
-- use @. for *
-- use @! for |
-
-Change:
-
-#+BEGIN_SRC
-[Semantic Versioning](https://semver.org/)
-#+END_SRC
-to:
-
-#+BEGIN_SRC
-@{Semantic Versioning}@(https@@://semver.org/)
-#+END_SRC
-
-See the [[src/functions.nim][functions.nim]] file for other examples.
+The jsondocraw command replaces the descriptions in the json with
+the text from the source file as is. The nimble *jsondoc* command
+creates the jsondocraw exe.  jsondocraw calls nim's jsondoc
+command then patches the descriptions.
 
 [[#contents][茶]]
 

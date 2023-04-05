@@ -8,7 +8,8 @@
 <body>
 <h1>updateTemplate.nim</h1>
 
-<p>Update a template.</p>
+<p>Update a template.
+</p>
 
 Nim source code: <a href="../../src/updateTemplate.nim">updateTemplate.nim</a>
 
@@ -22,7 +23,13 @@ Nim source code: <a href="../../src/updateTemplate.nim">updateTemplate.nim</a>
 
 <h3 id="collectReplaceCommand">collectReplaceCommand</h3>
 
-<p>Collect the replace commands.  Read template lines and write out non-command lines. When a replace command is found, return its lines.  This includes the command line and its continue lines. On input extraLine is the first line to use.  On exit extraLine is the line that caused the collection to stop which is commonly the first replacement block line.</p>
+<p>Collect the replace commands.  Read template lines and write out
+non-command lines. When a replace command is found, return its
+lines.  This includes the command line and its continue lines.
+On input extraLine is the first line to use.  On exit extraLine
+is the line that caused the collection to stop which is commonly
+the first replacement block line.
+</p>
 
 <pre class="nim-code">
 proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
@@ -33,7 +40,9 @@ proc collectReplaceCommand(env: var Env; lb: var LineBuffer;
 
 <h3 id="updateTemplate">updateTemplate</h3>
 
-<p>Update the template and return 0 on success. Return 1 if a warning messages was written while processing the template.</p>
+<p>Update the template and return 0 on success. Return 1 if a
+warning messages was written while processing the template.
+</p>
 
 <pre class="nim-code">
 proc updateTemplate(env: var Env; args: Args) {.
@@ -43,7 +52,8 @@ proc updateTemplate(env: var Env; args: Args) {.
 
 <h3 id="updateTemplateTop">updateTemplateTop</h3>
 
-<p>Update the template.</p>
+<p>Update the template.
+</p>
 
 <pre class="nim-code">
 proc updateTemplateTop(env: var Env; args: Args) {.raises: [ValueError, IOError,

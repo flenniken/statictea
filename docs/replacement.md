@@ -38,8 +38,7 @@ To use a left bracket in a replacement block you use two left brackets, {{,
 * [varSegment](#varsegment) &mdash; Return a variable segment made from the dot name.
 * [lineToSegments](#linetosegments) &mdash; Convert a line to a list of segments.
 * [varSegmentDotName](#varsegmentdotname) &mdash; Given a variable segment, return its dot name.
-* [writeTempSegments](#writetempsegments) &mdash; Write the replacement block's stored segments to the result
-stream with the variables filled in.
+* [writeTempSegments](#writetempsegments) &mdash; Write the replacement block's stored segments to the result stream with the variables filled in.
 * [allocTempSegments](#alloctempsegments) &mdash; Create a TempSegments object.
 * [closeDeleteTempSegments](#closedeletetempsegments) &mdash; Close the TempSegments and delete its backing temporary file.
 * [storeLineSegments](#storelinesegments) &mdash; Divide the line into segments and write them to the TempSegments' temp file.

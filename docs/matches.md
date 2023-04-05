@@ -8,15 +8,13 @@ Methods for matching sub-strings.
 
 * const: [commands](#commands) &mdash; The StaticTea commands.
 * [parsePrepost](#parseprepost) &mdash; Parse the prepost item on the terminal command line.
-* [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given
-table plus optional following whitespace.
+* [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.
 * [matchCommand](#matchcommand) &mdash; Match statictea commands.
 * [matchLastPart](#matchlastpart) &mdash; Match the last part of a command line.
 * [getLastPart](#getlastpart) &mdash; Return the optional plus sign and line endings from the line.
 * [matchTabSpace](#matchtabspace) &mdash; Match one or more spaces or tabs starting at the given position.
 * [emptyOrSpaces](#emptyorspaces) &mdash; Return true when the text is empty or all whitespace from start to the end.
-* [matchEqualSign](#matchequalsign) &mdash; Match an equal sign or "&=" and the optional trailing
-whitespace.
+* [matchEqualSign](#matchequalsign) &mdash; Match an equal sign or "&=" and the optional trailing whitespace.
 * [matchCommaParentheses](#matchcommaparentheses) &mdash; Match a comma or right parentheses and the optional trailing whitespace.
 * [matchNumber](#matchnumber) &mdash; Match a number and the optional trailing whitespace.
 * [matchNumberNotCached](#matchnumbernotcached) &mdash; Match a number and the optional trailing whitespace.
@@ -28,8 +26,7 @@ whitespace.
 * [matchCommaOrSymbol](#matchcommaorsymbol) &mdash; Match a comma or the symbol and the optional trailing whitespace.
 * [matchSymbol](#matchsymbol) &mdash; Match the symbol and the optional trailing whitespace.
 * [matchNotOrParen](#matchnotorparen) &mdash; Match "not " or "(" and the trailing whitespace.
-* [matchBoolExprOperator](#matchboolexproperator) &mdash; Match boolean expression operators (bool operators plus compareh
-operators) and the trailing whitespace.
+* [matchBoolExprOperator](#matchboolexproperator) &mdash; Match boolean expression operators (bool operators plus compareh operators) and the trailing whitespace.
 * [matchCompareOperator](#matchcompareoperator) &mdash; Match the compare operators and the trailing whitespace.
 * [matchReplCmd](#matchreplcmd) &mdash; Match the REPL commands and the trailing optional whitespace.
 * [matchParameterType](#matchparametertype) &mdash; Match a parameter type and the trailing whitespace.

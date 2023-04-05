@@ -8,7 +8,8 @@
 <body>
 <h1>signatures.nim</h1>
 
-<p>Statictea function signatures and parameter checking.</p>
+<p>Statictea function signatures and parameter checking.
+</p>
 
 Nim source code: <a href="../../src/signatures.nim">signatures.nim</a>
 
@@ -24,7 +25,8 @@ Nim source code: <a href="../../src/signatures.nim">signatures.nim</a>
 
 <h3 id="paramCodeString">paramCodeString</h3>
 
-<p>Return a string representation of a ParamCode object.</p>
+<p>Return a string representation of a ParamCode object.
+</p>
 
 <pre class="nim-code">
 func paramCodeString(paramCode: ParamCode): string
@@ -32,7 +34,8 @@ func paramCodeString(paramCode: ParamCode): string
 
 <h3 id="kindToParamCode">kindToParamCode</h3>
 
-<p>Convert a value type to a parameter type.</p>
+<p>Convert a value type to a parameter type.
+</p>
 
 <pre class="nim-code">
 func kindToParamCode(kind: ValueKind): ParamCode
@@ -40,7 +43,9 @@ func kindToParamCode(kind: ValueKind): ParamCode
 
 <h3 id="sameType">sameType</h3>
 
-<p>Check whether the param type is the same type or compatible with the value.</p>
+<p>Check whether the param type is the same type or compatible with
+the value.
+</p>
 
 <pre class="nim-code">
 func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
@@ -48,7 +53,9 @@ func sameType(paramCode: ParamCode; valueKind: ValueKind): bool
 
 <h3 id="sameType-1">sameType</h3>
 
-<p>Check whether the param type is the same type or compatible with the value.</p>
+<p>Check whether the param type is the same type or compatible with
+the value.
+</p>
 
 <pre class="nim-code">
 func sameType(paramType: ParamType; valueKind: ValueKind): bool
@@ -56,7 +63,12 @@ func sameType(paramType: ParamType; valueKind: ValueKind): bool
 
 <h3 id="mapParameters">mapParameters</h3>
 
-<p>Create a dictionary of the parameters and arguments. The parameter names become the dictionary keys.  Return a FunResult object containing the dictionary or a warning when the arguments do not match the signature.  When they do not match, the warning parameter tells the first non-matching argument.</p>
+<p>Create a dictionary of the parameters and arguments. The
+parameter names become the dictionary keys.  Return a FunResult
+object containing the dictionary or a warning when the arguments
+do not match the signature.  When they do not match, the warning
+parameter tells the first non-matching argument.
+</p>
 
 <pre class="nim-code">
 func mapParameters(signature: Signature; args: seq[Value]): FunResult

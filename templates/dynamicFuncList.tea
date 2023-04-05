@@ -31,8 +31,7 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   newEntry.funcName = entry.name
 
   # Remove the formatting from the description.
-  desc = get(entry, "description", "")
-  newEntry.docComment = replaceRe(desc, state.patterns)
+  newEntry.docComment = get(entry, "description", "")
 
   newEntry.lineNum = entry.line
   newEntry.numLines = state.starts[concat("k", string(entry.line))]
@@ -43,24 +42,8 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
 starts = dict()
 listLoop(s.entries, starts, get-starts, s.entries)
 
-# Define replacement patterns to remove formatting from the doc
-# comments (descriptions).
-patterns = list( +
-  "~~~~", "~~~", +
-  "@@", "", +
-  "@{", "[", +
-  "}@", "]", +
-  "@!", "|", +
-  "[ ]*@:", "\n", +
-  "@\\.", "*", +
-  "&quot;", "\"", +
-  "&gt;", ">", +
-  "&lt;", "<", +
-  "&amp;", "&")
-
 # Create a list of dictionaries, one dictionary per statictea function.
 state = dict()
-state.patterns = patterns
 state.starts = starts
 entries = []
 listLoop(s.entries, entries, get-entry, state)

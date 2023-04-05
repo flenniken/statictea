@@ -17,36 +17,30 @@ Nim source code: <a href="../../src/vartypes.nim">vartypes.nim</a>
 
 <ul>
 <li>const:  <a href="#variableStartChars">variableStartChars</a> &mdash; The characters that make up a variable dotname.</li>
-<li>const:  <a href="#variableMiddleChars">variableMiddleChars</a> &mdash; A variable contains ascii letters, digits, underscores and
-hypens.</li>
-<li>const:  <a href="#variableChars">variableChars</a> &mdash; A variable contains ascii letters, digits, underscores and
-hypens.</li>
+<li>const:  <a href="#variableMiddleChars">variableMiddleChars</a> &mdash; A variable contains ascii letters, digits, underscores and hypens.</li>
+<li>const:  <a href="#variableChars">variableChars</a> &mdash; A variable contains ascii letters, digits, underscores and hypens.</li>
 <li>const:  <a href="#startTFVarNumber">startTFVarNumber</a> &mdash; A character that starts true, false, a variable or a number.</li>
 <li>type:  <a href="#VarsDict">VarsDict</a> &mdash; This is a ref type.</li>
 <li>type:  <a href="#Mutable">Mutable</a> &mdash; The mutable state of lists and dictionaries.</li>
 <li>type:  <a href="#DictType">DictType</a> &mdash; The statictea dictionary type.</li>
 <li>type:  <a href="#ListType">ListType</a> &mdash; The statictea list type.</li>
-<li>type:  <a href="#Variables">Variables</a> &mdash; Dictionary holding all statictea variables in multiple distinct
-logical dictionaries.</li>
+<li>type:  <a href="#Variables">Variables</a> &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.</li>
 <li>type:  <a href="#VarsDictOr">VarsDictOr</a> &mdash; A VarsDict object or a warning.</li>
 <li>type:  <a href="#ValueKind">ValueKind</a> &mdash; The statictea variable types.</li>
 <li>type:  <a href="#Value">Value</a> &mdash; A variable's value reference.</li>
 <li>type:  <a href="#ValueOr">ValueOr</a> &mdash; A Value object or a warning.</li>
 <li>type:  <a href="#Statement">Statement</a> &mdash; Statement object stores the statement text, the line number and its line ending.</li>
 <li>type:  <a href="#FunctionPtr">FunctionPtr</a> &mdash; Signature of a statictea built in function.</li>
-<li>type:  <a href="#ParamCode">ParamCode</a> &mdash; Parameter type, one character of "ifsldpa" corresponding to int,
-float, string, list, dict, func, any.</li>
+<li>type:  <a href="#ParamCode">ParamCode</a> &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.</li>
 <li>type:  <a href="#ParamType">ParamType</a> &mdash; The statictea parameter types.</li>
 <li>type:  <a href="#Param">Param</a> &mdash; Holds attributes for one parameter.</li>
 <li>type:  <a href="#Signature">Signature</a> &mdash; Holds the function signature.</li>
 <li>type:  <a href="#SignatureOr">SignatureOr</a> &mdash; A signature or message.</li>
 <li>type:  <a href="#FunctionSpec">FunctionSpec</a> &mdash; Holds the function details.</li>
 <li>type:  <a href="#FunResultKind">FunResultKind</a> &mdash; The kind of a FunResult object, either a value or warning.</li>
-<li>type:  <a href="#FunResult">FunResult</a> &mdash; Contains the result of calling a function, either a value or a
-warning.</li>
+<li>type:  <a href="#FunResult">FunResult</a> &mdash; Contains the result of calling a function, either a value or a warning.</li>
 <li>type:  <a href="#SideEffect">SideEffect</a> &mdash; The kind of side effect for a statement.</li>
-<li>type:  <a href="#ValuePosSi">ValuePosSi</a> &mdash; A value and the position after the value in the statement along
-with the side effect, if any.</li>
+<li>type:  <a href="#ValuePosSi">ValuePosSi</a> &mdash; A value and the position after the value in the statement along with the side effect, if any.</li>
 <li>type:  <a href="#ValuePosSiOr">ValuePosSiOr</a> &mdash; A ValuePosSi object or a warning.</li>
 <li> <a href="#newSignature">newSignature</a> &mdash; Create a Signature object.</li>
 <li> <a href="#newSignatureOr">newSignatureOr</a> &mdash; Create a new SignatureOr with a message.</li>
@@ -67,8 +61,7 @@ with the side effect, if any.</li>
 <li> <a href="#newValue-5">newValue</a> &mdash; Create a dictionary value from a VarsDict.</li>
 <li> <a href="#newValue-6">newValue</a> &mdash; Create a new value from an existing value.</li>
 <li> <a href="#newValue-7">newValue</a> &mdash; Create a new list value from an array of items of the same kind.</li>
-<li> <a href="#newValue-8">newValue</a> &mdash; Create a new dict value from an array of pairs where the pairs
-are the same type which may be Value type.</li>
+<li> <a href="#newValue-8">newValue</a> &mdash; Create a new dict value from an array of pairs where the pairs are the same type which may be Value type.</li>
 <li> <a href="#newFunc">newFunc</a> &mdash; Create a new func which is a FunctionSpec.</li>
 <li> <a href="#newValue-9">newValue</a> &mdash; Create a new func value.</li>
 <li> <a href="#newEmptyListValue">newEmptyListValue</a> &mdash; Create a new empty list value.</li>
@@ -81,8 +74,7 @@ are the same type which may be Value type.</li>
 <li> <a href="#dictToString">dictToString</a> &mdash; Return a string representation of a dict Value in JSON format.</li>
 <li> <a href="#listToString">listToString</a> &mdash; Return a string representation of a list variable in JSON format.</li>
 <li> <a href="#valueToString">valueToString</a> &mdash; Return a string representation of a variable in JSON format.</li>
-<li> <a href="#valueToStringRB">valueToStringRB</a> &mdash; Return the string representation of the variable for use in the
-replacement blocks.</li>
+<li> <a href="#valueToStringRB">valueToStringRB</a> &mdash; Return the string representation of the variable for use in the replacement blocks.</li>
 <li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a Value.</li>
 <li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a VarsDict.</li>
 <li> <a href="#dotNameRep">dotNameRep</a> &mdash; Return a dot name string representation of a dictionary.</li>
@@ -91,8 +83,7 @@ replacement blocks.</li>
 <li> <a href="#newValueOr-1">newValueOr</a> &mdash; Create a new ValueOr containing a warning.</li>
 <li> <a href="#newValueOr-2">newValueOr</a> &mdash; Create a new ValueOr containing a value.</li>
 <li> <a href="#newFunResultWarn">newFunResultWarn</a> &mdash; Return a new FunResult object containing a warning.</li>
-<li> <a href="#newFunResultWarn-1">newFunResultWarn</a> &mdash; Return a new FunResult object containing a warning created from a
-WarningData object.</li>
+<li> <a href="#newFunResultWarn-1">newFunResultWarn</a> &mdash; Return a new FunResult object containing a warning created from a WarningData object.</li>
 <li> <a href="#newFunResult">newFunResult</a> &mdash; Return a new FunResult object containing a value.</li>
 <li> <a href="#a___-1">`==`</a> &mdash; Compare two FunResult objects and return true when equal.</li>
 <li> <a href="#a___-2">`!=`</a> &mdash; Compare two FunResult objects and return false when equal.</li>

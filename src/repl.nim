@@ -24,6 +24,21 @@ import parseMarkdown
 const
   wrapColumn = 60
 
+  replHelp* = """
+Enter statements or commands at the prompt.
+
+Available commands:
+
+* h — this help text
+* p — print a variable like in a replacement block
+* pd — print a dictionary as dot names
+* pf - print function names, signatures or docs, e.g. f, f.cmp, f.cmp[0]
+* plc - print a list in columns
+* plv - print a list vertical, one element per line
+* v — print the number of variables in the one letter dictionaries
+* q — quit (ctrl-d too)"""
+    ## Help text.
+
 type
   ReplCommand* = enum
     ## The REPL commands.
@@ -58,21 +73,6 @@ func showVariables(variables: Variables): string =
       result.add("$1={}" % key)
     else:
       result.add("$1={$2}" % [key, $d.dictv.dict.len])
-
-proc replHelp(): string =
-  result = """
-Enter statements or commands at the prompt.
-
-Available commands:
-
-* h — this help text
-* p — print a variable like in a replacement block
-* pd — print a dictionary as dot names
-* pf - print function names, signatures or docs, e.g. f, f.cmp, f.cmp[0]
-* plc - print a list in columns
-* plv - print a list vertical, one element per line
-* v — print the number of variables in the one letter dictionaries
-* q — quit (ctrl-d too)"""
 
 proc errorAndColumn(env: var Env, messageId: MessageId, line: string,
     runningPos: Natural, p1 = "") =
@@ -279,7 +279,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
         return true
     of h_cmd:
       if runningPos == line.len:
-        env.writeOut(replHelp())
+        env.writeOut(replHelp)
         return false
     of v_cmd:
       if runningPos == line.len:

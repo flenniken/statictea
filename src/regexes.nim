@@ -6,7 +6,7 @@
 ##
 ## ~~~nim
 ## let line = "123abc456"
-## let pattern = ".@.abc"
+## let pattern = ".*abc"
 ## let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
 ##
 ## check matchesO.isSome == true
@@ -17,7 +17,7 @@
 ##
 ## ~~~ nim
 ## let line = "template.html(87)"
-## let pattern = r"^(.@.)\(([0-9]+)\)$"
+## let pattern = r"^(.*)\(([0-9]+)\)$"
 ## let matchesO = matchPatternCached(line, pattern, 0, 2)
 ##
 ## check matchesO.isSome == true

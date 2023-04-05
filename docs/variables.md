@@ -14,8 +14,7 @@ prefix and it allows functions to be specified without the f prefix.
 
 * const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.
 * type: [Operator](#operator) &mdash; The statement operator types.
-* type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator,
-and value which is the result of running a statement.
+* type: [VariableData](#variabledata) &mdash; The VariableData object holds the variable name, operator, and value which is the result of running a statement.
 * type: [VariableDataOr](#variabledataor) &mdash; A VariableData object or a warning.
 * type: [NoPrefixDict](#noprefixdict) &mdash; The variable letter prefix to use when it's missing.
 * [newVariableDataOr](#newvariabledataor) &mdash; Create an object containing a warning.
@@ -23,18 +22,12 @@ and value which is the result of running a statement.
 * [newVariableDataOr](#newvariabledataor-2) &mdash; Create an object containing a VariableData object.
 * [`$`](#) &mdash; Return a string representation of VariableData.
 * [startVariables](#startvariables) &mdash; Create an empty variables object in its initial state.
-* [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer
-items.
-* [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string
-items.
-* [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running
-a command.
-* [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a
-warning.
-* [assignVariable](#assignvariable-1) &mdash; Assign the variable the given value if possible, else return a
-warning.
-* [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return
-a warning.
+* [getTeaVarIntDefault](#getteavarintdefault) &mdash; Return the int value of one of the tea dictionary integer items.
+* [getTeaVarStringDefault](#getteavarstringdefault) &mdash; Return the string value of one of the tea dictionary string items.
+* [resetVariables](#resetvariables) &mdash; Clear the local variables and reset the tea variables for running a command.
+* [assignVariable](#assignvariable) &mdash; Assign the variable the given value if possible, else return a warning.
+* [assignVariable](#assignvariable-1) &mdash; Assign the variable the given value if possible, else return a warning.
+* [getVariable](#getvariable) &mdash; Look up the variable and return its value when found, else return a warning.
 
 # outputValues
 

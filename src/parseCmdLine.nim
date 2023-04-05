@@ -14,11 +14,11 @@ type
     ##
     ## ~~~
     ## prefix command  [code]   [comment] [continuation]
-    ## |      |        |        |         @![postfix]
-    ## |      |        |        |         ||  [ending]
-    ## |      |        |        |         ||  |
+    ## │      │        │        │         │[postfix]
+    ## │      │        │        │         ││  [ending]
+    ## │      │        │        │         ││  │
     ## <!--$  nextline var = 5  # comment +-->\n
-    ##      |
+    ##      │
     ##      optional spaces
     ## ~~~
     ##

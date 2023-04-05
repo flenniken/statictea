@@ -16,8 +16,7 @@ echo timer.seconds()
 
 * type: [Timer](#timer) &mdash; Holds the start time in seconds.
 * [newTimer](#newtimer) &mdash; Create a new timer and set the start time.
-* [seconds](#seconds) &mdash; Return the elapsed seconds rounded to the specified number of
-digits.
+* [seconds](#seconds) &mdash; Return the elapsed seconds rounded to the specified number of digits.
 
 # Timer
 

@@ -1,10 +1,8 @@
 # opresult.nim
 
-OpResult holds either a value or a message.  It's similar to
-the Option type but instead of returning nothing, you return a
-message that tells why you cannot return the value.
-
-You use this to make particular OpResult objects. See [OpResultId](opresultid.md).
+OpResult holds either a value or a message.  It's similar to the
+Option type but instead of returning nothing, you return a message
+that tells why you cannot return the value.
 
 
 * [opresult.nim](../src/opresult.nim) &mdash; Nim source code.

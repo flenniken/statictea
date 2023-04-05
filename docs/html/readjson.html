@@ -18,12 +18,9 @@ Nim source code: <a href="../../src/readjson.nim">readjson.nim</a>
 <ul>
 <li>const:  <a href="#maxDepth">maxDepth</a> &mdash; The maximum depth you can nest items.</li>
 <li> <a href="#jsonToValue">jsonToValue</a> &mdash; Convert a Nim json node to a statictea value.</li>
-<li> <a href="#readJsonStream">readJsonStream</a> &mdash; Read a json stream and return the parsed data in a value object
-or return a warning.</li>
-<li> <a href="#readJsonString">readJsonString</a> &mdash; Read a json string and return the parsed data in a value object
-or return a warning.</li>
-<li> <a href="#readJsonFile">readJsonFile</a> &mdash; Read a json file and return the parsed data in a value object or
-return a warning.</li>
+<li> <a href="#readJsonStream">readJsonStream</a> &mdash; Read a json stream and return the parsed data in a value object or return a warning.</li>
+<li> <a href="#readJsonString">readJsonString</a> &mdash; Read a json string and return the parsed data in a value object or return a warning.</li>
+<li> <a href="#readJsonFile">readJsonFile</a> &mdash; Read a json file and return the parsed data in a value object or return a warning.</li>
 <li> <a href="#unescapePopularChar">unescapePopularChar</a> &mdash; Unescape the popular char and return its value.</li>
 <li> <a href="#parseJsonStr">parseJsonStr</a> &mdash; Parse the quoted json string literal.</li>
 </ul>
@@ -92,16 +89,16 @@ not a popular char, return 0.
 </p><p>Popular characters and their escape values:
 
 </p><pre class="plain-code">
-|char      | name           | unicode|
-|----------|----------------|--------|
-|&quot;         | quotation mark | U+0022 |
-|\\        | reverse solidus| U+005C |
-|/         | solidus        | U+002F |
-|b         | backspace      | U+0008 |
-|f         | form feed      | U+000C |
-|n         | line feed      | U+000A |
-|r         | carriage return| U+000D |
-|t         | tab            | U+0009 |
+│char │ name            │ unicode│
+├─────┼─────────────────┼────────┤
+│&quot;    │ quotation mark  │ U+0022 │
+│\\   │ reverse solidus │ U+005C │
+│/    │ solidus         │ U+002F │
+│b    │ backspace       │ U+0008 │
+│f    │ form feed       │ U+000C │
+│n    │ line feed       │ U+000A │
+│r    │ carriage return │ U+000D │
+│t    │ tab             │ U+0009 │
 </pre>
 
 

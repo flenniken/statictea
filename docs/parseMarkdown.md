@@ -16,15 +16,12 @@ highlight statictea code.
 * [newFragmentLen2](#newfragmentlen2) &mdash; Create a new Fragment from start and length values.
 * [`$`](#) &mdash; Return a string representation of a Fragment.
 * [`$`](#-1) &mdash; Return a string representation of a sequence of fragments.
-* [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of
-elements.
+* [parseMarkdown](#parsemarkdown) &mdash; Parse the simple description markdown and return a list of elements.
 * [`$`](#-2) &mdash; Return a string representation of an Element.
 * [`$`](#-3) &mdash; Return a string representation of a list of Elements.
-* [atMultiline](#atmultiline) &mdash; Determine whether the start index points a the start of a
-multiline string.
+* [atMultiline](#atmultiline) &mdash; Determine whether the start index points a the start of a multiline string.
 * [lineEnd](#lineend) &mdash; Find the end of the line.
-* [highlightCode](#highlightcode) &mdash; Identify all the fragments in the StaticTea code to
-highlight.
+* [highlightCode](#highlightcode) &mdash; Identify all the fragments in the StaticTea code to highlight.
 
 # ElementTag
 

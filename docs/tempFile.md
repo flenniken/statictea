@@ -31,11 +31,9 @@ check line2 == "line 2"
 
 * type: [TempFile](#tempfile) &mdash; Temporary filename and associated file object.
 * type: [TempFileStream](#tempfilestream) &mdash; Temporary filename and associated stream object.
-* [openTempFile](#opentempfile) &mdash; Create an empty file in the temp directory open for read
-write.
+* [openTempFile](#opentempfile) &mdash; Create an empty file in the temp directory open for read write.
 * [closeDeleteFile](#closedeletefile) &mdash; Close and delete the temp file.
-* [openTempFileStream](#opentempfilestream) &mdash; Create an empty file stream in the temp directory open for read
-write.
+* [openTempFileStream](#opentempfilestream) &mdash; Create an empty file stream in the temp directory open for read write.
 * [closeDeleteStream](#closedeletestream) &mdash; Close the stream and delete the associated temp file.
 
 # TempFile

@@ -9,16 +9,13 @@ descriptions. The descriptions match the source.
 # Index
 
 * const: [helpText](#helptext) &mdash; The help text shown with -h.
-* type: [Args](#args) &mdash; Args holds the source nim filename and the destination
-json filename to create.
+* type: [Args](#args) &mdash; Args holds the source nim filename and the destination json filename to create.
 * [newArgs](#newargs) &mdash; Create an Args object from a CmlArgs.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.
 * [`$`](#) &mdash; Return a string representation of an Args object.
 * [readOneDesc](#readonedesc) &mdash; Return the doc comment found in the given range of line numbers.
-* [readDescriptions](#readdescriptions) &mdash; Read all the descriptions in the text specified by the line
-numbers.
-* [removePresentation](#removepresentation) &mdash; Create a json file without presentation formatting in the
-descriptions.
+* [readDescriptions](#readdescriptions) &mdash; Read all the descriptions in the text specified by the line numbers.
+* [removePresentation](#removepresentation) &mdash; Create a json file without presentation formatting in the descriptions.
 
 # helpText
 

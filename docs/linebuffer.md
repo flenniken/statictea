@@ -28,11 +28,9 @@ while line = lb.readLine():
 * [getFilename](#getfilename) &mdash; Return the filename of the stream, if there is one.
 * [getStream](#getstream) &mdash; Return the associated stream.
 * [newLineBuffer](#newlinebuffer) &mdash; Return a new LineBuffer for the given stream.
-* [reset](#reset) &mdash; Clear the buffer and set the read position at the start of the
-stream.
+* [reset](#reset) &mdash; Clear the buffer and set the read position at the start of the stream.
 * [readline](#readline) &mdash; Return the next line from the LineBuffer.
-* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time from the content string and keep the
-line endings.
+* [yieldContentLine](#yieldcontentline) &mdash; Yield one line at a time from the content string and keep the line endings.
 
 # minMaxLineLen
 

@@ -8,7 +8,8 @@
 <body>
 <h1>comparelines.nim</h1>
 
-<p>Compare lines of text.</p>
+<p>Compare lines of text.
+</p>
 
 Nim source code: <a href="../../src/comparelines.nim">comparelines.nim</a>
 
@@ -26,7 +27,8 @@ Nim source code: <a href="../../src/comparelines.nim">comparelines.nim</a>
 
 <h3 id="OpResultStr">OpResultStr</h3>
 
-<p>On success return T, otherwise return a message telling what went wrong.</p>
+<p>On success return T, otherwise return a message telling what went wrong.
+</p>
 
 <pre class="nim-code">
 OpResultStr[T] = OpResult[T, string]
@@ -34,7 +36,8 @@ OpResultStr[T] = OpResult[T, string]
 
 <h3 id="opValueStr">opValueStr</h3>
 
-<p>Return an OpResultStr with a value.</p>
+<p>Return an OpResultStr with a value.
+</p>
 
 <pre class="nim-code">
 func opValueStr[T](value: T): OpResultStr[T]
@@ -42,7 +45,8 @@ func opValueStr[T](value: T): OpResultStr[T]
 
 <h3 id="opMessageStr">opMessageStr</h3>
 
-<p>Return an OpResultStr with a message why the value cannot be returned.</p>
+<p>Return an OpResultStr with a message why the value cannot be returned.
+</p>
 
 <pre class="nim-code">
 func opMessageStr[T](message: string): OpResultStr[T]
@@ -50,7 +54,9 @@ func opMessageStr[T](message: string): OpResultStr[T]
 
 <h3 id="splitNewLines">splitNewLines</h3>
 
-<p>Split lines and keep the line endings. Works with n and rn type endings. keyword: splitLines</p>
+<p>Split lines and keep the line endings. Works with \n and \r\n
+type endings. keyword: splitLines
+</p>
 
 <pre class="nim-code">
 func splitNewLines(content: string): seq[string]
@@ -58,7 +64,8 @@ func splitNewLines(content: string): seq[string]
 
 <h3 id="linesSideBySide">linesSideBySide</h3>
 
-<p>Show the two sets of lines side by side (above and below).</p>
+<p>Show the two sets of lines side by side (above and below).
+</p>
 
 <pre class="nim-code">
 proc linesSideBySide(gotContent: string; expectedContent: string;
@@ -67,7 +74,9 @@ proc linesSideBySide(gotContent: string; expectedContent: string;
 
 <h3 id="testLinesSideBySide">testLinesSideBySide</h3>
 
-<p>If the two strings are equal, return true, else show the differences and return false.</p>
+<p>If the two strings are equal, return true, else show the
+differences and return false.
+</p>
 
 <pre class="nim-code">
 proc testLinesSideBySide(got: string; expected: string): bool {.
@@ -76,7 +85,9 @@ proc testLinesSideBySide(got: string; expected: string): bool {.
 
 <h3 id="compareFiles">compareFiles</h3>
 
-<p>Compare two files and return the differences. When they are equal return &quot;&quot;.</p>
+<p>Compare two files and return the differences. When they are equal
+return &quot;&quot;.
+</p>
 
 <pre class="nim-code">
 proc compareFiles(gotFilename: string; expectedFilename: string): OpResultStr[

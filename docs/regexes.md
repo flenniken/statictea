@@ -47,8 +47,7 @@ check resultStringO.get() == "456456"
 
 * type: [CompilePattern](#compilepattern) &mdash; A cache of compiled regex patterns, mapping a pattern to CompilePattern.
 * type: [Matches](#matches) &mdash; Holds the result of a match.
-* type: [Replacement](#replacement) &mdash; Holds the regular expression pattern and its replacement for
-the replaceMany function.
+* type: [Replacement](#replacement) &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.
 * [newMatches](#newmatches) &mdash; Create a new Matches object with no groups.
 * [newMatches](#newmatches-1) &mdash; Create a new Matches object with one group.
 * [newMatches](#newmatches-2) &mdash; Create a new Matches object with two groups.
@@ -72,8 +71,7 @@ the replaceMany function.
 * [matchRegex](#matchregex) &mdash; Match a regular expression pattern in a string.
 * [compilePattern](#compilepattern-1) &mdash; Compile the pattern and return a regex object.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
-* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular
-expression pattern for next time.
+* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern for next time.
 * [replaceMany](#replacemany) &mdash; Replace the patterns in the string with their replacements.
 
 # CompilePattern

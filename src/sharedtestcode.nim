@@ -16,9 +16,9 @@ when defined(test):
 
   proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
     ## Read lines from a LineBuffer returning line endings but don't
-    ## @:read more than the maximum number of lines. Reading starts at
-    ## @:the current lb's current position and the position at the end
-    ## @:is ready for reading the next line.
+    ## read more than the maximum number of lines. Reading starts at
+    ## the current lb's current position and the position at the end
+    ## is ready for reading the next line.
     var count = 0
     while true:
       if count >= maxLines:
@@ -87,14 +87,14 @@ when defined(test):
     ## Compare got with expected and show the differences if any. Set
     ## the result variable to false when there are differences, else
     ## leave result as is.
-    ## @:
-    ## @:Example usage:
-    ## @:
-    ## @:~~~
-    ## @:result = gotExpected($handled, $eHandled, "handled:")
-    ## @:gotExpectedResult(retLeftName, eLeftName, "left name:")
-    ## @:gotExpectedResult($retOperator, $eOperator, "operator:")
-    ## @:~~~~
+    ##
+    ## Example usage:
+    ##
+    ## ~~~
+    ## result = gotExpected($handled, $eHandled, "handled:")
+    ## gotExpectedResult(retLeftName, eLeftName, "left name:")
+    ## gotExpectedResult($retOperator, $eOperator, "operator:")
+    ## ~~~
 
     if got != expected:
       if message != "":

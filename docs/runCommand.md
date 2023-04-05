@@ -13,8 +13,7 @@ Run a command and fill in the variables dictionaries.
 * type: [SpecialFunctionOr](#specialfunctionor) &mdash; A SpecialFunction or a warning message.
 * type: [Found](#found) &mdash; The line endings found.
 * type: [LinesOr](#linesor) &mdash; A list of lines or a warning.
-* type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block
-iteration and whether to stop or not.
+* type: [LoopControl](#loopcontrol) &mdash; Controls whether to output the current replacement block iteration and whether to stop or not.
 * [newLinesOr](#newlinesor) &mdash; Return a new LinesOr object containing a warning.
 * [newLinesOr](#newlinesor-1) &mdash; Return a new LinesOr object containing a warning.
 * [newLinesOr](#newlinesor-2) &mdash; Return a new LinesOr object containing a list of lines.
@@ -38,24 +37,19 @@ iteration and whether to stop or not.
 * [newParameterName](#newparametername) &mdash; Create a new ParameterName object.
 * [newParameterNameOr](#newparameternameor) &mdash; Create a new ParameterNameOr object.
 * [newParameterNameOr](#newparameternameor-1) &mdash; Create a warning.
-* [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the
-start position.
-* [getParameterNameOr](#getparameternameor) &mdash; Get a parameter name from the statement and skip trailing
-whitespace.
+* [getRightType](#getrighttype) &mdash; Return the type of the right hand side of the statement at the start position.
+* [getParameterNameOr](#getparameternameor) &mdash; Get a parameter name from the statement and skip trailing whitespace.
 * [getDotNameOr](#getdotnameor) &mdash; Get a dot name from the statement.
 * [getDotName](#getdotname) &mdash; Get a variable name (dotname) from the statement.
 * [matchTripleOrPlusSign](#matchtripleorplussign) &mdash; Match the optional """ or + at the end of the line.
 * [addText](#addtext) &mdash; Add the line up to the line-ending to the text string.
 * [getFragmentAndPos](#getfragmentandpos) &mdash; Split up a long statement around the given position.
 * [getWarnStatement](#getwarnstatement) &mdash; Return a multiline error message.
-* [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of
-the problem.
+* [warnStatement](#warnstatement) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
 * [warnStatement](#warnstatement-1) &mdash; Show an invalid statement with a pointer pointing at the start of the problem.
-* [removeLineEnd](#removelineend) &mdash; Return a new string with the \n or \r\n removed from the end of
-the line.
+* [removeLineEnd](#removelineend) &mdash; Return a new string with the \n or \r\n removed from the end of the line.
 * [yieldStatements](#yieldstatements) &mdash; Iterate through the command's statements.
-* [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines
-if needed.
+* [readStatement](#readstatement) &mdash; Read the next statement from the code file reading multiple lines if needed.
 * [getMultilineStr](#getmultilinestr) &mdash; Return the triple quoted string literal.
 * [matchTabSpace2](#matchtabspace2) &mdash; Match one or more spaces or tabs starting at the given position.
 * [getString](#getstring) &mdash; Return a literal string value and position after it.
@@ -68,27 +62,19 @@ if needed.
 * [getFunctionValuePosSi](#getfunctionvaluepossi) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
-* [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the
-position after it.
-* [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after
-the trailing whitespace.
+* [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
+* [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
 * [listLoop](#listloop) &mdash; Make a new list from an existing list.
-* [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start
-parameter points at which is a string, number, variable, list, or
-condition.
+* [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn, log and listLoop.
 * [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
-* [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string,
-operator and value.
+* [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [skipSpaces](#skipspaces) &mdash; Skip the leading spaces and tabs.
 * [callUserFunction](#calluserfunction) &mdash; Run the given user function.
 * [runStatementAssignVar](#runstatementassignvar) &mdash; Run a statement and assign the variable if appropriate.
-* [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a
-message.
-* [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition,
-return true and fill in the return parameters.
-* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and
-assign the variable.
+* [parseSignature](#parsesignature) &mdash; Parse the signature and return the list of parameters or a message.
+* [isFunctionDefinition](#isfunctiondefinition) &mdash; If the statement is the first line of a function definition, return true and fill in the return parameters.
+* [defineUserFunctionAssignVar](#defineuserfunctionassignvar) &mdash; If the statement starts a function definition, define it and assign the variable.
 * [runCommand](#runcommand) &mdash; Run a command and fill in the variables dictionaries.
 * [runCodeFile](#runcodefile) &mdash; Run the code file and fill in the variables.
 * [runCodeFiles](#runcodefiles) &mdash; Run each code file and populate the variables.

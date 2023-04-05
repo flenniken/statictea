@@ -12,8 +12,7 @@ Messages IDs and associated strings and routines to get them.
 * [getWarning](#getwarning) &mdash; Return the warning string.
 * [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
 * [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
-* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning
-information.
+* [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
 * [`$`](#) &mdash; Return a string representation of WarningData.
 * [`==`](#-1) &mdash; 
 

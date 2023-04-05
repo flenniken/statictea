@@ -8,7 +8,8 @@
 <body>
 <h1>startingvars.nim</h1>
 
-<p>Get the starting variables.</p>
+<p>Get the starting variables.
+</p>
 
 Nim source code: <a href="../../src/startingvars.nim">startingvars.nim</a>
 
@@ -23,7 +24,9 @@ Nim source code: <a href="../../src/startingvars.nim">startingvars.nim</a>
 
 <h3 id="readJsonFiles">readJsonFiles</h3>
 
-<p>Read json files and return a variable dictionary.  Skip a duplicate variable and generate a warning.</p>
+<p>Read json files and return a variable dictionary.  Skip a
+duplicate variable and generate a warning.
+</p>
 
 <pre class="nim-code">
 proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict {.
@@ -33,7 +36,8 @@ proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict {.
 
 <h3 id="argsPrepostList">argsPrepostList</h3>
 
-<p>Create a prepost list of lists for t args.</p>
+<p>Create a prepost list of lists for t args.
+</p>
 
 <pre class="nim-code">
 func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
@@ -41,7 +45,8 @@ func argsPrepostList(prepostList: seq[Prepost]): seq[seq[string]]
 
 <h3 id="getTeaArgs">getTeaArgs</h3>
 
-<p>Create the t args dictionary from the statictea arguments.</p>
+<p>Create the t args dictionary from the statictea arguments.
+</p>
 
 <pre class="nim-code">
 func getTeaArgs(args: Args): Value
@@ -49,7 +54,9 @@ func getTeaArgs(args: Args): Value
 
 <h3 id="getStartVariables">getStartVariables</h3>
 
-<p>Return the starting variables.  Read the server json files, run the code files and setup the initial tea variables.</p>
+<p>Return the starting variables.  Read the server json files, run
+the code files and setup the initial tea variables.
+</p>
 
 <pre class="nim-code">
 proc getStartVariables(env: var Env; args: Args): Variables {.

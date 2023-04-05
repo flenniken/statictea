@@ -12,8 +12,7 @@ Environment holding the input and output streams.
 * const: [staticteaLog](#statictealog) &mdash; Name of the default statictea log file.
 * type: [Env](#env) &mdash; Env holds the input and output streams.
 * [close](#close) &mdash; Close the environment streams.
-* [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning
-count.
+* [outputWarning](#outputwarning) &mdash; Write a message to the error stream and increment the warning count.
 * [warn](#warn) &mdash; Write a formatted warning message to the error stream.
 * [warn](#warn-1) &mdash; Write a formatted warning message to the error stream.
 * [warnNoFile](#warnnofile) &mdash; Write a formatted warning message to the error stream.
@@ -24,15 +23,12 @@ count.
 * [log](#log) &mdash; Append the message to the log file.
 * [writeOut](#writeout) &mdash; Write a message to the output stream.
 * [writeErr](#writeerr) &mdash; Write a message to the error stream.
-* [checkLogSize](#checklogsize) &mdash; Check the log file size and write a warning message when the file
-is big.
+* [checkLogSize](#checklogsize) &mdash; Check the log file size and write a warning message when the file is big.
 * [openLogFile](#openlogfile) &mdash; Open the log file and update the environment.
-* [openEnv](#openenv) &mdash; Open and return the environment containing standard error and
-standard out as streams.
+* [openEnv](#openenv) &mdash; Open and return the environment containing standard error and standard out as streams.
 * [setupLogging](#setuplogging) &mdash; Turn on logging for the environment using the specified log file.
 * [addExtraStreams](#addextrastreams) &mdash; Add the template and result streams to the environment.
-* [addExtraStreamsForUpdate](#addextrastreamsforupdate) &mdash; For the update case, add the template and result streams to the
-environment.
+* [addExtraStreamsForUpdate](#addextrastreamsforupdate) &mdash; For the update case, add the template and result streams to the environment.
 
 # logWarnSize
 

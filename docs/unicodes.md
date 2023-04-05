@@ -7,24 +7,17 @@ Functions that deal with Unicode.
 # Index
 
 * [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.
-* [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not
-bytes).
+* [stringLen](#stringlen) &mdash; Return the number of unicode characters in the string (not bytes).
 * [githubAnchor](#githubanchor) &mdash; Convert the name to a github anchor name.
 * [htmlAnchor](#htmlanchor) &mdash; Convert the name to a html anchor (class) name.
-* [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode code point given a 4 character unicode escape
-string like u1234.
-* [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode code point given a 4 or 8 character unicode escape
-string.
+* [parseHexUnicode16](#parsehexunicode16) &mdash; Return the unicode code point given a 4 character unicode escape string like u1234.
+* [parseHexUnicode](#parsehexunicode) &mdash; Return the unicode code point given a 4 or 8 character unicode escape string.
 * [codePointToString](#codepointtostring) &mdash; Convert a code point to a one character UTF-8 string.
 * [codePointsToString](#codepointstostring) &mdash; Convert a list of code points to a string.
-* [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return a one character string given a 4 or 8 character unicode
-escape string.
-* [slice](#slice) &mdash; Extract a substring from a string by its Unicode character
-position (not byte index).
-* [visibleControl](#visiblecontrol) &mdash; Return a new string with the tab and line endings and other
-control characters visible.
-* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the
-given text.
+* [parseHexUnicodeToString](#parsehexunicodetostring) &mdash; Return a one character string given a 4 or 8 character unicode escape string.
+* [slice](#slice) &mdash; Extract a substring from a string by its Unicode character position (not byte index).
+* [visibleControl](#visiblecontrol) &mdash; Return a new string with the tab and line endings and other control characters visible.
+* [startColumn](#startcolumn) &mdash; Return enough spaces to point at the start byte position of the given text.
 
 # cmpString
 

@@ -20,8 +20,7 @@ Nim source code: <a href="../../src/args.nim">args.nim</a>
 <li>type:  <a href="#PrepostTable">PrepostTable</a> &mdash; The prefix postfix pairs stored in an ordered dictionary.</li>
 <li>type:  <a href="#Args">Args</a> &mdash; Args holds all the command line arguments.</li>
 <li>type:  <a href="#ArgsOr">ArgsOr</a> &mdash; The args or a warning.</li>
-<li> <a href="#makeUserPrepostTable">makeUserPrepostTable</a> &mdash; Return the user's ordered table that maps prefixes to
-postfixes.</li>
+<li> <a href="#makeUserPrepostTable">makeUserPrepostTable</a> &mdash; Return the user's ordered table that maps prefixes to postfixes.</li>
 <li> <a href="#newArgsOr">newArgsOr</a> &mdash; Return a new ArgsOr object containing a warning.</li>
 <li> <a href="#newArgsOr-1">newArgsOr</a> &mdash; Return a new ArgsOr object containing a warning.</li>
 <li> <a href="#newArgsOr-2">newArgsOr</a> &mdash; Return a new ArgsOr object containing args.</li>
@@ -31,8 +30,7 @@ postfixes.</li>
 <li> <a href="#a__-2">`$`</a> &mdash; Return the seq[Prepost] string representation.</li>
 <li>const:  <a href="#predefinedPrepost">predefinedPrepost</a> &mdash; The predefined prefixes and postfixes.</li>
 <li> <a href="#makeDefaultPrepostTable">makeDefaultPrepostTable</a> &mdash; Return the default ordered table that maps prefixes to postfixes.</li>
-<li> <a href="#getPrepostTable">getPrepostTable</a> &mdash; Get the the prepost settings from the user or use the default
-ones.</li>
+<li> <a href="#getPrepostTable">getPrepostTable</a> &mdash; Get the the prepost settings from the user or use the default ones.</li>
 </ul>
 
 <h3 id="Prepost">Prepost</h3>
@@ -161,18 +159,7 @@ func `$`(prepostList: seq[Prepost]): string {.raises: [ValueError], tags: [].}
 <h3 id="predefinedPrepost">predefinedPrepost</h3>
 
 <p>The predefined prefixes and postfixes.
-
-</p><ul>
-<li>$$ — Default when no comment like Markdown
-</li><li>﹤!--$ and --&gt; — HTML
-</li><li>#$ — Bash, python, etc.
-</li><li>;$ — Config files, Lisp
-</li><li>//$ — C++
-</li><li>/*$ and */ — C, C++
-</li><li>﹠lt;!--$ and --﹠gt; — HTML inside a textarea element
-</li><li>#␠$ — Org Mode
-</li></ul>
-
+</p>
 
 <pre class="nim-code">
 predefinedPrepost: array[8, Prepost] = [(prefix: "$$", postfix: ""),

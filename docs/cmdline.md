@@ -31,8 +31,7 @@ section.
 * [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
-* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered
-dictionary.
+* type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.
 * type: [CmlMessageId](#cmlmessageid) &mdash; Possible message IDs returned by cmdline.
 * type: [ArgsOrMessageKind](#argsormessagekind) &mdash; The kind of an ArgsOrMessage object, either args or a message.
 * type: [ArgsOrMessage](#argsormessage) &mdash; Contains the command line args or a message.
@@ -40,13 +39,11 @@ dictionary.
 * type: [CmlOption](#cmloption) &mdash; An CmlOption holds its type, long name and short name.
 * [newCmlOption](#newcmloption) &mdash; Create a new CmlOption object.
 * [newArgsOrMessage](#newargsormessage) &mdash; Create a new ArgsOrMessage object containing arguments.
-* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and
-optionally the problem argument.
+* [newArgsOrMessage](#newargsormessage-1) &mdash; Create a new ArgsOrMessage object containing a message id and optionally the problem argument.
 * [`$`](#) &mdash; Return a string representation of an CmlOption object.
 * [`$`](#-1) &mdash; Return a string representation of a ArgsOrMessage object.
 * [commandLineEcho](#commandlineecho) &mdash; Show the command line arguments.
-* [collectArgs](#collectargs) &mdash; Get the command line arguments from the system and return a
-list.
+* [collectArgs](#collectargs) &mdash; Get the command line arguments from the system and return a list.
 * [cmdLine](#cmdline) &mdash; Parse the command line arguments.
 * const: [cmlMessages](#cmlmessages) &mdash; Messages used by this module.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.

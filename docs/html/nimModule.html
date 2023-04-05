@@ -83,18 +83,15 @@
 </span>  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">entry.name</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
-<span class="t-dotName">u.fixup-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">rawDescripton</span>: <span class="t-type">string</span>, <span class="t-param">templateType</span>: <span class="t-type">string</span>, <span class="t-param">patterns</span>: <span class="t-type">list</span>) <span class="t-type">dict</span>
-  <span class="t-doc">## Fix up the description for html or markdown. Remove the special
-</span>  <span class="t-doc">## patterns from the description resulting in markdown.  For the
-</span>  <span class="t-doc">## html template convert the markdown to html. For the md template
+<span class="t-dotName">u.fixup-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDescription</span>: <span class="t-type">string</span>, <span class="t-param">templateType</span>: <span class="t-type">string</span>) <span class="t-type">dict</span>
+  <span class="t-doc">## Fix up the description for html or markdown.  For the html
+</span>  <span class="t-doc">## template convert the markdown to html. For the md template
 </span>  <span class="t-doc">## replace the statictea code blocks with javascript so the code is
 </span>  <span class="t-doc">## highlighted by github.
 </span>
-  <span class="t-comment"># Remove the special markup resulting in markdown text.
-</span>  <span class="t-dotName">mdDescription</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">rawDescripton</span>, <span class="t-dotName">patterns</span>)
-
   <span class="t-comment"># Use the first sentence for the short description.
-</span>  <span class="t-dotName">short</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">mdDescription</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">mdDescription</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
+</span>  <span class="t-dotName">first</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">mdDescription</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">mdDescription</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
+  <span class="t-dotName">short</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">first</span>, [<span class="t-str">&quot;\n&quot;</span>, <span class="t-str">&quot; &quot;</span>])
 
   <span class="t-comment"># Convert the markdown description to html for the html
 </span>  <span class="t-comment"># template. For md switch statictea code blocks to javascript.
@@ -123,7 +120,7 @@
   <span class="t-comment"># Remove the special formatting from the description and encode it
 </span>  <span class="t-comment"># for html or markdown.
 </span>  <span class="t-dotName">rawDescription</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
-  <span class="t-dotName">ret</span> = <span class="t-funcCall">u.fixup-description</span>(<span class="t-dotName">rawDescription</span>, <span class="t-dotName">state.templateType</span>, <span class="t-dotName">state.patterns</span>)
+  <span class="t-dotName">ret</span> = <span class="t-funcCall">u.fixup-description</span>(<span class="t-dotName">rawDescription</span>, <span class="t-dotName">state.templateType</span>)
   <span class="t-dotName">newEntry.description</span> = <span class="t-dotName">ret.description</span>
   <span class="t-dotName">newEntry.short</span> = <span class="t-dotName">ret.short</span>
 
@@ -135,22 +132,6 @@
   <span class="t-dotName">newEntry.anchor</span> = <span class="t-dotName">state.anchors</span>[<span class="t-dotName">ix</span>]
   <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">newEntry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
-
-<span class="t-comment"># Define replacement patterns to remove special formatting from the
-</span><span class="t-comment"># descriptions.
-</span><span class="t-dotName">patterns</span> = [ +
-  <span class="t-str">&quot;~~~~&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>, +
-  <span class="t-str">&quot;@@&quot;</span>, <span class="t-str">&quot;&quot;</span>, +
-  <span class="t-str">&quot;@{&quot;</span>, <span class="t-str">&quot;[&quot;</span>, +
-  <span class="t-str">&quot;}@&quot;</span>, <span class="t-str">&quot;]&quot;</span>, +
-  <span class="t-str">&quot;@!&quot;</span>, <span class="t-str">&quot;|&quot;</span>, +
-  <span class="t-str">&quot;[ ]*@:&quot;</span>, <span class="t-str">&quot;\n&quot;</span>, +
-  <span class="t-str">&quot;@\\.&quot;</span>, <span class="t-str">&quot;*&quot;</span>, +
-  <span class="t-str">&quot;&amp;quot;&quot;</span>, <span class="t-str">&quot;\&quot;&quot;</span>, +
-  <span class="t-str">&quot;&amp;gt;&quot;</span>, <span class="t-str">&quot;&gt;&quot;</span>, +
-  <span class="t-str">&quot;&amp;lt;&quot;</span>, <span class="t-str">&quot;&lt;&quot;</span>, +
-  <span class="t-str">&quot;&amp;amp;&quot;</span>, <span class="t-str">&quot;&amp;&quot;</span> +
-]
 
 <span class="t-comment"># Determine the template type from the template&#x27;s extension.
 </span><span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">t.args.resultFilename</span>)
@@ -166,12 +147,11 @@
 <span class="t-dotName">o.moduleName</span> = <span class="t-dotName">origPath.filename</span>
 
 <span class="t-comment"># Format the description for html or markdown.
-</span><span class="t-dotName">ret</span> = <span class="t-funcCall">u.fixup-description</span>(<span class="t-dotName">s.moduleDescription</span>, <span class="t-dotName">templateType</span>, <span class="t-dotName">patterns</span>)
+</span><span class="t-dotName">ret</span> = <span class="t-funcCall">u.fixup-description</span>(<span class="t-dotName">s.moduleDescription</span>, <span class="t-dotName">templateType</span>)
 <span class="t-dotName">o.moduleDescription</span> = <span class="t-dotName">ret.description</span>
 
 <span class="t-comment"># Reformat the server entries list and store it in o.entries.
 </span><span class="t-dotName">state</span> = <span class="t-funcCall">dict</span>()
-<span class="t-dotName">state.patterns</span> = <span class="t-dotName">patterns</span>
 <span class="t-dotName">state.anchors</span> = <span class="t-dotName">anchors</span>
 <span class="t-dotName">state.templateType</span> = <span class="t-dotName">templateType</span>
 <span class="t-dotName">o.entries</span> = []

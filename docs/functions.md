@@ -18,8 +18,7 @@ function implements the "cmp" function for floats.
 * [functionDetails](#functiondetails) &mdash; Convert the function spec to a dictionary value.
 * [cmpBaseValues](#cmpbasevalues) &mdash; Compares two values a and b.
 * [parseNumber](#parsenumber) &mdash; Return the literal number value and position after it.
-* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with
-their values.
+* [formatString](#formatstring) &mdash; Format a string by filling in the variable placeholders with their values.
 * [fun_cmp_iii](#fun_cmp_iii) &mdash; Compare two ints.
 * [fun_cmp_ffi](#fun_cmp_ffi) &mdash; Compare two floats.
 * [fun_cmp_ssobi](#fun_cmp_ssobi) &mdash; Compare two strings.
@@ -29,10 +28,8 @@ their values.
 * [fun_len_di](#fun_len_di) &mdash; Number of elements in a dictionary.
 * [fun_get_lioaa](#fun_get_lioaa) &mdash; Get a list value by its index.
 * [fun_get_dsoaa](#fun_get_dsoaa) &mdash; Get a dictionary value by its key.
-* [fun_if0_iaoaa](#fun_if0_iaoaa) &mdash; If the condition is 0, return the second argument, else return
-the third argument.
-* [fun_if_baoaa](#fun_if_baoaa) &mdash; If the condition is true, return the second argument, else return
-the third argument.
+* [fun_if0_iaoaa](#fun_if0_iaoaa) &mdash; If the condition is 0, return the second argument, else return the third argument.
+* [fun_if_baoaa](#fun_if_baoaa) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [fun_add_iii](#fun_add_iii) &mdash; Add two integers.
 * [fun_add_fff](#fun_add_fff) &mdash; Add two floats.
 * [fun_sub_iii](#fun_sub_iii) &mdash; Subtract two integers.
@@ -56,8 +53,7 @@ the third argument.
 * [fun_dict_old](#fun_dict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [fun_list_al](#fun_list_al) &mdash; Create a list of variables.
 * [fun_listLoop_lapoab](#fun_listloop_lapoab) &mdash; Loop over items in a list and fill in a container.
-* [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with
-another string.
+* [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [fun_replaceRe_sls](#fun_replacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
 * [fun_path_sosd](#fun_path_sosd) &mdash; Split a file path into its component pieces.
@@ -68,18 +64,15 @@ another string.
 * [fun_sort_lssil](#fun_sort_lssil) &mdash; Sort a list of lists.
 * [fun_sort_lsssl](#fun_sort_lsssl) &mdash; Sort a list of dictionaries.
 * [fun_anchors_lsl](#fun_anchors_lsl) &mdash; Create anchor names from heading names.
-* [fun_type_as](#fun_type_as) &mdash; Return the argument type, one of: int, float, string, list,
-dict, bool or func.
+* [fun_type_as](#fun_type_as) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
 * [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
 * [fun_join_lsois](#fun_join_lsois) &mdash; Join a list of strings with a separator.
 * [fun_warn_ss](#fun_warn_ss) &mdash; Return a warning message and skip the current statement.
 * [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file.
-* [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and
-has has side effects.
+* [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has has side effects.
 * [fun_string_aoss](#fun_string_aoss) &mdash; Convert a variable to a string.
 * [fun_string_sds](#fun_string_sds) &mdash; Convert the dictionary variable to dot names.
-* [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a
-replacement block.
+* [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a replacement block.
 * [fun_func_sp](#fun_func_sp) &mdash; Define a function.
 * [fun_functionDetails_pd](#fun_functiondetails_pd) &mdash; Return the function details in a dictionary.
 * [fun_startsWith_ssb](#fun_startswith_ssb) &mdash; Check whether a strings starts with the given prefix.
@@ -101,21 +94,16 @@ replacement block.
 * [fun_lte_iib](#fun_lte_iib) &mdash; Return true when an int is less than or equal to another int.
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
-* [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs,
-bullets and code blocks.
-* [fun_highlight_sl](#fun_highlight_sl) &mdash; Divide a string of StaticTea code into fragments useful for
-syntax highlighting.
+* [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
+* [fun_highlight_sl](#fun_highlight_sl) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
 * [escapeHtmlBody](#escapehtmlbody) &mdash; Excape text for placing in body html.
 * [escapeHtmlAttribute](#escapehtmlattribute) &mdash; Excape text for placing in an html attribute.
 * [fun_html_sss](#fun_html_sss) &mdash; Escape text for placing it in an html page.
 * [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
-* [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a
-list of arguments, return the one that best matches the
-arguments.
-* [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like:
-"cmp" and "ffi".
+* [getBestFunction](#getbestfunction) &mdash; Given a function variable or a list of function variables and a list of arguments, return the one that best matches the arguments.
+* [splitFuncName](#splitfuncname) &mdash; Split a funcName like "fun_cmp_ffi" to its name and signature like: "cmp" and "ffi".
 * [makeFuncDictionary](#makefuncdictionary) &mdash; Create the f dictionary from the built in functions.
 * [funcsVarDict](#funcsvardict) &mdash; The f dictionary of built-in functions.
 
@@ -1507,8 +1495,8 @@ Examples:
 
 ~~~javascript
 list = list("Tea", "Water", "Tea")
-anchors(list, "github") =>
-  ["tea", "water", "tea-1"]
+a = anchors(list, "github")
+# a => ["tea", "water", "tea-1"]
 ~~~
 
 
@@ -2455,7 +2443,7 @@ places:
 
 ~~~javascript
 name = html("Mad <Hatter>", "body")
-  => "Mad <Hatter>"
+  => "Mad &lt;Hatter&gt;"
 ~~~
 
 For more information about how to escape and what is safe see:

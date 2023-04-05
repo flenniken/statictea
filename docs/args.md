@@ -10,8 +10,7 @@ Types for handling command line arguments.
 * type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
 * type: [Args](#args) &mdash; Args holds all the command line arguments.
 * type: [ArgsOr](#argsor) &mdash; The args or a warning.
-* [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to
-postfixes.
+* [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
 * [newArgsOr](#newargsor) &mdash; Return a new ArgsOr object containing a warning.
 * [newArgsOr](#newargsor-1) &mdash; Return a new ArgsOr object containing a warning.
 * [newArgsOr](#newargsor-2) &mdash; Return a new ArgsOr object containing args.
@@ -21,8 +20,7 @@ postfixes.
 * [`$`](#-2) &mdash; Return the seq[Prepost] string representation.
 * const: [predefinedPrepost](#predefinedprepost) &mdash; The predefined prefixes and postfixes.
 * [makeDefaultPrepostTable](#makedefaultpreposttable) &mdash; Return the default ordered table that maps prefixes to postfixes.
-* [getPrepostTable](#getpreposttable) &mdash; Get the the prepost settings from the user or use the default
-ones.
+* [getPrepostTable](#getpreposttable) &mdash; Get the the prepost settings from the user or use the default ones.
 
 # Prepost
 
@@ -150,15 +148,6 @@ func `$`(prepostList: seq[Prepost]): string {.raises: [ValueError], tags: [].}
 # predefinedPrepost
 
 The predefined prefixes and postfixes.
-
-* $$ — Default when no comment like Markdown
-* ﹤!--$ and --> — HTML
-* #$ — Bash, python, etc.
-* ;$ — Config files, Lisp
-* //$ — C++
-* /*$ and */ — C, C++
-* ﹠lt;!--$ and --﹠gt; — HTML inside a textarea element
-* #␠$ — Org Mode
 
 
 ~~~nim

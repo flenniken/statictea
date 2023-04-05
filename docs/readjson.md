@@ -8,12 +8,9 @@ Read json content.
 
 * const: [maxDepth](#maxdepth) &mdash; The maximum depth you can nest items.
 * [jsonToValue](#jsontovalue) &mdash; Convert a Nim json node to a statictea value.
-* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the parsed data in a value object
-or return a warning.
-* [readJsonString](#readjsonstring) &mdash; Read a json string and return the parsed data in a value object
-or return a warning.
-* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the parsed data in a value object or
-return a warning.
+* [readJsonStream](#readjsonstream) &mdash; Read a json stream and return the parsed data in a value object or return a warning.
+* [readJsonString](#readjsonstring) &mdash; Read a json string and return the parsed data in a value object or return a warning.
+* [readJsonFile](#readjsonfile) &mdash; Read a json file and return the parsed data in a value object or return a warning.
 * [unescapePopularChar](#unescapepopularchar) &mdash; Unescape the popular char and return its value.
 * [parseJsonStr](#parsejsonstr) &mdash; Parse the quoted json string literal.
 
@@ -81,16 +78,16 @@ not a popular char, return 0.
 Popular characters and their escape values:
 
 ~~~
-|char      | name           | unicode|
-|----------|----------------|--------|
-|"         | quotation mark | U+0022 |
-|\\        | reverse solidus| U+005C |
-|/         | solidus        | U+002F |
-|b         | backspace      | U+0008 |
-|f         | form feed      | U+000C |
-|n         | line feed      | U+000A |
-|r         | carriage return| U+000D |
-|t         | tab            | U+0009 |
+│char │ name            │ unicode│
+├─────┼─────────────────┼────────┤
+│"    │ quotation mark  │ U+0022 │
+│\\   │ reverse solidus │ U+005C │
+│/    │ solidus         │ U+002F │
+│b    │ backspace       │ U+0008 │
+│f    │ form feed       │ U+000C │
+│n    │ line feed       │ U+000A │
+│r    │ carriage return │ U+000D │
+│t    │ tab             │ U+0009 │
 ~~~
 
 

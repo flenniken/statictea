@@ -6,7 +6,7 @@
 ## import cmdline
 ##
 ## # Define the supported options.
-## var options = newSeq@{CmlOption]()
+## var options = newSeq[CmlOption]()
 ## options.add(newCmlOption("help", 'h', cmlStopArgument))
 ## options.add(newCmlOption("log", 'l', cmlOptionalArgument))
 ## ...
@@ -20,7 +20,7 @@
 ## else:
 ##   # Optionally post process the resulting arguments.
 ##   let args = newArgs(argsOrMessage.args)
-## ~~~~
+## ~~~
 ##
 ## For a complete example see the bottom of the file in the isMainModule
 ## section.

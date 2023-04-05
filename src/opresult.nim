@@ -1,8 +1,6 @@
-## OpResult holds either a value or a message.  It's similar to
-## the Option type but instead of returning nothing, you return a
-## message that tells why you cannot return the value.
-##
-## You use this to make particular OpResult objects. See @{OpResultId}@(opresultid.md).
+## OpResult holds either a value or a message.  It's similar to the
+## Option type but instead of returning nothing, you return a message
+## that tells why you cannot return the value.
 
 import messages
 
@@ -51,9 +49,9 @@ type
     ##
     ## proc get_string(): OpResultWarn[string] =
     ##   if problem:
-    ##     result = opMessage@{string}@(newWarningData(wUnknownArg))
+    ##     result = opMessage[string](newWarningData(wUnknownArg))
     ##   else:
-    ##     result = opValue@{string}@("string of char")
+    ##     result = opValue[string]("string of char")
     ##
     ## let strOr = get_string()
     ## if strOr.isMessage:
@@ -83,9 +81,9 @@ type
     ##
     ## proc get_string(): OpResultId[string] =
     ##   if problem:
-    ##     result = opMessage@{string}@(wUnknownArg)
+    ##     result = opMessage[string](wUnknownArg)
     ##   else:
-    ##     result = opValue@{string}@("string of char")
+    ##     result = opValue[string]("string of char")
     ##
     ## let strOr = get_string()
     ## if strOr.isMessage:

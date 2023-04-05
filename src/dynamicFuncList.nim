@@ -54,8 +54,8 @@ Examples:
 
 ~~~statictea
 list = list("Tea", "Water", "Tea")
-anchors(list, "github") =>
-  ["tea", "water", "tea-1"]
+a = anchors(list, "github")
+# a => ["tea", "water", "tea-1"]
 ~~~
 
 """
@@ -710,7 +710,7 @@ places:
 
 ~~~statictea
 name = html("Mad <Hatter>", "body")
-  => "Mad <Hatter>"
+  => "Mad &lt;Hatter&gt;"
 ~~~
 
 For more information about how to escape and what is safe see:

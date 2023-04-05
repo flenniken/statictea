@@ -7,36 +7,30 @@ StaticTea variable types.
 # Index
 
 * const: [variableStartChars](#variablestartchars) &mdash; The characters that make up a variable dotname.
-* const: [variableMiddleChars](#variablemiddlechars) &mdash; A variable contains ascii letters, digits, underscores and
-hypens.
-* const: [variableChars](#variablechars) &mdash; A variable contains ascii letters, digits, underscores and
-hypens.
+* const: [variableMiddleChars](#variablemiddlechars) &mdash; A variable contains ascii letters, digits, underscores and hypens.
+* const: [variableChars](#variablechars) &mdash; A variable contains ascii letters, digits, underscores and hypens.
 * const: [startTFVarNumber](#starttfvarnumber) &mdash; A character that starts true, false, a variable or a number.
 * type: [VarsDict](#varsdict) &mdash; This is a ref type.
 * type: [Mutable](#mutable) &mdash; The mutable state of lists and dictionaries.
 * type: [DictType](#dicttype) &mdash; The statictea dictionary type.
 * type: [ListType](#listtype) &mdash; The statictea list type.
-* type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct
-logical dictionaries.
+* type: [Variables](#variables) &mdash; Dictionary holding all statictea variables in multiple distinct logical dictionaries.
 * type: [VarsDictOr](#varsdictor) &mdash; A VarsDict object or a warning.
 * type: [ValueKind](#valuekind) &mdash; The statictea variable types.
 * type: [Value](#value) &mdash; A variable's value reference.
 * type: [ValueOr](#valueor) &mdash; A Value object or a warning.
 * type: [Statement](#statement) &mdash; Statement object stores the statement text, the line number and its line ending.
 * type: [FunctionPtr](#functionptr) &mdash; Signature of a statictea built in function.
-* type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int,
-float, string, list, dict, func, any.
+* type: [ParamCode](#paramcode) &mdash; Parameter type, one character of "ifsldpa" corresponding to int, float, string, list, dict, func, any.
 * type: [ParamType](#paramtype) &mdash; The statictea parameter types.
 * type: [Param](#param) &mdash; Holds attributes for one parameter.
 * type: [Signature](#signature) &mdash; Holds the function signature.
 * type: [SignatureOr](#signatureor) &mdash; A signature or message.
 * type: [FunctionSpec](#functionspec) &mdash; Holds the function details.
 * type: [FunResultKind](#funresultkind) &mdash; The kind of a FunResult object, either a value or warning.
-* type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a
-warning.
+* type: [FunResult](#funresult) &mdash; Contains the result of calling a function, either a value or a warning.
 * type: [SideEffect](#sideeffect) &mdash; The kind of side effect for a statement.
-* type: [ValuePosSi](#valuepossi) &mdash; A value and the position after the value in the statement along
-with the side effect, if any.
+* type: [ValuePosSi](#valuepossi) &mdash; A value and the position after the value in the statement along with the side effect, if any.
 * type: [ValuePosSiOr](#valuepossior) &mdash; A ValuePosSi object or a warning.
 * [newSignature](#newsignature) &mdash; Create a Signature object.
 * [newSignatureOr](#newsignatureor) &mdash; Create a new SignatureOr with a message.
@@ -57,8 +51,7 @@ with the side effect, if any.
 * [newValue](#newvalue-5) &mdash; Create a dictionary value from a VarsDict.
 * [newValue](#newvalue-6) &mdash; Create a new value from an existing value.
 * [newValue](#newvalue-7) &mdash; Create a new list value from an array of items of the same kind.
-* [newValue](#newvalue-8) &mdash; Create a new dict value from an array of pairs where the pairs
-are the same type which may be Value type.
+* [newValue](#newvalue-8) &mdash; Create a new dict value from an array of pairs where the pairs are the same type which may be Value type.
 * [newFunc](#newfunc) &mdash; Create a new func which is a FunctionSpec.
 * [newValue](#newvalue-9) &mdash; Create a new func value.
 * [newEmptyListValue](#newemptylistvalue) &mdash; Create a new empty list value.
@@ -71,8 +64,7 @@ are the same type which may be Value type.
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
 * [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
-* [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the
-replacement blocks.
+* [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
 * [`$`](#-3) &mdash; Return a string representation of a Value.
 * [`$`](#-4) &mdash; Return a string representation of a VarsDict.
 * [dotNameRep](#dotnamerep) &mdash; Return a dot name string representation of a dictionary.
@@ -81,8 +73,7 @@ replacement blocks.
 * [newValueOr](#newvalueor-1) &mdash; Create a new ValueOr containing a warning.
 * [newValueOr](#newvalueor-2) &mdash; Create a new ValueOr containing a value.
 * [newFunResultWarn](#newfunresultwarn) &mdash; Return a new FunResult object containing a warning.
-* [newFunResultWarn](#newfunresultwarn-1) &mdash; Return a new FunResult object containing a warning created from a
-WarningData object.
+* [newFunResultWarn](#newfunresultwarn-1) &mdash; Return a new FunResult object containing a warning created from a WarningData object.
 * [newFunResult](#newfunresult) &mdash; Return a new FunResult object containing a value.
 * [`==`](#-5) &mdash; Compare two FunResult objects and return true when equal.
 * [`!=`](#-6) &mdash; Compare two FunResult objects and return false when equal.
