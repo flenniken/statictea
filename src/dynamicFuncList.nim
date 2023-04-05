@@ -241,7 +241,7 @@ cmp("Tea", "tea", false) => 0
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
-~~~statictea
+~~~ statictea
 cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
@@ -251,7 +251,7 @@ to three digits (no letters).
 
 Examples:
 
-~~~statictea
+~~~ statictea
 cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
@@ -658,40 +658,6 @@ Examples:
 ~~~statictea
 gte(2, 4) => false
 gte(3, 3) => true
-~~~
-
-"""
-
-  dc_fun_highlight_sl = """
-Divide a string of StaticTea code into fragments useful for
-syntax highlighting.  Return a list of tagged fragments.
-
-~~~statictea
-highlight = func(code: string) list
-~~~
-
-Tags:
-
-* other — not one of the other types
-* dotName — a dot name
-* funcCall — a function call; a dot name followed by a left parenthesis
-* num — a literal number
-* str — a literal string
-* multiline — a multiline literal string
-* doc — a doc comment
-* comment — a comment
-* param — a parameter name
-* type — int, float, string, list, dict, bool, func, any and optional
-
-Example:
-
-~~~statictea
-frags = highlight("a = 5")
-frags => [
-  ["dotName", "a"],
-  ["other", " = "],
-  ["num", "5"],
-]
 ~~~
 
 """
@@ -1310,6 +1276,40 @@ or(true, warn("not hit")) => true
 
 """
 
+  dc_fun_parseCode_sl = """
+Parse a string of StaticTea code into fragments useful for
+syntax highlighting.  Return a list of tagged fragments.
+
+~~~statictea
+parseCode = func(code: string) list
+~~~
+
+Tags:
+
+* other — not one of the other types
+* dotName — a dot name
+* funcCall — a function call; a dot name followed by a left parenthesis
+* num — a literal number
+* str — a literal string
+* multiline — a multiline literal string
+* doc — a doc comment
+* comment — a comment
+* param — a parameter name
+* type — int, float, string, list, dict, bool, func, any and optional
+
+Example:
+
+~~~statictea
+frags = parseCode("a = 5")
+frags => [
+  ["dotName", "a"],
+  ["other", " = "],
+  ["num", "5"],
+]
+~~~
+
+"""
+
   dc_fun_path_sosd = """
 Split a file path into its component pieces. Return a dictionary
 with the filename, basename, extension and directory.
@@ -1850,7 +1850,6 @@ warn("always warn")
     info("fun_gt_iib", dc_fun_gt_iib, 19),
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
     info("fun_gte_iib", dc_fun_gte_iib, 19),
-    info("fun_highlight_sl", dc_fun_highlight_sl, 45),
     info("fun_html_sss", dc_fun_html_sss, 34),
     info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 57),
     info("fun_if_baoaa", dc_fun_if_baoaa, 39),
@@ -1877,6 +1876,7 @@ warn("always warn")
     info("fun_ne_ssb", dc_fun_ne_ssb, 19),
     info("fun_not_bb", dc_fun_not_bb, 18),
     info("fun_or_bbb", dc_fun_or_bbb, 23),
+    info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
     info("fun_path_sosd", dc_fun_path_sosd, 55),
     info("fun_readJson_sa", dc_fun_readJson_sa, 23),
     info("fun_replace_siiss", dc_fun_replace_siiss, 110),
@@ -1934,7 +1934,6 @@ warn("always warn")
     2550,
     2607,
     2588,
-    2769,
     2845,
     566,
     623,
@@ -1961,6 +1960,7 @@ warn("always warn")
     2531,
     2371,
     2412,
+    2769,
     1531,
     2704,
     1362,

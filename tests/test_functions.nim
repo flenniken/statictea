@@ -182,9 +182,9 @@ proc testMarkdownLite(text: string, eJson: string): bool =
   let funResult = callFunction("markdownLite", arguments)
   result = gotExpected($funResult, eJson)
 
-proc testHighlight(text: string, expected: string): bool =
+proc testParseCode(text: string, expected: string): bool =
   var arguments = @[newValue(text)]
-  let funResult = callFunction("highlight", arguments)
+  let funResult = callFunction("parseCode", arguments)
   if funResult.kind == frWarning:
     echo "got a warning"
     return false
@@ -2081,7 +2081,7 @@ end
     assert eValueOr.isValue
     check testMarkdownLite(text, $eValueOr.value)
 
-  test "highlight":
+  test "parseCode":
     let text = """
 a = 5
 """
@@ -2091,9 +2091,9 @@ a = 5
 2: ["num","5"]
 3: ["other","\n"]
 """
-    check testHighlight(text, expected)
+    check testParseCode(text, expected)
 
-  test "highlight":
+  test "parseCode":
     let text = """
 a = 5 # comment here
 len = len("tea")
@@ -2113,7 +2113,7 @@ len = len("tea")
 10: ["other",")\n"]
 11: ["comment","# testing\n"]
 """
-    check testHighlight(text, expected)
+    check testParseCode(text, expected)
 
   test "escapeHtmlBody":
     check escapeHtmlBody("") == ""

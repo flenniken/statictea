@@ -2766,12 +2766,12 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
     elementList.listv.list.add(sublist)
   result = newFunResult(elementList)
 
-func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Divide a string of StaticTea code into fragments useful for
+func fun_parseCode_sl*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Parse a string of StaticTea code into fragments useful for
   ## syntax highlighting.  Return a list of tagged fragments.
   ##
   ## ~~~statictea
-  ## highlight = func(code: string) list
+  ## parseCode = func(code: string) list
   ## ~~~
   ##
   ## Tags:
@@ -2790,14 +2790,14 @@ func fun_highlight_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Example:
   ##
   ## ~~~statictea
-  ## frags = highlight("a = 5")
+  ## frags = parseCode("a = 5")
   ## frags => [
   ##   ["dotName", "a"],
   ##   ["other", " = "],
   ##   ["num", "5"],
   ## ]
   ## ~~~
-  tMapParameters("highlight", "sl")
+  tMapParameters("parseCode", "sl")
   let codeText = map["a"].stringv
   var fragments = highlightCode(codeText)
 
@@ -2909,7 +2909,7 @@ functionsDict["fun_gt_ffb"] = fun_gt_ffb
 functionsDict["fun_gt_iib"] = fun_gt_iib
 functionsDict["fun_gte_ffb"] = fun_gte_ffb
 functionsDict["fun_gte_iib"] = fun_gte_iib
-functionsDict["fun_highlight_sl"] = fun_highlight_sl
+functionsDict["fun_parseCode_sl"] = fun_parseCode_sl
 functionsDict["fun_html_sss"] = fun_html_sss
 functionsDict["fun_if_baoaa"] = fun_if_baoaa
 functionsDict["fun_if0_iaoaa"] = fun_if0_iaoaa

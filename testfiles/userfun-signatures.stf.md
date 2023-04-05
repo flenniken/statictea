@@ -109,7 +109,6 @@ gt(a: float, b: float) bool
 gt(a: int, b: int) bool
 gte(a: float, b: float) bool
 gte(a: int, b: int) bool
-highlight(a: string) list
 html(a: string, b: string) string
 if0(a: int, b: any, c: any) any
 if(a: bool, b: any, c: any) any
@@ -136,6 +135,7 @@ ne(a: int, b: int) bool
 ne(a: string, b: string) bool
 not(a: bool) bool
 or(a: bool, b: bool) bool
+parseCode(a: string) list
 path(a: string, b: string) dict
 readJson(a: string) any
 replace(a: string, b: int, c: int, d: string) string

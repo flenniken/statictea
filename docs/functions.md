@@ -95,7 +95,7 @@ function implements the "cmp" function for floats.
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
 * [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
-* [fun_highlight_sl](#fun_highlight_sl) &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.
+* [fun_parseCode_sl](#fun_parsecode_sl) &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.
 * [escapeHtmlBody](#escapehtmlbody) &mdash; Excape text for placing in body html.
 * [escapeHtmlAttribute](#escapehtmlattribute) &mdash; Excape text for placing in an html attribute.
 * [fun_html_sss](#fun_html_sss) &mdash; Escape text for placing it in an html page.
@@ -2371,13 +2371,13 @@ func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
     raises: [KeyError], tags: [].}
 ~~~
 
-# fun_highlight_sl
+# fun_parseCode_sl
 
-Divide a string of StaticTea code into fragments useful for
+Parse a string of StaticTea code into fragments useful for
 syntax highlighting.  Return a list of tagged fragments.
 
 ~~~javascript
-highlight = func(code: string) list
+parseCode = func(code: string) list
 ~~~
 
 Tags:
@@ -2396,7 +2396,7 @@ Tags:
 Example:
 
 ~~~javascript
-frags = highlight("a = 5")
+frags = parseCode("a = 5")
 frags => [
   ["dotName", "a"],
   ["other", " = "],
@@ -2406,7 +2406,7 @@ frags => [
 
 
 ~~~nim
-func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_parseCode_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ~~~
 

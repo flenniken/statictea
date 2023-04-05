@@ -42,8 +42,6 @@ replacement block.
 * [gt](#gt-1) &mdash; Return true when an int is greater then another int.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
 * [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
-* [highlight](#highlight) &mdash; Divide a string of StaticTea code into fragments useful for
-syntax highlighting.
 * [html](#html) &mdash; Escape text for placing it in an html page.
 * [if0](#if0) &mdash; If the condition is 0, return the second argument, else return
 the third argument.
@@ -73,6 +71,8 @@ bullets and code blocks.
 * [ne](#ne-2) &mdash; Return true when two strings are not equal.
 * [not](#not) &mdash; Boolean not.
 * [or](#or) &mdash; Boolean OR with short circuit.
+* [parseCode](#parsecode) &mdash; Parse a string of StaticTea code into fragments useful for
+syntax highlighting.
 * [path](#path) &mdash; Split a file path into its component pieces.
 * [readJson](#readjson) &mdash; Convert a JSON string to a variable.
 * [replace](#replace) &mdash; Replace a substring specified by its position and length with
@@ -343,7 +343,7 @@ cmp("Tea", "tea", false) => 0
 Compare two StaticTea version numbers. Returns -1 for less, 0 for
 equal and 1 for greater than.
 
-~~~javascript
+~~~ statictea
 cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
@@ -353,7 +353,7 @@ to three digits (no letters).
 
 Examples:
 
-~~~javascript
+~~~ statictea
 cmpVersion("1.2.5", "1.1.8") => 1
 cmpVersion("1.2.5", "1.3.0") => -1
 cmpVersion("1.2.5", "1.2.5") => 0
@@ -780,41 +780,6 @@ Examples:
 ~~~javascript
 gte(2, 4) => false
 gte(3, 3) => true
-~~~
-
-
-
-# highlight
-
-Divide a string of StaticTea code into fragments useful for
-syntax highlighting.  Return a list of tagged fragments.
-
-~~~javascript
-highlight = func(code: string) list
-~~~
-
-Tags:
-
-* other — not one of the other types
-* dotName — a dot name
-* funcCall — a function call; a dot name followed by a left parenthesis
-* num — a literal number
-* str — a literal string
-* multiline — a multiline literal string
-* doc — a doc comment
-* comment — a comment
-* param — a parameter name
-* type — int, float, string, list, dict, bool, func, any and optional
-
-Example:
-
-~~~javascript
-frags = highlight("a = 5")
-frags => [
-  ["dotName", "a"],
-  ["other", " = "],
-  ["num", "5"],
-]
 ~~~
 
 
@@ -1455,6 +1420,41 @@ or(false, true) => true
 or(true, false) => true
 or(false, false) => false
 or(true, warn("not hit")) => true
+~~~
+
+
+
+# parseCode
+
+Parse a string of StaticTea code into fragments useful for
+syntax highlighting.  Return a list of tagged fragments.
+
+~~~javascript
+parseCode = func(code: string) list
+~~~
+
+Tags:
+
+* other — not one of the other types
+* dotName — a dot name
+* funcCall — a function call; a dot name followed by a left parenthesis
+* num — a literal number
+* str — a literal string
+* multiline — a multiline literal string
+* doc — a doc comment
+* comment — a comment
+* param — a parameter name
+* type — int, float, string, list, dict, bool, func, any and optional
+
+Example:
+
+~~~javascript
+frags = parseCode("a = 5")
+frags => [
+  ["dotName", "a"],
+  ["other", " = "],
+  ["num", "5"],
+]
 ~~~
 
 

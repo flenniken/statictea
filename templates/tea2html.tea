@@ -13,5 +13,5 @@ u.handle-fragment = func(ix: int, fragment: list, frags: list) bool
 
 # Syntax highlight the server code.
 highlightedFrags = []
-listLoop(highlight(s.text), highlightedFrags, u.handle-fragment)
+listLoop(parseCode(s.text), highlightedFrags, u.handle-fragment)
 o.htmlText = join(highlightedFrags, "")

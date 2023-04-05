@@ -105,7 +105,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_lte_ffb">fun_lte_ffb</a> &mdash; Return true when a float is less than or equal to another float.</li>
 <li> <a href="#fun_readJson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
 <li> <a href="#fun_markdownLite_sl">fun_markdownLite_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.</li>
-<li> <a href="#fun_highlight_sl">fun_highlight_sl</a> &mdash; Divide a string of StaticTea code into fragments useful for syntax highlighting.</li>
+<li> <a href="#fun_parseCode_sl">fun_parseCode_sl</a> &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.</li>
 <li> <a href="#escapeHtmlBody">escapeHtmlBody</a> &mdash; Excape text for placing in body html.</li>
 <li> <a href="#escapeHtmlAttribute">escapeHtmlAttribute</a> &mdash; Excape text for placing in an html attribute.</li>
 <li> <a href="#fun_html_sss">fun_html_sss</a> &mdash; Escape text for placing it in an html page.</li>
@@ -2406,13 +2406,13 @@ func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult
     raises: [KeyError], tags: [].}
 </pre>
 
-<h3 id="fun_highlight_sl">fun_highlight_sl</h3>
+<h3 id="fun_parseCode_sl">fun_parseCode_sl</h3>
 
-<p>Divide a string of StaticTea code into fragments useful for
+<p>Parse a string of StaticTea code into fragments useful for
 syntax highlighting.  Return a list of tagged fragments.
 
 </p><pre class="tea-code">
-<span class="t-dotName">highlight</span> = <span class="t-funcCall">func</span>(<span class="t-param">code</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
+<span class="t-dotName">parseCode</span> = <span class="t-funcCall">func</span>(<span class="t-param">code</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
 </pre>
 <p>
 Tags:
@@ -2433,7 +2433,7 @@ Tags:
 <p>Example:
 
 </p><pre class="tea-code">
-<span class="t-dotName">frags</span> = <span class="t-funcCall">highlight</span>(<span class="t-str">&quot;a = 5&quot;</span>)
+<span class="t-dotName">frags</span> = <span class="t-funcCall">parseCode</span>(<span class="t-str">&quot;a = 5&quot;</span>)
 <span class="t-dotName">frags</span> =&gt; [
   [<span class="t-str">&quot;dotName&quot;</span>, <span class="t-str">&quot;a&quot;</span>],
   [<span class="t-str">&quot;other&quot;</span>, <span class="t-str">&quot; = &quot;</span>],
@@ -2443,7 +2443,7 @@ Tags:
 
 
 <pre class="nim-code">
-func fun_highlight_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_parseCode_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 </pre>
 

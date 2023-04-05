@@ -41,12 +41,13 @@
 <span class="t-dotName">u.html-code</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
   <span class="t-doc">## Format the &quot;code&quot; md element list as html.
 </span>  <span class="t-dotName">lines</span> = []
-  <span class="t-dotName">class</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">item</span>[<span class="t-num">0</span>] == <span class="t-str">&quot;~~~statictea\n&quot;</span>), <span class="t-str">&quot;tea-code&quot;</span>, <span class="t-str">&quot;plain-code&quot;</span>)
+  <span class="t-dotName">teaCode</span> = <span class="t-funcCall">find</span>(<span class="t-dotName">item</span>[<span class="t-num">0</span>], <span class="t-str">&quot;statictea&quot;</span>, <span class="t-num">-1</span>)
+  <span class="t-dotName">class</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">teaCode</span> == <span class="t-num">-1</span>), <span class="t-str">&quot;plain-code&quot;</span>, <span class="t-str">&quot;tea-code&quot;</span>)
   <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;pre class=\&quot;{class}\&quot;&gt;\n&quot;</span>)
 
   <span class="t-dotName">codeBlock</span> = <span class="t-dotName">item</span>[<span class="t-num">1</span>]
   <span class="t-dotName">ret</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">class</span> == <span class="t-str">&quot;tea-code&quot;</span>), +
-    <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">highlight</span>(<span class="t-dotName">codeBlock</span>), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-fragment</span>), +
+    <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">parseCode</span>(<span class="t-dotName">codeBlock</span>), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-fragment</span>), +
     <span class="t-funcCall">u.handle-plain-code</span>(<span class="t-dotName">codeBlock</span>, <span class="t-dotName">lines</span>))
     
   <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;/pre&gt;\n&quot;</span>
@@ -97,7 +98,7 @@
 </span>  <span class="t-comment"># template. For md switch statictea code blocks to javascript.
 </span>  <span class="t-dotName">description</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">templateType</span> == <span class="t-str">&quot;html&quot;</span>), +
     <span class="t-funcCall">u.get-html-description</span>(<span class="t-dotName">mdDescription</span>), +
-    <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDescription</span>, [<span class="t-str">&quot;~~~statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
+    <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDescription</span>, [<span class="t-str">&quot;~~~\\s*statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
 
   <span class="t-comment"># Return both the full discription and the short form.
 </span>  <span class="t-dotName">ret</span> = <span class="t-funcCall">dict</span>()
