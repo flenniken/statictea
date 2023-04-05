@@ -64,8 +64,6 @@ the third argument.
 * [lt](#lt-1) &mdash; Return true when an int is less than another int.
 * [lte](#lte) &mdash; Return true when a float is less than or equal to another float.
 * [lte](#lte-1) &mdash; Return true when an int is less than or equal to another int.
-* [markdownLite](#markdownlite) &mdash; Parse a simple subset of markdown which contains paragraphs,
-bullets and code blocks.
 * [ne](#ne) &mdash; Return true when two floats are not equal.
 * [ne](#ne-1) &mdash; Return true when two ints are not equal.
 * [ne](#ne-2) &mdash; Return true when two strings are not equal.
@@ -73,6 +71,8 @@ bullets and code blocks.
 * [or](#or) &mdash; Boolean OR with short circuit.
 * [parseCode](#parsecode) &mdash; Parse a string of StaticTea code into fragments useful for
 syntax highlighting.
+* [parseMarkdown](#parsemarkdown) &mdash; Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks.
 * [path](#path) &mdash; Split a file path into its component pieces.
 * [readJson](#readjson) &mdash; Convert a JSON string to a variable.
 * [replace](#replace) &mdash; Replace a substring specified by its position and length with
@@ -1300,41 +1300,6 @@ lte(4, 3) => false
 
 
 
-# markdownLite
-
-Parse a simple subset of markdown which contains paragraphs,
-bullets and code blocks. This subset is used to document all
-StaticTea functions. Return a list of lists.
-
-~~~javascript
-markdownLite = func(mdText: string) list
-~~~
-
-list elements:
-
-* p — A paragraph element is one string, possibly containing
-newlines.
-
-* code — A code element is three strings. The first string is
-the code start line, for example “~~~” or “~~~nim”.  The second
-string (with newlines) contains the text of the block.  The third
-string is the ending line, for example “~~~”.
-
-* bullets — A bullets element contains a string (with newlines)
-for each bullet point.  The leading “* “ is not part of the
-string.
-
-~~~javascript
-elements = markdownLite(description)
-elements => [
-  ["p", ["the paragraph which may contain newlines"]]
-  ["code", ["~~~", "code text with newlines", "~~~"]]
-  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
-]
-~~~
-
-
-
 # ne
 
 Return true when two floats are not equal.
@@ -1454,6 +1419,41 @@ frags => [
   ["dotName", "a"],
   ["other", " = "],
   ["num", "5"],
+]
+~~~
+
+
+
+# parseMarkdown
+
+Parse a simple subset of markdown which contains paragraphs,
+bullets and code blocks. This subset is used to document all
+StaticTea functions. Return a list of lists.
+
+~~~javascript
+parseMarkdown = func(mdText: string) list
+~~~
+
+list elements:
+
+* p — A paragraph element is one string, possibly containing
+newlines.
+
+* code — A code element is three strings. The first string is
+the code start line, for example “~~~” or “~~~nim”.  The second
+string (with newlines) contains the text of the block.  The third
+string is the ending line, for example “~~~”.
+
+* bullets — A bullets element contains a string (with newlines)
+for each bullet point.  The leading “* “ is not part of the
+string.
+
+~~~javascript
+elements = parseMarkdown(description)
+elements => [
+  ["p", ["the paragraph which may contain newlines"]]
+  ["code", ["~~~", "code text with newlines", "~~~"]]
+  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
 ]
 ~~~
 

@@ -63,7 +63,7 @@ u.handle-html-element = func(ix: int, element: list, lines: list) bool
 u.get-html-description = func(mdDescription: string) string
   ## Parse the description markdown text and return html paragraphs,
   ## bullet lists and code blocks.
-  elements = markdownLite(mdDescription)
+  elements = parseMarkdown(mdDescription)
   lines = []
   listLoop(elements, lines, u.handle-html-element)
   return(join(lines, ""))

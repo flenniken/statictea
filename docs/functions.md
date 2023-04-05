@@ -94,7 +94,7 @@ function implements the "cmp" function for floats.
 * [fun_lte_iib](#fun_lte_iib) &mdash; Return true when an int is less than or equal to another int.
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
-* [fun_markdownLite_sl](#fun_markdownlite_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
+* [fun_parseMarkdown_sl](#fun_parsemarkdown_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
 * [fun_parseCode_sl](#fun_parsecode_sl) &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.
 * [escapeHtmlBody](#escapehtmlbody) &mdash; Excape text for placing in body html.
 * [escapeHtmlAttribute](#escapehtmlattribute) &mdash; Excape text for placing in an html attribute.
@@ -2332,14 +2332,14 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
 ~~~
 
-# fun_markdownLite_sl
+# fun_parseMarkdown_sl
 
 Parse a simple subset of markdown which contains paragraphs,
 bullets and code blocks. This subset is used to document all
 StaticTea functions. Return a list of lists.
 
 ~~~javascript
-markdownLite = func(mdText: string) list
+parseMarkdown = func(mdText: string) list
 ~~~
 
 list elements:
@@ -2357,7 +2357,7 @@ for each bullet point.  The leading “* “ is not part of the
 string.
 
 ~~~javascript
-elements = markdownLite(description)
+elements = parseMarkdown(description)
 elements => [
   ["p", ["the paragraph which may contain newlines"]]
   ["code", ["~~~", "code text with newlines", "~~~"]]
@@ -2367,7 +2367,7 @@ elements => [
 
 
 ~~~nim
-func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_parseMarkdown_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ~~~
 

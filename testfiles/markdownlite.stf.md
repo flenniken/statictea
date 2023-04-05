@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # MarkdownLite
 
-Example using markdownLite.
+Example using parseMarkdown.
 
 ### File cmd.sh command
 
@@ -25,7 +25,7 @@ doc = """
 {o.md}
 """
 
-fragments = markdownLite(doc)
+fragments = parseMarkdown(doc)
 fragments => [
 $$ endblock
 $$ block
@@ -44,14 +44,14 @@ A subset of markdown which contains paragraphs,
 bullets and code blocks.
 
 ~~~ statictea
-markdownLite = func(mdText: string) list
+parseMarkdown = func(mdText: string) list
 ~~~
 
 * p -- a paragraph
 * code -- code block
 * bullets -- bullets"""
 
-o.fragments = markdownLite(o.md)
+o.fragments = parseMarkdown(o.md)
 ```
 
 ### File result.expected
@@ -62,7 +62,7 @@ A subset of markdown which contains paragraphs,
 bullets and code blocks.
 
 ~~~ statictea
-markdownLite = func(mdText: string) list
+parseMarkdown = func(mdText: string) list
 ~~~
 
 * p -- a paragraph
@@ -70,10 +70,10 @@ markdownLite = func(mdText: string) list
 * bullets -- bullets
 """
 
-fragments = markdownLite(doc)
+fragments = parseMarkdown(doc)
 fragments => [
   ["p",["A subset of markdown which contains paragraphs,\nbullets and code blocks.\n\n"]]
-  ["code",["~~~ statictea\n","markdownLite = func(mdText: string) list\n","~~~\n"]]
+  ["code",["~~~ statictea\n","parseMarkdown = func(mdText: string) list\n","~~~\n"]]
   ["p",["\n"]]
   ["bullets",["p -- a paragraph\n","code -- code block\n","bullets -- bullets"]]
 ]

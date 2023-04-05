@@ -104,7 +104,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_lte_iib">fun_lte_iib</a> &mdash; Return true when an int is less than or equal to another int.</li>
 <li> <a href="#fun_lte_ffb">fun_lte_ffb</a> &mdash; Return true when a float is less than or equal to another float.</li>
 <li> <a href="#fun_readJson_sa">fun_readJson_sa</a> &mdash; Convert a JSON string to a variable.</li>
-<li> <a href="#fun_markdownLite_sl">fun_markdownLite_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.</li>
+<li> <a href="#fun_parseMarkdown_sl">fun_parseMarkdown_sl</a> &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.</li>
 <li> <a href="#fun_parseCode_sl">fun_parseCode_sl</a> &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.</li>
 <li> <a href="#escapeHtmlBody">escapeHtmlBody</a> &mdash; Excape text for placing in body html.</li>
 <li> <a href="#escapeHtmlAttribute">escapeHtmlAttribute</a> &mdash; Excape text for placing in an html attribute.</li>
@@ -2361,14 +2361,14 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
-<h3 id="fun_markdownLite_sl">fun_markdownLite_sl</h3>
+<h3 id="fun_parseMarkdown_sl">fun_parseMarkdown_sl</h3>
 
 <p>Parse a simple subset of markdown which contains paragraphs,
 bullets and code blocks. This subset is used to document all
 StaticTea functions. Return a list of lists.
 
 </p><pre class="tea-code">
-<span class="t-dotName">markdownLite</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdText</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
+<span class="t-dotName">parseMarkdown</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdText</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
 </pre>
 <p>
 list elements:
@@ -2392,7 +2392,7 @@ string.
 
 </li></ul>
 <pre class="tea-code">
-<span class="t-dotName">elements</span> = <span class="t-funcCall">markdownLite</span>(<span class="t-dotName">description</span>)
+<span class="t-dotName">elements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">description</span>)
 <span class="t-dotName">elements</span> =&gt; [
   [<span class="t-str">&quot;p&quot;</span>, [<span class="t-str">&quot;the paragraph which may contain newlines&quot;</span>]]
   [<span class="t-str">&quot;code&quot;</span>, [<span class="t-str">&quot;~~~&quot;</span>, <span class="t-str">&quot;code text with newlines&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>]]
@@ -2402,7 +2402,7 @@ string.
 
 
 <pre class="nim-code">
-func fun_markdownLite_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_parseMarkdown_sl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 </pre>
 

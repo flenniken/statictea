@@ -2724,13 +2724,13 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
     return newFunResultWarn(valueOr.message)
   result = newFunResult(valueOr.value)
 
-func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_parseMarkdown_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Parse a simple subset of markdown which contains paragraphs,
   ## bullets and code blocks. This subset is used to document all
   ## StaticTea functions. Return a list of lists.
   ##
   ## ~~~statictea
-  ## markdownLite = func(mdText: string) list
+  ## parseMarkdown = func(mdText: string) list
   ## ~~~
   ##
   ## list elements:
@@ -2748,14 +2748,14 @@ func fun_markdownLite_sl*(variables: Variables, arguments: seq[Value]): FunResul
   ## string.
   ##
   ## ~~~statictea
-  ## elements = markdownLite(description)
+  ## elements = parseMarkdown(description)
   ## elements => [
   ##   ["p", ["the paragraph which may contain newlines"]]
   ##   ["code", ["~~~", "code text with newlines", "~~~"]]
   ##   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
   ## ]
   ## ~~~
-  tMapParameters("markdownLite", "sl")
+  tMapParameters("parseMarkdown", "sl")
   let text = map["a"].stringv
   var elements = parseMarkdown(text)
   var elementList = newEmptyListValue()
@@ -2930,7 +2930,7 @@ functionsDict["fun_lt_ffb"] = fun_lt_ffb
 functionsDict["fun_lt_iib"] = fun_lt_iib
 functionsDict["fun_lte_ffb"] = fun_lte_ffb
 functionsDict["fun_lte_iib"] = fun_lte_iib
-functionsDict["fun_markdownLite_sl"] = fun_markdownLite_sl
+functionsDict["fun_parseMarkdown_sl"] = fun_parseMarkdown_sl
 functionsDict["fun_ne_ffb"] = fun_ne_ffb
 functionsDict["fun_ne_iib"] = fun_ne_iib
 functionsDict["fun_ne_ssb"] = fun_ne_ssb

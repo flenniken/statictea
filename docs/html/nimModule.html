@@ -74,7 +74,7 @@
 <span class="t-dotName">u.get-html-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDescription</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
   <span class="t-doc">## Parse the description markdown text and return html paragraphs,
 </span>  <span class="t-doc">## bullet lists and code blocks.
-</span>  <span class="t-dotName">elements</span> = <span class="t-funcCall">markdownLite</span>(<span class="t-dotName">mdDescription</span>)
+</span>  <span class="t-dotName">elements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">mdDescription</span>)
   <span class="t-dotName">lines</span> = []
   <span class="t-funcCall">listLoop</span>(<span class="t-dotName">elements</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-element</span>)
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))

@@ -129,13 +129,13 @@ lt(a: float, b: float) bool
 lt(a: int, b: int) bool
 lte(a: float, b: float) bool
 lte(a: int, b: int) bool
-markdownLite(a: string) list
 ne(a: float, b: float) bool
 ne(a: int, b: int) bool
 ne(a: string, b: string) bool
 not(a: bool) bool
 or(a: bool, b: bool) bool
 parseCode(a: string) list
+parseMarkdown(a: string) list
 path(a: string, b: string) dict
 readJson(a: string) any
 replace(a: string, b: int, c: int, d: string) string

@@ -177,9 +177,9 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
     echo str
     echo getWarningLine("", 0, warningData.messageId, warningData.p1)
 
-proc testMarkdownLite(text: string, eJson: string): bool =
+proc testParseMarkdown(text: string, eJson: string): bool =
   var arguments = @[newValue(text)]
-  let funResult = callFunction("markdownLite", arguments)
+  let funResult = callFunction("parseMarkdown", arguments)
   result = gotExpected($funResult, eJson)
 
 proc testParseCode(text: string, expected: string): bool =
@@ -2021,14 +2021,14 @@ spec.numLines = 3
 spec.statements = ["return 0"]"""
     check gotExpected(got, expected)
 
-  test "markdownLite paragraph":
+  test "parseMarkdown paragraph":
     let text = """
 Markdown lite: paragraphs, code and bullets.
 """
     let expected = """[["p",["Markdown lite: paragraphs, code and bullets.\n"]]]"""
-    check testMarkdownLite(text, expected)
+    check testParseMarkdown(text, expected)
 
-  test "markdownLite bullets":
+  test "parseMarkdown bullets":
     let text = """
 * b1
 * b2
@@ -2036,9 +2036,9 @@ Markdown lite: paragraphs, code and bullets.
 * b4
 """
     let expected = """[["bullets",["b1\n","b2\n","b3\n","b4\n"]]]"""
-    check testMarkdownLite(text, expected)
+    check testParseMarkdown(text, expected)
 
-  test "markdownLite code":
+  test "parseMarkdown code":
     let text = """
 ~~~statictex
 xyz = 5
@@ -2046,9 +2046,9 @@ tea = "Earl Grey"
 ~~~
 """
     let expected = """[["code",["~~~statictex\n","xyz = 5\ntea = \"Earl Grey\"\n","~~~\n"]]]"""
-    check testMarkdownLite(text, expected)
+    check testParseMarkdown(text, expected)
 
-  test "markdownLite all":
+  test "parseMarkdown all":
     let text = """
 This test uses p, code and bullets.
 
@@ -2079,7 +2079,7 @@ end
 ["p", ["end\n"]]]"""
     var eValueOr = readJsonString(expected)
     assert eValueOr.isValue
-    check testMarkdownLite(text, $eValueOr.value)
+    check testParseMarkdown(text, $eValueOr.value)
 
   test "parseCode":
     let text = """

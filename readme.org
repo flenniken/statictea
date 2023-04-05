@@ -2669,17 +2669,17 @@ specifying f as shown below.
 
 #+BEGIN_SRC
 tea> pf f
-add         exists           if0       lt            slice
-anchors     find             if        lte           sort
-and         float            int       markdownLite  startsWith
-bool        format           join      ne            string
-case        func             joinPath  not           sub
-cmp         functionDetails  keys      or            type
-cmpVersion  get              len       path          values
-concat      gt               list      readJson      warn
-dict        gte              listLoop  replace
-dup         highlight        log       replaceRe
-eq          html             lower     return
+add         exists           if        lte            slice
+anchors     find             int       ne             sort
+and         float            join      not            startsWith
+bool        format           joinPath  or             string
+case        func             keys      parseCode      sub
+cmp         functionDetails  len       parseMarkdown  type
+cmpVersion  get              list      path           values
+concat      gt               listLoop  readJson       warn
+dict        gte              log       replace
+dup         html             lower     replaceRe
+eq          if0              lt        return
 #+END_SRC
 
 Each element in the f dictionary is a list of the function
