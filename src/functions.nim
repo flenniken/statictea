@@ -858,7 +858,7 @@ func fun_cmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult
   ## Compare two StaticTea version numbers. Returns -1 for less, 0 for
   ## equal and 1 for greater than.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmpVersion = func(versionA: string, versionB: string) int
   ## ~~~
   ##
@@ -868,7 +868,7 @@ func fun_cmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmpVersion("1.2.5", "1.1.8") => 1
   ## cmpVersion("1.2.5", "1.3.0") => -1
   ## cmpVersion("1.2.5", "1.2.5") => 0

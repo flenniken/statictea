@@ -30,7 +30,8 @@ u.handle-plain-code = func(codeBlock: string, frags: list) bool
 u.html-code = func(item: list) string
   ## Format the "code" md element list as html.
   lines = []
-  class = if((item[0] == "~~~statictea\n"), "tea-code", "plain-code")
+  teaCode = find(item[0], "statictea", -1)
+  class = if((teaCode == -1), "plain-code", "tea-code")
   lines &= format("<pre class=\"{class}\">\n")
 
   codeBlock = item[1]
@@ -86,7 +87,7 @@ u.fixup-description = func(mdDescription: string, templateType: string) dict
   # template. For md switch statictea code blocks to javascript.
   description = if((templateType == "html"), +
     u.get-html-description(mdDescription), +
-    replaceRe(mdDescription, ["~~~statictea", "~~~javascript"]))
+    replaceRe(mdDescription, ["~~~\\s*statictea", "~~~javascript"]))
 
   # Return both the full discription and the short form.
   ret = dict()
