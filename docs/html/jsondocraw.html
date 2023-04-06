@@ -18,7 +18,7 @@ Nim source code: <a href="../../src/jsondocraw.nim">jsondocraw.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>const:  <a href="#helpText">helpText</a> &mdash; The help text shown with -h.</li>
+<li>const:  <a href="#helpText">helpText</a> &mdash; alternate doc comment used instead of the first line.</li>
 <li>type:  <a href="#Args">Args</a> &mdash; Args holds the source nim filename and the destination json filename to create.</li>
 <li> <a href="#newArgs">newArgs</a> &mdash; Create an Args object from a CmlArgs.</li>
 <li> <a href="#getMessage">getMessage</a> &mdash; Return a message from a message id and problem argument.</li>
@@ -30,7 +30,8 @@ Nim source code: <a href="../../src/jsondocraw.nim">jsondocraw.nim</a>
 
 <h3 id="helpText">helpText</h3>
 
-<p>The help text shown with -h.
+<p>alternate doc comment used instead
+of the first line.
 </p>
 
 <pre class="nim-code">
@@ -41,10 +42,20 @@ nim jsondoc command then post processes the data to patch the
 descriptions.
 
 Usage:
-jsondocraw [-h] srcFilename destFilename
+  jsondocraw [-h] srcFilename destFilename
 
-srcFilename -- nim source filename
-destFilename -- filename of the json file to create
+  srcFilename -- nim source filename
+  destFilename -- filename of the json file to create
+
+If nim's jsondoc command crashes, replace the problem characters and
+try again. You can also use an alternate document comment #$ as a
+workaround. For example:
+
+proc myRoutine(a: int): string =
+  ## required simple line
+  #$ alternate doc comment used instead
+  #$ of the first line.
+  result = $a
 """
 </pre>
 
@@ -91,7 +102,8 @@ func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 
 <h3 id="readOneDesc">readOneDesc</h3>
 
-<p>Return the doc comment found in the given range of line numbers.
+<p>Return the doc comment found in the given range of line
+numbers. Look for #$ first then, if not found, look for ##.
 </p>
 
 <pre class="nim-code">

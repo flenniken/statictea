@@ -33,7 +33,12 @@ make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
   entry = dict()
   entry.name = fd.signature.name
   entry.docComment = replaceRe(fd.docComment, ["~~~statictea", "~~~javascript"])
-  entry.sentence = slice(fd.docComment, 0, add(find(fd.docComment, ".", -1), 1))
+
+  ax = fd.docComment
+  pos = find(ax, ".", -1)
+  text = if((pos == -1), ax, slice(ax, 0, add(pos, 1)))
+  entry.sentence = replaceRe(text, ["\n", " "])
+
   entry.anchorName = anchors[ix]
   newList &= entry
   return(false)

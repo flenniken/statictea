@@ -11,15 +11,13 @@ StaticTea nim source code documentation.
 * [functions.nim](functions.md) &mdash; StaticTea functions and supporting types.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [jsondocraw.nim](jsondocraw.md) &mdash; Generate json data from a nim source file.
-* [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line
-length.
+* [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line length.
 * [matches.nim](matches.md) &mdash; Methods for matching sub-strings.
 * [messages.nim](messages.md) &mdash; Messages IDs and associated strings and routines to get them.
 * [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.
 * [parseCmdLine.nim](parseCmdLine.md) &mdash; Parse a StaticTea language command line.
 * [parseCommandLine.nim](parseCommandLine.md) &mdash; Parse the StaticTea terminal command line and return the arguments.
-* [parseMarkdown.nim](parseMarkdown.md) &mdash; Parse the simple markdown used in the function descriptions and
-highlight statictea code.
+* [parseMarkdown.nim](parseMarkdown.md) &mdash; Parse the simple markdown used in the function descriptions and highlight statictea code.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [processTemplate.nim](processTemplate.md) &mdash; Process the template.
 * [readjson.nim](readjson.md) &mdash; Read json content.

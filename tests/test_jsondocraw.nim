@@ -85,6 +85,22 @@ line two
     let got = readOneDesc(srcLines, 1, 4)
     check gotExpected(got, expected)
 
+  test "readOneDesc other":
+    let sourceCode = """
+proc asdf(b: string): int =
+  ## a nim doc comment
+  #$ alternate comment
+  #$ line two
+  a = 5
+"""
+    let expected = """
+alternate comment
+line two
+"""
+    let srcLines = splitNewLines(sourceCode)
+    let got = readOneDesc(srcLines, 1, 6)
+    check gotExpected(got, expected)
+
   test "readOneDesc 0":
     let sourceCode = """
   ## line one

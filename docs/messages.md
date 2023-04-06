@@ -6,19 +6,19 @@ Messages IDs and associated strings and routines to get them.
 * [messages.nim](../src/messages.nim) &mdash; Nim source code.
 # Index
 
-* type: [MessageId](#messageid) &mdash; 
-* const: [Messages](#messages) &mdash; 
+* type: [MessageId](#messageid) &mdash; Message numbers.
+* const: [Messages](#messages) &mdash; The message text.
 * type: [WarningData](#warningdata) &mdash; Warning data.
 * [getWarning](#getwarning) &mdash; Return the warning string.
 * [getWarningLine](#getwarningline) &mdash; Return a formatted warning line.
 * [getWarningLine](#getwarningline-1) &mdash; Return a formatted warning line.
 * [newWarningData](#newwarningdata) &mdash; Create a WarningData object containing all the warning information.
 * [`$`](#) &mdash; Return a string representation of WarningData.
-* [`==`](#-1) &mdash; 
+* [`==`](#-1) &mdash; Return true when the two WarningData objects are equal.
 
 # MessageId
 
-
+Message numbers.
 
 ~~~nim
 MessageId = enum
@@ -97,7 +97,7 @@ MessageId = enum
 
 # Messages
 
-
+The message text.
 
 ~~~nim
 Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
@@ -344,7 +344,7 @@ func `$`(warningData: WarningData): string {.raises: [ValueError], tags: [].}
 
 # `==`
 
-
+Return true when the two WarningData objects are equal.
 
 ~~~nim
 func `==`(w1: WarningData; w2: WarningData): bool

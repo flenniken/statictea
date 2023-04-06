@@ -25,10 +25,20 @@ nim jsondoc command then post processes the data to patch the
 descriptions.
 
 Usage:
-jsondocraw [-h] srcFilename destFilename
+  jsondocraw [-h] srcFilename destFilename
 
-srcFilename -- nim source filename
-destFilename -- filename of the json file to create
+  srcFilename -- nim source filename
+  destFilename -- filename of the json file to create
+
+If nim's jsondoc command crashes, replace the problem characters and
+try again. You can also use an alternate document comment #$ as a
+workaround. For example:
+
+proc myRoutine(a: int): string =
+  ## required simple line
+  #$ alternate doc comment used instead
+  #$ of the first line.
+  result = $a
 """
     ## The help text shown with -h.
 
@@ -80,12 +90,10 @@ func `$`*(args: Args): string =
 proc raiseError(msg: string) =
   raise newException(JsonDocRawError, msg)
 
-proc readOneDesc*(srcLines: seq[string], start: int, finish: int): string =
-  ## Return the doc comment found in the given range of line numbers.
 
-  if start > srcLines.len:
-    return
-
+proc collectDescription(nimPattern: bool, srcLines: seq[string], start: int, finish: int): seq[string] =
+  ## Collect the description lines between the start and finish line
+  ## numbers.
   let startIx = start - 1
   var endIx: int
   if finish == -1:
@@ -95,39 +103,57 @@ proc readOneDesc*(srcLines: seq[string], start: int, finish: int): string =
   if endIx >= srcLines.len:
     return
 
-  # Add the discription as a sequence of lines with the leading spaces
-  # and ## removed.
-  var lines = newSeq[string]()
-  var foundDescription = false
-  let pattern = re(r"\s*##")
-  var blankFirstColumn = true
+  var pattern: string
+  if nimPattern:
+    pattern = r"\s*##"
+  else:
+    pattern = r"\s*#\$"
+  let rePattern = re(pattern)
+
+  var foundNimDesc = false
   for line in srcLines[startIx .. endIx]:
-    if line.startsWith(pattern):
+    if line.startsWith(rePattern):
+      # Strip the leading space and the two comment characters.
       let stripped = strip(line, trailing = false)
-      if stripped.len > 2:
-        let str = stripped[2 .. ^1]
-        lines.add(str)
-        let ch = str[0]
-        if ch != '\n' and ch != '\r' and ch != ' ':
-          blankFirstColumn = false
-      else:
-        lines.add("")
-      foundDescription = true
-    elif foundDescription:
+      result.add(stripped[2 .. ^1])
+      foundNimDesc = true
+    elif foundNimDesc:
       break
 
+proc trimDescLines(descLines: seq[string]): string =
+  ## If the description lines start with a blank column, trim it off.
+  ## Return the description as one string.
+
+  # Check for a blank first column.
+  var blankFirstColumn = true
+  for line in descLines:
+    if line.len > 0:
+      let ch = line[0]
+      if ch != '\n' and ch != '\r' and ch != ' ':
+        blankFirstColumn = false
+
   if not blankFirstColumn:
-    return lines.join("")
+    return descLines.join("")
 
   # Trim off one leading blank column.
-  var trimmedLines: seq[string]
-  trimmedLines = newSeq[string]()
-  for line in lines:
+  var trimmedLines = newSeq[string]()
+  for line in descLines:
     if line.len > 0 and line[0] == ' ':
       trimmedLines.add(line[1 .. ^1])
     else:
       trimmedLines.add(line)
   result = trimmedLines.join("")
+
+proc readOneDesc*(srcLines: seq[string], start: int, finish: int): string =
+  ## Return the doc comment found in the given range of line
+  ## numbers. Look for #$ first then, if not found, look for ##.
+
+  if start > srcLines.len:
+    return
+  var descLines = collectDescription(nimPattern=false, srcLines, start, finish)
+  if descLines.len == 0:
+    descLines = collectDescription(nimPattern=true, srcLines, start, finish)
+  result = trimDescLines(descLines)
 
 proc readDescriptions*(text: string, lineNums: seq[int]): OrderedTable[string, string] =
   ## Read all the descriptions in the text specified by the line
@@ -193,13 +219,17 @@ proc removePresentation*(args: Args) =
   # Read all the descriptions from the source file and return a
   # mapping from line number to description.
   let text = readFile(args.srcFilename)
-  let lineToDesc = readDescriptions(text, lineNums)
+  let lineNumToDesc = readDescriptions(text, lineNums)
 
-  # Patch the jsonObj replacing all the descriptions.
-  jsonObj["moduleDescription"] = newJString(lineToDesc["1"])
+  # Patch the jsonObj with descriptions from the source file.  When
+  # one not found, use the original.
+  let newModuleDescription = lineNumToDesc["1"]
+  if newModuleDescription != "":
+    jsonObj["moduleDescription"] = newJString(newModuleDescription)
   for entry in jsonObj["entries"]:
-    let desc = newJString(lineToDesc[$entry["line"]])
-    entry["description"] = desc
+    let newDesc = lineNumToDesc[$entry["line"]]
+    if newDesc != "":
+      entry["description"] = newJString(newDesc)
 
   # Write to a new json file.
   writeFile(args.destJsonFile, pretty(jsonObj))

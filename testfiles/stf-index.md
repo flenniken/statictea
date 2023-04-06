@@ -38,8 +38,7 @@ Here are all the Statictea stf tests:
 * [listLoop-new-dict](../testfiles/listLoop-new-dict.stf.md) &mdash; Test the listLoop function where it creates a dictionary.
 * [localvars-basics](../testfiles/localvars-basics.stf.md) &mdash; Test the readme local variables section.
 * [log-function](../testfiles/log-function.stf.md) &mdash; Test the log function.
-* [log-path](../testfiles/log-path.stf.md) &mdash; Test the default log path is written to when you specify -l without a
-filename.
+* [log-path](../testfiles/log-path.stf.md) &mdash; Test the default log path is written to when you specify -l without a filename.
 * [logging-hello-world](../testfiles/logging-hello-world.stf.md) &mdash; Test logging with Hello World.
 * [logging-replacement-block](../testfiles/logging-replacement-block.stf.md) &mdash; Test logging the replacement block.
 * [lreturncode](../testfiles/lreturncode.stf.md) &mdash; Test the return code for -l -h is 0.
@@ -48,12 +47,9 @@ filename.
 * [maxrepeat](../testfiles/maxrepeat.stf.md) &mdash; Test the t maxRepeat tea variable.
 * [missingvar](../testfiles/missingvar.stf.md) &mdash; Test with a missing replacement variable.
 * [multiple-json](../testfiles/multiple-json.stf.md) &mdash; Test with multiple json and code files.
-* [mutable-func-dicts](../testfiles/mutable-func-dicts.stf.md) &mdash; Test that you cannot change the dictionaries returned by built-in
-functions, except the dict function.
-* [mutable-func-lists](../testfiles/mutable-func-lists.stf.md) &mdash; Test that you cannot mutate the lists returned by the built-in
-functions (except the list function).
-* [mutable-o-g](../testfiles/mutable-o-g.stf.md) &mdash; Test that you cannot change o variables in templates and that you
-cannot change g variables in code files.
+* [mutable-func-dicts](../testfiles/mutable-func-dicts.stf.md) &mdash; Test that you cannot change the dictionaries returned by built-in functions, except the dict function.
+* [mutable-func-lists](../testfiles/mutable-func-lists.stf.md) &mdash; Test that you cannot mutate the lists returned by the built-in functions (except the list function).
+* [mutable-o-g](../testfiles/mutable-o-g.stf.md) &mdash; Test that you cannot change o variables in templates and that you cannot change g variables in code files.
 * [mutable-tea](../testfiles/mutable-tea.stf.md) &mdash; Test that you cannot change the tea variables lists and dicts.
 * [nextline-readme](../testfiles/nextline-readme.stf.md) &mdash; The nextline readme example.
 * [noendingline](../testfiles/noendingline.stf.md) &mdash; Test with no ending newline at the bottom of the file.
@@ -94,8 +90,7 @@ cannot change g variables in code files.
 * [userfun-details](../testfiles/userfun-details.stf.md) &mdash; Test the user function details function.
 * [userfun-signatures](../testfiles/userfun-signatures.stf.md) &mdash; Show built-in functions.
 * [warn-basics](../testfiles/warn-basics.stf.md) &mdash; Test the warn function.
-* [warn-log](../testfiles/warn-log.stf.md) &mdash; Test that the warn command increments the warning count and returns a
-non-zero return code.
+* [warn-log](../testfiles/warn-log.stf.md) &mdash; Test that the warn command increments the warning count and returns a non-zero return code.
 * [warn-no-warn](../testfiles/warn-no-warn.stf.md) &mdash; Test there is no warning when the warn is not run.
 * [warninglimit](../testfiles/warninglimit.stf.md) &mdash; Test that warnings stop after 32 + 1.
 

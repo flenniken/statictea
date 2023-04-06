@@ -12,9 +12,10 @@ $$ : path = path(d.filename)
 $$ : # Use the filename without the ending ".stf.md".
 $$ : name = slice(path.filename, 0, sub(len(path.filename), 7))
 $$ : # Use the first sentence for the short description.
-$$ : a = d.description
-$$ : shortLen = add(find(a, ".", sub(len(a), 1)), 1)
-$$ : short = slice(a, 0, shortLen)
+$$ : ax = d.description
+$$ : pos = find(ax, ".", -1)
+$$ : text = if((pos == -1), ax, slice(ax, 0, add(pos, 1)))
+$$ : short = replaceRe(text, ["\n", " "])
 * [{name}](../testfiles/{path.filename}) &mdash; {short}
 $$ endblock
 

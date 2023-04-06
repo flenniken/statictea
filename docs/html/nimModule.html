@@ -71,10 +71,10 @@
   <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">l.fn</span>(<span class="t-dotName">element</span>[<span class="t-num">1</span>])
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
-<span class="t-dotName">u.get-html-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDescription</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+<span class="t-dotName">u.get-html-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDesc</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
   <span class="t-doc">## Parse the description markdown text and return html paragraphs,
 </span>  <span class="t-doc">## bullet lists and code blocks.
-</span>  <span class="t-dotName">elements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">mdDescription</span>)
+</span>  <span class="t-dotName">elements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">mdDesc</span>)
   <span class="t-dotName">lines</span> = []
   <span class="t-funcCall">listLoop</span>(<span class="t-dotName">elements</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-element</span>)
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
@@ -84,21 +84,22 @@
 </span>  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">entry.name</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
-<span class="t-dotName">u.fixup-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDescription</span>: <span class="t-type">string</span>, <span class="t-param">templateType</span>: <span class="t-type">string</span>) <span class="t-type">dict</span>
+<span class="t-dotName">u.fixup-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDesc</span>: <span class="t-type">string</span>, <span class="t-param">templateType</span>: <span class="t-type">string</span>) <span class="t-type">dict</span>
   <span class="t-doc">## Fix up the description for html or markdown.  For the html
 </span>  <span class="t-doc">## template convert the markdown to html. For the md template
 </span>  <span class="t-doc">## replace the statictea code blocks with javascript so the code is
 </span>  <span class="t-doc">## highlighted by github.
 </span>
   <span class="t-comment"># Use the first sentence for the short description.
-</span>  <span class="t-dotName">first</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">mdDescription</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">mdDescription</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
-  <span class="t-dotName">short</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">first</span>, [<span class="t-str">&quot;\n&quot;</span>, <span class="t-str">&quot; &quot;</span>])
+</span>  <span class="t-dotName">pos</span> = <span class="t-funcCall">find</span>(<span class="t-dotName">mdDesc</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>)
+  <span class="t-dotName">sentence</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">pos</span> == <span class="t-num">-1</span>), <span class="t-dotName">mdDesc</span>, <span class="t-funcCall">slice</span>(<span class="t-dotName">mdDesc</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-dotName">pos</span>, <span class="t-num">1</span>)))
+  <span class="t-dotName">short</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">sentence</span>, [<span class="t-str">&quot;\n&quot;</span>, <span class="t-str">&quot; &quot;</span>])
 
   <span class="t-comment"># Convert the markdown description to html for the html
 </span>  <span class="t-comment"># template. For md switch statictea code blocks to javascript.
 </span>  <span class="t-dotName">description</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">templateType</span> == <span class="t-str">&quot;html&quot;</span>), +
-    <span class="t-funcCall">u.get-html-description</span>(<span class="t-dotName">mdDescription</span>), +
-    <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDescription</span>, [<span class="t-str">&quot;~~~\\s*statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
+    <span class="t-funcCall">u.get-html-description</span>(<span class="t-dotName">mdDesc</span>), +
+    <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDesc</span>, [<span class="t-str">&quot;~~~\\s*statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
 
   <span class="t-comment"># Return both the full discription and the short form.
 </span>  <span class="t-dotName">ret</span> = <span class="t-funcCall">dict</span>()

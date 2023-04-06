@@ -13,8 +13,10 @@ make-entry = func(ix: int, module: dict, entries: list) bool
   entry.name = path.basename
 
   # Use the first sentence for the short description.
-  description = get(module, "description", "")
-  entry.shortDesc = slice(description, 0, add(find(description, ".", -1), 1))
+  ax = get(module, "description", "")
+  pos = find(ax, ".", -1)
+  text = if((pos == -1), ax, slice(ax, 0, add(pos, 1)))
+  entry.shortDesc = replaceRe(text, ["\n", " "])
 
   entries &= entry
   return(false)

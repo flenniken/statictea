@@ -8,7 +8,7 @@ descriptions. The descriptions match the source.
 * [jsondocraw.nim](../src/jsondocraw.nim) &mdash; Nim source code.
 # Index
 
-* const: [helpText](#helptext) &mdash; The help text shown with -h.
+* const: [helpText](#helptext) &mdash; alternate doc comment used instead of the first line.
 * type: [Args](#args) &mdash; Args holds the source nim filename and the destination json filename to create.
 * [newArgs](#newargs) &mdash; Create an Args object from a CmlArgs.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.
@@ -19,7 +19,8 @@ descriptions. The descriptions match the source.
 
 # helpText
 
-The help text shown with -h.
+alternate doc comment used instead
+of the first line.
 
 
 ~~~nim
@@ -30,10 +31,20 @@ nim jsondoc command then post processes the data to patch the
 descriptions.
 
 Usage:
-jsondocraw [-h] srcFilename destFilename
+  jsondocraw [-h] srcFilename destFilename
 
-srcFilename -- nim source filename
-destFilename -- filename of the json file to create
+  srcFilename -- nim source filename
+  destFilename -- filename of the json file to create
+
+If nim's jsondoc command crashes, replace the problem characters and
+try again. You can also use an alternate document comment #$ as a
+workaround. For example:
+
+proc myRoutine(a: int): string =
+  ## required simple line
+  #$ alternate doc comment used instead
+  #$ of the first line.
+  result = $a
 """
 ~~~
 
@@ -80,7 +91,8 @@ func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 
 # readOneDesc
 
-Return the doc comment found in the given range of line numbers.
+Return the doc comment found in the given range of line
+numbers. Look for #$ first then, if not found, look for ##.
 
 
 ~~~nim

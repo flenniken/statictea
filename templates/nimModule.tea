@@ -60,10 +60,10 @@ u.handle-html-element = func(ix: int, element: list, lines: list) bool
   lines &= l.fn(element[1])
   return(false)
 
-u.get-html-description = func(mdDescription: string) string
+u.get-html-description = func(mdDesc: string) string
   ## Parse the description markdown text and return html paragraphs,
   ## bullet lists and code blocks.
-  elements = parseMarkdown(mdDescription)
+  elements = parseMarkdown(mdDesc)
   lines = []
   listLoop(elements, lines, u.handle-html-element)
   return(join(lines, ""))
@@ -73,21 +73,22 @@ u.get-name = func(ix: int, entry: dict, newList: list) bool
   newList &= entry.name
   return(false)
 
-u.fixup-description = func(mdDescription: string, templateType: string) dict
+u.fixup-description = func(mdDesc: string, templateType: string) dict
   ## Fix up the description for html or markdown.  For the html
   ## template convert the markdown to html. For the md template
   ## replace the statictea code blocks with javascript so the code is
   ## highlighted by github.
 
   # Use the first sentence for the short description.
-  first = slice(mdDescription, 0, add(find(mdDescription, ".", -1), 1))
-  short = replaceRe(first, ["\n", " "])
+  pos = find(mdDesc, ".", -1)
+  sentence = if((pos == -1), mdDesc, slice(mdDesc, 0, add(pos, 1)))
+  short = replaceRe(sentence, ["\n", " "])
 
   # Convert the markdown description to html for the html
   # template. For md switch statictea code blocks to javascript.
   description = if((templateType == "html"), +
-    u.get-html-description(mdDescription), +
-    replaceRe(mdDescription, ["~~~\\s*statictea", "~~~javascript"]))
+    u.get-html-description(mdDesc), +
+    replaceRe(mdDesc, ["~~~\\s*statictea", "~~~javascript"]))
 
   # Return both the full discription and the short form.
   ret = dict()

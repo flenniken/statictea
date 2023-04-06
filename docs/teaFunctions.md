@@ -32,8 +32,7 @@ variable or pass to another function.
 * [float](#float) &mdash; Create a float from an int.
 * [float](#float-1) &mdash; Create a float from a number string.
 * [float](#float-2) &mdash; Create a float from a number string.
-* [format](#format) &mdash; Format a string using replacement variables similar to a
-replacement block.
+* [format](#format) &mdash; Format a string using replacement variables similar to a replacement block.
 * [func](#func) &mdash; Define a function.
 * [functionDetails](#functiondetails) &mdash; Return the function details in a dictionary.
 * [get](#get) &mdash; Get a dictionary value by its key.
@@ -43,10 +42,8 @@ replacement block.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
 * [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
 * [html](#html) &mdash; Escape text for placing it in an html page.
-* [if0](#if0) &mdash; If the condition is 0, return the second argument, else return
-the third argument.
-* [if](#if) &mdash; If the condition is true, return the second argument, else return
-the third argument.
+* [if0](#if0) &mdash; If the condition is 0, return the second argument, else return the third argument.
+* [if](#if) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [int](#int) &mdash; Create an int from a float.
 * [int](#int-1) &mdash; Create an int from a number string.
 * [int](#int-2) &mdash; Create an int from a number string.
@@ -69,17 +66,13 @@ the third argument.
 * [ne](#ne-2) &mdash; Return true when two strings are not equal.
 * [not](#not) &mdash; Boolean not.
 * [or](#or) &mdash; Boolean OR with short circuit.
-* [parseCode](#parsecode) &mdash; Parse a string of StaticTea code into fragments useful for
-syntax highlighting.
-* [parseMarkdown](#parsemarkdown) &mdash; Parse a simple subset of markdown which contains paragraphs,
-bullets and code blocks.
+* [parseCode](#parsecode) &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.
+* [parseMarkdown](#parsemarkdown) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
 * [path](#path) &mdash; Split a file path into its component pieces.
 * [readJson](#readjson) &mdash; Convert a JSON string to a variable.
-* [replace](#replace) &mdash; Replace a substring specified by its position and length with
-another string.
+* [replace](#replace) &mdash; Replace a substring specified by its position and length with another string.
 * [replaceRe](#replacere) &mdash; Replace multiple parts of a string using regular expressions.
-* [return](#return) &mdash; Return is a special function that returns the value passed in and
-has has side effects.
+* [return](#return) &mdash; Return is a special function that returns the value passed in and has has side effects.
 * [slice](#slice) &mdash; Extract a substring from a string by its position and length.
 * [sort](#sort) &mdash; Sort a list of values of the same type.
 * [sort](#sort-1) &mdash; Sort a list of lists.
@@ -89,8 +82,7 @@ has has side effects.
 * [string](#string-1) &mdash; Convert the dictionary variable to dot names.
 * [sub](#sub) &mdash; Subtract two floats.
 * [sub](#sub-1) &mdash; Subtract two integers.
-* [type](#type) &mdash; Return the argument type, one of: int, float, string, list,
-dict, bool or func.
+* [type](#type) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
 * [values](#values) &mdash; Create a list out of the values in the specified dictionary.
 * [warn](#warn) &mdash; Return a warning message and skip the current statement.
 

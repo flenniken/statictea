@@ -44,7 +44,12 @@
 </span>  <span class="t-dotName">entry</span> = <span class="t-funcCall">dict</span>()
   <span class="t-dotName">entry.name</span> = <span class="t-dotName">fd.signature.name</span>
   <span class="t-dotName">entry.docComment</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">fd.docComment</span>, [<span class="t-str">&quot;~~~statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>])
-  <span class="t-dotName">entry.sentence</span> = <span class="t-funcCall">slice</span>(<span class="t-dotName">fd.docComment</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-funcCall">find</span>(<span class="t-dotName">fd.docComment</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>), <span class="t-num">1</span>))
+
+  <span class="t-dotName">ax</span> = <span class="t-dotName">fd.docComment</span>
+  <span class="t-dotName">pos</span> = <span class="t-funcCall">find</span>(<span class="t-dotName">ax</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>)
+  <span class="t-dotName">text</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">pos</span> == <span class="t-num">-1</span>), <span class="t-dotName">ax</span>, <span class="t-funcCall">slice</span>(<span class="t-dotName">ax</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-dotName">pos</span>, <span class="t-num">1</span>)))
+  <span class="t-dotName">entry.sentence</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">text</span>, [<span class="t-str">&quot;\n&quot;</span>, <span class="t-str">&quot; &quot;</span>])
+
   <span class="t-dotName">entry.anchorName</span> = <span class="t-dotName">anchors</span>[<span class="t-dotName">ix</span>]
   <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">entry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
