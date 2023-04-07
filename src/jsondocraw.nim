@@ -253,6 +253,7 @@ when isMainModule:
     if argsOrMessage.kind == cmlMessageKind:
       # Display the message.
       echo getMessage(argsOrMessage.messageId, argsOrMessage.problemArg)
+      echo helpText
       return 1
     let args = newArgs(argsOrMessage.args)
 
