@@ -8,13 +8,13 @@ Example:
 import cmdline
 
 # Define the supported options.
-var options = newSeq[CmlOption]()
-options.add(newCmlOption("help", 'h', cmlStopArgument))
-options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+var supportedOptions = newSeq[CmlOption]()
+supportedOptions.add(newCmlOption("help", 'h', cmlStopArgument))
+supportedOptions.add(newCmlOption("log", 'l', cmlOptionalArgument))
 ...
 
 # Parse the command line.
-let argsOrMessage = cmdline(options, collectArgs())
+let argsOrMessage = cmdline(supportedOptions, collectArgs())
 if argsOrMessage.kind == cmlMessageKind:
   # Display the message.
   echo getMessage(argsOrMessage.messageId,
@@ -114,19 +114,21 @@ The option type.
 * cmlArgument0or1 — option with an argument, 0 or 1 times.
 * cmlNoArgument — option without an argument, 0 or 1 times.
 * cmlOptionalArgument — option with an optional argument, 0
-    or 1 times.
+or 1 times.
 * cmlBareArgument — an argument without an option, 1 time.
 * cmlArgumentOnce — option with an argument, 1 time.
-* cmlArgumentMany — option with an argument, unlimited
-    number of times.
+* cmlArgumentMany — option with an argument, unlimited number
+of times.
 * cmlStopArgument — option without an argument, 0 or 1
-    times. Stop and return this option by itself.
+times. Stop and return this option by itself.
+* cmlNoOptions — when no arguments specified. No messages for
+any required options.
 
 
 ~~~nim
 CmlOptionType = enum
   cmlArgument0or1, cmlNoArgument, cmlOptionalArgument, cmlBareArgument,
-  cmlArgumentOnce, cmlArgumentMany, cmlStopArgument
+  cmlArgumentOnce, cmlArgumentMany, cmlStopArgument, cmlNoOptions
 ~~~
 
 # CmlOption
@@ -217,8 +219,9 @@ generate the arguments. Parse uses "arg value" not "arg=value".
 
 
 ~~~nim
-func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage {.
-    raises: [KeyError], tags: [].}
+func cmdLine(supportedOptions: openArray[CmlOption];
+             arguments: openArray[string]): ArgsOrMessage {.raises: [KeyError],
+    tags: [].}
 ~~~
 
 # cmlMessages

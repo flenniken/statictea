@@ -25,10 +25,13 @@ nim jsondoc command then post processes the data to patch the
 descriptions.
 
 Usage:
-  jsondocraw [-h] srcFilename destFilename
+  jsondocraw [-h] [-v] srcFilename destFilename
 
-  srcFilename -- nim source filename
-  destFilename -- filename of the json file to create
+  -h --help — show this message
+  -v --version — show the version number
+
+  srcFilename — nim source filename
+  destFilename — filename of the json file to create
 
 If nim's jsondoc command crashes, replace the problem characters and
 try again. You can also use an alternate document comment #$ as a
@@ -61,9 +64,16 @@ proc myRoutine(a: int): string =
 
 type
   Args* = object
-    ## Args holds the source nim filename and the destination
-    ## json filename to create.
+    ## Args holds the arguments specified on the command line.
+    ##
+    ## * help — help or -h was specified
+    ## * noOptions — no options or arguments specified
+    ## * version — version or -v was specified
+    ## * srcFilename — nim source filename
+    ## * destJsonFile — name of the JSON file to create
     help*: bool
+    noOptions*: bool
+    version*: bool
     srcFilename*: string
     destJsonFile*: string
 
@@ -72,6 +82,8 @@ type
 func newArgs*(cmlArgs: CmlArgs): Args =
   ## Create an Args object from a CmlArgs.
   result.help = "help" in cmlArgs
+  result.noOptions = "noOptions" in cmlArgs
+  result.version = "version" in cmlArgs
   if "srcFilename" in cmlArgs:
     result.srcFilename = cmlArgs["srcFilename"][0]
   if "destJsonFile" in cmlArgs:
@@ -236,8 +248,10 @@ proc removePresentation*(args: Args) =
 
 when isMainModule:
   proc run(args: Args): int =
-    if args.help:
+    if args.help or args.noOptions:
       echo helpText
+    elif args.version:
+      echo "0.0.1"
     else:
       removePresentation(args)
 
@@ -247,13 +261,14 @@ when isMainModule:
     # Parse the command line options.
     var options = newSeq[CmlOption]()
     options.add(newCmlOption("help", 'h', cmlStopArgument))
+    options.add(newCmlOption("noOptions", '_', cmlNoOptions))
+    options.add(newCmlOption("version", 'v', cmlStopArgument))
     options.add(newCmlOption("srcFilename", '_', cmlBareArgument))
     options.add(newCmlOption("destJsonFile", '_', cmlBareArgument))
     let argsOrMessage = cmdline(options, collectArgs())
     if argsOrMessage.kind == cmlMessageKind:
       # Display the message.
       echo getMessage(argsOrMessage.messageId, argsOrMessage.problemArg)
-      echo helpText
       return 1
     let args = newArgs(argsOrMessage.args)
 

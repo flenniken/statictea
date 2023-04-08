@@ -19,7 +19,7 @@ Nim source code: <a href="../../src/jsondocraw.nim">jsondocraw.nim</a>
 
 <ul>
 <li>const:  <a href="#helpText">helpText</a> &mdash; alternate doc comment used instead of the first line.</li>
-<li>type:  <a href="#Args">Args</a> &mdash; Args holds the source nim filename and the destination json filename to create.</li>
+<li>type:  <a href="#Args">Args</a> &mdash; Args holds the arguments specified on the command line.</li>
 <li> <a href="#newArgs">newArgs</a> &mdash; Create an Args object from a CmlArgs.</li>
 <li> <a href="#getMessage">getMessage</a> &mdash; Return a message from a message id and problem argument.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Args object.</li>
@@ -42,10 +42,13 @@ nim jsondoc command then post processes the data to patch the
 descriptions.
 
 Usage:
-  jsondocraw [-h] srcFilename destFilename
+  jsondocraw [-h] [-v] srcFilename destFilename
 
-  srcFilename -- nim source filename
-  destFilename -- filename of the json file to create
+  -h --help — show this message
+  -v --version — show the version number
+
+  srcFilename — nim source filename
+  destFilename — filename of the json file to create
 
 If nim's jsondoc command crashes, replace the problem characters and
 try again. You can also use an alternate document comment #$ as a
@@ -61,13 +64,22 @@ proc myRoutine(a: int): string =
 
 <h3 id="Args">Args</h3>
 
-<p>Args holds the source nim filename and the destination
-json filename to create.
-</p>
+<p>Args holds the arguments specified on the command line.
+
+</p><ul>
+<li>help — help or -h was specified
+</li><li>noOptions — no options or arguments specified
+</li><li>version — version or -v was specified
+</li><li>srcFilename — nim source filename
+</li><li>destJsonFile — name of the JSON file to create
+</li></ul>
+
 
 <pre class="nim-code">
 Args = object
   help*: bool
+  noOptions*: bool
+  version*: bool
   srcFilename*: string
   destJsonFile*: string
 </pre>

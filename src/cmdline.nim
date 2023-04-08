@@ -6,13 +6,13 @@
 ## import cmdline
 ##
 ## # Define the supported options.
-## var options = newSeq[CmlOption]()
-## options.add(newCmlOption("help", 'h', cmlStopArgument))
-## options.add(newCmlOption("log", 'l', cmlOptionalArgument))
+## var supportedOptions = newSeq[CmlOption]()
+## supportedOptions.add(newCmlOption("help", 'h', cmlStopArgument))
+## supportedOptions.add(newCmlOption("log", 'l', cmlOptionalArgument))
 ## ...
 ##
 ## # Parse the command line.
-## let argsOrMessage = cmdline(options, collectArgs())
+## let argsOrMessage = cmdline(supportedOptions, collectArgs())
 ## if argsOrMessage.kind == cmlMessageKind:
 ##   # Display the message.
 ##   echo getMessage(argsOrMessage.messageId,
@@ -28,6 +28,7 @@
 import std/os
 import std/tables
 import std/strutils
+import std/options
 
 type
   CmlArgs* = OrderedTable[string, seq[string]]
@@ -78,13 +79,15 @@ type
     ## * cmlArgument0or1 — option with an argument, 0 or 1 times.
     ## * cmlNoArgument — option without an argument, 0 or 1 times.
     ## * cmlOptionalArgument — option with an optional argument, 0
-    ##     or 1 times.
+    ## or 1 times.
     ## * cmlBareArgument — an argument without an option, 1 time.
     ## * cmlArgumentOnce — option with an argument, 1 time.
-    ## * cmlArgumentMany — option with an argument, unlimited
-    ##     number of times.
+    ## * cmlArgumentMany — option with an argument, unlimited number
+    ## of times.
     ## * cmlStopArgument — option without an argument, 0 or 1
-    ##     times. Stop and return this option by itself.
+    ## times. Stop and return this option by itself.
+    ## * cmlNoOptions — when no arguments specified. No messages for
+    ## any required options.
     cmlArgument0or1
     cmlNoArgument
     cmlOptionalArgument
@@ -92,6 +95,7 @@ type
     cmlArgumentOnce
     cmlArgumentMany
     cmlStopArgument
+    cmlNoOptions
 
   CmlOption* = object
     ## An CmlOption holds its type, long name and short name.
@@ -181,7 +185,13 @@ proc optionCount(args: var CmlArgs, optionName: string): Natural =
   else:
     result = args[optionName].len
 
-func cmdLine*(options: openArray[CmlOption],
+func findCmlNoOptions(supportedOptions: openArray[CmlOption]): Option[CmlOption] =
+  ## Find the cmlNoOptions in the options list.
+  for option in supportedOptions:
+    if option.optionType == cmlNoOptions:
+      result = some(option)
+
+func cmdLine*(supportedOptions: openArray[CmlOption],
     arguments: openArray[string]): ArgsOrMessage =
   ## Parse the command line arguments.  You pass in the list of
   ## supported options and the arguments to parse. The arguments found
@@ -203,7 +213,7 @@ func cmdLine*(options: openArray[CmlOption],
 
   # Populate shortOptions, longOptions, bareArgumentNames and onceNames.
   var bareIx = 0
-  for option in options:
+  for option in supportedOptions:
     if option.long in longOptions:
       # _07_, Duplicate long option: '--$1'.
       return newArgsOrMessage(cml_07_DupLongOption, $option.long)
@@ -298,6 +308,8 @@ func cmdLine*(options: openArray[CmlOption],
     of processOption:
       let option = longOptions[optionName]
       case option.optionType:
+      of cmlNoOptions:
+        discard
       of cmlNoArgument:
         state = start
         addArg(args, optionName)
@@ -356,6 +368,13 @@ func cmdLine*(options: openArray[CmlOption],
       state = start
       inc(ix)
 
+  # When no arguments and cmlNoOptions is specified, return it.
+  if args.len == 0:
+    let noO = findCmlNoOptions(supportedOptions)
+    if noO.isSome:
+      addArg(args, noO.get().long)
+      return newArgsOrMessage(args)
+
   if state == needArgument:
     # _02_, The option '$1' needs an argument.
     return newArgsOrMessage(cml_02_OptionRequiresArg, optionName)
@@ -369,7 +388,7 @@ func cmdLine*(options: openArray[CmlOption],
     addArg(args, optionName)
 
   # Make sure all the once arguments have one.
-  for option in options:
+  for option in supportedOptions:
     if option.optionType == cmlArgumentOnce:
       if not (option.long in args):
         # _02_, The option '$1' needs an argument.
@@ -459,15 +478,16 @@ cmdline [-h] [-u name] [-l [filename]] -r leader [-s state] source destination
       result.destination = cmlArgs["destination"][0]
 
   # Parse the command line.
-  var options = newSeq[CmlOption]()
-  options.add(newCmlOption("help", 'h', cmlStopArgument))
-  options.add(newCmlOption("log", 'l', cmlOptionalArgument))
-  options.add(newCmlOption("user", 'u', cmlArgumentMany))
-  options.add(newCmlOption("leader", 'r', cmlArgumentOnce))
-  options.add(newCmlOption("state", 's', cmlArgument0or1))
-  options.add(newCmlOption("source", '_', cmlBareArgument))
-  options.add(newCmlOption("destination", '_', cmlBareArgument))
-  let argsOrMessage = cmdline(options, collectArgs())
+  var supportedOptions = newSeq[CmlOption]()
+  supportedOptions.add(newCmlOption("help", 'h', cmlStopArgument))
+  supportedOptions.add(newCmlOption("help", '_', cmlNoOptions))
+  supportedOptions.add(newCmlOption("log", 'l', cmlOptionalArgument))
+  supportedOptions.add(newCmlOption("user", 'u', cmlArgumentMany))
+  supportedOptions.add(newCmlOption("leader", 'r', cmlArgumentOnce))
+  supportedOptions.add(newCmlOption("state", 's', cmlArgument0or1))
+  supportedOptions.add(newCmlOption("source", '_', cmlBareArgument))
+  supportedOptions.add(newCmlOption("destination", '_', cmlBareArgument))
+  let argsOrMessage = cmdline(supportedOptions, collectArgs())
   echo "Resulting argsOrMessage object:"
   echo ""
   echo $argsOrMessage

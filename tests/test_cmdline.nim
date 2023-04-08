@@ -108,6 +108,26 @@ suite "cmdline.nim":
     eCmlArgs["help"] = newSeq[string]()
     check compareArgs(argsOrMessage, eCmlArgs)
 
+  test "no options":
+    let parameters = newSeq[string]()
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("help", 'h', cmlNoArgument))
+    options.add(newCmlOption("noOptions", '_', cmlNoOptions))
+    let argsOrMessage = cmdLine(options, parameters)
+    var eCmlArgs: CmlArgs
+    eCmlArgs["noOptions"] = newSeq[string]()
+    check compareArgs(argsOrMessage, eCmlArgs)
+
+  test "no options with required":
+    let parameters = newSeq[string]()
+    var options = newSeq[CmlOption]()
+    options.add(newCmlOption("name", 'n', cmlArgumentOnce))
+    options.add(newCmlOption("noOptions", '_', cmlNoOptions))
+    let argsOrMessage = cmdLine(options, parameters)
+    var eCmlArgs: CmlArgs
+    eCmlArgs["noOptions"] = newSeq[string]()
+    check compareArgs(argsOrMessage, eCmlArgs)
+
   test "-l":
     let parameters = @["-l", "-t", "template.html"]
     var options = newSeq[CmlOption]()

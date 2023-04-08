@@ -16,13 +16,13 @@
 import cmdline
 
 # Define the supported options.
-var options = newSeq[CmlOption]()
-options.add(newCmlOption(&quot;help&quot;, &#x27;h&#x27;, cmlStopArgument))
-options.add(newCmlOption(&quot;log&quot;, &#x27;l&#x27;, cmlOptionalArgument))
+var supportedOptions = newSeq[CmlOption]()
+supportedOptions.add(newCmlOption(&quot;help&quot;, &#x27;h&#x27;, cmlStopArgument))
+supportedOptions.add(newCmlOption(&quot;log&quot;, &#x27;l&#x27;, cmlOptionalArgument))
 ...
 
 # Parse the command line.
-let argsOrMessage = cmdline(options, collectArgs())
+let argsOrMessage = cmdline(supportedOptions, collectArgs())
 if argsOrMessage.kind == cmlMessageKind:
   # Display the message.
   echo getMessage(argsOrMessage.messageId,
@@ -126,20 +126,22 @@ ArgsOrMessage = object
 <li>cmlArgument0or1 — option with an argument, 0 or 1 times.
 </li><li>cmlNoArgument — option without an argument, 0 or 1 times.
 </li><li>cmlOptionalArgument — option with an optional argument, 0
-    or 1 times.
+or 1 times.
 </li><li>cmlBareArgument — an argument without an option, 1 time.
 </li><li>cmlArgumentOnce — option with an argument, 1 time.
-</li><li>cmlArgumentMany — option with an argument, unlimited
-    number of times.
+</li><li>cmlArgumentMany — option with an argument, unlimited number
+of times.
 </li><li>cmlStopArgument — option without an argument, 0 or 1
-    times. Stop and return this option by itself.
+times. Stop and return this option by itself.
+</li><li>cmlNoOptions — when no arguments specified. No messages for
+any required options.
 </li></ul>
 
 
 <pre class="nim-code">
 CmlOptionType = enum
   cmlArgument0or1, cmlNoArgument, cmlOptionalArgument, cmlBareArgument,
-  cmlArgumentOnce, cmlArgumentMany, cmlStopArgument
+  cmlArgumentOnce, cmlArgumentMany, cmlStopArgument, cmlNoOptions
 </pre>
 
 <h3 id="CmlOption">CmlOption</h3>
@@ -230,8 +232,9 @@ generate the arguments. Parse uses &quot;arg value&quot; not &quot;arg=value&quo
 </p>
 
 <pre class="nim-code">
-func cmdLine(options: openArray[CmlOption]; arguments: openArray[string]): ArgsOrMessage {.
-    raises: [KeyError], tags: [].}
+func cmdLine(supportedOptions: openArray[CmlOption];
+             arguments: openArray[string]): ArgsOrMessage {.raises: [KeyError],
+    tags: [].}
 </pre>
 
 <h3 id="cmlMessages">cmlMessages</h3>
