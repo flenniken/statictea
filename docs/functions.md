@@ -2345,7 +2345,7 @@ type:
 parseMarkdown = func(mdText: string, type: string) list
 ~~~
 
-list elements:
+Block list elements:
 
 * p — A paragraph element is one string, possibly containing
 newlines.
@@ -2358,6 +2358,16 @@ string is the ending line, for example “~~~”.
 * bullets — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
+
+~~~javascript
+lite = parseMarkdown(description, "lite")
+lite => [
+  ["p", ["the paragraph which may contain newlines"]]
+  ["code", ["~~~", "code text with newlines", "~~~"]]
+  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
+
+Inline list elements:
 
 * normal -- unformated inline string
 
@@ -2372,14 +2382,6 @@ are not part of the string.
 
 * link -- inline hyperlink; two strings: text description and
 link. The [] and () are not part of the strings.
-
-~~~javascript
-lite = parseMarkdown(description, "lite")
-lite => [
-  ["p", ["the paragraph which may contain newlines"]]
-  ["code", ["~~~", "code text with newlines", "~~~"]]
-  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
-]
 
 inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
 inline => [

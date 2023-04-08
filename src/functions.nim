@@ -1445,9 +1445,9 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
   result = newFunResult(newValue(newString))
 
 func replaceReMap(map: VarsDict): FunResult =
-  ## Replace multiple parts of a string using regular expressions.
-  ## The map parameteter has the target string in a and the pairs in
-  ## b.
+  ## Replace multiple parts of a string using Perl regular
+  ## expressions.  The map parameteter has the target string in a and
+  ## the pairs in b.
 
   let str = map["a"].stringv
   let list = map["b"].listv.list
@@ -2736,7 +2736,7 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ## parseMarkdown = func(mdText: string, type: string) list
   ## ~~~
   ##
-  ## list elements:
+  ## Block list elements:
   ##
   ## * p — A paragraph element is one string, possibly containing
   ## newlines.
@@ -2749,6 +2749,16 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ## * bullets — A bullets element contains a string (with newlines)
   ## for each bullet point.  The leading “* “ is not part of the
   ## string.
+  ##
+  ## ~~~statictea
+  ## lite = parseMarkdown(description, "lite")
+  ## lite => [
+  ##   ["p", ["the paragraph which may contain newlines"]]
+  ##   ["code", ["~~~", "code text with newlines", "~~~"]]
+  ##   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+  ## ]
+  ##
+  ## Inline list elements:
   ##
   ## * normal -- unformated inline string
   ##
@@ -2763,14 +2773,6 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ##
   ## * link -- inline hyperlink; two strings: text description and
   ## link. The [] and () are not part of the strings.
-  ##
-  ## ~~~statictea
-  ## lite = parseMarkdown(description, "lite")
-  ## lite => [
-  ##   ["p", ["the paragraph which may contain newlines"]]
-  ##   ["code", ["~~~", "code text with newlines", "~~~"]]
-  ##   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
-  ## ]
   ##
   ## inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
   ## inline => [

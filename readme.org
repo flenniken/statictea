@@ -2510,14 +2510,15 @@ highlighter.
    :CUSTOM_ID: html-formatted-json
    :END:
 
-The nim jsondoc command produces html formatted json data.  Our
-desired final format is Github markdown so having html
+The nim jsondoc command produces html formatted descriptions.
+Our desired final format is Github markdown so having html
 presentation data in the json is a problem.
 
-The jsondocraw command replaces the descriptions in the json with
-the text from the source file as is. The nimble *jsondoc* command
-creates the jsondocraw exe.  jsondocraw calls nim's jsondoc
-command then patches the descriptions.
+The jsondocraw command produces a JSON file like jsondoc, except
+the descriptions match the text in the source file. Jsondocraw
+calls nim's jsondoc command then patches the descriptions.
+
+The nimble *jsondoc* command creates the jsondocraw exe.
 
 [[#contents][茶]]
 

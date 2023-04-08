@@ -2376,7 +2376,7 @@ document all StaticTea functions. Return a list of lists.
 <span class="t-dotName">parseMarkdown</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdText</span>: <span class="t-type">string</span>, <span class="t-param">type</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
 </pre>
 <p>
-list elements:
+Block list elements:
 
 </p><ul>
 <li>p — A paragraph element is one string, possibly containing
@@ -2396,30 +2396,6 @@ for each bullet point.  The leading “* “ is not part of the
 string.
 
 </li></ul>
-<ul>
-<li>normal -- unformated inline string
-
-</li></ul>
-<ul>
-<li>bold -- **bold** inline string. The leading and trailing * are
-not part of the string.
-
-</li></ul>
-<ul>
-<li>italic -- *italic* inline string. The leading and trailing *
-are not part of the string.
-
-</li></ul>
-<ul>
-<li>boldItalic -- ***bold and italic*** inline string. The leading and trailing *
-are not part of the string.
-
-</li></ul>
-<ul>
-<li>link -- inline hyperlink; two strings: text description and
-link. The [] and () are not part of the strings.
-
-</li></ul>
 <pre class="tea-code">
 <span class="t-dotName">lite</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">description</span>, <span class="t-str">&quot;lite&quot;</span>)
 <span class="t-dotName">lite</span> =&gt; [
@@ -2427,6 +2403,22 @@ link. The [] and () are not part of the strings.
   [<span class="t-str">&quot;code&quot;</span>, [<span class="t-str">&quot;~~~&quot;</span>, <span class="t-str">&quot;code text with newlines&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>]]
   [<span class="t-str">&quot;bullets&quot;</span>, [<span class="t-str">&quot;bullet (newlines) 1&quot;</span>, <span class="t-str">&quot;point 2&quot;</span>, <span class="t-str">&quot;3&quot;</span>, ...]
 ]
+
+<span class="t-dotName">Inline</span> <span class="t-dotName">list</span> <span class="t-dotName">elements</span>:
+
+* <span class="t-dotName">normal</span> <span class="t-num">-</span>- <span class="t-dotName">unformated</span> <span class="t-dotName">inline</span> <span class="t-dotName">string</span>
+
+* <span class="t-dotName">bold</span> <span class="t-num">-</span>- **<span class="t-dotName">bold</span>** <span class="t-dotName">inline</span> <span class="t-dotName">string.</span> <span class="t-dotName">The</span> <span class="t-dotName">leading</span> <span class="t-dotName">and</span> <span class="t-dotName">trailing</span> * <span class="t-dotName">are</span>
+<span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">string.</span>
+
+* <span class="t-dotName">italic</span> <span class="t-num">-</span>- *<span class="t-dotName">italic</span>* <span class="t-dotName">inline</span> <span class="t-dotName">string.</span> <span class="t-dotName">The</span> <span class="t-dotName">leading</span> <span class="t-dotName">and</span> <span class="t-dotName">trailing</span> *
+<span class="t-dotName">are</span> <span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">string.</span>
+
+* <span class="t-dotName">boldItalic</span> <span class="t-num">-</span>- ***<span class="t-dotName">bold</span> <span class="t-dotName">and</span> <span class="t-dotName">italic</span>*** <span class="t-dotName">inline</span> <span class="t-dotName">string.</span> <span class="t-dotName">The</span> <span class="t-dotName">leading</span> <span class="t-dotName">and</span> <span class="t-dotName">trailing</span> *
+<span class="t-dotName">are</span> <span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">string.</span>
+
+* <span class="t-dotName">link</span> <span class="t-num">-</span>- <span class="t-dotName">inline</span> <span class="t-dotName">hyperlink</span>; <span class="t-dotName">two</span> <span class="t-dotName">strings</span>: <span class="t-dotName">text</span> <span class="t-dotName">description</span> <span class="t-dotName">and</span>
+<span class="t-dotName">link.</span> <span class="t-dotName">The</span> [] <span class="t-dotName">and</span> () <span class="t-dotName">are</span> <span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">strings.</span>
 
 <span class="t-dotName">inline</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-str">&quot;**bold** and hyperlink [text](link)&quot;</span>, <span class="t-str">&quot;inline&quot;</span>)
 <span class="t-dotName">inline</span> =&gt; [

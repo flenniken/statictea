@@ -1288,7 +1288,7 @@ type:
 parseMarkdown = func(mdText: string, type: string) list
 ~~~
 
-list elements:
+Block list elements:
 
 * p — A paragraph element is one string, possibly containing
 newlines.
@@ -1301,6 +1301,16 @@ string is the ending line, for example “~~~”.
 * bullets — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
+
+~~~statictea
+lite = parseMarkdown(description, "lite")
+lite => [
+  ["p", ["the paragraph which may contain newlines"]]
+  ["code", ["~~~", "code text with newlines", "~~~"]]
+  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
+
+Inline list elements:
 
 * normal -- unformated inline string
 
@@ -1315,14 +1325,6 @@ are not part of the string.
 
 * link -- inline hyperlink; two strings: text description and
 link. The [] and () are not part of the strings.
-
-~~~statictea
-lite = parseMarkdown(description, "lite")
-lite => [
-  ["p", ["the paragraph which may contain newlines"]]
-  ["code", ["~~~", "code text with newlines", "~~~"]]
-  ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
-]
 
 inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
 inline => [
@@ -1900,7 +1902,7 @@ warn("always warn")
     info("fun_not_bb", dc_fun_not_bb, 18),
     info("fun_or_bbb", dc_fun_or_bbb, 23),
     info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
-    info("fun_parseMarkdown_ssl", dc_fun_parseMarkdown_ssl, 81),
+    info("fun_parseMarkdown_ssl", dc_fun_parseMarkdown_ssl, 83),
     info("fun_path_sosd", dc_fun_path_sosd, 55),
     info("fun_readJson_sa", dc_fun_readJson_sa, 23),
     info("fun_replace_siiss", dc_fun_replace_siiss, 110),
@@ -1958,7 +1960,7 @@ warn("always warn")
     2550,
     2607,
     2588,
-    2884,
+    2886,
     566,
     623,
     971,
@@ -1983,7 +1985,7 @@ warn("always warn")
     2531,
     2371,
     2412,
-    2808,
+    2810,
     2727,
     1531,
     2704,
