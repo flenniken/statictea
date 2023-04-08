@@ -42,6 +42,7 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 <li> <a href="#matchParameterType">matchParameterType</a> &mdash; Match a parameter type and the trailing whitespace.</li>
 <li> <a href="#matchDocComment">matchDocComment</a> &mdash; Match a doc comment.</li>
 <li> <a href="#matchReturnStatement">matchReturnStatement</a> &mdash; Match a return statement.</li>
+<li> <a href="#matchMarkdownLink">matchMarkdownLink</a> &mdash; Match a return statement.</li>
 </ul>
 
 <h3 id="commands">commands</h3>
@@ -335,6 +336,16 @@ proc matchDocComment(line: string; start: Natural): Option[Matches] {.
 <pre class="nim-code">
 proc matchReturnStatement(line: string; start: Natural): Option[Matches] {.
     raises: [KeyError], tags: [].}
+</pre>
+
+<h3 id="matchMarkdownLink">matchMarkdownLink</h3>
+
+<p>Match a return statement. a = return(...
+[description](link)
+</p>
+
+<pre class="nim-code">
+func matchMarkdownLink(line: string; start: Natural): Option[Matches]
 </pre>
 
 

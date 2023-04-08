@@ -258,3 +258,9 @@ proc matchReturnStatement*(line: string, start: Natural): Option[Matches] =
   ## Match a return statement. a = return(...
   let pattern = r"\s*[a-z-A-Z_]*\s*[=&]\s*return("
   result = matchPatternCached(line, pattern, start, 0)
+
+func matchMarkdownLink*(line: string, start: Natural): Option[Matches] =
+  ## Match a return statement. a = return(...
+  ## [description](link)
+  let pattern = r"\[([^\]]*)]\(([^\)]+)\)"
+  result = matchPattern(line, pattern, start, 2)

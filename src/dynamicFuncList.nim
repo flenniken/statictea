@@ -1276,13 +1276,16 @@ frags => [
 
 """
 
-  dc_fun_parseMarkdown_sl = """
-Parse a simple subset of markdown which contains paragraphs,
-bullets and code blocks. This subset is used to document all
-StaticTea functions. Return a list of lists.
+  dc_fun_parseMarkdown_ssl = """
+Parse a simple subset of markdown. This subset is used to
+document all StaticTea functions. Return a list of lists.
+
+type:
+* lite — parse paragraphs, bullets and code blocks. See list elements below.
+* inline — parse inline attributes, bold, italics, bold+italics and links
 
 ~~~statictea
-parseMarkdown = func(mdText: string) list
+parseMarkdown = func(mdText: string, type: string) list
 ~~~
 
 list elements:
@@ -1299,12 +1302,33 @@ string is the ending line, for example “~~~”.
 for each bullet point.  The leading “* “ is not part of the
 string.
 
+* normal -- unformated inline string
+
+* bold -- **bold** inline string. The leading and trailing * are
+not part of the string.
+
+* italic -- *italic* inline string. The leading and trailing *
+are not part of the string.
+
+* boldItalic -- ***bold and italic*** inline string. The leading and trailing *
+are not part of the string.
+
+* link -- inline hyperlink; two strings: text description and
+link. The [] and () are not part of the strings.
+
 ~~~statictea
-elements = parseMarkdown(description)
-elements => [
+lite = parseMarkdown(description, "lite")
+lite => [
   ["p", ["the paragraph which may contain newlines"]]
   ["code", ["~~~", "code text with newlines", "~~~"]]
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
+
+inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
+inline => [
+  ["bold", ["bold"]]
+  ["normal", [" and a hyperlink "]]
+  ["link", ["text", "link"]]
 ]
 ~~~
 
@@ -1876,7 +1900,7 @@ warn("always warn")
     info("fun_not_bb", dc_fun_not_bb, 18),
     info("fun_or_bbb", dc_fun_or_bbb, 23),
     info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
-    info("fun_parseMarkdown_sl", dc_fun_parseMarkdown_sl, 42),
+    info("fun_parseMarkdown_ssl", dc_fun_parseMarkdown_ssl, 81),
     info("fun_path_sosd", dc_fun_path_sosd, 55),
     info("fun_readJson_sa", dc_fun_readJson_sa, 23),
     info("fun_replace_siiss", dc_fun_replace_siiss, 110),
@@ -1934,7 +1958,7 @@ warn("always warn")
     2550,
     2607,
     2588,
-    2845,
+    2884,
     566,
     623,
     971,
@@ -1959,7 +1983,7 @@ warn("always warn")
     2531,
     2371,
     2412,
-    2769,
+    2808,
     2727,
     1531,
     2704,

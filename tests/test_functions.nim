@@ -177,8 +177,8 @@ proc testFormatStringWarn(str: string, eWarningData: WarningData,
     echo str
     echo getWarningLine("", 0, warningData.messageId, warningData.p1)
 
-proc testParseMarkdown(text: string, eJson: string): bool =
-  var arguments = @[newValue(text)]
+proc testParseMarkdown(text: string, eJson: string, kind = "lite"): bool =
+  var arguments = @[newValue(text), newValue(kind)]
   let funResult = callFunction("parseMarkdown", arguments)
   result = gotExpected($funResult, eJson)
 
@@ -2127,7 +2127,7 @@ len = len("tea")
     check escapeHtmlBody("a > 5") == "a &gt; 5"
     check escapeHtmlBody("""a = "5" """) == "a = &quot;5&quot; "
     check escapeHtmlBody("""a = '5' """) == "a = &#x27;5&#x27; "
-    
+
   test "escapeHtmlAttribute":
     check escapeHtmlAttribute("") == ""
     check escapeHtmlAttribute("abCD12") == "abCD12"

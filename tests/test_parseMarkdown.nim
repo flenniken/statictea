@@ -1,6 +1,7 @@
 import std/unittest
 import std/strutils
 import std/strFormat
+import std/options
 import parseMarkdown
 import sharedtestcode
 import compareLines
@@ -9,7 +10,7 @@ import unicodes
 const
   tripleQuotes = "\"\"\""
 
-proc markdownHtml(elements: seq[Element]): string =
+proc markdownHtml(elements: seq[BlockElement]): string =
   ## Generate HTML from the markdown elements.
   for element in elements:
     case element.tag
@@ -62,7 +63,7 @@ proc markdownHtml(elements: seq[Element]): string =
         result.add("</li>\n")
       result.add("</ul>\n")
 
-proc roundTripElements(elements: seq[Element]): string =
+proc roundTripElements(elements: seq[BlockElement]): string =
   ## Recreate, round trip, the markdown string from the markdown
   ## elements.
   for element in elements:
@@ -83,8 +84,8 @@ proc roundTripElements(elements: seq[Element]): string =
         result.add(nl_string)
 
 proc testParseMarkdown(content: string, expected: string): bool =
-  ## Test parseMarkdown
-  let elements = parseMarkdown(content)
+  ## Test parseBlockMarkdown
+  let elements = parseBlockMarkdown(content)
 
   let roundtrip = roundTripElements(elements)
   if content != roundtrip:
@@ -121,7 +122,7 @@ proc testHighlightCode(code: string, expected: string): bool =
   for f in fragments:
     let codeFrag = visibleControl(code[f.start .. f.fEnd - 1], spacesToo=true)
     got.add(fmt("{f.fragmentType}: {codeFrag}") & "\n")
-  
+
   if got == expected:
     let roundTrip = roundTripFragments(code, fragments)
     if roundTrip != code:
@@ -140,30 +141,45 @@ proc testHighlightCode(code: string, expected: string): bool =
     echo linesSideBySide(got, expected)
   return false
 
-suite "parseMarkdown.nim":
+proc testParseInlineMarkdown(text: string, expected: string): bool =
+  let elements = parseInlineMarkdown(text)
+  let got = $elements
+  if got == expected:
+    return true
+  echo linesSideBySide(got, expected)
+  return false
 
-  test "newElement":
-    check gotExpected($newElement(p, @[]), """
+proc testParseLink(text: string, start: Natural, expected: Option[LinkItem]): bool =
+  let linkItem = parseLink(text, start)
+  if linkItem == expected:
+    return true
+  echo linesSideBySide($linkItem, $expected)
+  return false
+
+suite "parseBlockMarkdown.nim":
+
+  test "newBlockElement":
+    check gotExpected($newBlockElement(p, @[]), """
 ---p---
 """)
-    check gotExpected($newElement(p, @["abc"]), """
+    check gotExpected($newBlockElement(p, @["abc"]), """
 ---p---
 :abc""")
-    check gotExpected($newElement(p, @["abc\n"]), """
+    check gotExpected($newBlockElement(p, @["abc\n"]), """
 ---p---
 :abc
 """)
-    check gotExpected($newElement(p, @["abc\n", "def\n"]), """
+    check gotExpected($newBlockElement(p, @["abc\n", "def\n"]), """
 ---p---
 :abc
 :def
 """)
   test "elements string repr":
-    var elements = newSeq[Element]()
+    var elements = newSeq[BlockElement]()
     check gotExpected($elements, "")
 
-    elements.add(newElement(p, @["hello\n"]))
-    elements.add(newElement(p, @["there\n"]))
+    elements.add(newBlockElement(p, @["hello\n"]))
+    elements.add(newBlockElement(p, @["there\n"]))
     check gotExpected($elements, """
 ---p---
 :hello
@@ -171,12 +187,12 @@ suite "parseMarkdown.nim":
 :there
 """)
 
-  test "parseMarkdown empty":
+  test "parseBlockMarkdown empty":
     let content = ""
     let expected = ""
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown p":
+  test "parseBlockMarkdown p":
     let content = """
 This is a test.
 """
@@ -186,7 +202,7 @@ This is a test.
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown few p lines":
+  test "parseBlockMarkdown few p lines":
     let content = """
 This is a paragraph with
 several lines
@@ -200,7 +216,7 @@ in it.
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown few p":
+  test "parseBlockMarkdown few p":
     let content = """
 This is a paragraph with
 several lines
@@ -219,7 +235,7 @@ in it.
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown code":
+  test "parseBlockMarkdown code":
     let content = """
 ~~~
 a = 5
@@ -233,7 +249,7 @@ a = 5
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown code 2":
+  test "parseBlockMarkdown code 2":
     let content = """
 ~~~
 a = 5
@@ -251,7 +267,7 @@ c = 7
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown code 3":
+  test "parseBlockMarkdown code 3":
     let content = """
 Example:
 ~~~
@@ -268,7 +284,7 @@ a = 5
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown code type":
+  test "parseBlockMarkdown code type":
     let content = """
 ~~~nim
 a = 5
@@ -284,7 +300,7 @@ b = 6
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown p bullet":
+  test "parseBlockMarkdown p bullet":
     let content = """
 Example:
 * a
@@ -301,7 +317,7 @@ Example:
 """
     check testParseMarkdown(content, expected)
 
-  test "parseMarkdown bullet code":
+  test "parseBlockMarkdown bullet code":
     let content = """
 * a
 * b
@@ -478,7 +494,7 @@ Examples:
 <span style="color: green;">banana</span> = <span style="color: SeaGreen;">"plant"</span>
 </pre>
 """
-    let elements = parseMarkdown(content)
+    let elements = parseBlockMarkdown(content)
     let html =  markdownHtml(elements)
     # echo html
     if html != expectedHtml:
@@ -708,3 +724,58 @@ other: ␠=␠
 str: "␊me␊"
 """
     check testHighlightCode(code, expected)
+
+  test "countStars":
+    check countStars("", 0) == 0
+    check countStars("", 1) == 0
+    check countStars("a", 0) == 0
+    check countStars("a", 1) == 0
+    check countStars("ab", 0) == 0
+    check countStars("ab", 1) == 0
+    check countStars("ab", 2) == 0
+
+    check countStars("a*", 0) == 0
+    check countStars("a*", 1) == 1
+    check countStars("a*b", 1) == 1
+    check countStars("a*b*", 1) == 1
+    check countStars("a**b", 1) == 2
+
+    check countStars("*", 0) == 1
+    check countStars("**", 0) == 2
+    check countStars("***", 0) == 3
+    check countStars("****", 0) == 4
+
+    check countStars("**", 1) == 1
+    check countStars("***", 1) == 2
+    check countStars("****", 1) == 3
+
+  test "parseInlineMarkdown":
+    check testParseInlineMarkdown("", "")
+    check testParseInlineMarkdown("a", " normal a")
+    check testParseInlineMarkdown("abc", " normal abc")
+    check testParseInlineMarkdown("*b*", " italic b")
+    check testParseInlineMarkdown("**b**", " bold b")
+    check testParseInlineMarkdown("***b***", " boldItalic b")
+    # check testParseInlineMarkdown("[text](link)", ""
+    check testParseInlineMarkdown("a\nb", " normal a\nb")
+    check testParseInlineMarkdown("a **b** c", " normal a  bold b normal  c")
+
+    check testParseInlineMarkdown("*i* **b** ***bi***", " italic i normal   bold b normal   boldItalic bi")
+    check testParseInlineMarkdown("*i***b*****bi***", " italic i bold b boldItalic bi")
+    check testParseInlineMarkdown("*a**b**c*", " italic a italic b italic c")
+    check testParseInlineMarkdown("**a**\n*c*", " bold a normal \n italic c")
+
+    check testParseInlineMarkdown("* b", " normal * b")
+    check testParseInlineMarkdown("** b", " normal ** b")
+    check testParseInlineMarkdown("*** b", " normal *** b")
+
+    check testParseInlineMarkdown("**b*", " normal **b*")
+    check testParseInlineMarkdown("*b**", " italic b normal *")
+
+    check testParseInlineMarkdown("[desc](link)", " link desc link")
+    check testParseInlineMarkdown("[desc](link) -- **a**", " link desc link normal  --  bold a")
+
+  test "parseLink":
+    check testParseLink("[desc](link)", 0, some(newLinkItem(0, 12, "desc", "link")))
+    check testParseLink("  [desc](link)", 2, some(newLinkItem(2, 14, "desc", "link")))
+    check testParseLink("[desc](link", 0, none(LinkItem))

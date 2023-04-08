@@ -25,7 +25,7 @@ doc = """
 {o.md}
 """
 
-fragments = parseMarkdown(doc)
+fragments = parseMarkdown(doc, "lite")
 fragments => [
 $$ endblock
 $$ block
@@ -44,14 +44,14 @@ A subset of markdown which contains paragraphs,
 bullets and code blocks.
 
 ~~~ statictea
-parseMarkdown = func(mdText: string) list
+parseMarkdown = func(mdText: string, type: string) list
 ~~~
 
 * p -- a paragraph
 * code -- code block
 * bullets -- bullets"""
 
-o.fragments = parseMarkdown(o.md)
+o.fragments = parseMarkdown(o.md, "lite")
 ```
 
 ### File result.expected
@@ -62,7 +62,7 @@ A subset of markdown which contains paragraphs,
 bullets and code blocks.
 
 ~~~ statictea
-parseMarkdown = func(mdText: string) list
+parseMarkdown = func(mdText: string, type: string) list
 ~~~
 
 * p -- a paragraph
@@ -70,10 +70,10 @@ parseMarkdown = func(mdText: string) list
 * bullets -- bullets
 """
 
-fragments = parseMarkdown(doc)
+fragments = parseMarkdown(doc, "lite")
 fragments => [
   ["p",["A subset of markdown which contains paragraphs,\nbullets and code blocks.\n\n"]]
-  ["code",["~~~ statictea\n","parseMarkdown = func(mdText: string) list\n","~~~\n"]]
+  ["code",["~~~ statictea\n","parseMarkdown = func(mdText: string, type: string) list\n","~~~\n"]]
   ["p",["\n"]]
   ["bullets",["p -- a paragraph\n","code -- code block\n","bullets -- bullets"]]
 ]

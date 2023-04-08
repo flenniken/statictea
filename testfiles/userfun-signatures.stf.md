@@ -135,7 +135,7 @@ ne(a: string, b: string) bool
 not(a: bool) bool
 or(a: bool, b: bool) bool
 parseCode(a: string) list
-parseMarkdown(a: string) list
+parseMarkdown(a: string, b: string) list
 path(a: string, b: string) dict
 readJson(a: string) any
 replace(a: string, b: int, c: int, d: string) string

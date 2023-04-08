@@ -2724,13 +2724,16 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
     return newFunResultWarn(valueOr.message)
   result = newFunResult(valueOr.value)
 
-func fun_parseMarkdown_sl*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Parse a simple subset of markdown which contains paragraphs,
-  ## bullets and code blocks. This subset is used to document all
-  ## StaticTea functions. Return a list of lists.
+func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Parse a simple subset of markdown. This subset is used to
+  ## document all StaticTea functions. Return a list of lists.
+  ##
+  ## type:
+  ## * lite — parse paragraphs, bullets and code blocks. See list elements below.
+  ## * inline — parse inline attributes, bold, italics, bold+italics and links
   ##
   ## ~~~statictea
-  ## parseMarkdown = func(mdText: string) list
+  ## parseMarkdown = func(mdText: string, type: string) list
   ## ~~~
   ##
   ## list elements:
@@ -2747,24 +2750,60 @@ func fun_parseMarkdown_sl*(variables: Variables, arguments: seq[Value]): FunResu
   ## for each bullet point.  The leading “* “ is not part of the
   ## string.
   ##
+  ## * normal -- unformated inline string
+  ##
+  ## * bold -- **bold** inline string. The leading and trailing * are
+  ## not part of the string.
+  ##
+  ## * italic -- *italic* inline string. The leading and trailing *
+  ## are not part of the string.
+  ##
+  ## * boldItalic -- ***bold and italic*** inline string. The leading and trailing *
+  ## are not part of the string.
+  ##
+  ## * link -- inline hyperlink; two strings: text description and
+  ## link. The [] and () are not part of the strings.
+  ##
   ## ~~~statictea
-  ## elements = parseMarkdown(description)
-  ## elements => [
+  ## lite = parseMarkdown(description, "lite")
+  ## lite => [
   ##   ["p", ["the paragraph which may contain newlines"]]
   ##   ["code", ["~~~", "code text with newlines", "~~~"]]
   ##   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
   ## ]
+  ##
+  ## inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
+  ## inline => [
+  ##   ["bold", ["bold"]]
+  ##   ["normal", [" and a hyperlink "]]
+  ##   ["link", ["text", "link"]]
+  ## ]
   ## ~~~
-  tMapParameters("parseMarkdown", "sl")
+  tMapParameters("parseMarkdown", "ssl")
   let text = map["a"].stringv
-  var elements = parseMarkdown(text)
-  var elementList = newEmptyListValue()
-  for element in elements:
-    var sublist = newEmptyListValue()
-    sublist.listv.list.add(newValue($element.tag))
-    sublist.listv.list.add(newValue(element.content))
-    elementList.listv.list.add(sublist)
-  result = newFunResult(elementList)
+  let kind = map["b"].stringv
+  case kind:
+  of "lite":
+    let elements = parseBlockMarkdown(text)
+    var elementList = newEmptyListValue()
+    for element in elements:
+      var sublist = newEmptyListValue()
+      sublist.listv.list.add(newValue($element.tag))
+      sublist.listv.list.add(newValue(element.content))
+      elementList.listv.list.add(sublist)
+    result = newFunResult(elementList)
+  of "inline":
+    let inlineElements = parseInlineMarkdown(text)
+    var elementList = newEmptyListValue()
+    for inLineElement in inlineElements:
+      var sublist = newEmptyListValue()
+      sublist.listv.list.add(newValue($inLineElement.tag))
+      sublist.listv.list.add(newValue(inLineElement.content))
+      elementList.listv.list.add(sublist)
+    result = newFunResult(elementList)
+  else:
+    # Invalid parseMarkdown type, expected lite or inline.
+    return newFunResultWarn(wInvalidParseMdType, 1)
 
 func fun_parseCode_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Parse a string of StaticTea code into fragments useful for
@@ -2930,7 +2969,7 @@ functionsDict["fun_lt_ffb"] = fun_lt_ffb
 functionsDict["fun_lt_iib"] = fun_lt_iib
 functionsDict["fun_lte_ffb"] = fun_lte_ffb
 functionsDict["fun_lte_iib"] = fun_lte_iib
-functionsDict["fun_parseMarkdown_sl"] = fun_parseMarkdown_sl
+functionsDict["fun_parseMarkdown_ssl"] = fun_parseMarkdown_ssl
 functionsDict["fun_ne_ffb"] = fun_ne_ffb
 functionsDict["fun_ne_iib"] = fun_ne_iib
 functionsDict["fun_ne_ssb"] = fun_ne_ssb

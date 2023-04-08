@@ -17,41 +17,58 @@ Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#ElementTag">ElementTag</a> &mdash; The supported markdown elements.</li>
-<li>type:  <a href="#Element">Element</a> &mdash; Parse markdown elements (parseMarkdown).</li>
+<li>type:  <a href="#BlockElementTag">BlockElementTag</a> &mdash; The supported markdown elements.</li>
+<li>type:  <a href="#BlockElement">BlockElement</a> &mdash; Parse markdown elements (parseBlockMarkdown and parseInlineMarkdown).</li>
 <li>type:  <a href="#FragmentType">FragmentType</a> &mdash; Hightlight fragments.</li>
 <li>type:  <a href="#Fragment">Fragment</a> &mdash; A fragment of a string.</li>
-<li> <a href="#newElement">newElement</a> &mdash; Create an Element object.</li>
+<li>type:  <a href="#InlineElementTag">InlineElementTag</a> &mdash; The supported inline markdown elements.</li>
+<li>type:  <a href="#InlineElement">InlineElement</a> &mdash; Parse markdown elements (parseInlineMarkdown).</li>
+<li>type:  <a href="#LinkItem">LinkItem</a> &mdash; A link item containing description and a link string and the start and end position in the text.</li>
+<li> <a href="#newLinkItem">newLinkItem</a> &mdash; Create a LinkItem object </li>
+<li> <a href="#newBlockElement">newBlockElement</a> &mdash; Create an Element object.</li>
+<li> <a href="#newInlineElement">newInlineElement</a> &mdash; Create an Element object.</li>
 <li> <a href="#newFragment">newFragment</a> &mdash; Create a new Fragment from start and end values.</li>
 <li> <a href="#newFragmentLen2">newFragmentLen2</a> &mdash; Create a new Fragment from start and length values.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of a Fragment.</li>
 <li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a sequence of fragments.</li>
-<li> <a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse the simple description markdown and return a list of elements.</li>
-<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of an Element.</li>
-<li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a list of Elements.</li>
+<li> <a href="#parseBlockMarkdown">parseBlockMarkdown</a> &mdash; Parse the simple description markdown and return a list of elements.</li>
+<li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of an BlockElement.</li>
+<li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a list of BlockElements.</li>
+<li> <a href="#a__-4">`$`</a> &mdash; Return a string representation of an InlineElement.</li>
+<li> <a href="#a__-5">`$`</a> &mdash; Return a string representation of a list of InlineElement.</li>
 <li> <a href="#atMultiline">atMultiline</a> &mdash; Determine whether the start index points a the start of a multiline string.</li>
 <li> <a href="#lineEnd">lineEnd</a> &mdash; Find the end of the line.</li>
 <li> <a href="#highlightCode">highlightCode</a> &mdash; Identify all the fragments in the StaticTea code to highlight.</li>
+<li> <a href="#countStars">countStars</a> &mdash; Count the number of contiguous stars (*) starting at pos.</li>
+<li> <a href="#parseLink">parseLink</a> &mdash; Parse the link at the given start position.</li>
+<li> <a href="#parseInlineMarkdown">parseInlineMarkdown</a> &mdash; Parse the text looking for bold, italic, bold+italic and links.</li>
 </ul>
 
-<h3 id="ElementTag">ElementTag</h3>
+<h3 id="BlockElementTag">BlockElementTag</h3>
 
 <p>The supported markdown elements.
-</p>
+
+</p><ul>
+<li>nothing — not one of the other tags
+</li><li>p — paragraph block
+</li><li>code — code block
+</li><li>bullets — one or more bullet points
+</li></ul>
+
 
 <pre class="nim-code">
-ElementTag = enum
+BlockElementTag = enum
   nothing, p, code, bullets
 </pre>
 
-<h3 id="Element">Element</h3>
+<h3 id="BlockElement">BlockElement</h3>
 
-<p>Parse markdown elements (parseMarkdown).
+<p>Parse markdown elements (parseBlockMarkdown and parseInlineMarkdown).
 </p>
 
 <pre class="nim-code">
-Element = object
-  tag*: ElementTag
+BlockElement = object
+  tag*: BlockElementTag
   content*: seq[string]
 </pre>
 
@@ -98,13 +115,77 @@ Fragment = object
   fEnd*: Natural
 </pre>
 
-<h3 id="newElement">newElement</h3>
+<h3 id="InlineElementTag">InlineElementTag</h3>
+
+<p>The supported inline markdown elements.
+
+</p><ul>
+<li>normal — unformatted inline text
+</li><li>bold — bold inline text
+</li><li>italic — italic inline text
+</li><li>boldItalic — bold and italic inline text
+</li><li>link — link
+</li></ul>
+
+
+<pre class="nim-code">
+InlineElementTag = enum
+  normal, bold, italic, boldItalic, link
+</pre>
+
+<h3 id="InlineElement">InlineElement</h3>
+
+<p>Parse markdown elements (parseInlineMarkdown).
+</p>
+
+<pre class="nim-code">
+InlineElement = object
+  tag*: InlineElementTag
+  content*: seq[string]
+</pre>
+
+<h3 id="LinkItem">LinkItem</h3>
+
+<p>A link item containing description and a link string and the
+start and end position in the text.
+[description](https://google.com)
+^                                ^
+</p>
+
+<pre class="nim-code">
+LinkItem = object
+  start*: Natural
+  finish*: Natural
+  description*: string
+  link*: string
+</pre>
+
+<h3 id="newLinkItem">newLinkItem</h3>
+
+<p>Create a LinkItem object
+</p>
+
+<pre class="nim-code">
+proc newLinkItem(start: Natural; finish: Natural; description: string;
+                 link: string): LinkItem
+</pre>
+
+<h3 id="newBlockElement">newBlockElement</h3>
 
 <p>Create an Element object.
 </p>
 
 <pre class="nim-code">
-proc newElement(tag: ElementTag; content: seq[string]): Element
+proc newBlockElement(tag: BlockElementTag; content: seq[string]): BlockElement
+</pre>
+
+<h3 id="newInlineElement">newInlineElement</h3>
+
+<p>Create an Element object.
+</p>
+
+<pre class="nim-code">
+proc newInlineElement(tag: InlineElementTag; content: seq[string]): InlineElement
 </pre>
 
 <h3 id="newFragment">newFragment</h3>
@@ -143,7 +224,7 @@ func `$`(f: Fragment): string {.raises: [ValueError], tags: [].}
 func `$`(fragments: seq[Fragment]): string {.raises: [ValueError], tags: [].}
 </pre>
 
-<h3 id="parseMarkdown">parseMarkdown</h3>
+<h3 id="parseBlockMarkdown">parseBlockMarkdown</h3>
 
 <p>Parse the simple description markdown and return a list of
 elements.
@@ -171,26 +252,48 @@ not part of the string.
 
 
 <pre class="nim-code">
-func parseMarkdown(desc: string): seq[Element]
+func parseBlockMarkdown(desc: string): seq[BlockElement]
 </pre>
 
 <h3 id="a__-2">`$`</h3>
 
-<p>Return a string representation of an Element. Each item in the
+<p>Return a string representation of an BlockElement. Each item in the
 content list starts with a colon on a new line.
 </p>
 
 <pre class="nim-code">
-func `$`(element: Element): string {.raises: [ValueError], tags: [].}
+func `$`(element: BlockElement): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="a__-3">`$`</h3>
 
-<p>Return a string representation of a list of Elements.
+<p>Return a string representation of a list of BlockElements.
 </p>
 
 <pre class="nim-code">
-func `$`(elements: seq[Element]): string {.raises: [ValueError], tags: [].}
+func `$`(elements: seq[BlockElement]): string {.raises: [ValueError], tags: [].}
+</pre>
+
+<h3 id="a__-4">`$`</h3>
+
+<p>Return a string representation of an InlineElement.
+</p><pre class="plain-code">
+**text** =&gt; &quot; bold text&quot;
+[desc](http) =&gt; &quot; link desc http&quot;
+</pre>
+
+
+<pre class="nim-code">
+func `$`(element: InlineElement): string {.raises: [ValueError], tags: [].}
+</pre>
+
+<h3 id="a__-5">`$`</h3>
+
+<p>Return a string representation of a list of InlineElement.
+</p>
+
+<pre class="nim-code">
+func `$`(elements: seq[InlineElement]): string {.raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="atMultiline">atMultiline</h3>
@@ -225,6 +328,50 @@ doesn&#x27;t validate the code but it works for valid code.
 
 <pre class="nim-code">
 func highlightCode(codeText: string): seq[Fragment]
+</pre>
+
+<h3 id="countStars">countStars</h3>
+
+<p>Count the number of contiguous stars (*) starting at pos.
+</p>
+
+<pre class="nim-code">
+func countStars(text: string; pos: Natural): Natural
+</pre>
+
+<h3 id="parseLink">parseLink</h3>
+
+<p>Parse the link at the given start position.
+
+</p><pre class="plain-code">
+[description](link)
+^                  ^
+</pre>
+
+
+<pre class="nim-code">
+func parseLink(text: string; start: Natural): Option[LinkItem]
+</pre>
+
+<h3 id="parseInlineMarkdown">parseInlineMarkdown</h3>
+
+<p>Parse the text looking for bold, italic, bold+italic and
+links. Return a list of inline elements.
+
+</p><p>Example:
+
+</p><pre class="tea-code">
+<span class="t-dotName">inline</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-str">&quot;**bold** and hyperlink [desc](link)&quot;</span>, <span class="t-str">&quot;inline&quot;</span>)
+<span class="t-dotName">inline</span> =&gt; [
+  [<span class="t-str">&quot;bold&quot;</span>, [<span class="t-str">&quot;bold&quot;</span>]]
+  [<span class="t-str">&quot;normal&quot;</span>, [<span class="t-str">&quot; and a hyperlink &quot;</span>]]
+  [<span class="t-str">&quot;link&quot;</span>, [<span class="t-str">&quot;desc&quot;</span>, <span class="t-str">&quot;link&quot;</span>]]
+]
+</pre>
+
+
+<pre class="nim-code">
+func parseInlineMarkdown(text: string): seq[InlineElement]
 </pre>
 
 

@@ -114,10 +114,10 @@ proc echoDocComment(funcVar: Value) =
   ## Write the doc comment to standard out with syntax highlighting.
   assert funcVar.kind == vkFunc
   let functionSpec = funcVar.funcv
-  var elements = parseMarkdown(functionSpec.docComment)
+  var elements = parseBlockMarkdown(functionSpec.docComment)
   for element in elements:
     case element.tag
-    of ElementTag.nothing:
+    of BlockElementTag.nothing:
       discard
     of p:
       stdout.write(element.content[0])

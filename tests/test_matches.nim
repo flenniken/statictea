@@ -198,6 +198,11 @@ proc testMatchDocComment(line: string, start: Natural,
   let matchesO = matchDocComment(line, start)
   result = gotExpected($matchesO, $eMatchesO, line)
 
+proc testMatchMarkdownLink(line: string, start: Natural,
+    eMatchesO: Option[Matches] = none(Matches)): bool =
+  let matchesO = matchMarkdownLink(line, start)
+  result = gotExpected($matchesO, $eMatchesO, line)
+
 suite "matches.nim":
 
   test "prepost table":
@@ -647,3 +652,10 @@ suite "matches.nim":
     check testMatchDocComment("  ##", 0, some(newMatches(4, 0)))
     check testMatchDocComment("## comment", 0, some(newMatches(2, 0)))
     check testMatchDocComment("  ## comment", 0, some(newMatches(4, 0)))
+
+  test "matchMarkdownLink":
+    check testMatchMarkdownLink("[](l)", 0, some(newMatches(5, 0, "", "l")))
+    check testMatchMarkdownLink("[desc](link)", 0, some(newMatches(12, 0, "desc", "link")))
+    check testMatchMarkdownLink("[StaticTea](https://github.com/flenniken/statictea)", 0,
+      some(newMatches(51, 0, "StaticTea", "https://github.com/flenniken/statictea")))
+    check testMatchMarkdownLink("[desc]()", 0, none(Matches))

@@ -2,19 +2,27 @@
 ## highlight statictea code.
 
 import std/strutils
+import std/options
 import lineBuffer
+import matches
+import regexes
 
 type
-  ElementTag* = enum
+  BlockElementTag* = enum
     ## The supported markdown elements.
+    ##
+    ## * nothing — not one of the other tags
+    ## * p — paragraph block
+    ## * code — code block
+    ## * bullets — one or more bullet points
     nothing,
     p,
     code,
     bullets,
 
-  Element* = object
-    ## Parse markdown elements (parseMarkdown).
-    tag*: ElementTag
+  BlockElement* = object
+    ## Parse markdown elements (parseBlockMarkdown and parseInlineMarkdown).
+    tag*: BlockElementTag
     content*: seq[string]
 
   FragmentType* = enum
@@ -50,9 +58,46 @@ type
     start*: Natural
     fEnd*: Natural
 
-proc newElement*(tag: ElementTag, content: seq[string]): Element =
+  InlineElementTag* = enum
+    ## The supported inline markdown elements.
+    ##
+    ## * normal — unformatted inline text
+    ## * bold — bold inline text
+    ## * italic — italic inline text
+    ## * boldItalic — bold and italic inline text
+    ## * link — link
+    normal,
+    bold,
+    italic,
+    boldItalic,
+    link
+
+  InlineElement* = object
+    ## Parse markdown elements (parseInlineMarkdown).
+    tag*: InlineElementTag
+    content*: seq[string]
+
+  LinkItem* = object
+    ## A link item containing description and a link string and the
+    ## start and end position in the text.
+    ## [description](https://google.com)
+    ## ^                                ^
+    start*: Natural
+    finish*: Natural
+    description*: string
+    link*: string
+
+proc newLinkItem*(start: Natural, finish: Natural, description: string, link: string): LinkItem =
+  ## Create a LinkItem object
+  result = LinkItem(start: start, finish: finish, description: description, link: link)
+
+proc newBlockElement*(tag: BlockElementTag, content: seq[string]): BlockElement =
   ## Create an Element object.
-  result = Element(tag: tag, content: content)
+  result = BlockElement(tag: tag, content: content)
+
+proc newInlineElement*(tag: InlineElementTag, content: seq[string]): InlineElement =
+  ## Create an Element object.
+  result = InlineElement(tag: tag, content: content)
 
 proc clear(list: var seq[string]) =
   ## Clear (empty) the list.
@@ -77,7 +122,7 @@ func `$`*(fragments: seq[Fragment]): string =
   for f in fragments:
     result.add("$1, start: $2, fEnd: $3\n" % [$f.fragmentType, $f.start, $f.fEnd])
 
-func parseMarkdown*(desc: string): seq[Element] =
+func parseBlockMarkdown*(desc: string): seq[BlockElement] =
   ## Parse the simple description markdown and return a list of
   ## elements.
   ##
@@ -122,17 +167,17 @@ func parseMarkdown*(desc: string): seq[Element] =
       if line.startsWith("\n"):
         # p ended
         newLineString.add(line)
-        result.add(newElement(tag, @[newLineString]))
+        result.add(newBlockElement(tag, @[newLineString]))
         tag = nothing
         newLineString = ""
       elif line.startsWith("~~~"):
-        result.add(newElement(tag, @[newLineString]))
+        result.add(newBlockElement(tag, @[newLineString]))
         # code started
         content.add(line)
         newLineString = ""
         tag = code
       elif line.startsWith("* "):
-        result.add(newElement(tag, @[newLineString]))
+        result.add(newBlockElement(tag, @[newLineString]))
         # bullets started
         newLineString = line[2 .. ^1]
         tag = bullets
@@ -144,7 +189,7 @@ func parseMarkdown*(desc: string): seq[Element] =
         # code ended
         content.add(newLineString)
         content.add(line)
-        result.add(newElement(tag, content))
+        result.add(newBlockElement(tag, content))
         content.clear()
         tag = nothing
         newLineString = ""
@@ -157,7 +202,7 @@ func parseMarkdown*(desc: string): seq[Element] =
         # bullets ended
         newLineString.add(line)
         content.add(newLineString)
-        result.add(newElement(tag, content))
+        result.add(newBlockElement(tag, content))
         content.clear()
         newLineString = ""
         tag = nothing
@@ -167,7 +212,7 @@ func parseMarkdown*(desc: string): seq[Element] =
         newLineString = line[2 .. ^1]
       elif line.startsWith("~~~"):
         content.add(newLineString)
-        result.add(newElement(tag, content))
+        result.add(newBlockElement(tag, content))
         newLineString = ""
         content.clear()
         # code started
@@ -183,26 +228,41 @@ func parseMarkdown*(desc: string): seq[Element] =
     discard
   of p:
     # p ended
-    result.add(newElement(tag, @[newLineString]))
+    result.add(newBlockElement(tag, @[newLineString]))
   of code:
     # code ended
     content.add(newLineString)
     content.add("")
-    result.add(newElement(tag, content))
+    result.add(newBlockElement(tag, content))
   of bullets:
     # bullets ended
     content.add(newLineString)
-    result.add(newElement(tag, content))
+    result.add(newBlockElement(tag, content))
 
-func `$`*(element: Element): string =
-  ## Return a string representation of an Element. Each item in the
+func `$`*(element: BlockElement): string =
+  ## Return a string representation of an BlockElement. Each item in the
   ## content list starts with a colon on a new line.
   result.add("---$1---\n" % $element.tag)
   for line in element.content:
     result.add(":$1" % line)
 
-func `$`*(elements: seq[Element]): string =
-  ## Return a string representation of a list of Elements.
+func `$`*(elements: seq[BlockElement]): string =
+  ## Return a string representation of a list of BlockElements.
+  for element in elements:
+    result.add($element)
+
+func `$`*(element: InlineElement): string =
+  ## Return a string representation of an InlineElement.
+  ## ~~~
+  ## **text** => " bold text"
+  ## [desc](http) => " link desc http"
+  ## ~~~
+  result.add(" $1" % $element.tag)
+  for ix, line in element.content:
+    result.add(" $1" % line)
+
+func `$`*(elements: seq[InlineElement]): string =
+  ## Return a string representation of a list of InlineElement.
   for element in elements:
     result.add($element)
 
@@ -429,3 +489,139 @@ func highlightCode*(codeText: string): seq[Fragment] =
 
   if start < codeText.len:
     addFrag(hlOther)
+
+func countStars*(text: string, pos: Natural): Natural =
+  ## Count the number of contiguous stars (*) starting at pos.
+  var vpos = pos
+  while vpos < text.len and text[vpos] == '*':
+    inc(result)
+    inc(vpos)
+
+func parseLink*(text: string, start: Natural): Option[LinkItem] =
+  ## Parse the link at the given start position.
+  ##
+  ## ~~~
+  ## [description](link)
+  ## ^                  ^
+  ## ~~~
+  let matchesO = matchMarkdownLink(text, start)
+  if isSome(matchesO):
+    let matches = matchesO.get()
+    let (desc, link) = matchesO.get2Groups()
+    result = some(newLinkItem(start, start + matches.length, desc, link))
+
+func parseInlineMarkdown*(text: string): seq[InlineElement] =
+  ## Parse the text looking for bold, italic, bold+italic and
+  ## links. Return a list of inline elements.
+  ##
+  ## Example:
+  ##
+  ## ~~~ statictea
+  ## inline = parseMarkdown("**bold** and hyperlink [desc](link)", "inline")
+  ## inline => [
+  ##   ["bold", ["bold"]]
+  ##   ["normal", [" and a hyperlink "]]
+  ##   ["link", ["desc", "link"]]
+  ## ]
+  ## ~~~
+
+  type
+    State = enum
+      ## Parsing states.
+      sNormal, sBold, sItalic, sBoldItalic
+
+  var state = sNormal
+  var currentPos = 0
+  var span = ""
+
+  # Loop through the text one byte at a time.
+  while true:
+    if currentPos > text.len - 1:
+      break
+    var ch = text[currentPos]
+    case state
+    of sNormal:
+      case ch
+      of '[':
+        let linkItemO = parseLink(text, currentPos)
+        if linkItemO.isSome:
+          let linkItem = linkItemO.get()
+          var list = newSeq[string]()
+          list.add(linkItem.description)
+          list.add(linkItem.link)
+          result.add(newInlineElement(link, list))
+          currentPos = linkItem.finish - 1
+        else:
+          span.add(ch)
+      of '*':
+        if span != "":
+          result.add(newInlineElement(normal, @[span]))
+          span = ""
+        let stars = countStars(text, currentPos)
+        case stars:
+        of 1:
+          state = sItalic
+        of 2:
+          state = sBold
+          inc(currentPos)
+        else:
+          state = sBoldItalic
+          inc(currentPos)
+          inc(currentPos)
+      else:
+        span.add(ch)
+
+    of sItalic:
+      case ch
+      of '*':
+        if span != "":
+          result.add(newInlineElement(italic, @[span]))
+          span = ""
+        state = sNormal
+      else:
+        span.add(ch)
+
+    of sBold:
+      case ch
+      of '*':
+        let stars = countStars(text, currentPos)
+        if stars >= 2:
+          if span != "":
+            result.add(newInlineElement(bold, @[span]))
+            span = ""
+          state = sNormal
+          inc(currentPos)
+        else:
+          span.add(ch)
+      else:
+        span.add(ch)
+
+    of sBoldItalic:
+      case ch
+      of '*':
+        let stars = countStars(text, currentPos)
+        if stars >= 3:
+          if span != "":
+            result.add(newInlineElement(boldItalic, @[span]))
+            span = ""
+          state = sNormal
+          inc(currentPos)
+          inc(currentPos)
+        else:
+          span.add(ch)
+      else:
+        span.add(ch)
+
+    inc(currentPos)
+
+  case state
+  of sItalic:
+    span.insert("*")
+  of sBold:
+    span.insert("**")
+  of sBoldItalic:
+    span.insert("***")
+  of sNormal:
+    discard
+  if span != "":
+    result.add(newInlineElement(normal, @[span]))

@@ -32,6 +32,7 @@ Methods for matching sub-strings.
 * [matchParameterType](#matchparametertype) &mdash; Match a parameter type and the trailing whitespace.
 * [matchDocComment](#matchdoccomment) &mdash; Match a doc comment.
 * [matchReturnStatement](#matchreturnstatement) &mdash; Match a return statement.
+* [matchMarkdownLink](#matchmarkdownlink) &mdash; Match a return statement.
 
 # commands
 
@@ -322,6 +323,16 @@ Match a return statement. a = return(...
 ~~~nim
 proc matchReturnStatement(line: string; start: Natural): Option[Matches] {.
     raises: [KeyError], tags: [].}
+~~~
+
+# matchMarkdownLink
+
+Match a return statement. a = return(...
+[description](link)
+
+
+~~~nim
+func matchMarkdownLink(line: string; start: Natural): Option[Matches]
 ~~~
 
 

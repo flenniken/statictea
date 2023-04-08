@@ -94,7 +94,7 @@ function implements the "cmp" function for floats.
 * [fun_lte_iib](#fun_lte_iib) &mdash; Return true when an int is less than or equal to another int.
 * [fun_lte_ffb](#fun_lte_ffb) &mdash; Return true when a float is less than or equal to another float.
 * [fun_readJson_sa](#fun_readjson_sa) &mdash; Convert a JSON string to a variable.
-* [fun_parseMarkdown_sl](#fun_parsemarkdown_sl) &mdash; Parse a simple subset of markdown which contains paragraphs, bullets and code blocks.
+* [fun_parseMarkdown_ssl](#fun_parsemarkdown_ssl) &mdash; Parse a simple subset of markdown.
 * [fun_parseCode_sl](#fun_parsecode_sl) &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.
 * [escapeHtmlBody](#escapehtmlbody) &mdash; Excape text for placing in body html.
 * [escapeHtmlAttribute](#escapehtmlattribute) &mdash; Excape text for placing in an html attribute.
@@ -2332,14 +2332,17 @@ func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
 ~~~
 
-# fun_parseMarkdown_sl
+# fun_parseMarkdown_ssl
 
-Parse a simple subset of markdown which contains paragraphs,
-bullets and code blocks. This subset is used to document all
-StaticTea functions. Return a list of lists.
+Parse a simple subset of markdown. This subset is used to
+document all StaticTea functions. Return a list of lists.
+
+type:
+* lite — parse paragraphs, bullets and code blocks. See list elements below.
+* inline — parse inline attributes, bold, italics, bold+italics and links
 
 ~~~javascript
-parseMarkdown = func(mdText: string) list
+parseMarkdown = func(mdText: string, type: string) list
 ~~~
 
 list elements:
@@ -2356,18 +2359,39 @@ string is the ending line, for example “~~~”.
 for each bullet point.  The leading “* “ is not part of the
 string.
 
+* normal -- unformated inline string
+
+* bold -- **bold** inline string. The leading and trailing * are
+not part of the string.
+
+* italic -- *italic* inline string. The leading and trailing *
+are not part of the string.
+
+* boldItalic -- ***bold and italic*** inline string. The leading and trailing *
+are not part of the string.
+
+* link -- inline hyperlink; two strings: text description and
+link. The [] and () are not part of the strings.
+
 ~~~javascript
-elements = parseMarkdown(description)
-elements => [
+lite = parseMarkdown(description, "lite")
+lite => [
   ["p", ["the paragraph which may contain newlines"]]
   ["code", ["~~~", "code text with newlines", "~~~"]]
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
+]
+
+inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
+inline => [
+  ["bold", ["bold"]]
+  ["normal", [" and a hyperlink "]]
+  ["link", ["text", "link"]]
 ]
 ~~~
 
 
 ~~~nim
-func fun_parseMarkdown_sl(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_parseMarkdown_ssl(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ~~~
 
