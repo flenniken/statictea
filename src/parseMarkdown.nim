@@ -545,6 +545,9 @@ func parseInlineMarkdown*(text: string): seq[InlineElement] =
       of '[':
         let linkItemO = parseLink(text, currentPos)
         if linkItemO.isSome:
+          if span != "":
+            result.add(newInlineElement(normal, @[span]))
+            span = ""
           let linkItem = linkItemO.get()
           var list = newSeq[string]()
           list.add(linkItem.description)

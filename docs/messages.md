@@ -92,7 +92,7 @@ MessageId = enum
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
   wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace, wNotDictVariable,
-  wSpecifyF, wNotListVariable, wVarNameNotDotName
+  wSpecifyF, wNotListVariable, wVarNameNotDotName, wInvalidParseMdType
 ~~~
 
 # Messages
@@ -143,7 +143,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The substring was not found and no default argument.",
     "The resulting duplicated string must be under 1024 characters, got: $1.",
     "Specify arguments in pairs.",
-    "None of the case conditions match and no else case.",
+    "None of the case conditions match $1 and no else case.",
     "You cannot assign to an existing variable.", "", "Invalid length: $1.", "",
     "", "Expected / or \\.",
     "The variables h - k, m - r are reserved variable names.", "",
@@ -263,7 +263,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "You can only assign a user function variable to the u dictionary.",
     """Invalid html place, expected "body", or "attribute".""",
     "The variable is not a dictionary.", "Specify f or a function variable.",
-    "The variable is not a list.", "Expected a variable name without dots."]
+    "The variable is not a list.", "Expected a variable name without dots.",
+    "Invalid parseMarkdown type, expected lite or inline."]
 ~~~
 
 # WarningData

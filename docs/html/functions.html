@@ -481,13 +481,13 @@ length is 0.
 </p><p>The condition types and what is considered 0:
 
 </p><ul>
-<li>bool — false
-</li><li>int — 0
-</li><li>float — 0.0
-</li><li>string — when the length of the string is 0
-</li><li>list — when the length of the list is 0
-</li><li>dict — when the length of the dictionary is 0
-</li><li>func — always 0
+<li><b>bool</b> — false
+</li><li><b>int</b> — 0
+</li><li><b>float</b> — 0.0
+</li><li><b>string</b> — when the length of the string is 0
+</li><li><b>list</b> — when the length of the list is 0
+</li><li><b>dict</b> — when the length of the dictionary is 0
+</li><li><b>func</b> — always 0
 
 </li></ul>
 <p>The IF functions are special in a couple of ways, see
@@ -708,7 +708,7 @@ Examples:
 
 <pre class="nim-code">
 func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [].}
+    raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="fun_case_sloaa">fun_case_sloaa</h3>
@@ -734,17 +734,17 @@ can be any type.
 Examples:
 
 </p><pre class="tea-code">
-<span class="t-dotName">cases</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">15</span>, <span class="t-str">&quot;water&quot;</span>, <span class="t-num">2.3</span>, <span class="t-str">&quot;beer&quot;</span>, <span class="t-str">&quot;cold&quot;</span>)
-<span class="t-funcCall">case</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-num">15</span>
-<span class="t-funcCall">case</span>(<span class="t-str">&quot;water&quot;</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-num">2.3</span>
-<span class="t-funcCall">case</span>(<span class="t-str">&quot;beer&quot;</span>, <span class="t-dotName">cases</span>) =&gt; <span class="t-str">&quot;cold&quot;</span>
-<span class="t-funcCall">case</span>(<span class="t-str">&quot;bunch&quot;</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;other&quot;</span>) =&gt; <span class="t-str">&quot;other&quot;</span>
+<span class="t-dotName">pairs</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">15</span>, <span class="t-str">&quot;water&quot;</span>, <span class="t-num">2.3</span>, <span class="t-str">&quot;beer&quot;</span>, <span class="t-str">&quot;cold&quot;</span>)
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">pairs</span>) =&gt; <span class="t-num">15</span>
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;water&quot;</span>, <span class="t-dotName">pairs</span>) =&gt; <span class="t-num">2.3</span>
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;beer&quot;</span>, <span class="t-dotName">pairs</span>) =&gt; <span class="t-str">&quot;cold&quot;</span>
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;bunch&quot;</span>, <span class="t-dotName">pairs</span>, <span class="t-str">&quot;other&quot;</span>) =&gt; <span class="t-str">&quot;other&quot;</span>
 </pre>
 
 
 <pre class="nim-code">
 func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [].}
+    raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
 <h3 id="parseVersion">parseVersion</h3>
@@ -765,7 +765,7 @@ equal and 1 for greater than.
 <span class="t-dotName">cmpVersion</span> = <span class="t-funcCall">func</span>(<span class="t-param">versionA</span>: <span class="t-type">string</span>, <span class="t-param">versionB</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
 </pre>
 <p>
-StaticTea uses Semantic Versioning [https://semver.org/](https://semver.org/)
+StaticTea uses Semantic Versioning (<a href="https://semver.org/">https://semver.org/</a>)
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -859,10 +859,10 @@ func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
 Round options:
 
 </p><ul>
-<li>&quot;round&quot; - nearest integer, the default.
-</li><li>&quot;floor&quot; - integer below (to the left on number line)
-</li><li>&quot;ceiling&quot; - integer above (to the right on number line)
-</li><li>&quot;truncate&quot; - remove decimals
+<li><b>round</b> - nearest integer, the default.
+</li><li><b>floor</b> - integer below (to the left on number line)
+</li><li><b>ceiling</b> - integer above (to the right on number line)
+</li><li><b>truncate</b> - remove decimals
 
 </li></ul>
 <p>Examples:
@@ -898,10 +898,10 @@ func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
 Round options:
 
 </p><ul>
-<li>&quot;round&quot; - nearest integer, the default
-</li><li>&quot;floor&quot; - integer below (to the left on number line)
-</li><li>&quot;ceiling&quot; - integer above (to the right on number line)
-</li><li>&quot;truncate&quot; - remove decimals
+<li><b>round</b> - nearest integer, the default
+</li><li><b>floor</b> - integer below (to the left on number line)
+</li><li><b>ceiling</b> - integer above (to the right on number line)
+</li><li><b>truncate</b> - remove decimals
 
 </li></ul>
 <p>Examples:
@@ -938,10 +938,10 @@ return the default value.
 Round options:
 
 </p><ul>
-<li>&quot;round&quot; - nearest integer, the default
-</li><li>&quot;floor&quot; - integer below (to the left on number line)
-</li><li>&quot;ceiling&quot; - integer above (to the right on number line)
-</li><li>&quot;truncate&quot; - remove decimals
+<li><b>round</b> - nearest integer, the default
+</li><li><b>floor</b> - integer below (to the left on number line)
+</li><li><b>ceiling</b> - integer above (to the right on number line)
+</li><li><b>truncate</b> - remove decimals
 
 </li></ul>
 <p>Examples:
@@ -977,13 +977,13 @@ func if0Condition(cond: Value): bool
 False values by variable types:
 
 </p><ul>
-<li>bool — false
-</li><li>int — 0
-</li><li>float — 0.0
-</li><li>string — when the length of the string is 0
-</li><li>list — when the length of the list is 0
-</li><li>dict — when the length of the dictionary is 0
-</li><li>func — always false
+<li><b>bool</b> — false
+</li><li><b>int</b> — 0
+</li><li><b>float</b> — 0.0
+</li><li><b>string</b> — when the length of the string is 0
+</li><li><b>list</b> — when the length of the list is 0
+</li><li><b>dict</b> — when the length of the dictionary is 0
+</li><li><b>func</b> — always false
 
 </li></ul>
 <p>Examples:
@@ -1199,10 +1199,10 @@ a string as well.
 </pre>
 <p>
 </p><ul>
-<li>str: string
-</li><li>start: substring start index
-</li><li>length: substring length
-</li><li>replacement: substring replacement
+<li><b>str</b> — string to operate on
+</li><li><b>start</b> — substring start index
+</li><li><b>length</b> — substring length
+</li><li><b>replacement</b> — substring replacement
 
 </li></ul>
 <p>Examples:
@@ -1276,7 +1276,7 @@ Examples:
 </pre>
 <p>
 For developing and debugging regular expressions see the
-website: [https://regex101.com/](https://regex101.com/)
+website: (<a href="https://regex101.com/">https://regex101.com/</a>).
 </p>
 
 <pre class="nim-code">
@@ -1398,15 +1398,16 @@ func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_sort_lsosl">fun_sort_lsosl</h3>
 
-<p>Sort a list of values of the same type.  The values are ints,
-floats, or strings.
+<p>Sort a list of values of the same type.
 
-</p><p>You specify the sort order, &quot;ascending&quot; or &quot;descending&quot;.
+</p><ul>
+<li><b>list</b> — a list of values of the same type, either int, float or string
+</li><li><b>order</b> — the sort order: &quot;ascending&quot; or &quot;descending&quot;
+</li><li><b>insensitive</b> — sort strings case insensitive. Case
+sensitive is the default.
 
-</p><p>You have the option of sorting strings case &quot;insensitive&quot;. Case
-&quot;sensitive&quot; is the default.
-
-</p><pre class="tea-code">
+</li></ul>
+<pre class="tea-code">
 <span class="t-dotName">sort</span> = <span class="t-funcCall">func</span>(<span class="t-param">values</span>: <span class="t-type">list</span>, <span class="t-param">order</span>: <span class="t-type">string</span>, <span class="t-param">insensitive</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">list</span>
 </pre>
 <p>
@@ -1437,16 +1438,16 @@ func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Sort a list of lists.
 
-</p><p>You specify the sort order, &quot;ascending&quot; or &quot;descending&quot;.
-
-</p><p>You specify how to sort strings either case &quot;sensitive&quot; or
-&quot;insensitive&quot;.
-
-</p><p>You specify which index to compare by.  The compare index value
+</p><ul>
+<li><b>lists</b> — a list of lists
+</li><li><b>order</b> — the sort order: &quot;ascending&quot; or &quot;descending&quot;
+</li><li><b>case</b> — sort strings case either case sensitive or insensitive.
+</li><li><b>index</b> — which index to compare by.  The compare index value
 must exist in each list, be the same type and be an int, float,
 or string.
 
-</p><pre class="tea-code">
+</li></ul>
+<pre class="tea-code">
 <span class="t-dotName">sort</span> = <span class="t-funcCall">func</span>(<span class="t-param">lists</span>: <span class="t-type">list</span>, <span class="t-param">order</span>: <span class="t-type">string</span>, <span class="t-param">case</span>: <span class="t-type">string</span>, <span class="t-param">index</span>: <span class="t-type">int</span>) <span class="t-type">list</span>
 </pre>
 <p>
@@ -1470,16 +1471,16 @@ func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <p>Sort a list of dictionaries.
 
-</p><p>You specify the sort order, &quot;ascending&quot; or &quot;descending&quot;.
-
-</p><p>You specify how to sort strings either case &quot;sensitive&quot; or
-&quot;insensitive&quot;.
-
-</p><p>You specify the compare key.  The key value must exist in
+</p><ul>
+<li><b>dicts</b> — a list of dictionaries
+</li><li><b>order</b> — the sort order: &quot;ascending&quot; or &quot;descending&quot;
+</li><li><b>case</b> — sort strings case either sensitive or insensitive
+</li><li><b>key</b> — the compare key.  The key value must exist in
 each dictionary, be the same type and be an int, float or
 string.
 
-</p><pre class="tea-code">
+</li></ul>
+<pre class="tea-code">
 <span class="t-dotName">sort</span> = <span class="t-funcCall">func</span>(<span class="t-param">dicts</span>: <span class="t-type">list</span>, <span class="t-param">order</span>: <span class="t-type">string</span>, <span class="t-param">case</span>: <span class="t-type">string</span>, <span class="t-param">key</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
 </pre>
 <p>
@@ -1512,8 +1513,8 @@ heading names.
 type:
 
 </p><ul>
-<li>html — HTML class names
-</li><li>github — GitHub markdown anchor links
+<li><b>html</b> — HTML class names
+</li><li><b>github</b> — GitHub markdown anchor links
 
 </li></ul>
 <p>Examples:
@@ -1717,8 +1718,8 @@ looping by returning “skip” and “stop”.
 </pre>
 <p>
 </p><ul>
-<li>“stop” – stops processing the command
-</li><li>“skip” – skips this replacement block and continues with the next iteration
+<li><b>stop</b> – stops processing the command
+</li><li><b>skip</b> – skips this replacement block and continues with the next iteration
 
 </li></ul>
 <p>The following block command repeats 4 times but skips when
@@ -1756,12 +1757,12 @@ The default stype is &quot;rb&quot; which is used for replacement blocks.
 </p><p>stype:
 
 </p><ul>
-<li>json — returns JSON
-</li><li>rb — replacement block (rb) returns JSON except strings are
+<li><b>json</b> — returns JSON
+</li><li><b>rb</b> — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
-</li><li>dn — dot name (dn) returns JSON except dictionary elements
+</li><li><b>dn</b> — dot name (dn) returns JSON except dictionary elements
 are printed one per line as &quot;key = value&quot;. See string(dotName, string).
-</li><li>vl — vertical list (vl) returns JSON except list elements
+</li><li><b>vl</b> — vertical list (vl) returns JSON except list elements
 are printed one per line as &quot;ix: value&quot;.
 
 </li></ul>
@@ -2368,8 +2369,8 @@ document all StaticTea functions. Return a list of lists.
 
 </p><p>type:
 </p><ul>
-<li>lite — parse paragraphs, bullets and code blocks. See list elements below.
-</li><li>inline — parse inline attributes, bold, italics, bold+italics and links
+<li><b>lite</b> — parse paragraphs, bullets and code blocks. See list elements below.
+</li><li><b>inline</b> — parse inline attributes, bold, italics, bold+italics and links
 
 </li></ul>
 <pre class="tea-code">
@@ -2379,19 +2380,13 @@ document all StaticTea functions. Return a list of lists.
 Block list elements:
 
 </p><ul>
-<li>p — A paragraph element is one string, possibly containing
+<li><b>p</b> — A paragraph element is one string, possibly containing
 newlines.
-
-</li></ul>
-<ul>
-<li>code — A code element is three strings. The first string is
+</li><li><b>code</b> — A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string (with newlines) contains the text of the block.  The third
 string is the ending line, for example “~~~”.
-
-</li></ul>
-<ul>
-<li>bullets — A bullets element contains a string (with newlines)
+</li><li><b>bullets</b> — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
 
@@ -2403,23 +2398,23 @@ string.
   [<span class="t-str">&quot;code&quot;</span>, [<span class="t-str">&quot;~~~&quot;</span>, <span class="t-str">&quot;code text with newlines&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>]]
   [<span class="t-str">&quot;bullets&quot;</span>, [<span class="t-str">&quot;bullet (newlines) 1&quot;</span>, <span class="t-str">&quot;point 2&quot;</span>, <span class="t-str">&quot;3&quot;</span>, ...]
 ]
+</pre>
+<p>
+Inline list elements:
 
-<span class="t-dotName">Inline</span> <span class="t-dotName">list</span> <span class="t-dotName">elements</span>:
+</p><ul>
+<li><b>normal</b> -- an inline span of unformatted text
+</li><li><b>bold</b> -- an inline span of <b>bold</b> text.
+</li><li><b>italic</b> -- an inline span of <i>italic</i> text.
+</li><li><b>boldItalic</b> -- an inline span of <b><i>bold and italic</i></b> text.
+</li><li><b>link</b> -- an inline hyperlink; two strings: description and
+link.
 
-* <span class="t-dotName">normal</span> <span class="t-num">-</span>- <span class="t-dotName">unformated</span> <span class="t-dotName">inline</span> <span class="t-dotName">string</span>
+</li></ul>
+<p>The leading and trailing stars are not part of the strings and the
+[] and () are not part of the link.
 
-* <span class="t-dotName">bold</span> <span class="t-num">-</span>- **<span class="t-dotName">bold</span>** <span class="t-dotName">inline</span> <span class="t-dotName">string.</span> <span class="t-dotName">The</span> <span class="t-dotName">leading</span> <span class="t-dotName">and</span> <span class="t-dotName">trailing</span> * <span class="t-dotName">are</span>
-<span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">string.</span>
-
-* <span class="t-dotName">italic</span> <span class="t-num">-</span>- *<span class="t-dotName">italic</span>* <span class="t-dotName">inline</span> <span class="t-dotName">string.</span> <span class="t-dotName">The</span> <span class="t-dotName">leading</span> <span class="t-dotName">and</span> <span class="t-dotName">trailing</span> *
-<span class="t-dotName">are</span> <span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">string.</span>
-
-* <span class="t-dotName">boldItalic</span> <span class="t-num">-</span>- ***<span class="t-dotName">bold</span> <span class="t-dotName">and</span> <span class="t-dotName">italic</span>*** <span class="t-dotName">inline</span> <span class="t-dotName">string.</span> <span class="t-dotName">The</span> <span class="t-dotName">leading</span> <span class="t-dotName">and</span> <span class="t-dotName">trailing</span> *
-<span class="t-dotName">are</span> <span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">string.</span>
-
-* <span class="t-dotName">link</span> <span class="t-num">-</span>- <span class="t-dotName">inline</span> <span class="t-dotName">hyperlink</span>; <span class="t-dotName">two</span> <span class="t-dotName">strings</span>: <span class="t-dotName">text</span> <span class="t-dotName">description</span> <span class="t-dotName">and</span>
-<span class="t-dotName">link.</span> <span class="t-dotName">The</span> [] <span class="t-dotName">and</span> () <span class="t-dotName">are</span> <span class="t-dotName">not</span> <span class="t-dotName">part</span> <span class="t-dotName">of</span> <span class="t-dotName">the</span> <span class="t-dotName">strings.</span>
-
+</p><pre class="tea-code">
 <span class="t-dotName">inline</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-str">&quot;**bold** and hyperlink [text](link)&quot;</span>, <span class="t-str">&quot;inline&quot;</span>)
 <span class="t-dotName">inline</span> =&gt; [
   [<span class="t-str">&quot;bold&quot;</span>, [<span class="t-str">&quot;bold&quot;</span>]]
@@ -2446,16 +2441,16 @@ syntax highlighting.  Return a list of tagged fragments.
 Tags:
 
 </p><ul>
-<li>other — not one of the other types
-</li><li>dotName — a dot name
-</li><li>funcCall — a function call; a dot name followed by a left parenthesis
-</li><li>num — a literal number
-</li><li>str — a literal string
-</li><li>multiline — a multiline literal string
-</li><li>doc — a doc comment
-</li><li>comment — a comment
-</li><li>param — a parameter name
-</li><li>type — int, float, string, list, dict, bool, func, any and optional
+<li><b>other</b> — not one of the other types
+</li><li><b>dotName</b> — a dot name
+</li><li><b>funcCall</b> — a function call; a dot name followed by a left parenthesis
+</li><li><b>num</b> — a literal number
+</li><li><b>str</b> — a literal string
+</li><li><b>multiline</b> — a multiline literal string
+</li><li><b>doc</b> — a doc comment
+</li><li><b>comment</b> — a comment
+</li><li><b>param</b> — a parameter name
+</li><li><b>type</b> — int, float, string, list, dict, bool, func, any and optional
 
 </li></ul>
 <p>Example:
@@ -2504,8 +2499,8 @@ proc escapeHtmlAttribute(text: string): string
 places:
 
 </p><ul>
-<li>body — in the html body
-</li><li>attribute — in an html attribute
+<li><b>body</b> — in the html body
+</li><li><b>attribute</b> — in an html attribute
 
 </li></ul>
 <pre class="tea-code">
@@ -2514,7 +2509,7 @@ places:
 </pre>
 <p>
 For more information about how to escape and what is safe see:
-[XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
+<a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts">XSS Cheatsheets</a>
 </p>
 
 <pre class="nim-code">
@@ -2536,9 +2531,9 @@ functionsDict = newTable(32)
 <p>The built-in function information.
 
 </p><ul>
-<li>funcName — the function name in the nim file, e.g.: fun_add_ii
-</li><li>docComment — the function documentation
-</li><li>numLines — the number of function code lines
+<li><b>funcName</b> — the function name in the nim file, e.g.: fun_add_ii
+</li><li><b>docComment</b> — the function documentation
+</li><li><b>numLines</b> — the number of function code lines
 </li></ul>
 
 

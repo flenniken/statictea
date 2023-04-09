@@ -578,7 +578,7 @@ suite "functions.nim":
       newValue(5), newValue("v5"),
     ])
     var arguments = @[newValue(11), cases]
-    let eFunResult = newFunResultWarn(wMissingElse, 2)
+    let eFunResult = newFunResultWarn(wMissingElse, 2, "11")
     check testFunction("case", arguments, eFunResult)
 
   test "case string":
@@ -588,6 +588,15 @@ suite "functions.nim":
     ])
     var arguments = @[newValue("5"), cases]
     var eFunResult = newFunResult(newValue("v5"))
+    check testFunction("case", arguments, eFunResult)
+
+  test "case bold":
+    var cases = newValue([
+      newValue("bold"), newValue("b"),
+      newValue("italic"), newValue("i"),
+    ])
+    var arguments = @[newValue("bold"), cases]
+    var eFunResult = newFunResult(newValue("b"))
     check testFunction("case", arguments, eFunResult)
 
   test "case multiple matches":

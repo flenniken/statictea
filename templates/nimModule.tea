@@ -4,14 +4,53 @@
 
 ## The nimble tasks docm and doch run the template.
 
+u.html-link = func(linkElement: list) string
+  ## Convert the inline link element into an html link.
+  tag = linkElement[0]
+  # if((tag != "link"), warn(format("expected a link element got: {tag}")))
+  if((tag != "link"), return(""))
+  eList = linkElement[1]
+  linkDesc = html(eList[0], "body")
+  url = eList[1]
+  # todo: escape url -- html(eList[1], "url")
+  return(format("<a href=\"{url}\">{linkDesc}</a>"))
+
+u.handle-html-inline = func(ix: int, inLineElement: list, lines: list) bool
+  ## Format the inline md element as html and add it to lines.
+  tag = inLineElement[0]
+  eList = inLineElement[1]
+  text = html(eList[0], "body")
+  lines &= case(tag, [ +
+    "normal", text, +
+    "bold", join(["<b>", text, "</b>"], ""), +
+    "italic", join(["<i>", text, "</i>"], ""), +
+    "boldItalic", join(["<b><i>", text, "</i></b>"], ""), +
+    "link", u.html-link(inLineElement) ])
+  return(false)
+
+u.inline-html = func(text: string) string
+  ## Convert the inline text to html with bold, italic and links
+  ## formatted.
+  inlineElements = parseMarkdown(text, "inline")
+  json = string(inlineElements, "vl")
+  log(format("parseMarkdown:\n{json}"))
+  inlineFrags = []
+  listLoop(inlineElements, inlineFrags, u.handle-html-inline)
+  return(join(inlineFrags, ""))
+
 u.handle-html-bullet = func(ix: int, bullet: string, lines: list) bool
   ## Make the bullet text into an html bullet and add it to lines.
-  lines &= join(["<li>", html(bullet, "body"), "</li>"], "")
+  text = u.inline-html(bullet)
+  lines &= join(["<li>", text, "</li>"], "")
   return(false)
 
 u.html-paragraph = func(item: list) string
   ## Return html given a "p" element md list.
-  return(join(["<p>", html(item[0], "body"), "</p>"], ""))
+  text = item[0]
+  log(format("text before: {text}"))
+  inlineText = u.inline-html(text)
+  log(format("text after: {inlineText}"))
+  return(join(["<p>", inlineText, "</p>"], ""))
 
 u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
   ## Highlight the fragment for html and add it to the frags list.
@@ -77,7 +116,8 @@ u.fixup-description = func(mdDesc: string, templateType: string) dict
   ## Fix up the description for html or markdown.  For the html
   ## template convert the markdown to html. For the md template
   ## replace the statictea code blocks with javascript so the code is
-  ## highlighted by github.
+  ## highlighted by github. Return a dictionary with the description
+  ## and its first sentence (short).
 
   # Use the first sentence for the short description.
   pos = find(mdDesc, ".", -1)

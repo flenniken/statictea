@@ -290,8 +290,9 @@ func getCase(map: VarsDict): FunResult =
   if "c" in map:
     result = newFunResult(map["c"])
   else:
-    # None of the case conditions match and no else case.
-    result = newFunResultWarn(wMissingElse, 2)
+    # mainCondition is a string or a number.
+    # None of the case conditions match $1 and no else case."
+    result = newFunResultWarn(wMissingElse, 2, $mainCondition)
 
 func convertFloatToInt(num: float, map: VarsDict): FunResult =
   ## Convert float to an integer. The map contains the optional round
@@ -571,13 +572,13 @@ func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## The condition types and what is considered 0:
   ##
-  ## * bool — false
-  ## * int — 0
-  ## * float — 0.0
-  ## * string — when the length of the string is 0
-  ## * list — when the length of the list is 0
-  ## * dict — when the length of the dictionary is 0
-  ## * func — always 0
+  ## * **bool** — false
+  ## * **int** — 0
+  ## * **float** — 0.0
+  ## * **string** — when the length of the string is 0
+  ## * **list** — when the length of the list is 0
+  ## * **dict** — when the length of the dictionary is 0
+  ## * **func** — always 0
   ##
   ## The IF functions are special in a couple of ways, see
   ## the If Functions section.
@@ -832,11 +833,11 @@ func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Examples:
   ##
   ## ~~~statictea
-  ## cases = list("tea", 15, "water", 2.3, "beer", "cold")
-  ## case("tea", cases) => 15
-  ## case("water", cases) => 2.3
-  ## case("beer", cases) => "cold"
-  ## case("bunch", cases, "other") => "other"
+  ## pairs = list("tea", 15, "water", 2.3, "beer", "cold")
+  ## case("tea", pairs) => 15
+  ## case("water", pairs) => 2.3
+  ## case("beer", pairs) => "cold"
+  ## case("bunch", pairs, "other") => "other"
   ## ~~~
 
   tMapParameters("case", "sloaa")
@@ -862,7 +863,7 @@ func fun_cmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult
   ## cmpVersion = func(versionA: string, versionB: string) int
   ## ~~~
   ##
-  ## StaticTea uses Semantic Versioning [https://semver.org/](https://semver.org/)
+  ## StaticTea uses Semantic Versioning ([https://semver.org/](https://semver.org/))
   ## with the added restriction that each version component has one
   ## to three digits (no letters).
   ##
@@ -977,10 +978,10 @@ func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Round options:
   ##
-  ## * "round" - nearest integer, the default.
-  ## * "floor" - integer below (to the left on number line)
-  ## * "ceiling" - integer above (to the right on number line)
-  ## * "truncate" - remove decimals
+  ## * **round** - nearest integer, the default.
+  ## * **floor** - integer below (to the left on number line)
+  ## * **ceiling** - integer above (to the right on number line)
+  ## * **truncate** - remove decimals
   ##
   ## Examples:
   ##
@@ -1012,10 +1013,10 @@ func fun_int_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Round options:
   ##
-  ## * "round" - nearest integer, the default
-  ## * "floor" - integer below (to the left on number line)
-  ## * "ceiling" - integer above (to the right on number line)
-  ## * "truncate" - remove decimals
+  ## * **round** - nearest integer, the default
+  ## * **floor** - integer below (to the left on number line)
+  ## * **ceiling** - integer above (to the right on number line)
+  ## * **truncate** - remove decimals
   ##
   ## Examples:
   ##
@@ -1055,10 +1056,10 @@ func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Round options:
   ##
-  ## * "round" - nearest integer, the default
-  ## * "floor" - integer below (to the left on number line)
-  ## * "ceiling" - integer above (to the right on number line)
-  ## * "truncate" - remove decimals
+  ## * **round** - nearest integer, the default
+  ## * **floor** - integer below (to the left on number line)
+  ## * **ceiling** - integer above (to the right on number line)
+  ## * **truncate** - remove decimals
   ##
   ## Examples:
   ##
@@ -1113,13 +1114,13 @@ func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## False values by variable types:
   ##
-  ## * bool — false
-  ## * int — 0
-  ## * float — 0.0
-  ## * string — when the length of the string is 0
-  ## * list — when the length of the list is 0
-  ## * dict — when the length of the dictionary is 0
-  ## * func — always false
+  ## * **bool** — false
+  ## * **int** — 0
+  ## * **float** — 0.0
+  ## * **string** — when the length of the string is 0
+  ## * **list** — when the length of the list is 0
+  ## * **dict** — when the length of the dictionary is 0
+  ## * **func** — always false
   ##
   ## Examples:
   ##
@@ -1368,10 +1369,10 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## replace = func(str: string, start: int, length: int, replacement: string) string
   ## ~~~
   ##
-  ## * str: string
-  ## * start: substring start index
-  ## * length: substring length
-  ## * replacement: substring replacement
+  ## * **str** — string to operate on
+  ## * **start** — substring start index
+  ## * **length** — substring length
+  ## * **replacement** — substring replacement
   ##
   ## Examples:
   ##
@@ -1488,7 +1489,7 @@ func fun_replaceRe_sls*(variables: Variables, arguments: seq[Value]): FunResult 
   ## ~~~
   ##
   ## For developing and debugging regular expressions see the
-  ## website: [https://regex101.com/](https://regex101.com/)
+  ## website: ([https://regex101.com/](https://regex101.com/)).
 
   tMapParameters("replaceRe", "sls")
   let list = map["b"].listv.list
@@ -1750,13 +1751,12 @@ func generalSort(map: VarsDict): FunResult =
   result = newFunResult(newValue(newList))
 
 func fun_sort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Sort a list of values of the same type.  The values are ints,
-  ## floats, or strings.
+  ## Sort a list of values of the same type.
   ##
-  ## You specify the sort order, "ascending" or "descending".
-  ##
-  ## You have the option of sorting strings case "insensitive". Case
-  ## "sensitive" is the default.
+  ## * **list** — a list of values of the same type, either int, float or string
+  ## * **order** — the sort order: "ascending" or "descending"
+  ## * **insensitive** — sort strings case insensitive. Case
+  ## sensitive is the default.
   ##
   ## ~~~statictea
   ## sort = func(values: list, order: string, insensitive: optional string) list
@@ -1785,12 +1785,10 @@ func fun_sort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_sort_lssil*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Sort a list of lists.
   ##
-  ## You specify the sort order, "ascending" or "descending".
-  ##
-  ## You specify how to sort strings either case "sensitive" or
-  ## "insensitive".
-  ##
-  ## You specify which index to compare by.  The compare index value
+  ## * **lists** — a list of lists
+  ## * **order** — the sort order: "ascending" or "descending"
+  ## * **case** — sort strings case either case sensitive or insensitive.
+  ## * **index** — which index to compare by.  The compare index value
   ## must exist in each list, be the same type and be an int, float,
   ## or string.
   ##
@@ -1814,12 +1812,10 @@ func fun_sort_lssil*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_sort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Sort a list of dictionaries.
   ##
-  ## You specify the sort order, "ascending" or "descending".
-  ##
-  ## You specify how to sort strings either case "sensitive" or
-  ## "insensitive".
-  ##
-  ## You specify the compare key.  The key value must exist in
+  ## * **dicts** — a list of dictionaries
+  ## * **order** — the sort order: "ascending" or "descending"
+  ## * **case** — sort strings case either sensitive or insensitive
+  ## * **key** — the compare key.  The key value must exist in
   ## each dictionary, be the same type and be an int, float or
   ## string.
   ##
@@ -1851,8 +1847,8 @@ func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## type:
   ##
-  ## * html — HTML class names
-  ## * github — GitHub markdown anchor links
+  ## * **html** — HTML class names
+  ## * **github** — GitHub markdown anchor links
   ##
   ## Examples:
   ##
@@ -2096,8 +2092,8 @@ func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## if(c, return("skip"))
   ## ~~~
   ##
-  ## * “stop” – stops processing the command
-  ## * “skip” – skips this replacement block and continues with the next iteration
+  ## * **stop** – stops processing the command
+  ## * **skip** – skips this replacement block and continues with the next iteration
   ##
   ## The following block command repeats 4 times but skips when
   ## t.row is 2.
@@ -2139,12 +2135,12 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## stype:
   ##
-  ## * json — returns JSON
-  ## * rb — replacement block (rb) returns JSON except strings are
+  ## * **json** — returns JSON
+  ## * **rb** — replacement block (rb) returns JSON except strings are
   ## not quoted and special characters are not escaped.
-  ## * dn — dot name (dn) returns JSON except dictionary elements
+  ## * **dn** — dot name (dn) returns JSON except dictionary elements
   ## are printed one per line as "key = value". See string(dotName, string).
-  ## * vl — vertical list (vl) returns JSON except list elements
+  ## * **vl** — vertical list (vl) returns JSON except list elements
   ## are printed one per line as "ix: value".
   ##
   ## Examples variables:
@@ -2729,8 +2725,8 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ## document all StaticTea functions. Return a list of lists.
   ##
   ## type:
-  ## * lite — parse paragraphs, bullets and code blocks. See list elements below.
-  ## * inline — parse inline attributes, bold, italics, bold+italics and links
+  ## * **lite** — parse paragraphs, bullets and code blocks. See list elements below.
+  ## * **inline** — parse inline attributes, bold, italics, bold+italics and links
   ##
   ## ~~~statictea
   ## parseMarkdown = func(mdText: string, type: string) list
@@ -2738,15 +2734,13 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ##
   ## Block list elements:
   ##
-  ## * p — A paragraph element is one string, possibly containing
+  ## * **p** — A paragraph element is one string, possibly containing
   ## newlines.
-  ##
-  ## * code — A code element is three strings. The first string is
+  ## * **code** — A code element is three strings. The first string is
   ## the code start line, for example “~~~” or “~~~nim”.  The second
   ## string (with newlines) contains the text of the block.  The third
   ## string is the ending line, for example “~~~”.
-  ##
-  ## * bullets — A bullets element contains a string (with newlines)
+  ## * **bullets** — A bullets element contains a string (with newlines)
   ## for each bullet point.  The leading “* “ is not part of the
   ## string.
   ##
@@ -2757,23 +2751,21 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ##   ["code", ["~~~", "code text with newlines", "~~~"]]
   ##   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
   ## ]
+  ## ~~~
   ##
   ## Inline list elements:
   ##
-  ## * normal -- unformated inline string
+  ## * **normal** -- an inline span of unformatted text
+  ## * **bold** -- an inline span of **bold** text.
+  ## * **italic** -- an inline span of *italic* text.
+  ## * **boldItalic** -- an inline span of ***bold and italic*** text.
+  ## * **link** -- an inline hyperlink; two strings: description and
+  ## link.
   ##
-  ## * bold -- **bold** inline string. The leading and trailing * are
-  ## not part of the string.
+  ## The leading and trailing stars are not part of the strings and the
+  ## [] and () are not part of the link.
   ##
-  ## * italic -- *italic* inline string. The leading and trailing *
-  ## are not part of the string.
-  ##
-  ## * boldItalic -- ***bold and italic*** inline string. The leading and trailing *
-  ## are not part of the string.
-  ##
-  ## * link -- inline hyperlink; two strings: text description and
-  ## link. The [] and () are not part of the strings.
-  ##
+  ## ~~~ statictea
   ## inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
   ## inline => [
   ##   ["bold", ["bold"]]
@@ -2817,16 +2809,16 @@ func fun_parseCode_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Tags:
   ##
-  ## * other — not one of the other types
-  ## * dotName — a dot name
-  ## * funcCall — a function call; a dot name followed by a left parenthesis
-  ## * num — a literal number
-  ## * str — a literal string
-  ## * multiline — a multiline literal string
-  ## * doc — a doc comment
-  ## * comment — a comment
-  ## * param — a parameter name
-  ## * type — int, float, string, list, dict, bool, func, any and optional
+  ## * **other** — not one of the other types
+  ## * **dotName** — a dot name
+  ## * **funcCall** — a function call; a dot name followed by a left parenthesis
+  ## * **num** — a literal number
+  ## * **str** — a literal string
+  ## * **multiline** — a multiline literal string
+  ## * **doc** — a doc comment
+  ## * **comment** — a comment
+  ## * **param** — a parameter name
+  ## * **type** — int, float, string, list, dict, bool, func, any and optional
   ##
   ## Example:
   ##
@@ -2892,8 +2884,8 @@ func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## places:
   ##
-  ## * body — in the html body
-  ## * attribute — in an html attribute
+  ## * **body** — in the html body
+  ## * **attribute** — in an html attribute
   ##
   ## ~~~statictea
   ## name = html("Mad <Hatter>", "body")
@@ -2901,7 +2893,7 @@ func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## ~~~
   ##
   ## For more information about how to escape and what is safe see:
-  ## [XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
+  ## [XSS Cheatsheets](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
 
   tMapParameters("html", "sss")
   let text = map["a"].stringv
@@ -2999,9 +2991,9 @@ type
   BuiltInInfo* = object
     ## The built-in function information.
     ##
-    ## * funcName — the function name in the nim file, e.g.: fun_add_ii
-    ## * docComment — the function documentation
-    ## * numLines — the number of function code lines
+    ## * **funcName** — the function name in the nim file, e.g.: fun_add_ii
+    ## * **docComment** — the function documentation
+    ## * **numLines** — the number of function code lines
     funcName*: string
     docComment*: string
     numLines*: Natural

@@ -739,6 +739,7 @@ proc taskDoch(namePart: string, forceRebuild = false) =
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
     # echo cmd
+    # exec cmd
     runCmd(cmd)
     echo fmt"file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)

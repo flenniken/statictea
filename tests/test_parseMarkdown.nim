@@ -775,6 +775,9 @@ str: "␊me␊"
     check testParseInlineMarkdown("[desc](link)", " link desc link")
     check testParseInlineMarkdown("[desc](link) -- **a**", " link desc link normal  --  bold a")
 
+    check testParseInlineMarkdown("something [desc](http) more",
+      " normal something  link desc http normal  more")
+
   test "parseLink":
     check testParseLink("[desc](link)", 0, some(newLinkItem(0, 12, "desc", "link")))
     check testParseLink("  [desc](link)", 2, some(newLinkItem(2, 14, "desc", "link")))

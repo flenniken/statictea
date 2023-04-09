@@ -469,13 +469,13 @@ length is 0.
 
 The condition types and what is considered 0:
 
-* bool — false
-* int — 0
-* float — 0.0
-* string — when the length of the string is 0
-* list — when the length of the list is 0
-* dict — when the length of the dictionary is 0
-* func — always 0
+* **bool** — false
+* **int** — 0
+* **float** — 0.0
+* **string** — when the length of the string is 0
+* **list** — when the length of the list is 0
+* **dict** — when the length of the dictionary is 0
+* **func** — always 0
 
 The IF functions are special in a couple of ways, see
 the If Functions section.
@@ -695,7 +695,7 @@ case(3, cases, "wine") => "wine"
 
 ~~~nim
 func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [].}
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ~~~
 
 # fun_case_sloaa
@@ -721,17 +721,17 @@ case = func(condition: string, pairs: list, default: optional any) any
 Examples:
 
 ~~~javascript
-cases = list("tea", 15, "water", 2.3, "beer", "cold")
-case("tea", cases) => 15
-case("water", cases) => 2.3
-case("beer", cases) => "cold"
-case("bunch", cases, "other") => "other"
+pairs = list("tea", 15, "water", 2.3, "beer", "cold")
+case("tea", pairs) => 15
+case("water", pairs) => 2.3
+case("beer", pairs) => "cold"
+case("bunch", pairs, "other") => "other"
 ~~~
 
 
 ~~~nim
 func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [].}
+    raises: [KeyError, Exception], tags: [RootEffect].}
 ~~~
 
 # parseVersion
@@ -752,7 +752,7 @@ equal and 1 for greater than.
 cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
-StaticTea uses Semantic Versioning [https://semver.org/](https://semver.org/)
+StaticTea uses Semantic Versioning ([https://semver.org/](https://semver.org/))
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -845,10 +845,10 @@ int = func(num: float, roundOption: optional string) int
 
 Round options:
 
-* "round" - nearest integer, the default.
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+* **round** - nearest integer, the default.
+* **floor** - integer below (to the left on number line)
+* **ceiling** - integer above (to the right on number line)
+* **truncate** - remove decimals
 
 Examples:
 
@@ -882,10 +882,10 @@ int = func(numString: string, roundOption: optional string) int
 
 Round options:
 
-* "round" - nearest integer, the default
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+* **round** - nearest integer, the default
+* **floor** - integer below (to the left on number line)
+* **ceiling** - integer above (to the right on number line)
+* **truncate** - remove decimals
 
 Examples:
 
@@ -920,10 +920,10 @@ int = func(numString: string, roundOption: string, default: optional any) any
 
 Round options:
 
-* "round" - nearest integer, the default
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+* **round** - nearest integer, the default
+* **floor** - integer below (to the left on number line)
+* **ceiling** - integer above (to the right on number line)
+* **truncate** - remove decimals
 
 Examples:
 
@@ -957,13 +957,13 @@ bool = func(value: Value) bool
 
 False values by variable types:
 
-* bool — false
-* int — 0
-* float — 0.0
-* string — when the length of the string is 0
-* list — when the length of the list is 0
-* dict — when the length of the dictionary is 0
-* func — always false
+* **bool** — false
+* **int** — 0
+* **float** — 0.0
+* **string** — when the length of the string is 0
+* **list** — when the length of the list is 0
+* **dict** — when the length of the dictionary is 0
+* **func** — always false
 
 Examples:
 
@@ -1177,10 +1177,10 @@ a string as well.
 replace = func(str: string, start: int, length: int, replacement: string) string
 ~~~
 
-* str: string
-* start: substring start index
-* length: substring length
-* replacement: substring replacement
+* **str** — string to operate on
+* **start** — substring start index
+* **length** — substring length
+* **replacement** — substring replacement
 
 Examples:
 
@@ -1253,7 +1253,7 @@ replaceRe("abcdefabc", list))
 ~~~
 
 For developing and debugging regular expressions see the
-website: [https://regex101.com/](https://regex101.com/)
+website: ([https://regex101.com/](https://regex101.com/)).
 
 
 ~~~nim
@@ -1375,13 +1375,12 @@ func fun_values_dl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_sort_lsosl
 
-Sort a list of values of the same type.  The values are ints,
-floats, or strings.
+Sort a list of values of the same type.
 
-You specify the sort order, "ascending" or "descending".
-
-You have the option of sorting strings case "insensitive". Case
-"sensitive" is the default.
+* **list** — a list of values of the same type, either int, float or string
+* **order** — the sort order: "ascending" or "descending"
+* **insensitive** — sort strings case insensitive. Case
+sensitive is the default.
 
 ~~~javascript
 sort = func(values: list, order: string, insensitive: optional string) list
@@ -1414,12 +1413,10 @@ func fun_sort_lsosl(variables: Variables; arguments: seq[Value]): FunResult {.
 
 Sort a list of lists.
 
-You specify the sort order, "ascending" or "descending".
-
-You specify how to sort strings either case "sensitive" or
-"insensitive".
-
-You specify which index to compare by.  The compare index value
+* **lists** — a list of lists
+* **order** — the sort order: "ascending" or "descending"
+* **case** — sort strings case either case sensitive or insensitive.
+* **index** — which index to compare by.  The compare index value
 must exist in each list, be the same type and be an int, float,
 or string.
 
@@ -1447,12 +1444,10 @@ func fun_sort_lssil(variables: Variables; arguments: seq[Value]): FunResult {.
 
 Sort a list of dictionaries.
 
-You specify the sort order, "ascending" or "descending".
-
-You specify how to sort strings either case "sensitive" or
-"insensitive".
-
-You specify the compare key.  The key value must exist in
+* **dicts** — a list of dictionaries
+* **order** — the sort order: "ascending" or "descending"
+* **case** — sort strings case either sensitive or insensitive
+* **key** — the compare key.  The key value must exist in
 each dictionary, be the same type and be an int, float or
 string.
 
@@ -1488,8 +1483,8 @@ anchors = func(names: list, type: string) list
 
 type:
 
-* html — HTML class names
-* github — GitHub markdown anchor links
+* **html** — HTML class names
+* **github** — GitHub markdown anchor links
 
 Examples:
 
@@ -1691,8 +1686,8 @@ if(c, return("stop"))
 if(c, return("skip"))
 ~~~
 
-* “stop” – stops processing the command
-* “skip” – skips this replacement block and continues with the next iteration
+* **stop** – stops processing the command
+* **skip** – skips this replacement block and continues with the next iteration
 
 The following block command repeats 4 times but skips when
 t.row is 2.
@@ -1728,12 +1723,12 @@ The default stype is "rb" which is used for replacement blocks.
 
 stype:
 
-* json — returns JSON
-* rb — replacement block (rb) returns JSON except strings are
+* **json** — returns JSON
+* **rb** — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
-* dn — dot name (dn) returns JSON except dictionary elements
+* **dn** — dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
-* vl — vertical list (vl) returns JSON except list elements
+* **vl** — vertical list (vl) returns JSON except list elements
 are printed one per line as "ix: value".
 
 Examples variables:
@@ -2338,8 +2333,8 @@ Parse a simple subset of markdown. This subset is used to
 document all StaticTea functions. Return a list of lists.
 
 type:
-* lite — parse paragraphs, bullets and code blocks. See list elements below.
-* inline — parse inline attributes, bold, italics, bold+italics and links
+* **lite** — parse paragraphs, bullets and code blocks. See list elements below.
+* **inline** — parse inline attributes, bold, italics, bold+italics and links
 
 ~~~javascript
 parseMarkdown = func(mdText: string, type: string) list
@@ -2347,15 +2342,13 @@ parseMarkdown = func(mdText: string, type: string) list
 
 Block list elements:
 
-* p — A paragraph element is one string, possibly containing
+* **p** — A paragraph element is one string, possibly containing
 newlines.
-
-* code — A code element is three strings. The first string is
+* **code** — A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string (with newlines) contains the text of the block.  The third
 string is the ending line, for example “~~~”.
-
-* bullets — A bullets element contains a string (with newlines)
+* **bullets** — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
 
@@ -2366,23 +2359,21 @@ lite => [
   ["code", ["~~~", "code text with newlines", "~~~"]]
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
 ]
+~~~
 
 Inline list elements:
 
-* normal -- unformated inline string
+* **normal** -- an inline span of unformatted text
+* **bold** -- an inline span of **bold** text.
+* **italic** -- an inline span of *italic* text.
+* **boldItalic** -- an inline span of ***bold and italic*** text.
+* **link** -- an inline hyperlink; two strings: description and
+link.
 
-* bold -- **bold** inline string. The leading and trailing * are
-not part of the string.
+The leading and trailing stars are not part of the strings and the
+[] and () are not part of the link.
 
-* italic -- *italic* inline string. The leading and trailing *
-are not part of the string.
-
-* boldItalic -- ***bold and italic*** inline string. The leading and trailing *
-are not part of the string.
-
-* link -- inline hyperlink; two strings: text description and
-link. The [] and () are not part of the strings.
-
+~~~javascript
 inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
 inline => [
   ["bold", ["bold"]]
@@ -2408,16 +2399,16 @@ parseCode = func(code: string) list
 
 Tags:
 
-* other — not one of the other types
-* dotName — a dot name
-* funcCall — a function call; a dot name followed by a left parenthesis
-* num — a literal number
-* str — a literal string
-* multiline — a multiline literal string
-* doc — a doc comment
-* comment — a comment
-* param — a parameter name
-* type — int, float, string, list, dict, bool, func, any and optional
+* **other** — not one of the other types
+* **dotName** — a dot name
+* **funcCall** — a function call; a dot name followed by a left parenthesis
+* **num** — a literal number
+* **str** — a literal string
+* **multiline** — a multiline literal string
+* **doc** — a doc comment
+* **comment** — a comment
+* **param** — a parameter name
+* **type** — int, float, string, list, dict, bool, func, any and optional
 
 Example:
 
@@ -2464,8 +2455,8 @@ html = func(text: string, place: string) string
 
 places:
 
-* body — in the html body
-* attribute — in an html attribute
+* **body** — in the html body
+* **attribute** — in an html attribute
 
 ~~~javascript
 name = html("Mad <Hatter>", "body")
@@ -2473,7 +2464,7 @@ name = html("Mad <Hatter>", "body")
 ~~~
 
 For more information about how to escape and what is safe see:
-[XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
+[XSS Cheatsheets](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
 
 
 ~~~nim
@@ -2494,9 +2485,9 @@ functionsDict = newTable(32)
 
 The built-in function information.
 
-* funcName — the function name in the nim file, e.g.: fun_add_ii
-* docComment — the function documentation
-* numLines — the number of function code lines
+* **funcName** — the function name in the nim file, e.g.: fun_add_ii
+* **docComment** — the function documentation
+* **numLines** — the number of function code lines
 
 
 ~~~nim

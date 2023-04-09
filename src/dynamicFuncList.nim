@@ -47,8 +47,8 @@ anchors = func(names: list, type: string) list
 
 type:
 
-* html — HTML class names
-* github — GitHub markdown anchor links
+* **html** — HTML class names
+* **github** — GitHub markdown anchor links
 
 Examples:
 
@@ -89,13 +89,13 @@ bool = func(value: Value) bool
 
 False values by variable types:
 
-* bool — false
-* int — 0
-* float — 0.0
-* string — when the length of the string is 0
-* list — when the length of the list is 0
-* dict — when the length of the dictionary is 0
-* func — always false
+* **bool** — false
+* **int** — 0
+* **float** — 0.0
+* **string** — when the length of the string is 0
+* **list** — when the length of the list is 0
+* **dict** — when the length of the dictionary is 0
+* **func** — always false
 
 Examples:
 
@@ -169,11 +169,11 @@ case = func(condition: string, pairs: list, default: optional any) any
 Examples:
 
 ~~~statictea
-cases = list("tea", 15, "water", 2.3, "beer", "cold")
-case("tea", cases) => 15
-case("water", cases) => 2.3
-case("beer", cases) => "cold"
-case("bunch", cases, "other") => "other"
+pairs = list("tea", 15, "water", 2.3, "beer", "cold")
+case("tea", pairs) => 15
+case("water", pairs) => 2.3
+case("beer", pairs) => "cold"
+case("bunch", pairs, "other") => "other"
 ~~~
 
 """
@@ -245,7 +245,7 @@ equal and 1 for greater than.
 cmpVersion = func(versionA: string, versionB: string) int
 ~~~
 
-StaticTea uses Semantic Versioning [https://semver.org/](https://semver.org/)
+StaticTea uses Semantic Versioning ([https://semver.org/](https://semver.org/))
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -671,8 +671,8 @@ html = func(text: string, place: string) string
 
 places:
 
-* body — in the html body
-* attribute — in an html attribute
+* **body** — in the html body
+* **attribute** — in an html attribute
 
 ~~~statictea
 name = html("Mad <Hatter>", "body")
@@ -680,7 +680,7 @@ name = html("Mad <Hatter>", "body")
 ~~~
 
 For more information about how to escape and what is safe see:
-[XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
+[XSS Cheatsheets](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts)
 
 """
 
@@ -692,13 +692,13 @@ length is 0.
 
 The condition types and what is considered 0:
 
-* bool — false
-* int — 0
-* float — 0.0
-* string — when the length of the string is 0
-* list — when the length of the list is 0
-* dict — when the length of the dictionary is 0
-* func — always 0
+* **bool** — false
+* **int** — 0
+* **float** — 0.0
+* **string** — when the length of the string is 0
+* **list** — when the length of the list is 0
+* **dict** — when the length of the dictionary is 0
+* **func** — always 0
 
 The IF functions are special in a couple of ways, see
 the If Functions section.
@@ -777,10 +777,10 @@ int = func(num: float, roundOption: optional string) int
 
 Round options:
 
-* "round" - nearest integer, the default.
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+* **round** - nearest integer, the default.
+* **floor** - integer below (to the left on number line)
+* **ceiling** - integer above (to the right on number line)
+* **truncate** - remove decimals
 
 Examples:
 
@@ -809,10 +809,10 @@ int = func(numString: string, roundOption: optional string) int
 
 Round options:
 
-* "round" - nearest integer, the default
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+* **round** - nearest integer, the default
+* **floor** - integer below (to the left on number line)
+* **ceiling** - integer above (to the right on number line)
+* **truncate** - remove decimals
 
 Examples:
 
@@ -842,10 +842,10 @@ int = func(numString: string, roundOption: string, default: optional any) any
 
 Round options:
 
-* "round" - nearest integer, the default
-* "floor" - integer below (to the left on number line)
-* "ceiling" - integer above (to the right on number line)
-* "truncate" - remove decimals
+* **round** - nearest integer, the default
+* **floor** - integer below (to the left on number line)
+* **ceiling** - integer above (to the right on number line)
+* **truncate** - remove decimals
 
 Examples:
 
@@ -1252,16 +1252,16 @@ parseCode = func(code: string) list
 
 Tags:
 
-* other — not one of the other types
-* dotName — a dot name
-* funcCall — a function call; a dot name followed by a left parenthesis
-* num — a literal number
-* str — a literal string
-* multiline — a multiline literal string
-* doc — a doc comment
-* comment — a comment
-* param — a parameter name
-* type — int, float, string, list, dict, bool, func, any and optional
+* **other** — not one of the other types
+* **dotName** — a dot name
+* **funcCall** — a function call; a dot name followed by a left parenthesis
+* **num** — a literal number
+* **str** — a literal string
+* **multiline** — a multiline literal string
+* **doc** — a doc comment
+* **comment** — a comment
+* **param** — a parameter name
+* **type** — int, float, string, list, dict, bool, func, any and optional
 
 Example:
 
@@ -1281,8 +1281,8 @@ Parse a simple subset of markdown. This subset is used to
 document all StaticTea functions. Return a list of lists.
 
 type:
-* lite — parse paragraphs, bullets and code blocks. See list elements below.
-* inline — parse inline attributes, bold, italics, bold+italics and links
+* **lite** — parse paragraphs, bullets and code blocks. See list elements below.
+* **inline** — parse inline attributes, bold, italics, bold+italics and links
 
 ~~~statictea
 parseMarkdown = func(mdText: string, type: string) list
@@ -1290,15 +1290,13 @@ parseMarkdown = func(mdText: string, type: string) list
 
 Block list elements:
 
-* p — A paragraph element is one string, possibly containing
+* **p** — A paragraph element is one string, possibly containing
 newlines.
-
-* code — A code element is three strings. The first string is
+* **code** — A code element is three strings. The first string is
 the code start line, for example “~~~” or “~~~nim”.  The second
 string (with newlines) contains the text of the block.  The third
 string is the ending line, for example “~~~”.
-
-* bullets — A bullets element contains a string (with newlines)
+* **bullets** — A bullets element contains a string (with newlines)
 for each bullet point.  The leading “* “ is not part of the
 string.
 
@@ -1309,23 +1307,21 @@ lite => [
   ["code", ["~~~", "code text with newlines", "~~~"]]
   ["bullets", ["bullet (newlines) 1", "point 2", "3", ...]
 ]
+~~~
 
 Inline list elements:
 
-* normal -- unformated inline string
+* **normal** -- an inline span of unformatted text
+* **bold** -- an inline span of **bold** text.
+* **italic** -- an inline span of *italic* text.
+* **boldItalic** -- an inline span of ***bold and italic*** text.
+* **link** -- an inline hyperlink; two strings: description and
+link.
 
-* bold -- **bold** inline string. The leading and trailing * are
-not part of the string.
+The leading and trailing stars are not part of the strings and the
+[] and () are not part of the link.
 
-* italic -- *italic* inline string. The leading and trailing *
-are not part of the string.
-
-* boldItalic -- ***bold and italic*** inline string. The leading and trailing *
-are not part of the string.
-
-* link -- inline hyperlink; two strings: text description and
-link. The [] and () are not part of the strings.
-
+~~~ statictea
 inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
 inline => [
   ["bold", ["bold"]]
@@ -1396,10 +1392,10 @@ a string as well.
 replace = func(str: string, start: int, length: int, replacement: string) string
 ~~~
 
-* str: string
-* start: substring start index
-* length: substring length
-* replacement: substring replacement
+* **str** — string to operate on
+* **start** — substring start index
+* **length** — substring length
+* **replacement** — substring replacement
 
 Examples:
 
@@ -1467,7 +1463,7 @@ replaceRe("abcdefabc", list))
 ~~~
 
 For developing and debugging regular expressions see the
-website: [https://regex101.com/](https://regex101.com/)
+website: ([https://regex101.com/](https://regex101.com/)).
 
 """
 
@@ -1501,8 +1497,8 @@ if(c, return("stop"))
 if(c, return("skip"))
 ~~~
 
-* “stop” – stops processing the command
-* “skip” – skips this replacement block and continues with the next iteration
+* **stop** – stops processing the command
+* **skip** – skips this replacement block and continues with the next iteration
 
 The following block command repeats 4 times but skips when
 t.row is 2.
@@ -1545,13 +1541,12 @@ slice("añyóng", 0, 3) => "añy"
 """
 
   dc_fun_sort_lsosl = """
-Sort a list of values of the same type.  The values are ints,
-floats, or strings.
+Sort a list of values of the same type.
 
-You specify the sort order, "ascending" or "descending".
-
-You have the option of sorting strings case "insensitive". Case
-"sensitive" is the default.
+* **list** — a list of values of the same type, either int, float or string
+* **order** — the sort order: "ascending" or "descending"
+* **insensitive** — sort strings case insensitive. Case
+sensitive is the default.
 
 ~~~statictea
 sort = func(values: list, order: string, insensitive: optional string) list
@@ -1579,12 +1574,10 @@ sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
   dc_fun_sort_lssil = """
 Sort a list of lists.
 
-You specify the sort order, "ascending" or "descending".
-
-You specify how to sort strings either case "sensitive" or
-"insensitive".
-
-You specify which index to compare by.  The compare index value
+* **lists** — a list of lists
+* **order** — the sort order: "ascending" or "descending"
+* **case** — sort strings case either case sensitive or insensitive.
+* **index** — which index to compare by.  The compare index value
 must exist in each list, be the same type and be an int, float,
 or string.
 
@@ -1607,12 +1600,10 @@ sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
   dc_fun_sort_lsssl = """
 Sort a list of dictionaries.
 
-You specify the sort order, "ascending" or "descending".
-
-You specify how to sort strings either case "sensitive" or
-"insensitive".
-
-You specify the compare key.  The key value must exist in
+* **dicts** — a list of dictionaries
+* **order** — the sort order: "ascending" or "descending"
+* **case** — sort strings case either sensitive or insensitive
+* **key** — the compare key.  The key value must exist in
 each dictionary, be the same type and be an int, float or
 string.
 
@@ -1664,12 +1655,12 @@ The default stype is "rb" which is used for replacement blocks.
 
 stype:
 
-* json — returns JSON
-* rb — replacement block (rb) returns JSON except strings are
+* **json** — returns JSON
+* **rb** — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
-* dn — dot name (dn) returns JSON except dictionary elements
+* **dn** — dot name (dn) returns JSON except dictionary elements
 are printed one per line as "key = value". See string(dotName, string).
-* vl — vertical list (vl) returns JSON except list elements
+* **vl** — vertical list (vl) returns JSON except list elements
 are printed one per line as "ix: value".
 
 Examples variables:
@@ -1902,16 +1893,16 @@ warn("always warn")
     info("fun_not_bb", dc_fun_not_bb, 18),
     info("fun_or_bbb", dc_fun_or_bbb, 23),
     info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
-    info("fun_parseMarkdown_ssl", dc_fun_parseMarkdown_ssl, 83),
+    info("fun_parseMarkdown_ssl", dc_fun_parseMarkdown_ssl, 79),
     info("fun_path_sosd", dc_fun_path_sosd, 55),
     info("fun_readJson_sa", dc_fun_readJson_sa, 23),
     info("fun_replace_siiss", dc_fun_replace_siiss, 110),
     info("fun_replaceRe_sls", dc_fun_replaceRe_sls, 33),
     info("fun_return_aa", dc_fun_return_aa, 61),
     info("fun_slice_siois", dc_fun_slice_siois, 35),
-    info("fun_sort_lsosl", dc_fun_sort_lsosl, 33),
-    info("fun_sort_lssil", dc_fun_sort_lssil, 29),
-    info("fun_sort_lsssl", dc_fun_sort_lsssl, 29),
+    info("fun_sort_lsosl", dc_fun_sort_lsosl, 32),
+    info("fun_sort_lssil", dc_fun_sort_lssil, 27),
+    info("fun_sort_lsssl", dc_fun_sort_lsssl, 27),
     info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 23),
     info("fun_string_aoss", dc_fun_string_aoss, 104),
     info("fun_string_sds", dc_fun_string_sds, 24),
@@ -1929,81 +1920,81 @@ warn("always warn")
   # so when there are changes the diffs are easier to read.
 
   functionStarts = [
-    686,
-    662,
-    1843,
-    2389,
-    1107,
-    780,
-    813,
-    351,
-    330,
-    372,
-    857,
-    405,
-    1256,
-    1217,
-    2454,
-    2435,
-    2473,
-    758,
-    1144,
-    901,
-    944,
-    918,
-    2258,
-    2292,
-    2313,
-    528,
-    480,
-    2569,
-    2550,
-    2607,
-    2588,
-    2886,
-    566,
-    623,
-    971,
-    1006,
-    1048,
-    1975,
-    1934,
-    1605,
-    461,
-    442,
-    424,
-    1293,
-    1314,
-    2045,
-    1586,
-    2645,
-    2626,
-    2684,
-    2664,
-    2512,
-    2493,
-    2531,
-    2371,
-    2412,
-    2810,
-    2727,
-    1531,
-    2704,
-    1362,
-    1472,
-    2069,
-    1182,
-    1752,
+    687,
+    663,
+    1839,
+    2385,
+    1108,
+    781,
+    814,
+    352,
+    331,
+    373,
+    858,
+    406,
+    1257,
+    1218,
+    2450,
+    2431,
+    2469,
+    759,
+    1145,
+    902,
+    945,
+    919,
+    2254,
+    2288,
+    2309,
+    529,
+    481,
+    2565,
+    2546,
+    2603,
+    2584,
+    2878,
+    567,
+    624,
+    972,
+    1007,
+    1049,
+    1971,
+    1930,
+    1606,
+    462,
+    443,
+    425,
+    1294,
+    1315,
+    2041,
+    1587,
+    2641,
+    2622,
+    2680,
+    2660,
+    2508,
+    2489,
+    2527,
+    2367,
+    2408,
+    2802,
+    2723,
+    1532,
+    2700,
+    1363,
+    1473,
+    2065,
+    1183,
+    1753,
     1785,
-    1814,
-    2348,
-    2130,
-    2234,
-    733,
-    709,
-    1881,
-    1629,
-    2020,
+    1812,
+    2344,
+    2126,
+    2230,
+    734,
+    710,
+    1877,
+    1630,
+    2016,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.
