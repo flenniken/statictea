@@ -44,7 +44,6 @@
 </span>  <span class="t-doc">## formatted.
 </span>  <span class="t-dotName">inlineElements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">text</span>, <span class="t-str">&quot;inline&quot;</span>)
   <span class="t-dotName">json</span> = <span class="t-funcCall">string</span>(<span class="t-dotName">inlineElements</span>, <span class="t-str">&quot;vl&quot;</span>)
-  <span class="t-funcCall">log</span>(<span class="t-funcCall">format</span>(<span class="t-str">&quot;parseMarkdown:\n{json}&quot;</span>))
   <span class="t-dotName">inlineFrags</span> = []
   <span class="t-funcCall">listLoop</span>(<span class="t-dotName">inlineElements</span>, <span class="t-dotName">inlineFrags</span>, <span class="t-dotName">u.handle-html-inline</span>)
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">inlineFrags</span>, <span class="t-str">&quot;&quot;</span>))
@@ -58,9 +57,7 @@
 <span class="t-dotName">u.html-paragraph</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
   <span class="t-doc">## Return html given a &quot;p&quot; element md list.
 </span>  <span class="t-dotName">text</span> = <span class="t-dotName">item</span>[<span class="t-num">0</span>]
-  <span class="t-funcCall">log</span>(<span class="t-funcCall">format</span>(<span class="t-str">&quot;text before: {text}&quot;</span>))
   <span class="t-dotName">inlineText</span> = <span class="t-funcCall">u.inline-html</span>(<span class="t-dotName">text</span>)
-  <span class="t-funcCall">log</span>(<span class="t-funcCall">format</span>(<span class="t-str">&quot;text after: {inlineText}&quot;</span>))
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;p&gt;&quot;</span>, <span class="t-dotName">inlineText</span>, <span class="t-str">&quot;&lt;/p&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>))
 
 <span class="t-dotName">u.handle-html-fragment</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">fragment</span>: <span class="t-type">list</span>, <span class="t-param">frags</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>

@@ -11,8 +11,7 @@ u.html-link = func(linkElement: list) string
   if((tag != "link"), return(""))
   eList = linkElement[1]
   linkDesc = html(eList[0], "body")
-  url = eList[1]
-  # todo: escape url -- html(eList[1], "url")
+  url = html(eList[1], "url")
   return(format("<a href=\"{url}\">{linkDesc}</a>"))
 
 u.handle-html-inline = func(ix: int, inLineElement: list, lines: list) bool
@@ -33,7 +32,6 @@ u.inline-html = func(text: string) string
   ## formatted.
   inlineElements = parseMarkdown(text, "inline")
   json = string(inlineElements, "vl")
-  log(format("parseMarkdown:\n{json}"))
   inlineFrags = []
   listLoop(inlineElements, inlineFrags, u.handle-html-inline)
   return(join(inlineFrags, ""))
@@ -47,9 +45,7 @@ u.handle-html-bullet = func(ix: int, bullet: string, lines: list) bool
 u.html-paragraph = func(item: list) string
   ## Return html given a "p" element md list.
   text = item[0]
-  log(format("text before: {text}"))
   inlineText = u.inline-html(text)
-  log(format("text after: {inlineText}"))
   return(join(["<p>", inlineText, "</p>"], ""))
 
 u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool

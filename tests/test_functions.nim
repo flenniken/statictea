@@ -200,6 +200,11 @@ proc testParseCode(text: string, expected: string): bool =
   echo linesSideBySide(got, expected)
   return false
 
+proc testHtml(text: string, kind: string, eJson: string): bool =
+  var arguments = @[newValue(text), newValue(kind)]
+  let funResult = callFunction("html", arguments)
+  result = gotExpected($funResult, eJson)
+
 suite "functions.nim":
 
   test "splitFuncName":
@@ -2147,3 +2152,13 @@ len = len("tea")
     let str = "Zwölf Boxkämpfer"
     let expected = "Zw&#xC3;&#xB6;lf&#x20;Boxk&#xC3;&#xA4;mpfer"
     check escapeHtmlAttribute(str) == expected
+
+  test "html url":
+    let text = "http://google.com/"
+    let expected = """"http%3A%2F%2Fgoogle.com%2F""""
+    check testHtml(text, "url", expected)
+
+  test "html url utf-8":
+    let text = "https://google.com/?tea=茶tea-8336tea"
+    let expected = """"https%3A%2F%2Fgoogle.com%2F%3Ftea%3D%E8%8C%B6tea-8336tea""""
+    check testHtml(text, "url", expected)

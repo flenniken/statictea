@@ -788,10 +788,14 @@ places:
 
 * **body** — in the html body
 * **attribute** — in an html attribute
+* **url** — url encoding (percent encoding)
 
 ~~~javascript
 name = html("Mad <Hatter>", "body")
-  => "Mad &lt;Hatter&gt;"
+  #-> "Mad &lt;Hatter&gt;"
+
+url = html("https://github.com/flenniken/statictea", "url")
+  #-> "https%3A%2F%2Fgithub.com%2Fflenniken%2Fstatictea"
 ~~~
 
 For more information about how to escape and what is safe see:

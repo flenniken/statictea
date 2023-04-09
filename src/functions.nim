@@ -8,6 +8,7 @@ import std/strutils
 import std/math
 import std/os
 import std/algorithm
+import std/uri
 import messages
 import vartypes
 import regexes
@@ -2886,10 +2887,14 @@ func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## * **body** — in the html body
   ## * **attribute** — in an html attribute
+  ## * **url** — url encoding (percent encoding)
   ##
   ## ~~~statictea
   ## name = html("Mad <Hatter>", "body")
-  ##   => "Mad &lt;Hatter&gt;"
+  ##   #-> "Mad &lt;Hatter&gt;"
+  ##
+  ## url = html("https://github.com/flenniken/statictea", "url")
+  ##   #-> "https%3A%2F%2Fgithub.com%2Fflenniken%2Fstatictea"
   ## ~~~
   ##
   ## For more information about how to escape and what is safe see:
@@ -2904,6 +2909,8 @@ func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
     str = escapeHtmlBody(text)
   of "attribute":
     str = escapeHtmlAttribute(text)
+  of "url":
+    str = encodeUrl(text)
   else:
     # Invalid html place.
     return newFunResultWarn(wInvalidHtmlPlace, 1)

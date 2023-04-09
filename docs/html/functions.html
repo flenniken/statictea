@@ -765,7 +765,7 @@ equal and 1 for greater than.
 <span class="t-dotName">cmpVersion</span> = <span class="t-funcCall">func</span>(<span class="t-param">versionA</span>: <span class="t-type">string</span>, <span class="t-param">versionB</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
 </pre>
 <p>
-StaticTea uses Semantic Versioning (<a href="https://semver.org/">https://semver.org/</a>)
+StaticTea uses Semantic Versioning (<a href="https%3A%2F%2Fsemver.org%2F">https://semver.org/</a>)
 with the added restriction that each version component has one
 to three digits (no letters).
 
@@ -1276,7 +1276,7 @@ Examples:
 </pre>
 <p>
 For developing and debugging regular expressions see the
-website: (<a href="https://regex101.com/">https://regex101.com/</a>).
+website: (<a href="https%3A%2F%2Fregex101.com%2F">https://regex101.com/</a>).
 </p>
 
 <pre class="nim-code">
@@ -2501,15 +2501,19 @@ places:
 </p><ul>
 <li><b>body</b> — in the html body
 </li><li><b>attribute</b> — in an html attribute
+</li><li><b>url</b> — url encoding (percent encoding)
 
 </li></ul>
 <pre class="tea-code">
 <span class="t-dotName">name</span> = <span class="t-funcCall">html</span>(<span class="t-str">&quot;Mad &lt;Hatter&gt;&quot;</span>, <span class="t-str">&quot;body&quot;</span>)
-  =&gt; <span class="t-str">&quot;Mad &amp;lt;Hatter&amp;gt;&quot;</span>
-</pre>
+  <span class="t-comment">#-&gt; &quot;Mad &amp;lt;Hatter&amp;gt;&quot;
+</span>
+<span class="t-dotName">url</span> = <span class="t-funcCall">html</span>(<span class="t-str">&quot;https://github.com/flenniken/statictea&quot;</span>, <span class="t-str">&quot;url&quot;</span>)
+  <span class="t-comment">#-&gt; &quot;https%3A%2F%2Fgithub.com%2Fflenniken%2Fstatictea&quot;
+</span></pre>
 <p>
 For more information about how to escape and what is safe see:
-<a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding-for-html-contexts">XSS Cheatsheets</a>
+<a href="https%3A%2F%2Fcheatsheetseries.owasp.org%2Fcheatsheets%2FCross_Site_Scripting_Prevention_Cheat_Sheet.html%23output-encoding-for-html-contexts">XSS Cheatsheets</a>
 </p>
 
 <pre class="nim-code">
