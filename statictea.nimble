@@ -572,18 +572,18 @@ proc createDependencyGraph2() =
   rmFile(src_dot2_dot)
   rmFile(statictea2Dot)
 
-proc echoGrip() =
-  echo """
-The grip app is good for viewing github markdown locally.
-  grip --quiet readme.org &
-  http://localhost:6419/docs/index.md
-  http://localhost:6419/docs/teaFunctions.md
-  http://localhost:6419/testfiles/stf-index.md"""
+# proc echoGrip() =
+#   echo """
+# The grip app is good for viewing github markdown locally.
+#   grip --quiet readme.org &
+#   http://localhost:6419/docs/index.md
+#   http://localhost:6419/docs/teaFunctions.md
+#   http://localhost:6419/testfiles/stf-index.md"""
 
 proc taskDocmix() =
   ## Create the index html file.
 
-  var resultFile = "docs/index.md"
+  var resultFile = "docs/md/index.md"
   var templateFile = "templates/nimModuleIndex.md"
   var teaFile = "templates/nimModuleIndex.tea"
   var jsonFile = "docs/index.json"
@@ -678,7 +678,7 @@ proc taskDocm(namePart: string, forceRebuild = false) =
 
     let name = removeExt(basename)
     let srcFile = fmt"src/{name}.nim"
-    let resultFile = fmt"docs/{name}.md"
+    let resultFile = fmt"docs/md/{name}.md"
 
     if not forceRebuild and myFileNewer(resultFile, srcFile):
       # echo "Skipping unchanged $1." % name
@@ -702,8 +702,8 @@ proc taskDocm(namePart: string, forceRebuild = false) =
     rmFile(jsonFile)
 
 proc taskDoch(namePart: string, forceRebuild = false) =
-  ## Create one or more html docs; specify part of the name.":
-  ## namePart is part of a source file name, or "docs" when not specified.
+  ## Create one or more html documents; specify part of the name.":
+  ## namePart is part of a source file name, or "doch" when not specified.
 
   # Copy the css file to the docs html dir when it's newer or missing.
   let templateCssFile = fmt"templates/nimModule.css"
@@ -1028,7 +1028,7 @@ task doch, "\tCreate one or more html docs; specify part of the name.":
   let namePart = get_last_argument()
   taskDoch(namePart, true)
 
-task docmix, "\tCreate markdown docs index (docs/index.md).":
+task docmix, "\tCreate markdown docs index (docs/md/index.md).":
   taskDocmix()
 
 task dochix, "\tCreate html docs index (docs/html/index.html).":

@@ -22,9 +22,8 @@
 </span>  <span class="t-funcCall">if</span>((<span class="t-dotName">tag</span> != <span class="t-str">&quot;link&quot;</span>), <span class="t-funcCall">return</span>(<span class="t-str">&quot;&quot;</span>))
   <span class="t-dotName">eList</span> = <span class="t-dotName">linkElement</span>[<span class="t-num">1</span>]
   <span class="t-dotName">linkDesc</span> = <span class="t-funcCall">html</span>(<span class="t-dotName">eList</span>[<span class="t-num">0</span>], <span class="t-str">&quot;body&quot;</span>)
-  <span class="t-dotName">url</span> = <span class="t-dotName">eList</span>[<span class="t-num">1</span>]
-  <span class="t-comment"># todo: escape url -- html(eList[1], &quot;url&quot;)
-</span>  <span class="t-funcCall">return</span>(<span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;a href=\&quot;{url}\&quot;&gt;{linkDesc}&lt;/a&gt;&quot;</span>))
+  <span class="t-dotName">url</span> = <span class="t-funcCall">html</span>(<span class="t-dotName">eList</span>[<span class="t-num">1</span>], <span class="t-str">&quot;url&quot;</span>)
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;a href=\&quot;{url}\&quot;&gt;{linkDesc}&lt;/a&gt;&quot;</span>))
 
 <span class="t-dotName">u.handle-html-inline</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">inLineElement</span>: <span class="t-type">list</span>, <span class="t-param">lines</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Format the inline md element as html and add it to lines.

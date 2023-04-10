@@ -2437,7 +2437,7 @@ the [[#html-formatted-json][HTML Formatted Json]] section.
 For easier reading of the markdown templates, click the link then
 switch to "View Raw".
 
-- [[docs/index.md][Source Code]]
+- [[docs/md/index.md][Source Code]]
 - [[templates/nimModuleIndex.md][nimModuleIndex.md]] (view raw)
 - [[templates/nimModule.md][nimModule.md]] (view raw)
 - [[templates/nimModule.tea][nimModule.tea]]
@@ -2549,7 +2549,7 @@ Nimble Tasks:
 - *b*:  Build the statictea release exe (bin/x/statictea).
 - *docm*:  Create one or more markdown docs; specify part of the name.
 - *doch*:  Create one or more html docs; specify part of the name.
-- *docmix*:  Create markdown docs index (docs/index.md).
+- *docmix*:  Create markdown docs index (docs/md/index.md).
 - *dochix*:  Create html docs index (docs/html/index.html).
 - *jsonix*:  Display docs index json.
 - *json*:  Display one or more source file's json doc comments; specify part of the name.
