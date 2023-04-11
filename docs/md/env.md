@@ -3,7 +3,7 @@
 Environment holding the input and output streams.
 
 
-* [env.nim](../src/env.nim) &mdash; Nim source code.
+* [env.nim](../../src/env.nim) &mdash; Nim source code.
 # Index
 
 * const: [logWarnSize](#logwarnsize) &mdash; Warn the user when the log file gets over 1 GB.

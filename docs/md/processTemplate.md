@@ -3,7 +3,7 @@
 Process the template.
 
 
-* [processTemplate.nim](../src/processTemplate.nim) &mdash; Nim source code.
+* [processTemplate.nim](../../src/processTemplate.nim) &mdash; Nim source code.
 # Index
 
 * [collectCommand](#collectcommand) &mdash; Read template lines and write out non-command lines.

@@ -3,7 +3,7 @@
 Get the starting variables.
 
 
-* [startingvars.nim](../src/startingvars.nim) &mdash; Nim source code.
+* [startingvars.nim](../../src/startingvars.nim) &mdash; Nim source code.
 # Index
 
 * [readJsonFiles](#readjsonfiles) &mdash; Read json files and return a variable dictionary.

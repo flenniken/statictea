@@ -28,7 +28,7 @@ For a complete example see the bottom of the file in the isMainModule
 section.
 
 
-* [cmdline.nim](../src/cmdline.nim) &mdash; Nim source code.
+* [cmdline.nim](../../src/cmdline.nim) &mdash; Nim source code.
 # Index
 
 * type: [CmlArgs](#cmlargs) &mdash; CmlArgs holds the parsed command line arguments in an ordered dictionary.

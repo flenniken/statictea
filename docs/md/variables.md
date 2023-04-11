@@ -9,7 +9,7 @@ The language allows local variables to be specified without the l
 prefix and it allows functions to be specified without the f prefix.
 
 
-* [variables.nim](../src/variables.nim) &mdash; Nim source code.
+* [variables.nim](../../src/variables.nim) &mdash; Nim source code.
 # Index
 
 * const: [outputValues](#outputvalues) &mdash; Where the replacement block's output goes.

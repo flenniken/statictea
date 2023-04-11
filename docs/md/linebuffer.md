@@ -15,7 +15,7 @@ while line = lb.readLine():
 ~~~
 
 
-* [linebuffer.nim](../src/linebuffer.nim) &mdash; Nim source code.
+* [linebuffer.nim](../../src/linebuffer.nim) &mdash; Nim source code.
 # Index
 
 * const: [minMaxLineLen](#minmaxlinelen) &mdash; The minimum line length supported.

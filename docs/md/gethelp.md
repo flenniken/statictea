@@ -3,7 +3,7 @@
 Get the command line help message.
 
 
-* [gethelp.nim](../src/gethelp.nim) &mdash; Nim source code.
+* [gethelp.nim](../../src/gethelp.nim) &mdash; Nim source code.
 # Index
 
 * [getHelp](#gethelp) &mdash; Get the command line help message.

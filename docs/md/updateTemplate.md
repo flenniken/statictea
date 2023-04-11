@@ -3,7 +3,7 @@
 Update a template.
 
 
-* [updateTemplate.nim](../src/updateTemplate.nim) &mdash; Nim source code.
+* [updateTemplate.nim](../../src/updateTemplate.nim) &mdash; Nim source code.
 # Index
 
 * [collectReplaceCommand](#collectreplacecommand) &mdash; Collect the replace commands.

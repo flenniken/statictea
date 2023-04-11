@@ -13,8 +13,8 @@ add = func(a: float, b: float) float
 Examples:
 
 ~~~statictea
-add(1.5, 2.3) => 3.8
-add(3.2, -2.2) => 1.0
+add(1.5, 2.3) # 3.8
+add(3.2, -2.2) # 1.0
 ~~~
 
 """
@@ -29,9 +29,9 @@ add = func(a: int, b: int) int
 Examples:
 
 ~~~statictea
-add(1, 2) => 3
-add(3, -2) => 1
-add(-2, -5) => -7
+add(1, 2) # 3
+add(3, -2) # 1
+add(-2, -5) # -7
 ~~~
 
 """
@@ -55,7 +55,7 @@ Examples:
 ~~~statictea
 list = list("Tea", "Water", "Tea")
 a = anchors(list, "github")
-# a => ["tea", "water", "tea-1"]
+  # ["tea", "water", "tea-1"]
 ~~~
 
 """
@@ -71,11 +71,11 @@ and = func(a: bool, b: bool) bool
 Examples:
 
 ~~~statictea
-and(true, true) => true
-and(false, true) => false
-and(true, false) => false
-and(false, false) => false
-and(false, warn("not hit")) => false
+and(true, true) # true
+and(false, true) # false
+and(true, false) # false
+and(false, false) # false
+and(false, warn("not hit")) # false
 ~~~
 
 """
@@ -100,17 +100,17 @@ False values by variable types:
 Examples:
 
 ~~~statictea
-bool(0) => false
-bool(0.0) => false
-bool([]) => false
-bool("") => false
-bool(dict()) => false
+bool(0) # false
+bool(0.0) # false
+bool([]) # false
+bool("") # false
+bool(dict()) # false
 
-bool(5) => true
-bool(3.3) => true
-bool([8]) => true
-bool("tea") => true
-bool(dict("tea", 2)) => true
+bool(5) # true
+bool(3.3) # true
+bool([8]) # true
+bool("tea") # true
+bool(dict("tea", 2)) # true
 ~~~
 
 """
@@ -138,11 +138,11 @@ Examples:
 
 ~~~statictea
 cases = list(0, "tea", 1, "water", 2, "beer")
-case(0, cases) => "tea"
-case(1, cases) => "water"
-case(2, cases) => "beer"
-case(2, cases, "wine") => "beer"
-case(3, cases, "wine") => "wine"
+case(0, cases) # "tea"
+case(1, cases) # "water"
+case(2, cases) # "beer"
+case(2, cases, "wine") # "beer"
+case(3, cases, "wine") # "wine"
 ~~~
 
 """
@@ -170,10 +170,10 @@ Examples:
 
 ~~~statictea
 pairs = list("tea", 15, "water", 2.3, "beer", "cold")
-case("tea", pairs) => 15
-case("water", pairs) => 2.3
-case("beer", pairs) => "cold"
-case("bunch", pairs, "other") => "other"
+case("tea", pairs) # 15
+case("water", pairs) # 2.3
+case("beer", pairs) # "cold"
+case("bunch", pairs, "other") # "other"
 ~~~
 
 """
@@ -189,9 +189,9 @@ cmp = func(a: float, b: float) int
 Examples:
 
 ~~~statictea
-cmp(7.8, 9.1) => -1
-cmp(8.4, 8.4) => 0
-cmp(9.3, 2.2) => 1
+cmp(7.8, 9.1) # -1
+cmp(8.4, 8.4) # 0
+cmp(9.3, 2.2) # 1
 ~~~
 
 """
@@ -207,9 +207,9 @@ cmp = func(a: int, b: int) int
 Examples:
 
 ~~~statictea
-cmp(7, 9) => -1
-cmp(8, 8) => 0
-cmp(9, 2) => 1
+cmp(7, 9) # -1
+cmp(8, 8) # 0
+cmp(9, 2) # 1
 ~~~
 
 """
@@ -228,11 +228,11 @@ cmp = func(a: string, b: string, insensitive: optional bool) int
 Examples:
 
 ~~~statictea
-cmp("coffee", "tea") => -1
-cmp("tea", "tea") => 0
-cmp("Tea", "tea") => 1
-cmp("Tea", "tea", true) => 1
-cmp("Tea", "tea", false) => 0
+cmp("coffee", "tea") # -1
+cmp("tea", "tea") # 0
+cmp("Tea", "tea") # 1
+cmp("Tea", "tea", true) # 1
+cmp("Tea", "tea", false) # 0
 ~~~
 
 """
@@ -252,9 +252,9 @@ to three digits (no letters).
 Examples:
 
 ~~~ statictea
-cmpVersion("1.2.5", "1.1.8") => 1
-cmpVersion("1.2.5", "1.3.0") => -1
-cmpVersion("1.2.5", "1.2.5") => 0
+cmpVersion("1.2.5", "1.1.8") # 1
+cmpVersion("1.2.5", "1.3.0") # -1
+cmpVersion("1.2.5", "1.2.5") # 0
 ~~~
 
 """
@@ -269,8 +269,8 @@ concat = func(a: string, b: string) string
 Examples:
 
 ~~~statictea
-concat("tea", " time") => "tea time"
-concat("a", "b") => "ab"
+concat("tea", " time") # "tea time"
+concat("a", "b") # "ab"
 ~~~
 
 """
@@ -286,10 +286,10 @@ dict = func(pairs: optional list) dict
 Examples:
 
 ~~~statictea
-dict() => {}
-dict(["a", 5]) => {"a": 5}
-dict(["a", 5, "b", 33, "c", 0]) =>
-  {"a": 5, "b": 33, "c": 0}
+dict() # {}
+dict(["a", 5]) # {"a": 5}
+dict(["a", 5, "b", 33, "c", 0])
+  # {"a": 5, "b": 33, "c": 0}
 ~~~
 
 """
@@ -305,11 +305,11 @@ dup = func(pattern: string, count: int) string
 Examples:
 
 ~~~statictea
-dup("=", 3) => "==="
-dup("abc", 0) => ""
-dup("abc", 1) => "abc"
-dup("abc", 2) => "abcabc"
-dup("", 3) => ""
+dup("=", 3) # "==="
+dup("abc", 0) # ""
+dup("abc", 1) # "abc"
+dup("abc", 2) # "abcabc"
+dup("", 3) # ""
 ~~~
 
 """
@@ -324,8 +324,8 @@ eq(a: float, b: float) bool
 Examples:
 
 ~~~statictea
-eq(1.2, 1.2) => true
-eq(1.2, 3.2) => false
+eq(1.2, 1.2) # true
+eq(1.2, 3.2) # false
 ~~~
 
 """
@@ -340,8 +340,8 @@ eq = func(a: int, b: int) bool
 Examples:
 
 ~~~statictea
-eq(1, 1) => true
-eq(2, 3) => false
+eq(1, 1) # true
+eq(2, 3) # false
 ~~~
 
 """
@@ -357,8 +357,8 @@ eq = func(a: string, b: string) bool
 Examples:
 
 ~~~statictea
-eq("tea", "tea") => true
-eq("1.2", "3.2") => false
+eq("tea", "tea") # true
+eq("1.2", "3.2") # false
 ~~~
 
 """
@@ -375,8 +375,8 @@ Examples:
 
 ~~~statictea
 d = dict("tea", "Earl")
-exists(d, "tea") => true
-exists(d, "coffee") => false
+exists(d, "tea") # true
+exists(d, "coffee") # false
 ~~~
 
 """
@@ -396,12 +396,12 @@ Examples:
 ~~~statictea
        0123456789 1234567
 msg = "Tea time at 3:30."
-find(msg, "Tea") = 0
-find(msg, "time") = 4
-find(msg, "me") = 6
-find(msg, "party", -1) = -1
-find(msg, "party", len(msg)) = 17
-find(msg, "party", 0) = 0
+find(msg, "Tea") # 0
+find(msg, "time") # 4
+find(msg, "me") # 6
+find(msg, "party", -1) # -1
+find(msg, "party", len(msg)) # 17
+find(msg, "party", 0) # 0
 ~~~
 
 """
@@ -416,8 +416,8 @@ float = func(num: int) float
 Examples:
 
 ~~~statictea
-float(2) => 2.0
-float(-33) => -33.0
+float(2) # 2.0
+float(-33) # -33.0
 ~~~
 
 """
@@ -433,8 +433,8 @@ float = func(numString: string, default: optional any) any
 Examples:
 
 ~~~statictea
-float("2") => 2.0
-float("notnum", "nan") => nan
+float("2") # 2.0
+float("notnum", "nan") # nan
 ~~~
 
 """
@@ -449,9 +449,9 @@ float = func(numString: string) float
 Examples:
 
 ~~~statictea
-float("2") => 2.0
-float("2.4") => 2.4
-float("33") => 33.0
+float("2") # 2.0
+float("2.4") # 2.4
+float("33") # 33.0
 ~~~
 
 """
@@ -470,16 +470,14 @@ Example:
 let first = "Earl"
 let last = "Grey"
 str = format("name: {first} {last}")
-
-str => "name: Earl Grey"
+  # "name: Earl Grey"
 ~~~
 
 To enter a left bracket use two in a row.
 
 ~~~statictea
 str = format("use two {{ to get one")
-
-str => "use two { to get one"
+  # "use two { to get one"
 ~~~
 
 """
@@ -553,11 +551,12 @@ Examples:
 
 ~~~statictea
 d = dict("tea", "Earl Grey")
-get(d, "tea") => "Earl Grey"
-get(d, "coffee", "Tea") => "Tea"
+get(d, "tea") # "Earl Grey"
+get(d, "coffee", "Tea") # "Tea"
 ~~~
 
 Using dot notation:
+
 ~~~statictea
 d = dict("tea", "Earl Grey")
 d.tea => "Earl Grey"
@@ -580,14 +579,14 @@ Examples:
 
 ~~~statictea
 list = list(4, "a", 10)
-get(list, 0) => 4
-get(list, 1) => "a"
-get(list, 2) => 10
-get(list, 3, 99) => 99
-get(list, -1) => 10
-get(list, -2) => "a"
-get(list, -3) => 4
-get(list, -4, 11) => 11
+get(list, 0) # 4
+get(list, 1) # "a"
+get(list, 2) # 10
+get(list, 3, 99) # 99
+get(list, -1) # 10
+get(list, -2) # "a"
+get(list, -3) # 4
+get(list, -4, 11) # 11
 ~~~
 
 You can also use bracket notation to access list items.
@@ -608,8 +607,8 @@ gt = func(a: float, b: float) bool
 Examples:
 
 ~~~statictea
-gt(2.8, 4.3) => false
-gt(3.1, 2.5) => true
+gt(2.8, 4.3) # false
+gt(3.1, 2.5) # true
 ~~~
 
 """
@@ -624,8 +623,8 @@ gt = func(a: int, b: int) bool
 Examples:
 
 ~~~statictea
-gt(2, 4) => false
-gt(3, 2) => true
+gt(2, 4) # false
+gt(3, 2) # true
 ~~~
 
 """
@@ -640,8 +639,8 @@ gte = func(a: float, b: float) bool
 Examples:
 
 ~~~statictea
-gte(2.8, 4.3) => false
-gte(3.1, 3.1) => true
+gte(2.8, 4.3) # false
+gte(3.1, 3.1) # true
 ~~~
 
 """
@@ -656,8 +655,8 @@ gte = func(a: int, b: int) bool
 Examples:
 
 ~~~statictea
-gte(2, 4) => false
-gte(3, 3) => true
+gte(2, 4) # false
+gte(3, 3) # true
 ~~~
 
 """
@@ -677,10 +676,10 @@ places:
 
 ~~~statictea
 name = html("Mad <Hatter>", "body")
-  #-> "Mad &lt;Hatter&gt;"
+  # "Mad &lt;Hatter&gt;"
 
 url = html("https://github.com/flenniken/statictea", "url")
-  #-> "https%3A%2F%2Fgithub.com%2Fflenniken%2Fstatictea"
+  # "https%3A%2F%2Fgithub.com%2Fflenniken%2Fstatictea"
 ~~~
 
 For more information about how to escape and what is safe see:
@@ -714,19 +713,19 @@ if0 = func(condition: any, then: any, else: optional any) any
 Examples:
 
 ~~~statictea
-a = if0(0, "tea", "beer") => tea
-a = if0(1, "tea", "beer") => beer
-a = if0(4, "tea", "beer") => beer
-a = if0("", "tea", "beer") => tea
-a = if0("abc", "tea", "beer") => beer
-a = if0([], "tea", "beer") => tea
-a = if0([1,2], "tea", "beer") => beer
-a = if0(dict(), "tea", "beer") => tea
-a = if0(dict("a",1), "tea", "beer") => beer
-a = if0(false, "tea", "beer") => tea
-a = if0(true, "tea", "beer") => beer
-a = if0(true, "tea")
-a = if0(false, "tea")
+a = if0(0, "tea", "beer") # tea
+a = if0(1, "tea", "beer") # beer
+a = if0(4, "tea", "beer") # beer
+a = if0("", "tea", "beer") # tea
+a = if0("abc", "tea", "beer") # beer
+a = if0([], "tea", "beer") # tea
+a = if0([1,2], "tea", "beer") # beer
+a = if0(dict(), "tea", "beer") # tea
+a = if0(dict("a",1), "tea", "beer") # beer
+a = if0(false, "tea", "beer") # tea
+a = if0(true, "tea", "beer") # beer
+a = if0(true, "tea") # no assignment
+a = if0(false, "tea") # tea
 ~~~
 
 You don't have to assign the result of an if0 function which is
@@ -755,10 +754,11 @@ if = func(condition: bool, then: any, else: optional any) any
 Examples:
 
 ~~~statictea
-a = if(true, "tea", "beer") # => tea
-b = if(false, "tea", "beer") # => beer
-c = if((v < 5), "tea", "beer")
-d = if((v < 5), "tea")
+a = if(true, "tea", "beer") # tea
+b = if(false, "tea", "beer") # beer
+v = 6
+c = if((v < 5), "tea", "beer") # beer
+d = if((v < 5), "tea") # no assignment
 ~~~
 
 You don't have to assign the result of an if function which is
@@ -789,17 +789,17 @@ Round options:
 Examples:
 
 ~~~statictea
-int(2.34) => 2
-int(2.34, "round") => 2
-int(-2.34, "round") => -2
-int(6.5, "round") => 7
-int(-6.5, "round") => -7
-int(4.57, "floor") => 4
-int(-4.57, "floor") => -5
-int(6.3, "ceiling") => 7
-int(-6.3, "ceiling") => -6
-int(6.3456, "truncate") => 6
-int(-6.3456, "truncate") => -6
+int(2.34) # 2
+int(2.34, "round") # 2
+int(-2.34, "round") # -2
+int(6.5, "round") # 7
+int(-6.5, "round") # -7
+int(4.57, "floor") # 4
+int(-4.57, "floor") # -5
+int(6.3, "ceiling") # 7
+int(-6.3, "ceiling") # -6
+int(6.3456, "truncate") # 6
+int(-6.3456, "truncate") # -6
 ~~~
 
 """
@@ -821,17 +821,17 @@ Round options:
 Examples:
 
 ~~~statictea
-int("2") => 2
-int("2.34") => 2
-int("-2.34", "round") => -2
-int("6.5", "round") => 7
-int("-6.5", "round") => -7
-int("4.57", "floor") => 4
-int("-4.57", "floor") => -5
-int("6.3", "ceiling") => 7
-int("-6.3", "ceiling") => -6
-int("6.3456", "truncate") => 6
-int("-6.3456", "truncate") => -6
+int("2") # 2
+int("2.34") # 2
+int("-2.34", "round") # -2
+int("6.5", "round") # 7
+int("-6.5", "round") # -7
+int("4.57", "floor") # 4
+int("-4.57", "floor") # -5
+int("6.3", "ceiling") # 7
+int("-6.3", "ceiling") # -6
+int("6.3456", "truncate") # 6
+int("-6.3456", "truncate") # -6
 ~~~
 
 """
@@ -854,8 +854,8 @@ Round options:
 Examples:
 
 ~~~statictea
-int("2", "round", "nan") => 2
-int("notnum", "round", "nan") => nan
+int("2", "round", "nan") # 2
+int("notnum", "round", "nan") # nan
 ~~~
 
 """
@@ -872,14 +872,14 @@ join = func(strs: list, sep: string, skipEmpty: optional bool) string
 Examples:
 
 ~~~statictea
-join(["a", "b"], ", ") => "a, b"
-join(["a", "b"], "") => "ab"
-join(["a", "b", "c"], "") => "abc"
-join(["a"], ", ") => "a"
-join([""], ", ") => ""
-join(["a", "b"], "") => "ab"
-join(["a", "", "c"], "|") => "a||c"
-join(["a", "", "c"], "|", true) => "a|c"
+join(["a", "b"], ", ") # "a, b"
+join(["a", "b"], "") # "ab"
+join(["a", "b", "c"], "") # "abc"
+join(["a"], ", ") # "a"
+join([""], ", ") # ""
+join(["a", "b"], "") # "ab"
+join(["a", "", "c"], "|") # "a||c"
+join(["a", "", "c"], "|", true) # "a|c"
 ~~~
 
 """
@@ -903,23 +903,12 @@ joinPath = func(components: list, separator: optional string) string
 Examples:
 
 ~~~statictea
-joinPath(["images", "tea"]) =>
-  "images/tea"
-
-joinPath(["images", "tea"], "/") =>
-  "images/tea"
-
-joinPath(["images", "tea"], "\\") =>
-  "images\\tea"
-
-joinPath(["images/", "tea"]) =>
-  "images/tea"
-
-joinPath(["", "tea"]) =>
-  "/tea"
-
-joinPath(["/", "tea"]) =>
-  "/tea"
+joinPath(["images", "tea"]) # "images/tea"
+joinPath(["images", "tea"], "/") # "images/tea"
+joinPath(["images", "tea"], "\\") # "images\\tea"
+joinPath(["images/", "tea"]) # "images/tea"
+joinPath(["", "tea"]) # "/tea"
+joinPath(["/", "tea"]) # "/tea"
 ~~~
 
 """
@@ -935,8 +924,8 @@ Examples:
 
 ~~~statictea
 d = dict("a", 1, "b", 2, "c", 3)
-keys(d) => ["a", "b", "c"]
-values(d) => [1, 2, 3]
+keys(d) # ["a", "b", "c"]
+values(d) # [1, 2, 3]
 ~~~
 
 """
@@ -951,9 +940,9 @@ len = func(dictionary: dict) int
 Examples:
 
 ~~~statictea
-len(dict()) => 0
-len(dict("a", 4)) => 1
-len(dict("a", 4, "b", 3)) => 2
+len(dict()) # 0
+len(dict("a", 4)) # 1
+len(dict("a", 4, "b", 3)) # 2
 ~~~
 
 """
@@ -968,9 +957,9 @@ len = func(list: list) int
 Examples:
 
 ~~~statictea
-len(list()) => 0
-len(list(1)) => 1
-len(list(4, 5)) => 2
+len(list()) # 0
+len(list(1)) # 1
+len(list(4, 5)) # 2
 ~~~
 
 """
@@ -985,8 +974,8 @@ len = func(str: string) int
 Examples:
 
 ~~~statictea
-len("tea") => 3
-len("añyóng") => 6
+len("tea") # 3
+len("añyóng") # 6
 ~~~
 
 """
@@ -1089,9 +1078,9 @@ lower = func(str: string) string
 Examples:
 
 ~~~statictea
-lower("Tea") => "tea"
-lower("TEA") => "tea"
-lower("TEĀ") => "teā"
+lower("Tea") # "tea"
+lower("TEA") # "tea"
+lower("TEĀ") # "teā"
 ~~~
 
 """
@@ -1106,8 +1095,8 @@ lt = func(a: float, b: float) bool
 Examples:
 
 ~~~statictea
-lt(2.8, 4.3) => true
-lt(3.1, 2.5) => false
+lt(2.8, 4.3) # true
+lt(3.1, 2.5) # false
 ~~~
 
 """
@@ -1122,8 +1111,8 @@ lt = func(a: int, b: int) bool
 Examples:
 
 ~~~statictea
-gt(2, 4) => true
-gt(3, 2) => false
+gt(2, 4) # true
+gt(3, 2) # false
 ~~~
 
 """
@@ -1138,9 +1127,9 @@ lte = func(a: float, b: float) bool
 Examples:
 
 ~~~statictea
-lte(2.3, 4.4) => true
-lte(3.0, 3.0) => true
-lte(4.0, 3.0) => false
+lte(2.3, 4.4) # true
+lte(3.0, 3.0) # true
+lte(4.0, 3.0) # false
 ~~~
 
 """
@@ -1155,9 +1144,9 @@ lte = func(a: int, b: int) bool
 Examples:
 
 ~~~statictea
-lte(2, 4) => true
-lte(3, 3) => true
-lte(4, 3) => false
+lte(2, 4) # true
+lte(3, 3) # true
+lte(4, 3) # false
 ~~~
 
 """
@@ -1172,8 +1161,8 @@ ne = func(a: float, b: float) bool
 Examples:
 
 ~~~statictea
-ne(1.2, 1.2) => false
-ne(1.2, 3.2) => true
+ne(1.2, 1.2) # false
+ne(1.2, 3.2) # true
 ~~~
 
 """
@@ -1188,8 +1177,8 @@ ne = func(a: int, b: int) bool
 Examples:
 
 ~~~statictea
-ne(1, 1) => false
-ne(2, 3) => true
+ne(1, 1) # false
+ne(2, 3) # true
 ~~~
 
 """
@@ -1204,8 +1193,8 @@ ne(a: string, b: string) bool
 Examples:
 
 ~~~statictea
-ne("tea", "tea") => false
-ne("earl", "grey") => true
+ne("tea", "tea") # false
+ne("earl", "grey") # true
 ~~~
 
 """
@@ -1220,8 +1209,8 @@ not = func(value: bool) bool
 Examples:
 
 ~~~statictea
-not(true) => false
-not(false) => true
+not(true) # false
+not(false) # true
 ~~~
 
 """
@@ -1237,11 +1226,11 @@ or = func(a: bool, b: bool) bool
 Examples:
 
 ~~~statictea
-or(true, true) => true
-or(false, true) => true
-or(true, false) => true
-or(false, false) => false
-or(true, warn("not hit")) => true
+or(true, true) # true
+or(false, true) # true
+or(true, false) # true
+or(false, false) # false
+or(true, warn("not hit")) # true
 ~~~
 
 """
@@ -1378,11 +1367,11 @@ readJson = func(json: string) any
 Examples:
 
 ~~~statictea
-a = readJson("\\"tea\\"") => "tea"
-b = readJson("4.5") => 4.5
-c = readJson("[1,2,3]") => [1, 2, 3]
+a = readJson("\\"tea\\"") # "tea"
+b = readJson("4.5") # 4.5
+c = readJson("[1,2,3]") # [1, 2, 3]
 d = readJson("{\\"a\\":1, \\"b\\": 2}")
-  => {"a": 1, "b", 2}
+  # {"a": 1, "b", 2}
 ~~~
 
 """
@@ -1407,43 +1396,43 @@ Replace:
 ~~~statictea
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
-replace("123", 0, 1, "abcd") => abcd23
-replace("123", 0, 2, "abcd") => abcd3
+replace("123", 0, 1, "abcd") # abcd23
+replace("123", 0, 2, "abcd") # abcd3
 
-replace("123", 1, 1, "abcd") => 1abcd3
-replace("123", 1, 2, "abcd") => 1abcd
+replace("123", 1, 1, "abcd") # 1abcd3
+replace("123", 1, 2, "abcd") # 1abcd
 
-replace("123", 2, 1, "abcd") => 12abcd
+replace("123", 2, 1, "abcd") # 12abcd
 ~~~
 Insert:
 ~~~statictea
-replace("123", 0, 0, "abcd") => abcd123
-replace("123", 1, 0, "abcd") => 1abcd23
-replace("123", 2, 0, "abcd") => 12abcd3
-replace("123", 3, 0, "abcd") => 123abcd
+replace("123", 0, 0, "abcd") # abcd123
+replace("123", 1, 0, "abcd") # 1abcd23
+replace("123", 2, 0, "abcd") # 12abcd3
+replace("123", 3, 0, "abcd") # 123abcd
 ~~~
 Append:
 ~~~statictea
-replace("123", 3, 0, "abcd") => 123abcd
+replace("123", 3, 0, "abcd") # 123abcd
 ~~~
 Delete:
 ~~~statictea
-replace("123", 0, 1, "") => 23
-replace("123", 0, 2, "") => 3
-replace("123", 0, 3, "") => ""
+replace("123", 0, 1, "") # 23
+replace("123", 0, 2, "") # 3
+replace("123", 0, 3, "") # ""
 
-replace("123", 1, 1, "") => 13
-replace("123", 1, 2, "") => 1
+replace("123", 1, 1, "") # 13
+replace("123", 1, 2, "") # 1
 
-replace("123", 2, 1, "") => 12
+replace("123", 2, 1, "") # 12
 ~~~
 Edge Cases:
 ~~~statictea
-replace("", 0, 0, "") =>
-replace("", 0, 0, "a") => a
-replace("", 0, 0, "ab") => ab
-replace("", 0, 0, "abc") => abc
-replace("", 0, 0, "abcd") => abcd
+replace("", 0, 0, "") #
+replace("", 0, 0, "a") # a
+replace("", 0, 0, "ab") # ab
+replace("", 0, 0, "abc") # abc
+replace("", 0, 0, "abcd") # abcd
 ~~~
 
 """
@@ -1463,7 +1452,7 @@ Examples:
 ~~~statictea
 list = list("abc", "456", "def", "")
 replaceRe("abcdefabc", list))
-  => "456456"
+  # "456456"
 ~~~
 
 For developing and debugging regular expressions see the
@@ -1507,14 +1496,16 @@ if(c, return("skip"))
 The following block command repeats 4 times but skips when
 t.row is 2.
 
-~~~statictea
+~~~
 $$ block t.repeat = 4
 $$ : if((t.row == 2), return(“skip”))
 {t.row}
 $$ endblock
+~~~
 
 output:
 
+~~~
 0
 1
 3
@@ -1537,9 +1528,9 @@ slice = func(str: string, start: int, length: optional int) string
 Examples:
 
 ~~~statictea
-slice("Earl Grey", 1, 3) => "arl"
-slice("Earl Grey", 6) => "rey"
-slice("añyóng", 0, 3) => "añy"
+slice("Earl Grey", 1, 3) # "arl"
+slice("Earl Grey", 6) # "rey"
+slice("añyóng", 0, 3) # "añy"
 ~~~
 
 """
@@ -1560,17 +1551,17 @@ Examples:
 
 ~~~statictea
 ints = list(4, 3, 5, 5, 2, 4)
-sort(list, "ascending") => [2, 3, 4, 4, 5, 5]
-sort(list, "descending") => [5, 5, 4, 4, 3, 2]
+sort(list, "ascending") # [2, 3, 4, 4, 5, 5]
+sort(list, "descending") # [5, 5, 4, 4, 3, 2]
 
 floats = list(4.4, 3.1, 5.9)
-sort(floats, "ascending") => [3.1, 4.4, 5.9]
-sort(floats, "descending") => [5.9, 4.4, 3.1]
+sort(floats, "ascending") # [3.1, 4.4, 5.9]
+sort(floats, "descending") # [5.9, 4.4, 3.1]
 
 strs = list("T", "e", "a")
-sort(strs, "ascending") => ["T", "a", "e"]
-sort(strs, "ascending", "sensitive") => ["T", "a", "e"]
-sort(strs, "ascending", "insensitive") => ["a", "e", "T"]
+sort(strs, "ascending") # ["T", "a", "e"]
+sort(strs, "ascending", "sensitive") # ["T", "a", "e"]
+sort(strs, "ascending", "insensitive") # ["a", "e", "T"]
 ~~~
 
 """
@@ -1595,8 +1586,8 @@ Examples:
 l1 = list(4, 3, 1)
 l2 = list(2, 3, 4)
 listOfLists = list(l1, l2)
-sort(listOfLists, "ascending", "sensitive", 0) => [l2, l1]
-sort(listOfLists, "ascending", "sensitive", 2) => [l1, l2]
+sort(listOfLists, "ascending", "sensitive", 0) # [l2, l1]
+sort(listOfLists, "ascending", "sensitive", 2) # [l1, l2]
 ~~~
 
 """
@@ -1621,8 +1612,8 @@ Examples:
 d1 = dict("name", "Earl Gray", "weight", 1.2)
 d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
-sort(dicts, "ascending", "sensitive", "weight") => [d1, d2]
-sort(dicts, "descending", "sensitive", "name") => [d2, d1]
+sort(dicts, "ascending", "sensitive", "weight") # [d1, d2]
+sort(dicts, "descending", "sensitive", "name") # [d2, d1]
 ~~~
 
 """
@@ -1638,11 +1629,8 @@ startsWith = func(str: string, str: prefix) bool
 Examples:
 
 ~~~statictea
-a = startsWith("abcdef", "abc")
-b = startsWith("abcdef", "abf")
-
-a => true
-b => false
+a = startsWith("abcdef", "abc") # true
+b = startsWith("abcdef", "abf") # false
 ~~~
 
 """
@@ -1681,7 +1669,7 @@ found = true
 
 json:
 
-~~~statictea
+~~~
 str => "Earl Grey"
 pi => 3.14159
 one => 1
@@ -1695,7 +1683,7 @@ rb:
 
 Same as JSON except the following.
 
-~~~statictea
+~~~
 str => Earl Grey
 fn => cmp
 ~~~
@@ -1704,7 +1692,7 @@ dn:
 
 Same as JSON except the following.
 
-~~~statictea
+~~~
 d =>
 x = 1
 y = 2
@@ -1714,7 +1702,7 @@ vl:
 
 Same as JSON except the following.
 
-~~~statictea
+~~~
 a =>
 0: "red"
 1: "green"
@@ -1754,8 +1742,8 @@ sub = func(a: float, b: float) float
 Examples:
 
 ~~~statictea
-sub(4.5, 2.3) => 2.2
-sub(1.0, 2.2) => -1.2
+sub(4.5, 2.3) # 2.2
+sub(1.0, 2.2) # -1.2
 ~~~
 
 """
@@ -1770,9 +1758,9 @@ sub = func(a: int, b: int) int
 Examples:
 
 ~~~statictea
-sub(3, 1) => 2
-add(3, -2) => 5
-add(1, 5) => -4
+sub(3, 1) # 2
+add(3, -2) # 5
+add(1, 5) # -4
 ~~~
 
 """
@@ -1788,13 +1776,13 @@ type = func(variable: any) string
 Examples:
 
 ~~~statictea
-type(2) => "int"
-type(3.14159) => "float"
-type("Tea") => "string"
-type(list(1,2)) => "list"
-type(dict("a", 1)) => "dict"
-type(true) => "bool"
-type(f.cmp[0]) => "func"
+type(2) # "int"
+type(3.14159) # "float"
+type("Tea") # "string"
+type(list(1,2)) # "list"
+type(dict("a", 1)) # "dict"
+type(true) # "bool"
+type(f.cmp[0]) # "func"
 ~~~
 
 """
@@ -1810,8 +1798,8 @@ Examples:
 
 ~~~statictea
 d = dict("a", "apple", "b", 2, "c", 3)
-keys(d) => ["a", "b", "c"]
-values(d) => ["apple", 2, 3]
+keys(d) # ["a", "b", "c"]
+values(d) # ["apple", 2, 3]
 ~~~
 
 """
@@ -1862,10 +1850,10 @@ warn("always warn")
     info("fun_float_if", dc_fun_float_if, 17),
     info("fun_float_saa", dc_fun_float_saa, 27),
     info("fun_float_sf", dc_fun_float_sf, 26),
-    info("fun_format_ss", dc_fun_format_ss, 34),
+    info("fun_format_ss", dc_fun_format_ss, 32),
     info("fun_func_sp", dc_fun_func_sp, 21),
     info("fun_functionDetails_pd", dc_fun_functionDetails_pd, 35),
-    info("fun_get_dsoaa", dc_fun_get_dsoaa, 38),
+    info("fun_get_dsoaa", dc_fun_get_dsoaa, 39),
     info("fun_get_lioaa", dc_fun_get_lioaa, 48),
     info("fun_gt_ffb", dc_fun_gt_ffb, 19),
     info("fun_gt_iib", dc_fun_gt_iib, 19),
@@ -1873,12 +1861,12 @@ warn("always warn")
     info("fun_gte_iib", dc_fun_gte_iib, 19),
     info("fun_html_sss", dc_fun_html_sss, 40),
     info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 57),
-    info("fun_if_baoaa", dc_fun_if_baoaa, 39),
+    info("fun_if_baoaa", dc_fun_if_baoaa, 40),
     info("fun_int_fosi", dc_fun_int_fosi, 35),
     info("fun_int_sosi", dc_fun_int_sosi, 42),
     info("fun_int_ssaa", dc_fun_int_ssaa, 35),
     info("fun_join_lsois", dc_fun_join_lsois, 45),
-    info("fun_joinPath_loss", dc_fun_joinPath_loss, 41),
+    info("fun_joinPath_loss", dc_fun_joinPath_loss, 30),
     info("fun_keys_dl", dc_fun_keys_dl, 24),
     info("fun_len_di", dc_fun_len_di, 19),
     info("fun_len_li", dc_fun_len_li, 19),
@@ -1902,12 +1890,12 @@ warn("always warn")
     info("fun_readJson_sa", dc_fun_readJson_sa, 23),
     info("fun_replace_siiss", dc_fun_replace_siiss, 110),
     info("fun_replaceRe_sls", dc_fun_replaceRe_sls, 33),
-    info("fun_return_aa", dc_fun_return_aa, 61),
+    info("fun_return_aa", dc_fun_return_aa, 63),
     info("fun_slice_siois", dc_fun_slice_siois, 35),
     info("fun_sort_lsosl", dc_fun_sort_lsosl, 32),
     info("fun_sort_lssil", dc_fun_sort_lssil, 27),
     info("fun_sort_lsssl", dc_fun_sort_lsssl, 27),
-    info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 23),
+    info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 20),
     info("fun_string_aoss", dc_fun_string_aoss, 104),
     info("fun_string_sds", dc_fun_string_sds, 24),
     info("fun_sub_fff", dc_fun_sub_fff, 25),
@@ -1924,81 +1912,81 @@ warn("always warn")
   # so when there are changes the diffs are easier to read.
 
   functionStarts = [
-    688,
-    664,
-    1840,
-    2386,
-    1109,
-    782,
-    815,
-    353,
-    332,
-    374,
-    859,
-    407,
-    1258,
-    1219,
-    2451,
-    2432,
-    2470,
-    760,
-    1146,
-    903,
-    946,
-    920,
-    2255,
-    2289,
-    2310,
-    530,
-    482,
-    2566,
-    2547,
-    2604,
-    2585,
-    2879,
-    568,
-    625,
-    973,
-    1008,
-    1050,
-    1972,
-    1931,
-    1607,
-    463,
-    444,
-    426,
-    1295,
-    1316,
-    2042,
-    1588,
-    2642,
-    2623,
-    2681,
-    2661,
-    2509,
-    2490,
-    2528,
-    2368,
-    2409,
-    2803,
-    2724,
-    1533,
-    2701,
-    1364,
-    1474,
-    2066,
-    1184,
-    1754,
-    1786,
-    1813,
-    2345,
-    2127,
-    2231,
-    735,
-    711,
-    1878,
-    1631,
-    2017,
+    691,
+    667,
+    1843,
+    2375,
+    1112,
+    785,
+    818,
+    354,
+    333,
+    375,
+    862,
+    408,
+    1261,
+    1222,
+    2440,
+    2421,
+    2459,
+    763,
+    1149,
+    906,
+    949,
+    923,
+    2249,
+    2281,
+    2302,
+    531,
+    483,
+    2555,
+    2536,
+    2593,
+    2574,
+    2868,
+    570,
+    627,
+    976,
+    1011,
+    1053,
+    1964,
+    1934,
+    1610,
+    464,
+    445,
+    427,
+    1298,
+    1319,
+    2034,
+    1591,
+    2631,
+    2612,
+    2670,
+    2650,
+    2498,
+    2479,
+    2517,
+    2357,
+    2398,
+    2792,
+    2713,
+    1536,
+    2690,
+    1367,
+    1477,
+    2058,
+    1187,
+    1757,
+    1789,
+    1816,
+    2337,
+    2121,
+    2225,
+    738,
+    714,
+    1881,
+    1634,
+    2009,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

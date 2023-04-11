@@ -3,7 +3,7 @@
 StaticTea; A template processor and language.
 
 
-* [statictea.nim](../src/statictea.nim) &mdash; Nim source code.
+* [statictea.nim](../../src/statictea.nim) &mdash; Nim source code.
 # Index
 
 * [main](#main) &mdash; Run statictea.

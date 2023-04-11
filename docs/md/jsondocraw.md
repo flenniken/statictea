@@ -5,7 +5,7 @@ command except no html presentation information is in the
 descriptions. The descriptions match the source.
 
 
-* [jsondocraw.nim](../src/jsondocraw.nim) &mdash; Nim source code.
+* [jsondocraw.nim](../../src/jsondocraw.nim) &mdash; Nim source code.
 # Index
 
 * const: [helpText](#helptext) &mdash; alternate doc comment used instead of the first line.

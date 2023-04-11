@@ -3,7 +3,7 @@
 Parse a StaticTea language command line.
 
 
-* [parseCmdLine.nim](../src/parseCmdLine.nim) &mdash; Nim source code.
+* [parseCmdLine.nim](../../src/parseCmdLine.nim) &mdash; Nim source code.
 # Index
 
 * type: [LineParts](#lineparts) &mdash; LineParts holds parsed components of a line.

@@ -42,7 +42,7 @@ check resultStringO.get() == "456456"
 ~~~
 
 
-* [regexes.nim](../src/regexes.nim) &mdash; Nim source code.
+* [regexes.nim](../../src/regexes.nim) &mdash; Nim source code.
 # Index
 
 * type: [CompilePattern](#compilepattern) &mdash; A cache of compiled regex patterns, mapping a pattern to CompilePattern.

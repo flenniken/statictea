@@ -14,7 +14,7 @@ files, or run the nimble task "runhelp" to show the help text with
 glow.
 
 
-* [runner.nim](../src/runner.nim) &mdash; Nim source code.
+* [runner.nim](../../src/runner.nim) &mdash; Nim source code.
 # Index
 
 * const: [runnerId](#runnerid) &mdash; The first line of the stf file.

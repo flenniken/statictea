@@ -3,7 +3,7 @@
 Functions for decoding and validating UTF-8.
 
 
-* [utf8decoder.nim](../src/utf8decoder.nim) &mdash; Nim source code.
+* [utf8decoder.nim](../../src/utf8decoder.nim) &mdash; Nim source code.
 # Index
 
 * [decode](#decode) &mdash; Interior part of a UTF-8 decoder.

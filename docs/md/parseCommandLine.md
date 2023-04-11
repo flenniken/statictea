@@ -3,7 +3,7 @@
 Parse the StaticTea terminal command line and return the arguments.
 
 
-* [parseCommandLine.nim](../src/parseCommandLine.nim) &mdash; Nim source code.
+* [parseCommandLine.nim](../../src/parseCommandLine.nim) &mdash; Nim source code.
 # Index
 
 * [parseCommandLine](#parsecommandline) &mdash; Parse the terminal command line.

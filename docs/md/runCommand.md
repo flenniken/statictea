@@ -3,7 +3,7 @@
 Run a command and fill in the variables dictionaries.
 
 
-* [runCommand.nim](../src/runCommand.nim) &mdash; Nim source code.
+* [runCommand.nim](../../src/runCommand.nim) &mdash; Nim source code.
 # Index
 
 * const: [tripleQuotes](#triplequotes) &mdash; Triple quotes for building strings.

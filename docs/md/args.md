@@ -3,7 +3,7 @@
 Types for handling command line arguments.
 
 
-* [args.nim](../src/args.nim) &mdash; Nim source code.
+* [args.nim](../../src/args.nim) &mdash; Nim source code.
 # Index
 
 * type: [Prepost](#prepost) &mdash; Prepost holds one prefix and its associated postfix.

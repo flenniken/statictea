@@ -4,7 +4,7 @@ Parse the simple markdown used in the function descriptions and
 highlight statictea code.
 
 
-* [parseMarkdown.nim](../src/parseMarkdown.nim) &mdash; Nim source code.
+* [parseMarkdown.nim](../../src/parseMarkdown.nim) &mdash; Nim source code.
 # Index
 
 * type: [BlockElementTag](#blockelementtag) &mdash; The supported markdown elements.

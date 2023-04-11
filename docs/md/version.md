@@ -3,7 +3,7 @@
 The current StaticTea version number.
 
 
-* [version.nim](../src/version.nim) &mdash; Nim source code.
+* [version.nim](../../src/version.nim) &mdash; Nim source code.
 # Index
 
 * const: [staticteaVersion](#staticteaversion) &mdash; The statictea version number.

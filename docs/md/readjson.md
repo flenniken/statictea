@@ -3,7 +3,7 @@
 Read json content.
 
 
-* [readjson.nim](../src/readjson.nim) &mdash; Nim source code.
+* [readjson.nim](../../src/readjson.nim) &mdash; Nim source code.
 # Index
 
 * const: [maxDepth](#maxdepth) &mdash; The maximum depth you can nest items.
@@ -81,7 +81,7 @@ Popular characters and their escape values:
 │char │ name            │ unicode│
 ├─────┼─────────────────┼────────┤
 │"    │ quotation mark  │ U+0022 │
-│\\   │ reverse solidus │ U+005C │
+│\    │ reverse solidus │ U+005C │
 │/    │ solidus         │ U+002F │
 │b    │ backspace       │ U+0008 │
 │f    │ form feed       │ U+000C │

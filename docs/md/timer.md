@@ -11,7 +11,7 @@ echo timer.seconds()
 ~~~
 
 
-* [timer.nim](../src/timer.nim) &mdash; Nim source code.
+* [timer.nim](../../src/timer.nim) &mdash; Nim source code.
 # Index
 
 * type: [Timer](#timer) &mdash; Holds the start time in seconds.

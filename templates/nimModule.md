@@ -6,7 +6,7 @@ $$ block
 
 {o.moduleDescription}
 
-* [{o.moduleName}](../src/{o.moduleName}) &mdash; Nim source code.
+* [{o.moduleName}](../../src/{o.moduleName}) &mdash; Nim source code.
 $$ endblock
 $$ #
 $$ # Show the index label when there are entries.

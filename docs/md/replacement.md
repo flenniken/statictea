@@ -27,7 +27,7 @@ To use a left bracket in a replacement block you use two left brackets, {{,
 {{ results in {.
 
 
-* [replacement.nim](../src/replacement.nim) &mdash; Nim source code.
+* [replacement.nim](../../src/replacement.nim) &mdash; Nim source code.
 # Index
 
 * type: [ReplaceLineKind](#replacelinekind) &mdash; Line type returned by yieldReplacementLine.

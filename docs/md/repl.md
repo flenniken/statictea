@@ -4,7 +4,7 @@ Run commands at a prompt.
 Run evaluate print loop (REPL).
 
 
-* [repl.nim](../src/repl.nim) &mdash; Nim source code.
+* [repl.nim](../../src/repl.nim) &mdash; Nim source code.
 # Index
 
 * const: [replHelp](#replhelp) &mdash; Help text.

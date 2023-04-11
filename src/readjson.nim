@@ -132,7 +132,7 @@ func unescapePopularChar*(popular: char): char =
   ## │char │ name            │ unicode│
   ## ├─────┼─────────────────┼────────┤
   ## │"    │ quotation mark  │ U+0022 │
-  ## │\\   │ reverse solidus │ U+005C │
+  ## │\    │ reverse solidus │ U+005C │
   ## │/    │ solidus         │ U+002F │
   ## │b    │ backspace       │ U+0008 │
   ## │f    │ form feed       │ U+000C │

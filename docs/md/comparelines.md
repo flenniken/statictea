@@ -3,7 +3,7 @@
 Compare lines of text.
 
 
-* [comparelines.nim](../src/comparelines.nim) &mdash; Nim source code.
+* [comparelines.nim](../../src/comparelines.nim) &mdash; Nim source code.
 # Index
 
 * type: [OpResultStr](#opresultstr) &mdash; On success return T, otherwise return a message telling what went wrong.

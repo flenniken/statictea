@@ -26,7 +26,7 @@ check line2 == "line 2"
 ~~~
 
 
-* [tempFile.nim](../src/tempFile.nim) &mdash; Nim source code.
+* [tempFile.nim](../../src/tempFile.nim) &mdash; Nim source code.
 # Index
 
 * type: [TempFile](#tempfile) &mdash; Temporary filename and associated file object.

@@ -3,7 +3,7 @@
 Messages IDs and associated strings and routines to get them.
 
 
-* [messages.nim](../src/messages.nim) &mdash; Nim source code.
+* [messages.nim](../../src/messages.nim) &mdash; Nim source code.
 # Index
 
 * type: [MessageId](#messageid) &mdash; Message numbers.

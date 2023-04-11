@@ -3,7 +3,7 @@
 Functions that deal with Unicode.
 
 
-* [unicodes.nim](../src/unicodes.nim) &mdash; Nim source code.
+* [unicodes.nim](../../src/unicodes.nim) &mdash; Nim source code.
 # Index
 
 * [cmpString](#cmpstring) &mdash; Compares two UTF-8 strings a and b.

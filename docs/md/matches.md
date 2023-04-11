@@ -3,7 +3,7 @@
 Methods for matching sub-strings.
 
 
-* [matches.nim](../src/matches.nim) &mdash; Nim source code.
+* [matches.nim](../../src/matches.nim) &mdash; Nim source code.
 # Index
 
 * const: [commands](#commands) &mdash; The StaticTea commands.

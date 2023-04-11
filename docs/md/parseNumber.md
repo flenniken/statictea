@@ -4,7 +4,7 @@ Parse an int or float number string.  Return the number and
 position after the number.
 
 
-* [parseNumber.nim](../src/parseNumber.nim) &mdash; Nim source code.
+* [parseNumber.nim](../../src/parseNumber.nim) &mdash; Nim source code.
 # Index
 
 * [parseFloat](#parsefloat) &mdash; Parse the string and return the 64 bit float number and the position after the number.

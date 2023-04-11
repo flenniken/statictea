@@ -3,7 +3,7 @@
 StaticTea variable types.
 
 
-* [vartypes.nim](../src/vartypes.nim) &mdash; Nim source code.
+* [vartypes.nim](../../src/vartypes.nim) &mdash; Nim source code.
 # Index
 
 * const: [variableStartChars](#variablestartchars) &mdash; The characters that make up a variable dotname.

@@ -3,7 +3,7 @@
 Statictea function signatures and parameter checking.
 
 
-* [signatures.nim](../src/signatures.nim) &mdash; Nim source code.
+* [signatures.nim](../../src/signatures.nim) &mdash; Nim source code.
 # Index
 
 * [paramCodeString](#paramcodestring) &mdash; Return a string representation of a ParamCode object.

@@ -5,7 +5,7 @@ Option type but instead of returning nothing, you return a message
 that tells why you cannot return the value.
 
 
-* [opresult.nim](../src/opresult.nim) &mdash; Nim source code.
+* [opresult.nim](../../src/opresult.nim) &mdash; Nim source code.
 # Index
 
 * type: [OpResultKind](#opresultkind) &mdash; The kind of OpResult object, either a message or a value.
