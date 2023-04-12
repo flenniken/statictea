@@ -187,10 +187,10 @@ proc deleteFolder*(folder: string): string =
     result = getCurrentExceptionMsg()
 
 when not defined(test):
-  proc getHelp(): string =
-    ## Return the help message and usage text.
-    result = """
-# Runner
+  const
+    runnerHelp* = """
+# Stf Runner
+## Help for stf runner
 
 Run a single test file (stf) or run all stf files in a folder.
 
@@ -248,9 +248,9 @@ Command line types:
 The first line of the stf file identifies it as a stf file and tells
 the version. For example:
 
-~~~
+```
 stf file, version 0.1.0
-~~~
+```
 
 ### File Line
 
@@ -260,19 +260,19 @@ starts with "### File" must be a file type line.
 
 The general form of a file line is:
 
-~~~
+```
 ### File filename [noLineEnding] [command] [nonZeroReturn]
-~~~
+```
 
 Example file lines:
 
-~~~
+```
 ### File server.json
 ### File cmd.sh command
 ### File result.expected noLineEnding
 ### File cmd.sh command nonZeroReturn
 ### File cmd.sh command nonZeroReturn noLineEnding
-~~~
+```
 
 File Attributes:
 
@@ -311,17 +311,17 @@ the word "empty" for in place of a filename when you expect the file
 to be empty. A line that starts with "### Expected " must be an
 expected line.
 
-~~~
+```
 ### Expected gotFilename == expectedFilename
-~~~
+```
 
 Examples:
 
-~~~
+```
 ### Expected result == result.expected
 ### Expected t.txt == t.txt.expected
 ### Expected t.txt == empty
-~~~
+```
 
 ### Comments
 
@@ -330,6 +330,7 @@ syntax error.  The only possible syntax errors are with the id line,
 file lines and expected lines.
 
 """
+      ## Runner help text.
 
 func letterToWord(letter: char): OpResultStr[string] =
   ## Convert the one letter switch to its long form.
@@ -794,7 +795,7 @@ when not defined(test):
     ## successful.
 
     if args.help:
-      echo getHelp()
+      echo runnerHelp
     elif args.version:
       echo runnerId
     elif args.filename != "":

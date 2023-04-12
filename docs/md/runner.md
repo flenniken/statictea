@@ -42,6 +42,7 @@ glow.
 * [writeErr](#writeerr) &mdash; Write a message to stderr.
 * [createFolder](#createfolder) &mdash; Create a folder with the given name.
 * [deleteFolder](#deletefolder) &mdash; Delete a folder with the given name.
+* const: [runnerHelp](#runnerhelp) &mdash; Help for stf runner 
 * [parseRunCommandLine](#parseruncommandline) &mdash; Parse the command line arguments.
 * [isRunFileLine](#isrunfileline) &mdash; Return true when the line is a file line.
 * [isExpectedLine](#isexpectedline) &mdash; Return true when the line is an expected line.
@@ -315,6 +316,155 @@ deleted return a message telling why, else return "".
 ~~~nim
 proc deleteFolder(folder: string): string {.raises: [],
     tags: [WriteDirEffect, ReadDirEffect].}
+~~~
+
+# runnerHelp
+
+Help for stf runner
+
+
+~~~nim
+runnerHelp = """# Stf Runner
+## Help for stf runner
+
+Run a single test file (stf) or run all stf files in a folder.
+
+The runner reads a stf file, creates multiple small files in a test
+folder, runs files then verifies the files contain the correct data.
+
+A stf file is designed to look good in a markdown reader. You can use
+the .stf or .stf.md extention.
+
+## Usage
+
+runner [-h] [-v] [-l] [-f=filename] [-d=directory]
+
+* -h --help          Show this help message.
+* -v --version       Show the version number.
+* -l --leaveTempDir  Leave the temp folder.
+* -f --filename      Run the stf file.
+* -d --directory     Run the stf files (.stf or .stf.md) in the directory.
+
+## Processing Steps
+
+The stf file runner processes the file tasks in the following order:
+
+* create temp folder
+* create files in the temp folder
+* runs command type files
+* compares files
+* removes the temp folder
+
+The temp folder is created in the same folder as the stf file using
+the stf name with ".tempdir" append.
+
+Normally the temp folder is removed after running. The -l option
+leaves the folder for debugging purposes. If the temp folder exists
+when running, it is deleted, then recreated, then deleted when done.
+
+Runner returns 0 when all the tests pass. When running multiple stf
+files, it displays each test run and tells how many passed and failed.
+
+## Stf File Format
+
+The Single Test File format is a text file made up of single line
+commands.
+
+Command line types:
+
+1. id line
+2. file lines
+3. file blocks
+4. expected lines
+5. comment lines
+
+### Id Line
+
+The first line of the stf file identifies it as a stf file and tells
+the version. For example:
+
+```
+stf file, version 0.1.0
+```
+
+### File Line
+
+The file line is used to create a file. It starts with "### File "
+followed by the filename then some optional attributes. A line that
+starts with "### File" must be a file type line.
+
+The general form of a file line is:
+
+```
+### File filename [noLineEnding] [command] [nonZeroReturn]
+```
+
+Example file lines:
+
+```
+### File server.json
+### File cmd.sh command
+### File result.expected noLineEnding
+### File cmd.sh command nonZeroReturn
+### File cmd.sh command nonZeroReturn noLineEnding
+```
+
+File Attributes:
+
+* **filename** - the name of the file to create.
+
+The name is required and cannot contain spaces. The file is created in
+the temp folder.
+
+* **command** — marks this file to be run.
+
+All files are created before any command runs. The file is run in the
+temp folder as the working directory. The commands are run in the
+order specified in the file.
+
+* **nonZeroReturn** — the command returns non-zero on success
+
+Normally the runner fails when a command returns a non-zero return
+code.  With nonZeroReturn set, it fails when it returns zero.
+
+* **noLineEnding** — create the file without an ending newline.
+
+### File Block Lines
+
+The content of a file is bracketed by markdown code blocks, either
+"~~~" or "```".  The block follows a file line. The first block found
+is used, so you can have blocks as comments too.  All content up to
+the ending code marker go in the file, even lines that look like
+commands. You follow the ~~~ with a code name, e.g. javascript, for
+syntax highlighting.
+
+### Expected Line
+
+The expected line compares files. You specify two files that should be
+equal.  The compares are run after running the commands. You can use
+the word "empty" for in place of a filename when you expect the file
+to be empty. A line that starts with "### Expected " must be an
+expected line.
+
+```
+### Expected gotFilename == expectedFilename
+```
+
+Examples:
+
+```
+### Expected result == result.expected
+### Expected t.txt == t.txt.expected
+### Expected t.txt == empty
+```
+
+### Comments
+
+Comments are all the other lines of the file. So it is hard to make a
+syntax error.  The only possible syntax errors are with the id line,
+file lines and expected lines.
+
+"""
 ~~~
 
 # parseRunCommandLine

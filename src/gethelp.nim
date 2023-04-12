@@ -1,15 +1,14 @@
 ## Get the command line help message.
 
-func getHelp*(): string =
-  ## Get the command line help message.
-  result = """
+const
+  helpText* = """
 NAME
 
      statictea - combines a template with JSON to produce a result
 
 SYNOPSIS
 
-     statictea [-h] [-v] [-x] [-u] [-s server.json] [-o codefile.tea] 
+     statictea [-h] [-v] [-x] [-u] [-s server.json] [-o codefile.tea]
          [-t template.html] [-p "prefix[,postfix]"] [-r result.html]
 
 DESCRIPTION
@@ -93,3 +92,4 @@ EXAMPES
 SEE ALSO
      For more information see https://github.com/flenniken/statictea
 """
+   ## StaticTea help text.

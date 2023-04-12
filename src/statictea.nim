@@ -18,7 +18,7 @@ when isMainModule:
 proc processArgs(env: var Env, args: Args) =
   ## Run the option specified.
   if args.help:
-    env.writeOut(getHelp())
+    env.writeOut(helpText)
   elif args.version:
     env.writeOut(staticteaVersion)
   elif args.repl:
