@@ -1,6 +1,6 @@
 # Stf Test Files
 
-Here are all the Statictea stf tests:
+Stf (single test file) tests found in the testfiles folder.
 
 $$ # Sort the index by filename.
 $$ block

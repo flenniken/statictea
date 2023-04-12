@@ -1,6 +1,6 @@
 # Stf Test Files
 
-Here are all the Statictea stf tests:
+Stf (single test file) tests found in the testfiles folder.
 
 * [and-or](../testfiles/and-or.stf.md) &mdash; Test the and and or functions.
 * [block-readme](../testfiles/block-readme.stf.md) &mdash; Test the readme block example.
