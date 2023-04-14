@@ -387,8 +387,8 @@ See [[#trow][t.row]] for an example.
 :END:
 
 You create a new variable with a statement. A statement is an
-expression consisting of a variable, an operator and a right hand
-side.
+expression consisting of a variable name, an operator and a right
+hand side.
 
 The operator is an equal sign or an "&=". The equal sign appends
 to a dictionary and the &= appends to a list.
@@ -814,7 +814,9 @@ visible inside user defined functions so you don’t need to pass
 them in.  You specify the u prefix when defining and calling the
 function.
 
-Only user function variables are allowed in the u dictionary. 
+Only user function variables are allowed in the u
+dictionary. Below is an example of defining u.myCmp and calling
+it:
 
 #+BEGIN_SRC nim
 u.myCmp = func(…) int
@@ -1361,7 +1363,7 @@ tea = "Eary Grey"
 
 You access a dict element with a dot name, bracket notation or
 with the get function. If the key is an invalid variable name,
-cannot access it using dot notation.
+you cannot access it using dot notation.
 
 The get function has an optional default parameter that's used
 when the key doesn't exist (the z case below).
@@ -1373,9 +1375,9 @@ y = get(d, "y") # => 200
 z = get(d, "z", 300) # => 300
 #+END_SRC
 
-The server json data becomes the s dictionary. For example below
-s contains three top level elements, a, b and d. A and b are
-integers and d is a dictionary with elements x and y.
+The server json data becomes the s dictionary. For the example
+below s contains three top level elements, a, b and d. A and b
+are integers and d is a dictionary with elements x and y.
 
 server json:
 
@@ -2552,7 +2554,7 @@ Nimble Tasks:
 - *docmix*:  Create markdown docs index (docs/md/index.md).
 - *dochix*:  Create html docs index (docs/html/index.html).
 - *jsonix*:  Display docs index json.
-- *json*:  Display one or more source file's json doc comments; specify part of the name.
+- *json*:  Display a source file's json doc comments; specify part of the name.
 - *teafuncs*:  Create the function docs (docs/teaFunctions.md).
 - *dyfuncs*:  Create the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).
 - *dotsrc*:  Create source module dependency graph (docs/staticteadep.svg).
@@ -2567,14 +2569,15 @@ Nimble Tasks:
 - *newstf*:  Create new stf test skeleton, specify a name no ext.
 - *runhelp*:  Show the runner help text with glow.
 - *helpme*:  Show the statictea help text.
-- *remote*:  Check whether the utf8decoder module needs updating.
 - *cmdline*:  Build cmdline test app (bin/x/cmdline).
-- *drun*:  Run a statictea debian docker build env.
+- *jsondoc*:  Build jsondocraw app (bin/x/jsondocraw).
+- *drun*:  Run a statictea debian docker build environment
 - *ddelete*:  Delete the statictea docker image and container.
 - *dlist*:  List the docker image and container.
 - *clean*:  Remove all the binaries so everything gets built next time.
 - *replace*:  Show pattern for text search and replace in all the nim source files.
-- *tea2html*:  Create one or more html docs from the templates dir; specify part of the name.
+- *tea2html*:  Create one or more html docs from the templates
+  dir; specify part of the name.
 
 [[#contents][茶]]
 
