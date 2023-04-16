@@ -2328,9 +2328,10 @@ the normal form:
 - log - writes a message to the log file and has a bare form
 - func - defines a function, see [[#user-functions][User Functions]]
 - listLoop — has a bare form
+- case — conditionally evaluates its arguments
 
 If the form doesn't have an assignment it's called a bare
-function. The warn, return, if and log have bare forms.
+function. The warn, return, if, listLoop and log have bare forms.
 
 Special Form Examples:
 
@@ -2345,6 +2346,7 @@ v = or(c, d)
 warn(“the tea is hot”)
 return(1)
 log("log message")
+a = case(22, [11, 1, 22, 2])
 #+END_SRC
 
 [[#contents][茶]]

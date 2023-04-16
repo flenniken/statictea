@@ -2327,7 +2327,7 @@ func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunRe
   result = newFunResult(details)
 
 func fun_startsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Check whether a strings starts with the given prefix. Return true
+  ## Check whether a string starts with the given prefix. Return true
   ## when it does, else false.
   ##
   ## ~~~statictea

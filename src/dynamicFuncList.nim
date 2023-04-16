@@ -1637,7 +1637,7 @@ sort(dicts, "descending", "sensitive", "name") # [d2, d1]
 """
 
   dc_fun_startsWith_ssb = """
-Check whether a strings starts with the given prefix. Return true
+Check whether a string starts with the given prefix. Return true
 when it does, else false.
 
 ~~~statictea

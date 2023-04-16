@@ -75,7 +75,7 @@ function implements the "cmp" function for floats.
 * [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a replacement block.
 * [fun_func_sp](#fun_func_sp) &mdash; Define a function.
 * [fun_functionDetails_pd](#fun_functiondetails_pd) &mdash; Return the function details in a dictionary.
-* [fun_startsWith_ssb](#fun_startswith_ssb) &mdash; Check whether a strings starts with the given prefix.
+* [fun_startsWith_ssb](#fun_startswith_ssb) &mdash; Check whether a string starts with the given prefix.
 * [fun_not_bb](#fun_not_bb) &mdash; Boolean not.
 * [fun_and_bbb](#fun_and_bbb) &mdash; Boolean AND with short circuit.
 * [fun_or_bbb](#fun_or_bbb) &mdash; Boolean OR with short circuit.
@@ -1922,7 +1922,7 @@ func fun_functionDetails_pd(variables: Variables; arguments: seq[Value]): FunRes
 
 # fun_startsWith_ssb
 
-Check whether a strings starts with the given prefix. Return true
+Check whether a string starts with the given prefix. Return true
 when it does, else false.
 
 ~~~javascript

@@ -77,7 +77,7 @@ variable or pass to another function.
 * [sort](#sort) &mdash; Sort a list of values of the same type.
 * [sort](#sort-1) &mdash; Sort a list of lists.
 * [sort](#sort-2) &mdash; Sort a list of dictionaries.
-* [startsWith](#startswith) &mdash; Check whether a strings starts with the given prefix.
+* [startsWith](#startswith) &mdash; Check whether a string starts with the given prefix.
 * [string](#string) &mdash; Convert a variable to a string.
 * [string](#string-1) &mdash; Convert the dictionary variable to dot names.
 * [sub](#sub) &mdash; Subtract two floats.
@@ -1788,7 +1788,7 @@ sort(dicts, "descending", "sensitive", "name") # [d2, d1]
 
 # startsWith
 
-Check whether a strings starts with the given prefix. Return true
+Check whether a string starts with the given prefix. Return true
 when it does, else false.
 
 ~~~javascript
