@@ -24,19 +24,19 @@ $$ nextline a = warn("warn1: My message that's always output.")
 next line case
 
 $$ block
-$$ : a = if0(0, warn("warn2: conditional warning"), 2)
+$$ : a = if(true, warn("warn2: conditional warning"), 2)
 a = {a} -- missing
 $$ endblock
 
 $$ block
-$$ : a = if0(1, warn("warning not hit"), 2)
+$$ : a = if(false, warn("warning not hit"), 2)
 a = {a} = 2
 $$ endblock
 
 $$ block
-$$ : a = if0(0, warn("warn3: conditional warning"), "a")
-$$ : b = if0(1, warn("b warning not hit"), "b")
-$$ : c = if0(0, warn("warn4: conditional warning"), "c")
+$$ : a = if(true, warn("warn3: conditional warning"), "a")
+$$ : b = if(false, warn("b warning not hit"), "b")
+$$ : c = if(true, warn("warn4: conditional warning"), "c")
 a = {a} = missing
 b = {b} = b
 c = {c} = missing
@@ -44,8 +44,8 @@ $$ endblock
 
 $$ block
 $$ : warn("warn5: bare warning")
-$$ : if0(0, warn("warn6: warning in bare if")
-$$ : if0(2, warn("not hit"))
+$$ : if(true, warn("warn6: warning in bare if")
+$$ : if(false, warn("not hit"))
 $$ endblock
 ~~~
 

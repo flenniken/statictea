@@ -65,7 +65,7 @@ $$ :
 $$ : parts &= if((len(t.args.resultFilename) == 0), "", +
 $$ :   join([" --result ", t.args.resultFilename]))
 $$ :
-$$ : parts &= if0(len(t.args.logFilename), "", +
+$$ : parts &= if( (len(t.args.logFilename)==0), "", +
 $$ :   join([" --log ", t.args.logFilename]))
 $$ :
 $$ : parts &= join(g.serverParts)

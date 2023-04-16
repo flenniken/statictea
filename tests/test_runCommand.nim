@@ -1114,16 +1114,6 @@ statement: tea = a123
     let eVariableDataOr = newVariableDataOr(wWrongType, "string", 26)
     check testRunStatement(statement, eVariableDataOr)
 
-  test "getFragmentAndPos":
-    let text = """a = if0(1, missing(["123", cat(4, 5)], cat()), len("ab") )"""
-    let statement = newStatement(text, lineNum=1)
-    var (fragment, pointerPos) = getFragmentAndPos(statement, 4)
-    check fragment == text
-    check pointerPos == 4
-    (fragment, pointerPos) = getFragmentAndPos(statement, 20)
-    check fragment == text
-    check pointerPos == 20
-
   test "incomplete function":
     let statement = newStatement(text="""a = len("asdf"""", lineNum=1)
     let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 14)
@@ -1227,47 +1217,6 @@ statement: tea = a123
     let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(2))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "if0 when 0":
-    let statement = newStatement(text="""a = if0(0, 1, 2)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 when 0.0":
-    let statement = newStatement(text="""a = if0(0.0, 1, 2)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 when empty string":
-    let statement = newStatement(text="""a = if0("", 1, 2)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 when empty list":
-    let statement = newStatement(text="""a = if0([], 1, 2)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 when empty dict":
-    let statement = newStatement(text="""a = if0(dict(), 1, 2)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(1))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 when not empty list":
-    let statement = newStatement(text="""a = if0([4], 1, 2)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(2))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 skipping":
-    let text = """a = if0(0, len("123"), len("ab") )"""
-    let statement = newStatement(text, lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(3))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 missing":
-    let text = """a = if0(0, len("123"), missing("ab") )"""
-    let statement = newStatement(text, lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(3))
-    check testRunStatement(statement, eVariableDataOr)
 
   test "true two parameter if":
     let text = """a = if(true, "abc")"""
@@ -1275,20 +1224,8 @@ statement: tea = a123
     let eVariableDataOr = newVariableDataOr("a", opEqual, newValue("abc"))
     check testRunStatement(statement, eVariableDataOr)
 
-  test "true two parameter if0":
-    let text = """a = if0(0, "abc")"""
-    let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue("abc"))
-    check testRunStatement(statement, eVariableDataOr)
-
   test "false two parameter if":
     let text = """a = if(false, "abc")"""
-    let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "false two parameter if0":
-    let text = """a = if0(1, "abc")"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
@@ -1321,12 +1258,6 @@ statement: tea = a123
     let text = """a = warn("hello", 4)"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr(wTooManyArgs, "1", 18)
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "if0 missing required":
-    let text = """a = b"""
-    let statement = newStatement(text, lineNum=1)
-    let eVariableDataOr = newVariableDataOr(wNotInL, "b", 4)
     check testRunStatement(statement, eVariableDataOr)
 
   test "slice":
@@ -1384,39 +1315,39 @@ statement: tea = a123
     check testRunStatement(statement, eVariableDataOr)
 
   test "return stop nested":
-    let text = """a = if0(0, return("stop"))"""
+    let text = """a = if(true, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 11)
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 13)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if missing right paren":
-    let text = """a = if0(1, return("stop"), 2"""
+    let text = """a = if(false, return("stop"), 2"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wNoMatchingParen, "", 28)
+    let eVariableDataOr = newVariableDataOr(wNoMatchingParen, "", 31)
     check testRunStatement(statement, eVariableDataOr)
 
   test "if missing right paren 2":
-    let text = """if0(1, return("stop")"""
+    let text = """if(false, return("stop")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wNoMatchingParen, "", 21)
+    let eVariableDataOr = newVariableDataOr(wNoMatchingParen, "", 24)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return no stop":
-    let text = """a = if0(0, [1,2,return("stop")])"""
+    let text = """a = if(true, [1,2,return("stop")])"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 16)
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 18)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return cond stop":
-    let text = """a = if0(return("stop"),5)"""
+    let text = """a = if(return("stop"),5)"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 8)
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 7)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return third stop":
-    let text = """a = if0(1, 5, return("stop"))"""
+    let text = """a = if(false, 5, return("stop"))"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 14)
+    let eVariableDataOr = newVariableDataOr(wReturnArgument, "", 17)
     check testRunStatement(statement, eVariableDataOr)
 
   test "return third stop":
@@ -1426,33 +1357,33 @@ statement: tea = a123
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if taken":
-    let text = """if0(0, return("stop"))"""
+    let text = """if(true, return("stop"))"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr("", opReturn, newValue("stop"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if not taken":
-    let text = """if0(1, return("stop"))"""
+    let text = """if(false, return("stop"))"""
     let statement = newStatement(text)
     let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if takes two args":
-    let text = """if0(0, "second", "third")"""
+    let text = """if(true, "second", "third")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wBareIfTwoArguments, "", 15)
+    let eVariableDataOr = newVariableDataOr(wBareIfTwoArguments, "", 17)
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare if third":
-    let text = """if0(1, "second", "third")"""
+    let text = """if(false, "second", "third")"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wBareIfTwoArguments, "", 15)
+    let eVariableDataOr = newVariableDataOr(wBareIfTwoArguments, "", 18)
     check testRunStatement(statement, eVariableDataOr)
 
   test "bare extra":
-    let text = """if0(1, len("got one")) junk"""
+    let text = """if(false, len("got one")) junk"""
     let statement = newStatement(text)
-    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 23)
+    let eVariableDataOr = newVariableDataOr(wTextAfterValue, "", 26)
     check testRunStatement(statement, eVariableDataOr)
 
   test "empty line":
@@ -2465,8 +2396,8 @@ statement: g.a = 5
 
   test "runCodeFile warn":
     let content = """
-if0(0, warn("hello"))
-v = if0(1, warn("not this"), 5)
+if(true, warn("hello"))
+v = if(false, warn("not this"), 5)
 a = warn("there")
 """
     let eVarRep = """
@@ -2483,9 +2414,9 @@ testcode.tea(3): there
     let content = """
 a = 1
 b = 2
-if0(a, return("stop"))
+if( (a != 1), return("stop"))
 c = 4
-if0(cmp(1,a), return("stop"))
+if( (a == 1), return("stop"))
 end = 5
 """
     let eVarRep = """
@@ -2501,7 +2432,7 @@ o = {}
   test "runCodeFile return warning":
     let content = """
 a = 1
-c = if0(0, return("skip"))
+c = if(true, return("skip"))
 b = 2
 """
     let eVarRep = """
@@ -2511,8 +2442,8 @@ o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(2): w255: Invalid return; use a bare return in a user function or use it in a bare if statement.
-statement: c = if0(0, return("skip"))
-                      ^
+statement: c = if(true, return("skip"))
+                        ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines = eErrLines)
 

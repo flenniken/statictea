@@ -16,7 +16,7 @@ $statictea \
 ### File tmpl.txt
 
 ~~~
-$$ block a = if0(1, warn("shouldn't run"), "OK")
+$$ block a = if(false, warn("shouldn't run"), "OK")
 {a}
 $$ endblock
 ~~~

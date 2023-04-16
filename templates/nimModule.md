@@ -12,7 +12,7 @@ $$ #
 $$ # Show the index label when there are entries.
 $$ #
 $$ nextline
-$$ : t.repeat = if0(o.entries, 0, 1)
+$$ : t.repeat = if( (len(o.entries) == 0), 0, 1)
 # Index
 
 $$ # Create the index when there are entries.

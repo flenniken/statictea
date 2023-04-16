@@ -24,20 +24,10 @@ $$ : drink2 = if(false, "tea", "beer")
 {drink2} = beer
 $$ endblock
 
-Test three parameter if0.
-$$ block
-$$ : drink1 = if0(0, "tea", "beer")
-$$ : drink2 = if0(1, "tea", "beer")
-$$ : drink3 = if0(4, "tea", "beer")
-{drink1} = tea
-{drink2} = beer
-{drink3} = beer
-$$ endblock
-
 Test three parameter if as an argument.
 $$ block
-$$ : drink1 = len(if0(0, "tea", "beer"))
-$$ : drink2 = len(if0(1, "tea", "beer"))
+$$ : drink1 = len(if(true, "tea", "beer"))
+$$ : drink2 = len(if(false, "tea", "beer"))
 {drink1} = 3
 {drink2} = 4
 $$ endblock
@@ -69,11 +59,6 @@ Test three parameter if.
 tea = tea
 beer = beer
 
-Test three parameter if0.
-tea = tea
-beer = beer
-beer = beer
-
 Test three parameter if as an argument.
 3 = 3
 4 = 4
@@ -93,25 +78,25 @@ Test with 1 args, expect warnings.
 ### File stderr.expected
 
 ~~~
-tmpl.txt(29): w213: A bare IF without an assignment takes two arguments.
+tmpl.txt(19): w213: A bare IF without an assignment takes two arguments.
 statement: if(true, "tea", "beer")
                          ^
-tmpl.txt(34): w203: No matching end right parentheses.
+tmpl.txt(24): w203: No matching end right parentheses.
 statement: a = if(true, "tea", "beer", "wine")
                                      ^
-tmpl.txt(35): w213: A bare IF without an assignment takes two arguments.
+tmpl.txt(25): w213: A bare IF without an assignment takes two arguments.
 statement: if(true, "tea", "beer", "wine")
                          ^
-tmpl.txt(40): w179: The function requires at least 2 arguments.
+tmpl.txt(30): w179: The function requires at least 2 arguments.
 statement: a = if(true)
                   ^
-tmpl.txt(41): w213: A bare IF without an assignment takes two arguments.
+tmpl.txt(31): w213: A bare IF without an assignment takes two arguments.
 statement: if(true)
               ^
-tmpl.txt(42): w179: The function requires at least 2 arguments.
+tmpl.txt(32): w179: The function requires at least 2 arguments.
 statement: a = if(false)
                   ^
-tmpl.txt(43): w213: A bare IF without an assignment takes two arguments.
+tmpl.txt(33): w213: A bare IF without an assignment takes two arguments.
 statement: if(false)
               ^
 ~~~
