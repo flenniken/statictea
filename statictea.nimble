@@ -1239,8 +1239,8 @@ task dlist, "\tList the docker image and container.":
     echo fmt"No {staticteaContainer}."
 
 task clean, "\tRemove all the binaries so everything gets built next time.":
-  # Remove all the bin and doc files.
-  let dirs = @[fmt"bin/{dirName}", "docs/html", "docs"]
+  # Remove all the bin and some doc files.
+  let dirs = @[fmt"bin/{dirName}", "docs/html", "docs/md"]
   for dir in dirs:
     let list = listFiles(dir)
     for filename in list:
