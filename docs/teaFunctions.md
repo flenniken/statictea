@@ -41,7 +41,6 @@ variable or pass to another function.
 * [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
 * [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
 * [html](#html) &mdash; Escape text for placing it in an html page.
-* [if0](#if0) &mdash; If the condition is 0, return the second argument, else return the third argument.
 * [if](#if) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [int](#int) &mdash; Create an int from a float.
 * [int](#int-1) &mdash; Create an int from a number string.
@@ -802,58 +801,6 @@ For more information about how to escape and what is safe see:
 
 
 
-# if0
-
-If the condition is 0, return the second argument, else return
-the third argument.  You can use any type for the condition.  The
-condition is 0 for strings, lists and dictionaries when their
-length is 0.
-
-The condition types and what is considered 0:
-
-* **bool** — false
-* **int** — 0
-* **float** — 0.0
-* **string** — when the length of the string is 0
-* **list** — when the length of the list is 0
-* **dict** — when the length of the dictionary is 0
-* **func** — always 0
-
-The IF functions are special in a couple of ways, see
-the If Functions section.
-
-~~~javascript
-if0 = func(condition: any, then: any, else: optional any) any
-~~~
-
-Examples:
-
-~~~javascript
-a = if0(0, "tea", "beer") # tea
-a = if0(1, "tea", "beer") # beer
-a = if0(4, "tea", "beer") # beer
-a = if0("", "tea", "beer") # tea
-a = if0("abc", "tea", "beer") # beer
-a = if0([], "tea", "beer") # tea
-a = if0([1,2], "tea", "beer") # beer
-a = if0(dict(), "tea", "beer") # tea
-a = if0(dict("a",1), "tea", "beer") # beer
-a = if0(false, "tea", "beer") # tea
-a = if0(true, "tea", "beer") # beer
-a = if0(true, "tea") # no assignment
-a = if0(false, "tea") # tea
-~~~
-
-You don't have to assign the result of an if0 function which is
-useful when using a warn or return function for its side effects.
-The if takes two arguments when there is no assignment.
-
-~~~javascript
-if0(c, warn("got zero value"))
-~~~
-
-
-
 # if
 
 If the condition is true, return the second argument, else return
@@ -1184,7 +1131,7 @@ log = func(message: string) string
 You can log conditionally in a bare if statement:
 
 ~~~javascript
-if0(c, log("log this message when c is 0"))
+if(c, log("log this message when c is 0"))
 ~~~
 
 You can log unconditionally using a bare log statement:
@@ -1971,7 +1918,7 @@ warn = func(message: string) string
 You can warn conditionally in a bare if statement:
 
 ~~~javascript
-if0(c, warn("message is 0"))
+if(cond, warn("message is 0"))
 ~~~
 
 You can warn unconditionally using a bare warn statement:

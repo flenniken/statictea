@@ -111,7 +111,6 @@ gt(a: int, b: int) bool
 gte(a: float, b: float) bool
 gte(a: int, b: int) bool
 html(a: string, b: string) string
-if0(a: int, b: any, c: optional any) any
 if(a: bool, b: any, c: optional any) any
 int(a: float, b: optional string) int
 int(a: string, b: optional string) int

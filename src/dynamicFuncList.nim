@@ -689,57 +689,6 @@ For more information about how to escape and what is safe see:
 
 """
 
-  dc_fun_if0_iaoaa = """
-If the condition is 0, return the second argument, else return
-the third argument.  You can use any type for the condition.  The
-condition is 0 for strings, lists and dictionaries when their
-length is 0.
-
-The condition types and what is considered 0:
-
-* **bool** — false
-* **int** — 0
-* **float** — 0.0
-* **string** — when the length of the string is 0
-* **list** — when the length of the list is 0
-* **dict** — when the length of the dictionary is 0
-* **func** — always 0
-
-The IF functions are special in a couple of ways, see
-the If Functions section.
-
-~~~statictea
-if0 = func(condition: any, then: any, else: optional any) any
-~~~
-
-Examples:
-
-~~~statictea
-a = if0(0, "tea", "beer") # tea
-a = if0(1, "tea", "beer") # beer
-a = if0(4, "tea", "beer") # beer
-a = if0("", "tea", "beer") # tea
-a = if0("abc", "tea", "beer") # beer
-a = if0([], "tea", "beer") # tea
-a = if0([1,2], "tea", "beer") # beer
-a = if0(dict(), "tea", "beer") # tea
-a = if0(dict("a",1), "tea", "beer") # beer
-a = if0(false, "tea", "beer") # tea
-a = if0(true, "tea", "beer") # beer
-a = if0(true, "tea") # no assignment
-a = if0(false, "tea") # tea
-~~~
-
-You don't have to assign the result of an if0 function which is
-useful when using a warn or return function for its side effects.
-The if takes two arguments when there is no assignment.
-
-~~~statictea
-if0(c, warn("got zero value"))
-~~~
-
-"""
-
   dc_fun_if_baoaa = """
 If the condition is true, return the second argument, else return
 the third argument.
@@ -1057,7 +1006,7 @@ log = func(message: string) string
 You can log conditionally in a bare if statement:
 
 ~~~statictea
-if0(c, log("log this message when c is 0"))
+if(c, log("log this message when c is 0"))
 ~~~
 
 You can log unconditionally using a bare log statement:
@@ -1815,7 +1764,7 @@ warn = func(message: string) string
 You can warn conditionally in a bare if statement:
 
 ~~~statictea
-if0(c, warn("message is 0"))
+if(cond, warn("message is 0"))
 ~~~
 
 You can warn unconditionally using a bare warn statement:
@@ -1852,14 +1801,13 @@ warn("always warn")
     info("fun_format_ss", dc_fun_format_ss, 32),
     info("fun_func_sp", dc_fun_func_sp, 21),
     info("fun_functionDetails_pd", dc_fun_functionDetails_pd, 35),
-    info("fun_get_dsoaa", dc_fun_get_dsoaa, 39),
+    info("fun_get_dsoaa", dc_fun_get_dsoaa, 41),
     info("fun_get_lioaa", dc_fun_get_lioaa, 48),
     info("fun_gt_ffb", dc_fun_gt_ffb, 19),
     info("fun_gt_iib", dc_fun_gt_iib, 19),
     info("fun_gte_ffb", dc_fun_gte_ffb, 19),
     info("fun_gte_iib", dc_fun_gte_iib, 19),
     info("fun_html_sss", dc_fun_html_sss, 40),
-    info("fun_if0_iaoaa", dc_fun_if0_iaoaa, 57),
     info("fun_if_baoaa", dc_fun_if_baoaa, 40),
     info("fun_int_fosi", dc_fun_int_fosi, 35),
     info("fun_int_sosi", dc_fun_int_sosi, 42),
@@ -1911,80 +1859,79 @@ warn("always warn")
   # so when there are changes the diffs are easier to read.
 
   functionStarts = [
-    641,
-    617,
-    1816,
-    2342,
-    1085,
-    735,
-    780,
+    586,
+    562,
+    1761,
+    2287,
+    1030,
+    680,
+    725,
     323,
     302,
     344,
-    835,
-    1234,
-    1195,
-    2407,
-    2388,
-    2426,
-    713,
-    1122,
-    879,
-    922,
-    896,
-    2216,
-    2248,
-    2269,
+    780,
+    1179,
+    1140,
+    2352,
+    2333,
+    2371,
+    658,
+    1067,
+    824,
+    867,
+    841,
+    2161,
+    2193,
+    2214,
     481,
     433,
-    2522,
-    2503,
-    2560,
-    2541,
-    2835,
-    520,
-    577,
-    949,
-    984,
-    1026,
-    1937,
-    1907,
-    1583,
+    2467,
+    2448,
+    2505,
+    2486,
+    2780,
+    522,
+    894,
+    929,
+    971,
+    1882,
+    1852,
+    1528,
     414,
     395,
     377,
-    1271,
-    1292,
-    2001,
-    1564,
-    2598,
-    2579,
-    2637,
-    2617,
-    2465,
-    2446,
-    2484,
-    2324,
-    2365,
-    2759,
-    2680,
+    1216,
+    1237,
+    1946,
     1509,
-    2657,
-    1340,
-    1450,
-    2025,
-    1160,
-    1730,
-    1762,
-    1789,
-    2304,
-    2088,
-    2192,
-    688,
-    664,
-    1854,
-    1607,
-    1976,
+    2543,
+    2524,
+    2582,
+    2562,
+    2410,
+    2391,
+    2429,
+    2269,
+    2310,
+    2704,
+    2625,
+    1454,
+    2602,
+    1285,
+    1395,
+    1970,
+    1105,
+    1675,
+    1707,
+    1734,
+    2249,
+    2033,
+    2137,
+    633,
+    609,
+    1799,
+    1552,
+    1921,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

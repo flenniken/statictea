@@ -55,8 +55,8 @@ Run a command and fill in the variables dictionaries.
 * [getString](#getstring) &mdash; Return a literal string value and position after it.
 * [getNumber](#getnumber) &mdash; Return the literal number value and position after it.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
-* [ifFunctions](#iffunctions) &mdash; Return the if/if0 function's value and position after.
-* [bareIfAndIf0](#bareifandif0) &mdash; Handle the bare if/if0.
+* [ifFunction](#iffunction) &mdash; Return the "if" function's value and position after.
+* [bareIf](#bareif) &mdash; Handle the bare IF.
 * [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
 * [getArguments](#getarguments) &mdash; Get the function arguments and the position of each.
 * [getFunctionValuePosSi](#getfunctionvaluepossi) &mdash; Return the function's value and the position after it.
@@ -67,7 +67,7 @@ Run a command and fill in the variables dictionaries.
 * [listLoop](#listloop) &mdash; Make a new list from an existing list.
 * [caseFunction](#casefunction) &mdash; Return the case function's value and position after.
 * [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
-* [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn, log and listLoop.
+* [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, return, warn, log and listLoop.
 * [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [skipSpaces](#skipspaces) &mdash; Skip the leading spaces and tabs.
@@ -113,7 +113,6 @@ The special functions.
 
 * spNotSpecial — not a special function
 * spIf — if function
-* spIf0 — if0 function
 * spWarn — warn function
 * spLog — log function
 * spReturn — return function
@@ -126,9 +125,9 @@ The special functions.
 
 ~~~nim
 SpecialFunction {.pure.} = enum
-  spNotSpecial = "not-special", spIf = "if", spIf0 = "if0", spWarn = "warn",
-  spLog = "log", spReturn = "return", spAnd = "and", spOr = "or",
-  spFunc = "func", spListLoop = "listLoop", spCase = "case"
+  spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
+  spReturn = "return", spAnd = "and", spOr = "or", spFunc = "func",
+  spListLoop = "listLoop", spCase = "case"
 ~~~
 
 # SpecialFunctionOr
@@ -638,9 +637,9 @@ a = fn( 1 , 2 )
 func skipArgument(statement: Statement; startPos: Natural): PosOr
 ~~~
 
-# ifFunctions
+# ifFunction
 
-Return the if/if0 function's value and position after. It
+Return the "if" function's value and position after. It
 conditionally runs one of its arguments and skips the
 other. Start points at the first argument of the function. The
 position includes the trailing whitespace after the ending ).
@@ -656,15 +655,15 @@ a = if(cond, then)
 
 
 ~~~nim
-proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
-                 statement: Statement; start: Natural; variables: Variables;
-                 topLevel = false): ValuePosSiOr {.
-    raises: [Exception, KeyError], tags: [RootEffect].}
+proc ifFunction(env: var Env; specialFunction: SpecialFunction;
+                statement: Statement; start: Natural; variables: Variables;
+                topLevel = false): ValuePosSiOr {.raises: [Exception, KeyError],
+    tags: [RootEffect].}
 ~~~
 
-# bareIfAndIf0
+# bareIf
 
-Handle the bare if/if0. Return the resulting value and the
+Handle the bare IF. Return the resulting value and the
 position in the statement after the if.
 
 ~~~javascript
@@ -676,8 +675,8 @@ if(c, warn("c is true"))
 
 
 ~~~nim
-proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
-                  statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
+proc bareIf(env: var Env; specialFunction: SpecialFunction;
+            statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 ~~~
 
@@ -887,7 +886,7 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 
 # runBareFunction
 
-Handle bare function: if, if0, return, warn, log and listLoop. A
+Handle bare function: if, return, warn, log and listLoop. A
 bare function does not assign a variable.
 
 ~~~javascript

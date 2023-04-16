@@ -37,7 +37,6 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_len_di">fun_len_di</a> &mdash; Number of elements in a dictionary.</li>
 <li> <a href="#fun_get_lioaa">fun_get_lioaa</a> &mdash; Get a list value by its index.</li>
 <li> <a href="#fun_get_dsoaa">fun_get_dsoaa</a> &mdash; Get a dictionary value by its key.</li>
-<li> <a href="#fun_if0_iaoaa">fun_if0_iaoaa</a> &mdash; If the condition is 0, return the second argument, else return the third argument.</li>
 <li> <a href="#fun_if_baoaa">fun_if_baoaa</a> &mdash; If the condition is true, return the second argument, else return the third argument.</li>
 <li> <a href="#fun_add_iii">fun_add_iii</a> &mdash; Add two integers.</li>
 <li> <a href="#fun_add_fff">fun_add_fff</a> &mdash; Add two floats.</li>
@@ -54,7 +53,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_int_fosi">fun_int_fosi</a> &mdash; Create an int from a float.</li>
 <li> <a href="#fun_int_sosi">fun_int_sosi</a> &mdash; Create an int from a number string.</li>
 <li> <a href="#fun_int_ssaa">fun_int_ssaa</a> &mdash; Create an int from a number string.</li>
-<li> <a href="#if0Condition">if0Condition</a> &mdash; Convert the value to a boolean.</li>
+<li> <a href="#boolConditions">boolConditions</a> &mdash; Convert the value to a boolean.</li>
 <li> <a href="#fun_bool_ab">fun_bool_ab</a> &mdash; Create an bool from a value.</li>
 <li> <a href="#fun_find_ssoaa">fun_find_ssoaa</a> &mdash; Find the position of a substring in a string.</li>
 <li> <a href="#fun_slice_siois">fun_slice_siois</a> &mdash; Extract a substring from a string by its position and length.</li>
@@ -449,63 +448,6 @@ Using dot notation:
 <pre class="nim-code">
 func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-</pre>
-
-<h3 id="fun_if0_iaoaa">fun_if0_iaoaa</h3>
-
-<p>If the condition is 0, return the second argument, else return
-the third argument.  You can use any type for the condition.  The
-condition is 0 for strings, lists and dictionaries when their
-length is 0.
-
-</p><p>The condition types and what is considered 0:
-
-</p><ul>
-<li><b>bool</b> — false
-</li><li><b>int</b> — 0
-</li><li><b>float</b> — 0.0
-</li><li><b>string</b> — when the length of the string is 0
-</li><li><b>list</b> — when the length of the list is 0
-</li><li><b>dict</b> — when the length of the dictionary is 0
-</li><li><b>func</b> — always 0
-
-</li></ul>
-<p>The IF functions are special in a couple of ways, see
-the If Functions section.
-
-</p><pre class="tea-code">
-<span class="t-dotName">if0</span> = <span class="t-funcCall">func</span>(<span class="t-param">condition</span>: <span class="t-type">any</span>, <span class="t-param">then</span>: <span class="t-type">any</span>, <span class="t-param">else</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
-</pre>
-<p>
-Examples:
-
-</p><pre class="tea-code">
-<span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">0</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># tea
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">1</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-num">4</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># tea
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>([], <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># tea
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>([<span class="t-num">1</span>,<span class="t-num">2</span>], <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-funcCall">dict</span>(), <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># tea
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>,<span class="t-num">1</span>), <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">false</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># tea
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">true</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">true</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># no assignment
-</span><span class="t-dotName">a</span> = <span class="t-funcCall">if0</span>(<span class="t-dotName">false</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># tea
-</span></pre>
-<p>
-You don&#x27;t have to assign the result of an if0 function which is
-useful when using a warn or return function for its side effects.
-The if takes two arguments when there is no assignment.
-
-</p><pre class="tea-code">
-<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;got zero value&quot;</span>))
-</pre>
-
-
-<pre class="nim-code">
-func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_if_baoaa">fun_if_baoaa</h3>
@@ -954,13 +896,13 @@ func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 </pre>
 
-<h3 id="if0Condition">if0Condition</h3>
+<h3 id="boolConditions">boolConditions</h3>
 
 <p>Convert the value to a boolean.
 </p>
 
 <pre class="nim-code">
-func if0Condition(cond: Value): bool
+func boolConditions(cond: Value): bool
 </pre>
 
 <h3 id="fun_bool_ab">fun_bool_ab</h3>
@@ -1628,7 +1570,7 @@ You can call the warn function without an assignment.
 You can warn conditionally in a bare if statement:
 
 </p><pre class="tea-code">
-<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;message is 0&quot;</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">cond</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;message is 0&quot;</span>))
 </pre>
 <p>
 You can warn unconditionally using a bare warn statement:
@@ -1655,7 +1597,7 @@ without an assignment.
 You can log conditionally in a bare if statement:
 
 </p><pre class="tea-code">
-<span class="t-funcCall">if0</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">log</span>(<span class="t-str">&quot;log this message when c is 0&quot;</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">log</span>(<span class="t-str">&quot;log this message when c is 0&quot;</span>))
 </pre>
 <p>
 You can log unconditionally using a bare log statement:

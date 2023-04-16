@@ -27,7 +27,6 @@ function implements the "cmp" function for floats.
 * [fun_len_di](#fun_len_di) &mdash; Number of elements in a dictionary.
 * [fun_get_lioaa](#fun_get_lioaa) &mdash; Get a list value by its index.
 * [fun_get_dsoaa](#fun_get_dsoaa) &mdash; Get a dictionary value by its key.
-* [fun_if0_iaoaa](#fun_if0_iaoaa) &mdash; If the condition is 0, return the second argument, else return the third argument.
 * [fun_if_baoaa](#fun_if_baoaa) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [fun_add_iii](#fun_add_iii) &mdash; Add two integers.
 * [fun_add_fff](#fun_add_fff) &mdash; Add two floats.
@@ -44,7 +43,7 @@ function implements the "cmp" function for floats.
 * [fun_int_fosi](#fun_int_fosi) &mdash; Create an int from a float.
 * [fun_int_sosi](#fun_int_sosi) &mdash; Create an int from a number string.
 * [fun_int_ssaa](#fun_int_ssaa) &mdash; Create an int from a number string.
-* [if0Condition](#if0condition) &mdash; Convert the value to a boolean.
+* [boolConditions](#boolconditions) &mdash; Convert the value to a boolean.
 * [fun_bool_ab](#fun_bool_ab) &mdash; Create an bool from a value.
 * [fun_find_ssoaa](#fun_find_ssoaa) &mdash; Find the position of a substring in a string.
 * [fun_slice_siois](#fun_slice_siois) &mdash; Extract a substring from a string by its position and length.
@@ -438,61 +437,6 @@ d.tea => "Earl Grey"
 ~~~nim
 func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
-~~~
-
-# fun_if0_iaoaa
-
-If the condition is 0, return the second argument, else return
-the third argument.  You can use any type for the condition.  The
-condition is 0 for strings, lists and dictionaries when their
-length is 0.
-
-The condition types and what is considered 0:
-
-* **bool** — false
-* **int** — 0
-* **float** — 0.0
-* **string** — when the length of the string is 0
-* **list** — when the length of the list is 0
-* **dict** — when the length of the dictionary is 0
-* **func** — always 0
-
-The IF functions are special in a couple of ways, see
-the If Functions section.
-
-~~~javascript
-if0 = func(condition: any, then: any, else: optional any) any
-~~~
-
-Examples:
-
-~~~javascript
-a = if0(0, "tea", "beer") # tea
-a = if0(1, "tea", "beer") # beer
-a = if0(4, "tea", "beer") # beer
-a = if0("", "tea", "beer") # tea
-a = if0("abc", "tea", "beer") # beer
-a = if0([], "tea", "beer") # tea
-a = if0([1,2], "tea", "beer") # beer
-a = if0(dict(), "tea", "beer") # tea
-a = if0(dict("a",1), "tea", "beer") # beer
-a = if0(false, "tea", "beer") # tea
-a = if0(true, "tea", "beer") # beer
-a = if0(true, "tea") # no assignment
-a = if0(false, "tea") # tea
-~~~
-
-You don't have to assign the result of an if0 function which is
-useful when using a warn or return function for its side effects.
-The if takes two arguments when there is no assignment.
-
-~~~javascript
-if0(c, warn("got zero value"))
-~~~
-
-
-~~~nim
-func fun_if0_iaoaa(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
 
 # fun_if_baoaa
@@ -935,13 +879,13 @@ func fun_int_ssaa(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ~~~
 
-# if0Condition
+# boolConditions
 
 Convert the value to a boolean.
 
 
 ~~~nim
-func if0Condition(cond: Value): bool
+func boolConditions(cond: Value): bool
 ~~~
 
 # fun_bool_ab
@@ -1597,7 +1541,7 @@ warn = func(message: string) string
 You can warn conditionally in a bare if statement:
 
 ~~~javascript
-if0(c, warn("message is 0"))
+if(cond, warn("message is 0"))
 ~~~
 
 You can warn unconditionally using a bare warn statement:
@@ -1624,7 +1568,7 @@ log = func(message: string) string
 You can log conditionally in a bare if statement:
 
 ~~~javascript
-if0(c, log("log this message when c is 0"))
+if(c, log("log this message when c is 0"))
 ~~~
 
 You can log unconditionally using a bare log statement:

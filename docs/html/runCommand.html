@@ -65,8 +65,8 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#getString">getString</a> &mdash; Return a literal string value and position after it.</li>
 <li> <a href="#getNumber">getNumber</a> &mdash; Return the literal number value and position after it.</li>
 <li> <a href="#skipArgument">skipArgument</a> &mdash; Skip past the argument.</li>
-<li> <a href="#ifFunctions">ifFunctions</a> &mdash; Return the if/if0 function's value and position after.</li>
-<li> <a href="#bareIfAndIf0">bareIfAndIf0</a> &mdash; Handle the bare if/if0.</li>
+<li> <a href="#ifFunction">ifFunction</a> &mdash; Return the "if" function's value and position after.</li>
+<li> <a href="#bareIf">bareIf</a> &mdash; Handle the bare IF.</li>
 <li> <a href="#andOrFunctions">andOrFunctions</a> &mdash; Return the and/or function's value and the position after.</li>
 <li> <a href="#getArguments">getArguments</a> &mdash; Get the function arguments and the position of each.</li>
 <li> <a href="#getFunctionValuePosSi">getFunctionValuePosSi</a> &mdash; Return the function's value and the position after it.</li>
@@ -77,7 +77,7 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#listLoop">listLoop</a> &mdash; Make a new list from an existing list.</li>
 <li> <a href="#caseFunction">caseFunction</a> &mdash; Return the case function's value and position after.</li>
 <li> <a href="#getValuePosSi">getValuePosSi</a> &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.</li>
-<li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, if0, return, warn, log and listLoop.</li>
+<li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, return, warn, log and listLoop.</li>
 <li> <a href="#getBracketDotName">getBracketDotName</a> &mdash; Convert var[key] to a dot name.</li>
 <li> <a href="#runStatement">runStatement</a> &mdash; Run one statement and return the variable dot name string, operator and value.</li>
 <li> <a href="#skipSpaces">skipSpaces</a> &mdash; Skip the leading spaces and tabs.</li>
@@ -125,7 +125,6 @@ PosOr = OpResultWarn[Natural]
 </p><ul>
 <li>spNotSpecial — not a special function
 </li><li>spIf — if function
-</li><li>spIf0 — if0 function
 </li><li>spWarn — warn function
 </li><li>spLog — log function
 </li><li>spReturn — return function
@@ -139,9 +138,9 @@ PosOr = OpResultWarn[Natural]
 
 <pre class="nim-code">
 SpecialFunction {.pure.} = enum
-  spNotSpecial = "not-special", spIf = "if", spIf0 = "if0", spWarn = "warn",
-  spLog = "log", spReturn = "return", spAnd = "and", spOr = "or",
-  spFunc = "func", spListLoop = "listLoop", spCase = "case"
+  spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
+  spReturn = "return", spAnd = "and", spOr = "or", spFunc = "func",
+  spListLoop = "listLoop", spCase = "case"
 </pre>
 
 <h3 id="SpecialFunctionOr">SpecialFunctionOr</h3>
@@ -661,9 +660,9 @@ problem.
 func skipArgument(statement: Statement; startPos: Natural): PosOr
 </pre>
 
-<h3 id="ifFunctions">ifFunctions</h3>
+<h3 id="ifFunction">ifFunction</h3>
 
-<p>Return the if/if0 function&#x27;s value and position after. It
+<p>Return the &quot;if&quot; function&#x27;s value and position after. It
 conditionally runs one of its arguments and skips the
 other. Start points at the first argument of the function. The
 position includes the trailing whitespace after the ending ).
@@ -679,15 +678,15 @@ position includes the trailing whitespace after the ending ).
 
 
 <pre class="nim-code">
-proc ifFunctions(env: var Env; specialFunction: SpecialFunction;
-                 statement: Statement; start: Natural; variables: Variables;
-                 topLevel = false): ValuePosSiOr {.
-    raises: [Exception, KeyError], tags: [RootEffect].}
+proc ifFunction(env: var Env; specialFunction: SpecialFunction;
+                statement: Statement; start: Natural; variables: Variables;
+                topLevel = false): ValuePosSiOr {.raises: [Exception, KeyError],
+    tags: [RootEffect].}
 </pre>
 
-<h3 id="bareIfAndIf0">bareIfAndIf0</h3>
+<h3 id="bareIf">bareIf</h3>
 
-<p>Handle the bare if/if0. Return the resulting value and the
+<p>Handle the bare IF. Return the resulting value and the
 position in the statement after the if.
 
 </p><pre class="tea-code">
@@ -699,8 +698,8 @@ position in the statement after the if.
 
 
 <pre class="nim-code">
-proc bareIfAndIf0(env: var Env; specialFunction: SpecialFunction;
-                  statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
+proc bareIf(env: var Env; specialFunction: SpecialFunction;
+            statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 </pre>
 
@@ -910,7 +909,7 @@ proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
 
 <h3 id="runBareFunction">runBareFunction</h3>
 
-<p>Handle bare function: if, if0, return, warn, log and listLoop. A
+<p>Handle bare function: if, return, warn, log and listLoop. A
 bare function does not assign a variable.
 
 </p><pre class="tea-code">

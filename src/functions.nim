@@ -517,61 +517,6 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
     # The dictionary does not have an item with key $1.
     result = newFunResultWarn(wMissingDictItem, 1, key)
 
-func fun_if0_iaoaa*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## If the condition is 0, return the second argument, else return
-  ## the third argument.  You can use any type for the condition.  The
-  ## condition is 0 for strings, lists and dictionaries when their
-  ## length is 0.
-  ##
-  ## The condition types and what is considered 0:
-  ##
-  ## * **bool** — false
-  ## * **int** — 0
-  ## * **float** — 0.0
-  ## * **string** — when the length of the string is 0
-  ## * **list** — when the length of the list is 0
-  ## * **dict** — when the length of the dictionary is 0
-  ## * **func** — always 0
-  ##
-  ## The IF functions are special in a couple of ways, see
-  ## the If Functions section.
-  ##
-  ## ~~~statictea
-  ## if0 = func(condition: any, then: any, else: optional any) any
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## a = if0(0, "tea", "beer") # tea
-  ## a = if0(1, "tea", "beer") # beer
-  ## a = if0(4, "tea", "beer") # beer
-  ## a = if0("", "tea", "beer") # tea
-  ## a = if0("abc", "tea", "beer") # beer
-  ## a = if0([], "tea", "beer") # tea
-  ## a = if0([1,2], "tea", "beer") # beer
-  ## a = if0(dict(), "tea", "beer") # tea
-  ## a = if0(dict("a",1), "tea", "beer") # beer
-  ## a = if0(false, "tea", "beer") # tea
-  ## a = if0(true, "tea", "beer") # beer
-  ## a = if0(true, "tea") # no assignment
-  ## a = if0(false, "tea") # tea
-  ## ~~~
-  ##
-  ## You don't have to assign the result of an if0 function which is
-  ## useful when using a warn or return function for its side effects.
-  ## The if takes two arguments when there is no assignment.
-  ##
-  ## ~~~statictea
-  ## if0(c, warn("got zero value"))
-  ## ~~~
-
-  # Note: the if functions are handled in runCommand as a special
-  # case. This code is not run. It is here for the function list and
-  # documentation.
-  assert(false, "Unexpectedly hit IF0 in functions.nim.")
-  result = newFunResult(newValue(0))
-
 {.push overflowChecks: on, floatChecks: on.}
 
 func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -1058,7 +1003,7 @@ func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   if result.value.kind == vkFloat:
     result = convertFloatToInt(result.value.floatv, map)
 
-func if0Condition*(cond: Value): bool =
+func boolConditions*(cond: Value): bool =
   ## Convert the value to a boolean.
   result = true
   case cond.kind:
@@ -1117,7 +1062,7 @@ func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
 
   tMapParameters("bool", "ab")
   let value = map["a"]
-  result = newFunResult(newValue(if0Condition(value)))
+  result = newFunResult(newValue(boolConditions(value)))
 
 func fun_find_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Find the position of a substring in a string.  When the substring
@@ -1984,7 +1929,7 @@ func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## You can warn conditionally in a bare if statement:
   ##
   ## ~~~statictea
-  ## if0(c, warn("message is 0"))
+  ## if(cond, warn("message is 0"))
   ## ~~~
   ##
   ## You can warn unconditionally using a bare warn statement:
@@ -2009,7 +1954,7 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## You can log conditionally in a bare if statement:
   ##
   ## ~~~statictea
-  ## if0(c, log("log this message when c is 0"))
+  ## if(c, log("log this message when c is 0"))
   ## ~~~
   ##
   ## You can log unconditionally using a bare log statement:
@@ -2907,7 +2852,6 @@ functionsDict["fun_gte_iib"] = fun_gte_iib
 functionsDict["fun_parseCode_sl"] = fun_parseCode_sl
 functionsDict["fun_html_sss"] = fun_html_sss
 functionsDict["fun_if_baoaa"] = fun_if_baoaa
-functionsDict["fun_if0_iaoaa"] = fun_if0_iaoaa
 functionsDict["fun_int_fosi"] = fun_int_fosi
 functionsDict["fun_int_sosi"] = fun_int_sosi
 functionsDict["fun_int_ssaa"] = fun_int_ssaa

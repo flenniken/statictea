@@ -45,7 +45,6 @@ type
     ##
     ## * spNotSpecial — not a special function
     ## * spIf — if function
-    ## * spIf0 — if0 function
     ## * spWarn — warn function
     ## * spLog — log function
     ## * spReturn — return function
@@ -56,7 +55,6 @@ type
     ## * spCase — case function
     spNotSpecial = "not-special",
     spIf = "if",
-    spIf0 = "if0",
     spWarn = "warn",
     spLog = "log",
     spReturn = "return",
@@ -1058,8 +1056,6 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
   case value.funcv.signature.name
   of "if":
     result = spIf
-  of "if0":
-    result = spIf0
   of "and":
     result = spAnd
   of "or":
@@ -1107,7 +1103,7 @@ proc bareReturn(
 
   return newValuePosSiOr(value, runningPos, seReturn)
 
-proc ifFunctions*(
+proc ifFunction*(
     env: var Env,
     specialFunction: SpecialFunction,
     statement: Statement,
@@ -1115,7 +1111,7 @@ proc ifFunctions*(
     variables: Variables,
     topLevel = false,
   ): ValuePosSiOr =
-  ## Return the if/if0 function's value and position after. It
+  ## Return the "if" function's value and position after. It
   ## conditionally runs one of its arguments and skips the
   ## other. Start points at the first argument of the function. The
   ## position includes the trailing whitespace after the ending ).
@@ -1137,15 +1133,13 @@ proc ifFunctions*(
   let cond = vlcOr.value.value
   var runningPos = vlcOr.value.pos
 
-  # Get the boolean for IF and IF0.
+  # Get the boolean for IF..
   var condition = false
   if specialFunction == spIf:
     if cond.kind != vkBool:
       # The if condition must be a bool value, got a $1.
       return newValuePosSiOr(wExpectedBool, $cond.kind, start)
     condition = cond.boolv
-  else: # if0
-    condition = if0Condition(cond) == false
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)
@@ -1212,14 +1206,14 @@ proc ifFunctions*(
     sideEffect = vl3Or.value.sideEffect
   result = newValuePosSiOr(value, runningPos, sideEffect)
 
-proc bareIfAndIf0*(
+proc bareIf*(
     env: var Env,
     specialFunction: SpecialFunction,
     statement: Statement,
     start: Natural,
     variables: Variables,
   ): ValuePosSiOr =
-  ## Handle the bare if/if0. Return the resulting value and the
+  ## Handle the bare IF. Return the resulting value and the
   ## position in the statement after the if.
   ##
   ## ~~~statictea
@@ -1237,15 +1231,13 @@ proc bareIfAndIf0*(
   let cond = vlcOr.value.value
   runningPos = vlcOr.value.pos
 
-  # Get the boolean for IF and IF0.
+  # Get the boolean for IF..
   var condition = false
   if specialFunction == spIf:
     if cond.kind != vkBool:
       # The if condition must be a bool value, got a $1.
       return newValuePosSiOr(wExpectedBool, $cond.kind, start)
     condition = cond.boolv
-  else: # if0
-    condition = if0Condition(cond) == false
 
   # Match the comma and whitespace.
   let commaO = matchSymbol(statement.text, gComma, runningPos)
@@ -2248,9 +2240,9 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       # We have a function, run it and return its value.
       let specialFunction = getSpecialFunction(valueOr.value)
       case specialFunction:
-      of spIf, spIf0:
-        # Handle the special IF functions.
-        return ifFunctions(env, specialFunction, statement, rightName.pos, variables, topLevel)
+      of spIf:
+        # Handle the special IF function.
+        return ifFunction(env, specialFunction, statement, rightName.pos, variables, topLevel)
       of spAnd, spOr:
         # Handle the special AND/OR functions.
         return andOrFunctions(env, specialFunction, statement, rightName.pos, variables)
@@ -2312,7 +2304,7 @@ proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variable
 
 proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: DotName): ValuePosSiOr =
-  ## Handle bare function: if, if0, return, warn, log and listLoop. A
+  ## Handle bare function: if, return, warn, log and listLoop. A
   ## bare function does not assign a variable.
   ##
   ## ~~~statictea
@@ -2334,9 +2326,9 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
 
   # Handle all the special function types.
   case specialFunction:
-  of spIf, spIf0:
-    # Handle the special bare if functions.
-    result = bareIfAndIf0(env, specialFunction, statement, runningPos, variables)
+  of spIf:
+    # Handle the special bare if function.
+    result = bareIf(env, specialFunction, statement, runningPos, variables)
   of spReturn:
     result = bareReturn(env, statement, runningPos, variables)
   of spListLoop:
@@ -2446,8 +2438,8 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
 
   case leftName.kind
   of vnkFunction:
-    # Handle bare function: if, if0, return, warn, log and listLoop. A
-    # bare function does not assign a variable.
+    # Handle bare function: if, return, warn, log and listLoop. A bare
+    # function does not assign a variable.
     vlOr = runBareFunction(env, statement, runningPos, variables, leftName)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
