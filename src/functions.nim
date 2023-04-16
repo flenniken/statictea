@@ -2284,321 +2284,6 @@ func fun_not_bb*(variables: Variables, arguments: seq[Value]): FunResult =
   let cond = map["a"].boolv
   result = newFunResult(newValue(not(cond)))
 
-func fun_and_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Boolean AND with short circuit. If the first argument is false,
-  ## the second argument is not evaluated.
-  ##
-  ## ~~~statictea
-  ## and = func(a: bool, b: bool) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## and(true, true) # true
-  ## and(false, true) # false
-  ## and(true, false) # false
-  ## and(false, false) # false
-  ## and(false, warn("not hit")) # false
-  ## ~~~
-
-  # Note: this code isn't run, it's here for the docs and the function
-  # list.  The the code in runCommand.nim.
-  assert(false, "Unexpectedly hit AND in functions.nim.")
-  result = newFunResult(newValue(0))
-
-func fun_or_bbb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Boolean OR with short circuit. If the first argument is true,
-  ## the second argument is not evaluated.
-  ##
-  ## ~~~statictea
-  ## or = func(a: bool, b: bool) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## or(true, true) # true
-  ## or(false, true) # true
-  ## or(true, false) # true
-  ## or(false, false) # false
-  ## or(true, warn("not hit")) # true
-  ## ~~~
-
-  # Note: this code isn't run, it's here for the docs and the function
-  # list.  The the code in runCommand.nim.
-  assert(false, "Unexpectedly hit OR in functions.nim.")
-  result = newFunResult(newValue(0))
-
-func fun_eq_iib*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when the two ints are equal.
-  ##
-  ## ~~~statictea
-  ## eq = func(a: int, b: int) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## eq(1, 1) # true
-  ## eq(2, 3) # false
-  ## ~~~
-  tMapParameters("eq", "iib")
-  let a = map["a"].intv
-  let b = map["b"].intv
-  let cond = a == b
-  result = newFunResult(newValue(cond))
-
-func fun_eq_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when two floats are equal.
-  ##
-  ## ~~~statictea
-  ## eq(a: float, b: float) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## eq(1.2, 1.2) # true
-  ## eq(1.2, 3.2) # false
-  ## ~~~
-  tMapParameters("eq", "ffb")
-  let a = map["a"].floatv
-  let b = map["b"].floatv
-  let cond = a == b
-  result = newFunResult(newValue(cond))
-
-func fun_eq_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when two strings are equal.  See cmp function for case
-  ## insensitive compare.
-  ##
-  ## ~~~statictea
-  ## eq = func(a: string, b: string) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## eq("tea", "tea") # true
-  ## eq("1.2", "3.2") # false
-  ## ~~~
-  tMapParameters("eq", "ssb")
-  let a = map["a"].stringv
-  let b = map["b"].stringv
-  let cond = a == b
-  result = newFunResult(newValue(cond))
-
-func fun_ne_iib*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when two ints are not equal.
-  ##
-  ## ~~~statictea
-  ## ne = func(a: int, b: int) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## ne(1, 1) # false
-  ## ne(2, 3) # true
-  ## ~~~
-  tMapParameters("ne", "iib")
-  let a = map["a"].intv
-  let b = map["b"].intv
-  let cond = a != b
-  result = newFunResult(newValue(cond))
-
-func fun_ne_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when two floats are not equal.
-  ##
-  ## ~~~statictea
-  ## ne = func(a: float, b: float) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## ne(1.2, 1.2) # false
-  ## ne(1.2, 3.2) # true
-  ## ~~~
-  tMapParameters("ne", "ffb")
-  let a = map["a"].floatv
-  let b = map["b"].floatv
-  let cond = a != b
-  result = newFunResult(newValue(cond))
-
-func fun_ne_ssb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when two strings are not equal.
-  ##
-  ## ~~~statictea
-  ## ne(a: string, b: string) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## ne("tea", "tea") # false
-  ## ne("earl", "grey") # true
-  ## ~~~
-  tMapParameters("ne", "ssb")
-  let a = map["a"].stringv
-  let b = map["b"].stringv
-  let cond = a != b
-  result = newFunResult(newValue(cond))
-
-func fun_gt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when an int is greater then another int.
-  ##
-  ## ~~~statictea
-  ## gt = func(a: int, b: int) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## gt(2, 4) # false
-  ## gt(3, 2) # true
-  ## ~~~
-  tMapParameters("gt", "iib")
-  let a = map["a"].intv
-  let b = map["b"].intv
-  let cond = a > b
-  result = newFunResult(newValue(cond))
-
-func fun_gt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when one float is greater than another float.
-  ##
-  ## ~~~statictea
-  ## gt = func(a: float, b: float) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## gt(2.8, 4.3) # false
-  ## gt(3.1, 2.5) # true
-  ## ~~~
-  tMapParameters("gt", "ffb")
-  let a = map["a"].floatv
-  let b = map["b"].floatv
-  let cond = a > b
-  result = newFunResult(newValue(cond))
-
-func fun_gte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when an int is greater then or equal to another int.
-  ##
-  ## ~~~statictea
-  ## gte = func(a: int, b: int) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## gte(2, 4) # false
-  ## gte(3, 3) # true
-  ## ~~~
-  tMapParameters("gte", "iib")
-  let a = map["a"].intv
-  let b = map["b"].intv
-  let cond = a >= b
-  result = newFunResult(newValue(cond))
-
-func fun_gte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when a float is greater than or equal to another float.
-  ##
-  ## ~~~statictea
-  ## gte = func(a: float, b: float) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## gte(2.8, 4.3) # false
-  ## gte(3.1, 3.1) # true
-  ## ~~~
-  tMapParameters("gte", "ffb")
-  let a = map["a"].stringv
-  let b = map["b"].stringv
-  let cond = a >= b
-  result = newFunResult(newValue(cond))
-
-func fun_lt_iib*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when an int is less than another int.
-  ##
-  ## ~~~statictea
-  ## lt = func(a: int, b: int) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## gt(2, 4) # true
-  ## gt(3, 2) # false
-  ## ~~~
-  tMapParameters("gt", "iib")
-  let a = map["a"].intv
-  let b = map["b"].intv
-  let cond = a < b
-  result = newFunResult(newValue(cond))
-
-func fun_lt_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when a float is less then another float.
-  ##
-  ## ~~~statictea
-  ## lt = func(a: float, b: float) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## lt(2.8, 4.3) # true
-  ## lt(3.1, 2.5) # false
-  ## ~~~
-  tMapParameters("lt", "ffb")
-  let a = map["a"].floatv
-  let b = map["b"].floatv
-  let cond = a > b
-  result = newFunResult(newValue(cond))
-
-func fun_lte_iib*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when an int is less than or equal to another int.
-  ##
-  ## ~~~statictea
-  ## lte = func(a: int, b: int) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## lte(2, 4) # true
-  ## lte(3, 3) # true
-  ## lte(4, 3) # false
-  ## ~~~
-  tMapParameters("lte", "iib")
-  let a = map["a"].intv
-  let b = map["b"].intv
-  let cond = a <= b
-  result = newFunResult(newValue(cond))
-
-func fun_lte_ffb*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Return true when a float is less than or equal to another float.
-  ##
-  ## ~~~statictea
-  ## lte = func(a: float, b: float) bool
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## lte(2.3, 4.4) # true
-  ## lte(3.0, 3.0) # true
-  ## lte(4.0, 3.0) # false
-  ## ~~~
-  tMapParameters("lte", "ffb")
-  let a = map["a"].floatv
-  let b = map["b"].floatv
-  let cond = a <= b
-  result = newFunResult(newValue(cond))
-
 func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a JSON string to a variable.
   ##
@@ -2822,7 +2507,6 @@ var functionsDict* = newTable[string, FunctionPtr]()
 functionsDict["fun_add_fff"] = fun_add_fff
 functionsDict["fun_add_iii"] = fun_add_iii
 functionsDict["fun_anchors_lsl"] = fun_anchors_lsl
-functionsDict["fun_and_bbb"] = fun_and_bbb
 functionsDict["fun_bool_ab"] = fun_bool_ab
 functionsDict["fun_case_iloaa"] = fun_case_iloaa
 functionsDict["fun_case_sloaa"] = fun_case_sloaa
@@ -2832,9 +2516,6 @@ functionsDict["fun_cmp_ssobi"] = fun_cmp_ssobi
 functionsDict["fun_cmpVersion_ssi"] = fun_cmpVersion_ssi
 functionsDict["fun_dict_old"] = fun_dict_old
 functionsDict["fun_dup_sis"] = fun_dup_sis
-functionsDict["fun_eq_ffb"] = fun_eq_ffb
-functionsDict["fun_eq_iib"] = fun_eq_iib
-functionsDict["fun_eq_ssb"] = fun_eq_ssb
 functionsDict["fun_exists_dsb"] = fun_exists_dsb
 functionsDict["fun_find_ssoaa"] = fun_find_ssoaa
 functionsDict["fun_float_if"] = fun_float_if
@@ -2845,10 +2526,6 @@ functionsDict["fun_func_sp"] = fun_func_sp
 functionsDict["fun_functionDetails_pd"] = fun_functionDetails_pd
 functionsDict["fun_get_dsoaa"] = fun_get_dsoaa
 functionsDict["fun_get_lioaa"] = fun_get_lioaa
-functionsDict["fun_gt_ffb"] = fun_gt_ffb
-functionsDict["fun_gt_iib"] = fun_gt_iib
-functionsDict["fun_gte_ffb"] = fun_gte_ffb
-functionsDict["fun_gte_iib"] = fun_gte_iib
 functionsDict["fun_parseCode_sl"] = fun_parseCode_sl
 functionsDict["fun_html_sss"] = fun_html_sss
 functionsDict["fun_if_baoaa"] = fun_if_baoaa
@@ -2865,16 +2542,8 @@ functionsDict["fun_list_al"] = fun_list_al
 functionsDict["fun_listLoop_lapoab"] = fun_listLoop_lapoab
 functionsDict["fun_log_ss"] = fun_log_ss
 functionsDict["fun_lower_ss"] = fun_lower_ss
-functionsDict["fun_lt_ffb"] = fun_lt_ffb
-functionsDict["fun_lt_iib"] = fun_lt_iib
-functionsDict["fun_lte_ffb"] = fun_lte_ffb
-functionsDict["fun_lte_iib"] = fun_lte_iib
 functionsDict["fun_parseMarkdown_ssl"] = fun_parseMarkdown_ssl
-functionsDict["fun_ne_ffb"] = fun_ne_ffb
-functionsDict["fun_ne_iib"] = fun_ne_iib
-functionsDict["fun_ne_ssb"] = fun_ne_ssb
 functionsDict["fun_not_bb"] = fun_not_bb
-functionsDict["fun_or_bbb"] = fun_or_bbb
 functionsDict["fun_path_sosd"] = fun_path_sosd
 functionsDict["fun_readJson_sa"] = fun_readJson_sa
 functionsDict["fun_replace_siiss"] = fun_replace_siiss
@@ -2996,7 +2665,9 @@ proc makeFuncDictionary*(): VarsDict =
   assert(functionsDict.len == functionsList.len,
     "\n\n\x1b[1;31mManually update dynamicFuncList.nim. The functionsList list is out of date.\x1b[0m")
   assert(functionsDict.len == functionStarts.len,
-    "\n\n\x1b[1;31mManually update dynamicFuncList.nim. The functionStarts list is out of date.\x1b[0m")
+    """\n\n\x1b[1;31mManually update dynamicFuncList.nim.
+$1 != $2
+The functionStarts list is out of date.\x1b[0m""" % [$functionsDict.len, $functionStarts.len])
 
   for ix, bii in functionsList:
     let (name, signatureCode) = splitFuncName(bii.funcName)

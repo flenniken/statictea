@@ -2,7 +2,6 @@
 
 Stf (single test file) tests found in the testfiles folder.
 
-* [and-or](../testfiles/and-or.stf.md) &mdash; Test the and and or functions.
 * [block-readme](../testfiles/block-readme.stf.md) &mdash; Test the readme block example.
 * [bool-expr](../testfiles/bool-expr.stf.md) &mdash; Test boolean expressions.
 * [cmdline-no-templates](../testfiles/cmdline-no-templates.stf.md) &mdash; Test with no templates on the command line.
@@ -22,7 +21,6 @@ Stf (single test file) tests found in the testfiles folder.
 * [format-basic](../testfiles/format-basic.stf.md) &mdash; Test the format function.
 * [format-warnings](../testfiles/format-warnings.stf.md) &mdash; Test the format function's warning messages.
 * [func-basics](../testfiles/func-basics.stf.md) &mdash; Test the func type.
-* [func-special-forms](../testfiles/func-special-forms.stf.md) &mdash; Test the special forms.
 * [func-warnings](../testfiles/func-warnings.stf.md) &mdash; Test the function warnings.
 * [globalvars](../testfiles/globalvars.stf.md) &mdash; Test global variables.
 * [hello](../testfiles/hello.stf.md) &mdash; Readme Hello World example.

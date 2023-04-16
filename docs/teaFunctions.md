@@ -13,7 +13,6 @@ variable or pass to another function.
 * [add](#add) &mdash; Add two floats.
 * [add](#add-1) &mdash; Add two integers.
 * [anchors](#anchors) &mdash; Create anchor names from heading names.
-* [and](#and) &mdash; Boolean AND with short circuit.
 * [bool](#bool) &mdash; Create an bool from a value.
 * [case](#case) &mdash; Compare integer cases and return the matching value.
 * [case](#case-1) &mdash; Compare string cases and return the matching value.
@@ -23,9 +22,6 @@ variable or pass to another function.
 * [cmpVersion](#cmpversion) &mdash; Compare two StaticTea version numbers.
 * [dict](#dict) &mdash; Create a dictionary from a list of key, value pairs.
 * [dup](#dup) &mdash; Duplicate a string x times.
-* [eq](#eq) &mdash; Return true when two floats are equal.
-* [eq](#eq-1) &mdash; Return true when the two ints are equal.
-* [eq](#eq-2) &mdash; Return true when two strings are equal.
 * [exists](#exists) &mdash; Determine whether a key exists in a dictionary.
 * [find](#find) &mdash; Find the position of a substring in a string.
 * [float](#float) &mdash; Create a float from an int.
@@ -36,10 +32,6 @@ variable or pass to another function.
 * [functionDetails](#functiondetails) &mdash; Return the function details in a dictionary.
 * [get](#get) &mdash; Get a dictionary value by its key.
 * [get](#get-1) &mdash; Get a list value by its index.
-* [gt](#gt) &mdash; Return true when one float is greater than another float.
-* [gt](#gt-1) &mdash; Return true when an int is greater then another int.
-* [gte](#gte) &mdash; Return true when a float is greater than or equal to another float.
-* [gte](#gte-1) &mdash; Return true when an int is greater then or equal to another int.
 * [html](#html) &mdash; Escape text for placing it in an html page.
 * [if](#if) &mdash; If the condition is true, return the second argument, else return the third argument.
 * [int](#int) &mdash; Create an int from a float.
@@ -55,15 +47,7 @@ variable or pass to another function.
 * [listLoop](#listloop) &mdash; Loop over items in a list and fill in a container.
 * [log](#log) &mdash; Log a message to the log file.
 * [lower](#lower) &mdash; Lowercase a string.
-* [lt](#lt) &mdash; Return true when a float is less then another float.
-* [lt](#lt-1) &mdash; Return true when an int is less than another int.
-* [lte](#lte) &mdash; Return true when a float is less than or equal to another float.
-* [lte](#lte-1) &mdash; Return true when an int is less than or equal to another int.
-* [ne](#ne) &mdash; Return true when two floats are not equal.
-* [ne](#ne-1) &mdash; Return true when two ints are not equal.
-* [ne](#ne-2) &mdash; Return true when two strings are not equal.
 * [not](#not) &mdash; Boolean not.
-* [or](#or) &mdash; Boolean OR with short circuit.
 * [parseCode](#parsecode) &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.
 * [parseMarkdown](#parsemarkdown) &mdash; Parse a simple subset of markdown.
 * [path](#path) &mdash; Split a file path into its component pieces.
@@ -140,27 +124,6 @@ Examples:
 list = list("Tea", "Water", "Tea")
 a = anchors(list, "github")
   # ["tea", "water", "tea-1"]
-~~~
-
-
-
-# and
-
-Boolean AND with short circuit. If the first argument is false,
-the second argument is not evaluated.
-
-~~~javascript
-and = func(a: bool, b: bool) bool
-~~~
-
-Examples:
-
-~~~javascript
-and(true, true) # true
-and(false, true) # false
-and(true, false) # false
-and(false, false) # false
-and(false, warn("not hit")) # false
 ~~~
 
 
@@ -410,58 +373,6 @@ dup("", 3) # ""
 
 
 
-# eq
-
-Return true when two floats are equal.
-
-~~~javascript
-eq(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~javascript
-eq(1.2, 1.2) # true
-eq(1.2, 3.2) # false
-~~~
-
-
-
-# eq
-
-Return true when the two ints are equal.
-
-~~~javascript
-eq = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~javascript
-eq(1, 1) # true
-eq(2, 3) # false
-~~~
-
-
-
-# eq
-
-Return true when two strings are equal.  See cmp function for case
-insensitive compare.
-
-~~~javascript
-eq = func(a: string, b: string) bool
-~~~
-
-Examples:
-
-~~~javascript
-eq("tea", "tea") # true
-eq("1.2", "3.2") # false
-~~~
-
-
-
 # exists
 
 Determine whether a key exists in a dictionary. Return true when it
@@ -702,74 +613,6 @@ You can also use bracket notation to access list items.
 
 ~~~javascript
 a = teas[0]
-~~~
-
-
-
-# gt
-
-Return true when one float is greater than another float.
-
-~~~javascript
-gt = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~javascript
-gt(2.8, 4.3) # false
-gt(3.1, 2.5) # true
-~~~
-
-
-
-# gt
-
-Return true when an int is greater then another int.
-
-~~~javascript
-gt = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~javascript
-gt(2, 4) # false
-gt(3, 2) # true
-~~~
-
-
-
-# gte
-
-Return true when a float is greater than or equal to another float.
-
-~~~javascript
-gte = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~javascript
-gte(2.8, 4.3) # false
-gte(3.1, 3.1) # true
-~~~
-
-
-
-# gte
-
-Return true when an int is greater then or equal to another int.
-
-~~~javascript
-gte = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~javascript
-gte(2, 4) # false
-gte(3, 3) # true
 ~~~
 
 
@@ -1160,127 +1003,6 @@ lower("TEĀ") # "teā"
 
 
 
-# lt
-
-Return true when a float is less then another float.
-
-~~~javascript
-lt = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~javascript
-lt(2.8, 4.3) # true
-lt(3.1, 2.5) # false
-~~~
-
-
-
-# lt
-
-Return true when an int is less than another int.
-
-~~~javascript
-lt = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~javascript
-gt(2, 4) # true
-gt(3, 2) # false
-~~~
-
-
-
-# lte
-
-Return true when a float is less than or equal to another float.
-
-~~~javascript
-lte = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~javascript
-lte(2.3, 4.4) # true
-lte(3.0, 3.0) # true
-lte(4.0, 3.0) # false
-~~~
-
-
-
-# lte
-
-Return true when an int is less than or equal to another int.
-
-~~~javascript
-lte = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~javascript
-lte(2, 4) # true
-lte(3, 3) # true
-lte(4, 3) # false
-~~~
-
-
-
-# ne
-
-Return true when two floats are not equal.
-
-~~~javascript
-ne = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~javascript
-ne(1.2, 1.2) # false
-ne(1.2, 3.2) # true
-~~~
-
-
-
-# ne
-
-Return true when two ints are not equal.
-
-~~~javascript
-ne = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~javascript
-ne(1, 1) # false
-ne(2, 3) # true
-~~~
-
-
-
-# ne
-
-Return true when two strings are not equal.
-
-~~~javascript
-ne(a: string, b: string) bool
-~~~
-
-Examples:
-
-~~~javascript
-ne("tea", "tea") # false
-ne("earl", "grey") # true
-~~~
-
-
-
 # not
 
 Boolean not.
@@ -1294,27 +1016,6 @@ Examples:
 ~~~javascript
 not(true) # false
 not(false) # true
-~~~
-
-
-
-# or
-
-Boolean OR with short circuit. If the first argument is true,
-the second argument is not evaluated.
-
-~~~javascript
-or = func(a: bool, b: bool) bool
-~~~
-
-Examples:
-
-~~~javascript
-or(true, true) # true
-or(false, true) # true
-or(true, false) # true
-or(false, false) # false
-or(true, warn("not hit")) # true
 ~~~
 
 

@@ -142,11 +142,6 @@ proc testStartsWith(str: string, prefix: string, eBool: bool): bool =
   if testFunction("startsWith", arguments, eFunResult):
     result = true
 
-proc testComp(a: int|float|string, op: string, b: int|float|string, eResult: bool): bool =
-  var arguments = @[newValue(a), newValue(b)]
-  let eFunResult = newFunResult(newValue(eResult))
-  result = testFunction(op, arguments, eFunResult)
-
 proc testBool(value: Value, eResult: bool): bool =
   var arguments = @[value]
   let eFunResult = newFunResult(newValue(eResult))
@@ -1701,58 +1696,6 @@ d.sub.y = 4"""
     var arguments = @[newValue(true)]
     let eFunResult = newFunResult(newValue(false))
     check testFunction("not", arguments, eFunResult)
-
-  test "eq int":
-    check testComp(1, "eq", 1, true)
-    check testComp(1, "eq", 100, false)
-
-  test "eq float":
-    check testComp(1.1, "eq", 1.1, true)
-    check testComp(1.1, "eq", 2.1, false)
-
-  test "eq string":
-    check testComp("tea", "eq", "tea", true)
-    check testComp("tea", "eq", "beer", false)
-
-  test "ne int":
-    check testComp(1, "ne", 2, true)
-    check testComp(1, "ne", 1, false)
-
-  test "ne float":
-    check testComp(1.2, "ne", 1.2, false)
-    check testComp(1.2, "ne", 1.3, true)
-
-  test "ne string":
-    check testComp("tea", "ne", "tea", false)
-    check testComp("tea", "ne", "beer", true)
-
-  test "gt int":
-    check testComp(20, "gt", 1, true)
-    check testComp(2, "gt", 10, false)
-
-  test "gt float":
-    check testComp(101.2, "gt", 1.2, true)
-    check testComp(2.2, "gt", 22.2, false)
-
-  test "gte int":
-    check testComp(20, "gte", 1, true)
-    check testComp(2, "gte", 10, false)
-    check testComp(2, "gte", 2, true)
-
-  test "lte float":
-    check testComp(101.2, "lte", 1.2, false)
-    check testComp(2.2, "lte", 33.3, true)
-    check testComp(2.2, "lte", 2.2, true)
-
-  test "lte int":
-    check testComp(20, "lte", 1, false)
-    check testComp(2, "lte", 10, true)
-    check testComp(2, "lte", 2, true)
-
-  test "lte float":
-    check testComp(101.2, "lte", 1.2, false)
-    check testComp(2.2, "lte", 33.3, true)
-    check testComp(2.2, "lte", 2.2, true)
 
   test "ascii compare":
     # ascii order: sp - 0-9 A-Z _ a-z

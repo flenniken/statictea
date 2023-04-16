@@ -83,7 +83,6 @@ listLoop(funcList, o.signatures, make-signature, state)
 add(a: float, b: float) float
 add(a: int, b: int) int
 anchors(a: list, b: string) list
-and(a: bool, b: bool) bool
 bool(a: any) bool
 case(a: int, b: list, c: optional any) any
 case(a: string, b: list, c: optional any) any
@@ -93,9 +92,6 @@ cmp(a: string, b: string, c: optional bool) int
 cmpVersion(a: string, b: string) int
 dict(a: optional list) dict
 dup(a: string, b: int) string
-eq(a: float, b: float) bool
-eq(a: int, b: int) bool
-eq(a: string, b: string) bool
 exists(a: dict, b: string) bool
 find(a: string, b: string, c: optional any) any
 float(a: int) float
@@ -106,10 +102,6 @@ func(a: string) func
 functionDetails(a: func) dict
 get(a: dict, b: string, c: optional any) any
 get(a: list, b: int, c: optional any) any
-gt(a: float, b: float) bool
-gt(a: int, b: int) bool
-gte(a: float, b: float) bool
-gte(a: int, b: int) bool
 html(a: string, b: string) string
 if(a: bool, b: any, c: optional any) any
 int(a: float, b: optional string) int
@@ -125,15 +117,7 @@ list(a: any) list
 listLoop(a: list, b: any, c: func, d: optional any) bool
 log(a: string) string
 lower(a: string) string
-lt(a: float, b: float) bool
-lt(a: int, b: int) bool
-lte(a: float, b: float) bool
-lte(a: int, b: int) bool
-ne(a: float, b: float) bool
-ne(a: int, b: int) bool
-ne(a: string, b: string) bool
 not(a: bool) bool
-or(a: bool, b: bool) bool
 parseCode(a: string) list
 parseMarkdown(a: string, b: string) list
 path(a: string, b: optional string) dict

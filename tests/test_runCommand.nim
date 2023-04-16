@@ -389,12 +389,6 @@ proc testRunStatement(
       echo "expected:"
       echo getWarnStatement("filename", statement, eVariableDataOr.message)
 
-proc testRunBoolOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
-  let value = runBoolOp(newValue(left), op, newValue(right))
-  result = true
-  if value != eValue:
-    result = gotExpected($value, $eValue)
-
 proc testRunCompareOp(left: bool | Value, op: string, right: bool | Value, eValue: Value): bool =
   let value = runCompareOp(newValue(left), op, newValue(right))
   result = true
@@ -1489,57 +1483,6 @@ White$1
 
     check testGetMultilineStrE("$1\n", 3,
       newWarningData(wMissingEndingTriple, "", 4))
-
-  test "true and true":
-    let statement = newStatement(text="""a = and(true, true)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "true and false":
-    let statement = newStatement(text="""a = and(true, false)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "false and true":
-    let statement = newStatement(text="""a = and(false, true)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "false and false":
-    let statement = newStatement(text="""a = and(false, false)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "true or true":
-    let statement = newStatement(text="""a = or(true, true)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "true or false":
-    let statement = newStatement(text="""a = or(true, false)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "false or true":
-    let statement = newStatement(text="""a = or(false, true)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(true))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "false or false":
-    let statement = newStatement(text="""a = or(false, false)""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(false))
-    check testRunStatement(statement, eVariableDataOr)
-
-  test "runBoolOp":
-    check testRunBoolOp(true, "or", true, newValue(true))
-    check testRunBoolOp(true, "or", false, newValue(true))
-    check testRunBoolOp(false, "or", true, newValue(true))
-    check testRunBoolOp(false, "or", false, newValue(false))
-
-    check testRunBoolOp(true, "and", true, newValue(true))
-    check testRunBoolOp(true, "and", false, newValue(false))
-    check testRunBoolOp(false, "and", true, newValue(false))
-    check testRunBoolOp(false, "and", false, newValue(false))
 
   test "runCompareOp":
     check testRunCompareOp(newValue(5), "==", newValue(5), newValue(true))

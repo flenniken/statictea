@@ -60,26 +60,6 @@ a = anchors(list, "github")
 
 """
 
-  dc_fun_and_bbb = """
-Boolean AND with short circuit. If the first argument is false,
-the second argument is not evaluated.
-
-~~~statictea
-and = func(a: bool, b: bool) bool
-~~~
-
-Examples:
-
-~~~statictea
-and(true, true) # true
-and(false, true) # false
-and(true, false) # false
-and(false, false) # false
-and(false, warn("not hit")) # false
-~~~
-
-"""
-
   dc_fun_bool_ab = """
 Create an bool from a value.
 
@@ -316,55 +296,6 @@ dup("", 3) # ""
 
 """
 
-  dc_fun_eq_ffb = """
-Return true when two floats are equal.
-
-~~~statictea
-eq(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~statictea
-eq(1.2, 1.2) # true
-eq(1.2, 3.2) # false
-~~~
-
-"""
-
-  dc_fun_eq_iib = """
-Return true when the two ints are equal.
-
-~~~statictea
-eq = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~statictea
-eq(1, 1) # true
-eq(2, 3) # false
-~~~
-
-"""
-
-  dc_fun_eq_ssb = """
-Return true when two strings are equal.  See cmp function for case
-insensitive compare.
-
-~~~statictea
-eq = func(a: string, b: string) bool
-~~~
-
-Examples:
-
-~~~statictea
-eq("tea", "tea") # true
-eq("1.2", "3.2") # false
-~~~
-
-"""
-
   dc_fun_exists_dsb = """
 Determine whether a key exists in a dictionary. Return true when it
 exists, else false.
@@ -595,70 +526,6 @@ You can also use bracket notation to access list items.
 
 ~~~statictea
 a = teas[0]
-~~~
-
-"""
-
-  dc_fun_gt_ffb = """
-Return true when one float is greater than another float.
-
-~~~statictea
-gt = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~statictea
-gt(2.8, 4.3) # false
-gt(3.1, 2.5) # true
-~~~
-
-"""
-
-  dc_fun_gt_iib = """
-Return true when an int is greater then another int.
-
-~~~statictea
-gt = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~statictea
-gt(2, 4) # false
-gt(3, 2) # true
-~~~
-
-"""
-
-  dc_fun_gte_ffb = """
-Return true when a float is greater than or equal to another float.
-
-~~~statictea
-gte = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~statictea
-gte(2.8, 4.3) # false
-gte(3.1, 3.1) # true
-~~~
-
-"""
-
-  dc_fun_gte_iib = """
-Return true when an int is greater then or equal to another int.
-
-~~~statictea
-gte = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~statictea
-gte(2, 4) # false
-gte(3, 3) # true
 ~~~
 
 """
@@ -1034,120 +901,6 @@ lower("TEĀ") # "teā"
 
 """
 
-  dc_fun_lt_ffb = """
-Return true when a float is less then another float.
-
-~~~statictea
-lt = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~statictea
-lt(2.8, 4.3) # true
-lt(3.1, 2.5) # false
-~~~
-
-"""
-
-  dc_fun_lt_iib = """
-Return true when an int is less than another int.
-
-~~~statictea
-lt = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~statictea
-gt(2, 4) # true
-gt(3, 2) # false
-~~~
-
-"""
-
-  dc_fun_lte_ffb = """
-Return true when a float is less than or equal to another float.
-
-~~~statictea
-lte = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~statictea
-lte(2.3, 4.4) # true
-lte(3.0, 3.0) # true
-lte(4.0, 3.0) # false
-~~~
-
-"""
-
-  dc_fun_lte_iib = """
-Return true when an int is less than or equal to another int.
-
-~~~statictea
-lte = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~statictea
-lte(2, 4) # true
-lte(3, 3) # true
-lte(4, 3) # false
-~~~
-
-"""
-
-  dc_fun_ne_ffb = """
-Return true when two floats are not equal.
-
-~~~statictea
-ne = func(a: float, b: float) bool
-~~~
-
-Examples:
-
-~~~statictea
-ne(1.2, 1.2) # false
-ne(1.2, 3.2) # true
-~~~
-
-"""
-
-  dc_fun_ne_iib = """
-Return true when two ints are not equal.
-
-~~~statictea
-ne = func(a: int, b: int) bool
-~~~
-
-Examples:
-
-~~~statictea
-ne(1, 1) # false
-ne(2, 3) # true
-~~~
-
-"""
-
-  dc_fun_ne_ssb = """
-Return true when two strings are not equal.
-
-~~~statictea
-ne(a: string, b: string) bool
-~~~
-
-Examples:
-
-~~~statictea
-ne("tea", "tea") # false
-ne("earl", "grey") # true
-~~~
-
-"""
-
   dc_fun_not_bb = """
 Boolean not.
 
@@ -1160,26 +913,6 @@ Examples:
 ~~~statictea
 not(true) # false
 not(false) # true
-~~~
-
-"""
-
-  dc_fun_or_bbb = """
-Boolean OR with short circuit. If the first argument is true,
-the second argument is not evaluated.
-
-~~~statictea
-or = func(a: bool, b: bool) bool
-~~~
-
-Examples:
-
-~~~statictea
-or(true, true) # true
-or(false, true) # true
-or(true, false) # true
-or(false, false) # false
-or(true, warn("not hit")) # true
 ~~~
 
 """
@@ -1780,7 +1513,6 @@ warn("always warn")
     info("fun_add_fff", dc_fun_add_fff, 23),
     info("fun_add_iii", dc_fun_add_iii, 24),
     info("fun_anchors_lsl", dc_fun_anchors_lsl, 38),
-    info("fun_and_bbb", dc_fun_and_bbb, 23),
     info("fun_bool_ab", dc_fun_bool_ab, 37),
     info("fun_case_iloaa", dc_fun_case_iloaa, 45),
     info("fun_case_sloaa", dc_fun_case_sloaa, 43),
@@ -1790,9 +1522,6 @@ warn("always warn")
     info("fun_cmpVersion_ssi", dc_fun_cmpVersion_ssi, 44),
     info("fun_dict_old", dc_fun_dict_old, 37),
     info("fun_dup_sis", dc_fun_dup_sis, 39),
-    info("fun_eq_ffb", dc_fun_eq_ffb, 19),
-    info("fun_eq_iib", dc_fun_eq_iib, 19),
-    info("fun_eq_ssb", dc_fun_eq_ssb, 20),
     info("fun_exists_dsb", dc_fun_exists_dsb, 22),
     info("fun_find_ssoaa", dc_fun_find_ssoaa, 38),
     info("fun_float_if", dc_fun_float_if, 17),
@@ -1803,10 +1532,6 @@ warn("always warn")
     info("fun_functionDetails_pd", dc_fun_functionDetails_pd, 35),
     info("fun_get_dsoaa", dc_fun_get_dsoaa, 41),
     info("fun_get_lioaa", dc_fun_get_lioaa, 48),
-    info("fun_gt_ffb", dc_fun_gt_ffb, 19),
-    info("fun_gt_iib", dc_fun_gt_iib, 19),
-    info("fun_gte_ffb", dc_fun_gte_ffb, 19),
-    info("fun_gte_iib", dc_fun_gte_iib, 19),
     info("fun_html_sss", dc_fun_html_sss, 40),
     info("fun_if_baoaa", dc_fun_if_baoaa, 40),
     info("fun_int_fosi", dc_fun_int_fosi, 35),
@@ -1822,15 +1547,7 @@ warn("always warn")
     info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 48),
     info("fun_log_ss", dc_fun_log_ss, 24),
     info("fun_lower_ss", dc_fun_lower_ss, 19),
-    info("fun_lt_ffb", dc_fun_lt_ffb, 19),
-    info("fun_lt_iib", dc_fun_lt_iib, 19),
-    info("fun_lte_ffb", dc_fun_lte_ffb, 20),
-    info("fun_lte_iib", dc_fun_lte_iib, 20),
-    info("fun_ne_ffb", dc_fun_ne_ffb, 19),
-    info("fun_ne_iib", dc_fun_ne_iib, 19),
-    info("fun_ne_ssb", dc_fun_ne_ssb, 19),
     info("fun_not_bb", dc_fun_not_bb, 18),
-    info("fun_or_bbb", dc_fun_or_bbb, 23),
     info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
     info("fun_parseMarkdown_ssl", dc_fun_parseMarkdown_ssl, 79),
     info("fun_path_sosd", dc_fun_path_sosd, 55),
@@ -1862,7 +1579,6 @@ warn("always warn")
     586,
     562,
     1761,
-    2287,
     1030,
     680,
     725,
@@ -1872,9 +1588,6 @@ warn("always warn")
     780,
     1179,
     1140,
-    2352,
-    2333,
-    2371,
     658,
     1067,
     824,
@@ -1885,11 +1598,7 @@ warn("always warn")
     2214,
     481,
     433,
-    2467,
-    2448,
-    2505,
-    2486,
-    2780,
+    2465,
     522,
     894,
     929,
@@ -1904,19 +1613,11 @@ warn("always warn")
     1237,
     1946,
     1509,
-    2543,
-    2524,
-    2582,
-    2562,
-    2410,
-    2391,
-    2429,
     2269,
+    2389,
     2310,
-    2704,
-    2625,
     1454,
-    2602,
+    2287,
     1285,
     1395,
     1970,
