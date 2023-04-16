@@ -1650,33 +1650,6 @@ x = not( (a < b and c > d) )
 y = (a < b and not((c > d)))
 #+END_SRC
 
-There is an equivalent function for each boolean operator:
-
-- and — and
-- or — or
-- == — eq (equal)
-- != — ne (not equal)
-- < — lt (less than)
-- > — gt (greater than)
-- <= — lte (less than or equal)
-- >= — gte (greater than or equal)
-- not
-
-The following  code fragments are equivalent:
-
-#+BEGIN_SRC nim
-(a < b) #=> lt(a, b)
-
-(a < b and c > d) #=>
-  # and(lt(a, b), gt(c,d))
-
-(a or b or c) #=>
-  # or(or(a, b), c)
-
-(a and (b or c)) #=>
-  # and(a, or(b, c))
-#+END_SRC
-
 Note: If you need case insensitive string compare, use the cmp
 function.
 
@@ -2318,17 +2291,15 @@ a = len(“tea”)
 Below are the list of special functions and how the deviate from
 the normal form:
 
-- list - takes any number of arguments
+- case — conditionally evaluates its arguments
+- func - defines a function, see [[#user-functions][User Functions]]
 - if - conditionally evaluates its arguments and it has a bare form, see [[#if-functions][If Functions]]
-- and — conditionally evaluates its arguments
-- or — conditionally evaluates its arguments
-- warn — exits the statement with a warning and has a bare form
+- list - takes any number of arguments
+- listLoop — has a bare form
+- log - writes a message to the log file and has a bare form
 - return - exits the command block or function with a return
   value and has a bare form
-- log - writes a message to the log file and has a bare form
-- func - defines a function, see [[#user-functions][User Functions]]
-- listLoop — has a bare form
-- case — conditionally evaluates its arguments
+- warn — exits the statement with a warning and has a bare form
 
 If the form doesn't have an assignment it's called a bare
 function. The warn, return, if, listLoop and log have bare forms.
@@ -2341,8 +2312,6 @@ v = if(b, 5, 6)
 if(c, warn(“abc”))
 if(c, return(“abc”))
 newList &= if( (x > 5), value)
-v = and(c, d)
-v = or(c, d)
 warn(“the tea is hot”)
 return(1)
 log("log message")
@@ -2356,9 +2325,9 @@ a = case(22, [11, 1, 22, 2])
    :CUSTOM_ID: if-functions
    :END:
 
-The if and if0 functions are special in a few ways. They
-conditionally evaluate their arguments and they can be used in a
-statement without an assignment.
+The if function is special in a few ways. It conditionally
+evaluates its arguments and it can be used in a statement
+without an assignment.
 
 There are three basic forms, a three parameter form, a two
 parameter form and a bare two parameter form. Here are examples:
@@ -2368,7 +2337,6 @@ tea = if(cond, “black”, “green”)
 newList &= if(cond, value)
 if(cond, return(“stop”))
 #+END_SRC
-
 
 *Three Parameter Form*
 
@@ -2675,17 +2643,15 @@ specifying f as shown below.
 
 #+BEGIN_SRC
 tea> pf f
-add         exists           if        lte            slice
-anchors     find             int       ne             sort
-and         float            join      not            startsWith
-bool        format           joinPath  or             string
-case        func             keys      parseCode      sub
-cmp         functionDetails  len       parseMarkdown  type
-cmpVersion  get              list      path           values
-concat      gt               listLoop  readJson       warn
-dict        gte              log       replace
-dup         html             lower     replaceRe
-eq          if0              lt        return
+add         find             join      parseCode      startsWith
+anchors     float            joinPath  parseMarkdown  string
+bool        format           keys      path           sub
+case        func             len       readJson       type
+cmp         functionDetails  list      replace        values
+cmpVersion  get              listLoop  replaceRe      warn
+dict        html             log       return
+dup         if               lower     slice
+exists      int              not       sort
 #+END_SRC
 
 Each element in the f dictionary is a list of the function
