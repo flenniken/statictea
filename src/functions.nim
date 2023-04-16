@@ -265,37 +265,6 @@ func anchors(names: seq[Value], anchorNameProc: AnchorNameProc): FunResult =
 
   result = newFunResult(newValue(anchorNames))
 
-func getCase(map: VarsDict): FunResult =
-  ## Return the matching case value or the default when none
-  ## match. The map dictionary contains the parameters to the case
-  ## functions.
-
-  let mainCondition = map["a"]
-  let cases = map["b"]
-
-  let caseList = cases.listv.list
-  if caseList.len mod 2 != 0:
-    # Expected an even number of cases, got $1.
-    return newFunResultWarn(wNotEvenCases, 1, $caseList.len)
-
-  for ix in countUp(0, caseList.len-1, 2):
-    let condition = caseList[ix]
-    if mainCondition.kind != condition.kind:
-      # A case condition is not the same type as the main condition.
-     return newFunResultWarn(wCaseTypeMismatch)
-
-    if condition == mainCondition:
-      let value = caseList[ix+1]
-      return newFunResult(value)
-
-  # Return the else case if it exists.
-  if "c" in map:
-    result = newFunResult(map["c"])
-  else:
-    # mainCondition is a string or a number.
-    # None of the case conditions match $1 and no else case."
-    result = newFunResultWarn(wMissingElse, 2, $mainCondition)
-
 func convertFloatToInt(num: float, map: VarsDict): FunResult =
   ## Convert float to an integer. The map contains the optional round
   ## options as "b".
@@ -797,6 +766,9 @@ func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## generated.  The conditions must be integers. The return values
   ## can be any type.
   ##
+  ## If the pairs argument is a literal list, only the matching case is
+  ## executed and the other ones are skipped.
+  ##
   ## ~~~statictea
   ## case = case(condition: int, pairs: list, default: optional any) any
   ## ~~~
@@ -810,10 +782,19 @@ func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## case(2, cases) # "beer"
   ## case(2, cases, "wine") # "beer"
   ## case(3, cases, "wine") # "wine"
+  ##
+  ## x = case(1, [ +
+  ##   0, warn("not hit"), +
+  ##   1, "match", +
+  ##   2, warn("not hit")])
+  ## # x => match
   ## ~~~
 
-  tMapParameters("case", "iloaa")
-  result = getCase(map)
+  # Note: the case function is handled in runCommand as a special
+  # case. This code is not run. It is here for the function list and
+  # documentation.
+  assert(false, "Unexpectedly hit case in functions.nim.")
+  result = newFunResult(newValue(0))
 
 func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare string cases and return the matching value.  It takes a
@@ -830,6 +811,9 @@ func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## generated.  The conditions must be strings. The return values
   ## can be any type.
   ##
+  ## If the pairs argument is a literal list, only the matching case is
+  ## executed and the other ones are skipped.
+  ##
   ## ~~~statictea
   ## case = func(condition: string, pairs: list, default: optional any) any
   ## ~~~
@@ -842,10 +826,18 @@ func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## case("water", pairs) # 2.3
   ## case("beer", pairs) # "cold"
   ## case("bunch", pairs, "other") # "other"
+  ##
+  ## x = case("a", [ +
+  ##   "q", warn("not hit"), +
+  ##   "a", "match", +
+  ##   "e", warn("not hit")])
+  ## # x => match
   ## ~~~
-
-  tMapParameters("case", "sloaa")
-  result = getCase(map)
+  # Note: the case function is handled in runCommand as a special
+  # case. This code is not run. It is here for the function list and
+  # documentation.
+  assert(false, "Unexpectedly hit case in functions.nim.")
+  result = newFunResult(newValue(0))
 
 func parseVersion*(version: string): Option[(int, int, int)] =
   ## Parse a StaticTea version number and return its three components.

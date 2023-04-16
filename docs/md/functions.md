@@ -680,6 +680,9 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be integers. The return values
 can be any type.
 
+If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
 ~~~javascript
 case = case(condition: int, pairs: list, default: optional any) any
 ~~~
@@ -693,12 +696,17 @@ case(1, cases) # "water"
 case(2, cases) # "beer"
 case(2, cases, "wine") # "beer"
 case(3, cases, "wine") # "wine"
+
+x = case(1, [ +
+  0, warn("not hit"), +
+  1, "match", +
+  2, warn("not hit")])
+# x => match
 ~~~
 
 
 ~~~nim
-func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
 
 # fun_case_sloaa
@@ -717,6 +725,9 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be strings. The return values
 can be any type.
 
+If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
 ~~~javascript
 case = func(condition: string, pairs: list, default: optional any) any
 ~~~
@@ -729,12 +740,17 @@ case("tea", pairs) # 15
 case("water", pairs) # 2.3
 case("beer", pairs) # "cold"
 case("bunch", pairs, "other") # "other"
+
+x = case("a", [ +
+  "q", warn("not hit"), +
+  "a", "match", +
+  "e", warn("not hit")])
+# x => match
 ~~~
 
 
 ~~~nim
-func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
 
 # parseVersion

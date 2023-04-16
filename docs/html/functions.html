@@ -693,6 +693,9 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be integers. The return values
 can be any type.
 
+</p><p>If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
 </p><pre class="tea-code">
 <span class="t-dotName">case</span> = <span class="t-funcCall">case</span>(<span class="t-dotName">condition</span>: <span class="t-dotName">int</span>, <span class="t-dotName">pairs</span>: <span class="t-dotName">list</span>, <span class="t-dotName">default</span>: <span class="t-dotName">optional</span> <span class="t-dotName">any</span>) <span class="t-dotName">any</span>
 </pre>
@@ -706,12 +709,17 @@ Examples:
 </span><span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>) <span class="t-comment"># &quot;beer&quot;
 </span><span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;wine&quot;</span>) <span class="t-comment"># &quot;beer&quot;
 </span><span class="t-funcCall">case</span>(<span class="t-num">3</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;wine&quot;</span>) <span class="t-comment"># &quot;wine&quot;
+</span>
+<span class="t-dotName">x</span> = <span class="t-funcCall">case</span>(<span class="t-num">1</span>, [ +
+  <span class="t-num">0</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>), +
+  <span class="t-num">1</span>, <span class="t-str">&quot;match&quot;</span>, +
+  <span class="t-num">2</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>)])
+<span class="t-comment"># x =&gt; match
 </span></pre>
 
 
 <pre class="nim-code">
-func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+func fun_case_iloaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_case_sloaa">fun_case_sloaa</h3>
@@ -730,6 +738,9 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be strings. The return values
 can be any type.
 
+</p><p>If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
 </p><pre class="tea-code">
 <span class="t-dotName">case</span> = <span class="t-funcCall">func</span>(<span class="t-param">condition</span>: <span class="t-type">string</span>, <span class="t-param">pairs</span>: <span class="t-type">list</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
 </pre>
@@ -742,12 +753,17 @@ Examples:
 </span><span class="t-funcCall">case</span>(<span class="t-str">&quot;water&quot;</span>, <span class="t-dotName">pairs</span>) <span class="t-comment"># 2.3
 </span><span class="t-funcCall">case</span>(<span class="t-str">&quot;beer&quot;</span>, <span class="t-dotName">pairs</span>) <span class="t-comment"># &quot;cold&quot;
 </span><span class="t-funcCall">case</span>(<span class="t-str">&quot;bunch&quot;</span>, <span class="t-dotName">pairs</span>, <span class="t-str">&quot;other&quot;</span>) <span class="t-comment"># &quot;other&quot;
+</span>
+<span class="t-dotName">x</span> = <span class="t-funcCall">case</span>(<span class="t-str">&quot;a&quot;</span>, [ +
+  <span class="t-str">&quot;q&quot;</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>), +
+  <span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;match&quot;</span>, +
+  <span class="t-str">&quot;e&quot;</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>)])
+<span class="t-comment"># x =&gt; match
 </span></pre>
 
 
 <pre class="nim-code">
-func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+func fun_case_sloaa(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="parseVersion">parseVersion</h3>

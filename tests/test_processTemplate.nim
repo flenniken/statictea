@@ -855,7 +855,7 @@ $$ : 5, "five", "one"))
 {num}
 """
     let eErrLines = splitNewLines """
-template.html(2): w33: Expected a string, number, variable, list or condition.
+template.html(2): w256: A variable starts with an ascii letter.
 statement: num = len(case(5,
                             ^
 template.html(3): w256: A variable starts with an ascii letter.

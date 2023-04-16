@@ -1096,12 +1096,6 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
     let eVariableDataOr = newVariableDataOr(wDictRequiresEven, "", 14)
     check testRunStatement(statement, eVariableDataOr)
 
-  test "parameter error position":
-    let text = """result = case(33, 2, 22, "abc", 11, len(concat()))"""
-    let statement = newStatement(text, lineNum=1)
-    let eVariableDataOr = newVariableDataOr(wNotEnoughArgs, "2", 47)
-    check testRunStatement(statement, eVariableDataOr)
-
   test "assignTeaVariable missing":
     # The runStatement returns a dot name string and a value.  The
     # assignment doesn't happen until later. So t.missing, "1.2.3" is
@@ -1179,7 +1173,7 @@ statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
 
   test "incomplete function 2":
     let statement = newStatement(text="a = len(case(5,", lineNum=1)
-    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 15)
+    let eVariableDataOr = newVariableDataOr(wVarStartsWithLetter, "", 15)
     check testRunStatement(statement, eVariableDataOr)
 
   test "dot name":
@@ -3435,3 +3429,109 @@ o = {}
     check testGetParameterNameOr("func(one-: int", 5, newParameterNameOr(wVarEndsWith, "", 9))
     longName.add("a")
     check testGetParameterNameOr("func($1: int" % longName, 5, newParameterNameOr(wVarMaximumLength, "", 69))
+
+  test "case no main":
+    let text = """a = case()"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 9)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case literal int":
+    let text = """a = case(33, [1, 2, 33, 5])"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(5))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case literal string":
+    let text = """a = case("xyz", ["a", 2, "xyz", 11])"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(11))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case not int or string":
+    let text = """a = case(2.3, [1, 2, 43, 0], 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wExpectedIntOrString, "float", 9)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case missing comma":
+    let text = """a = case(2; 1, 2, 43, 0, 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wMissingComma, "", 10)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case literal default":
+    let text = """a = case(33, [1, 2, 43, 0], 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(55))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case literal list":
+    let text = """a = case(43, list(64, 1, 43, 2, 24, 3), 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(2))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case variable":
+    var variables = startVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "ls", newValue([11, 1, 22, 2]), opEqual)
+    let text = """a = case(22, ls, 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(2))
+    check testRunStatement(statement, eVariableDataOr, variables)
+
+  test "case literal default":
+    let text = """a = case(88, list(64, 1, 43, 2, 24, 3), 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(55))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case variable default":
+    var variables = startVariables(funcs = funcsVarDict)
+    discard assignVariable(variables, "ls", newValue([11, 1, 22, 2]), opEqual)
+    let text = """a = case(3, ls, 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(55))
+    check testRunStatement(statement, eVariableDataOr, variables)
+
+  test "case literal bad cond":
+    let text = """a = case(64, [&&, 1, 22, 2, 33, 3], 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wInvalidRightHandSide, "", 14)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case literal bad cond":
+    let text = """a = case(64, [11 . 1, 22, 2, 33, 3], 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wMissingComma, "", 17)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case literal second cond":
+    let text = """a = case(22, [11, 1, 22, 2, 33, 3], 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(2))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case comma or paren":
+    let text = """a = case(22, [11, 1, 22, 2, 33], 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wMissingComma, "", 30)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case missing end":
+    let text = """a = case(22, [11, 1, 22, 2), 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaBracket, "", 26)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case missing end 2":
+    let text = """a = case(22, list(11, 1, 22, 2], 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 30)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "case missing comma":
+    let text = """a = case(22, [11, 1, 22, 2] . 55)"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 28)
+    check testRunStatement(statement, eVariableDataOr)

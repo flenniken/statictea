@@ -130,6 +130,9 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be integers. The return values
 can be any type.
 
+If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
 ~~~statictea
 case = case(condition: int, pairs: list, default: optional any) any
 ~~~
@@ -143,6 +146,12 @@ case(1, cases) # "water"
 case(2, cases) # "beer"
 case(2, cases, "wine") # "beer"
 case(3, cases, "wine") # "wine"
+
+x = case(1, [ +
+  0, warn("not hit"), +
+  1, "match", +
+  2, warn("not hit")])
+# x => match
 ~~~
 
 """
@@ -162,6 +171,9 @@ value is returned if it is specified, otherwise a warning is
 generated.  The conditions must be strings. The return values
 can be any type.
 
+If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
 ~~~statictea
 case = func(condition: string, pairs: list, default: optional any) any
 ~~~
@@ -174,6 +186,12 @@ case("tea", pairs) # 15
 case("water", pairs) # 2.3
 case("beer", pairs) # "cold"
 case("bunch", pairs, "other") # "other"
+
+x = case("a", [ +
+  "q", warn("not hit"), +
+  "a", "match", +
+  "e", warn("not hit")])
+# x => match
 ~~~
 
 """
@@ -1833,8 +1851,8 @@ warn("always warn")
     info("fun_anchors_lsl", dc_fun_anchors_lsl, 38),
     info("fun_and_bbb", dc_fun_and_bbb, 23),
     info("fun_bool_ab", dc_fun_bool_ab, 37),
-    info("fun_case_iloaa", dc_fun_case_iloaa, 33),
-    info("fun_case_sloaa", dc_fun_case_sloaa, 32),
+    info("fun_case_iloaa", dc_fun_case_iloaa, 45),
+    info("fun_case_sloaa", dc_fun_case_sloaa, 43),
     info("fun_cmp_ffi", dc_fun_cmp_ffi, 21),
     info("fun_cmp_iii", dc_fun_cmp_iii, 21),
     info("fun_cmp_ssobi", dc_fun_cmp_ssobi, 33),
@@ -1912,81 +1930,81 @@ warn("always warn")
   # so when there are changes the diffs are easier to read.
 
   functionStarts = [
-    691,
-    667,
-    1843,
-    2375,
-    1112,
-    785,
-    818,
-    354,
-    333,
-    375,
-    862,
-    408,
-    1261,
-    1222,
-    2440,
-    2421,
-    2459,
-    763,
-    1149,
-    906,
-    949,
-    923,
-    2249,
-    2281,
-    2302,
-    531,
-    483,
-    2555,
-    2536,
-    2593,
-    2574,
-    2868,
-    570,
-    627,
-    976,
-    1011,
-    1053,
-    1964,
-    1934,
-    1610,
-    464,
-    445,
-    427,
-    1298,
-    1319,
-    2034,
-    1591,
-    2631,
-    2612,
-    2670,
-    2650,
-    2498,
-    2479,
-    2517,
-    2357,
-    2398,
-    2792,
-    2713,
-    1536,
-    2690,
-    1367,
-    1477,
-    2058,
-    1187,
-    1757,
-    1789,
-    1816,
-    2337,
-    2121,
-    2225,
-    738,
-    714,
-    1881,
-    1634,
-    2009,
+    660,
+    636,
+    1835,
+    2367,
+    1104,
+    754,
+    799,
+    323,
+    302,
+    344,
+    854,
+    377,
+    1253,
+    1214,
+    2432,
+    2413,
+    2451,
+    732,
+    1141,
+    898,
+    941,
+    915,
+    2241,
+    2273,
+    2294,
+    500,
+    452,
+    2547,
+    2528,
+    2585,
+    2566,
+    2860,
+    539,
+    596,
+    968,
+    1003,
+    1045,
+    1956,
+    1926,
+    1602,
+    433,
+    414,
+    396,
+    1290,
+    1311,
+    2026,
+    1583,
+    2623,
+    2604,
+    2662,
+    2642,
+    2490,
+    2471,
+    2509,
+    2349,
+    2390,
+    2784,
+    2705,
+    1528,
+    2682,
+    1359,
+    1469,
+    2050,
+    1179,
+    1749,
+    1781,
+    1808,
+    2329,
+    2113,
+    2217,
+    707,
+    683,
+    1873,
+    1626,
+    2001,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

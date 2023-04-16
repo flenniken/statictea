@@ -53,6 +53,7 @@ type
     ## * spOr — or function
     ## * spFunc — func function
     ## * spListLoop — list with callback function
+    ## * spCase — case function
     spNotSpecial = "not-special",
     spIf = "if",
     spIf0 = "if0",
@@ -63,6 +64,7 @@ type
     spOr = "or",
     spFunc = "func",
     spListLoop = "listLoop",
+    spCase = "case",
 
   SpecialFunctionOr* = OpResultWarn[SpecialFunction]
     ## A SpecialFunction or a warning message.
@@ -172,7 +174,7 @@ type
     ##
     ## * dotName — the dot name string
     ## * kind — the kind of name defined by the character following the name
-    ## * pos — the position after the trailing whitespace
+    ## * pos — the position after the trailing whitespace, including the ( for functions.
     dotName*: string
     kind*: DotNameKind
     pos*: Natural
@@ -1072,6 +1074,8 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
     result = spFunc
   of "listLoop":
     result = spListLoop
+  of "case":
+    result = spCase
   else:
     result = spNotSpecial
 
@@ -1466,13 +1470,22 @@ proc getFunctionValuePosSi*(
     listCase = false,
     topLevel = false,
 ): ValuePosSiOr =
-  ## Return the function's value and the position after it. Start points at the
-  ## first argument of the function. The position includes the trailing
-  ## whitespace after the ending ).
+  ## Return the function's value and the position after it. Start
+  ## points at the first argument of the function. The position
+  ## includes the trailing whitespace after the ending ). The
+  ## functionName is the name of the function to call. The functionPos
+  ## is the start position of the function.
+  ##
+  ## The listCase parameter true means brackets are used for
+  ## the list function. A true topLevel parameter means the item
+  ## pointed to by start is the first item after the equal sign (not
+  ## an argument).
   ##
   ## ~~~statictea
   ## a = get(b, 2, c) # condition
-  ##         ^        ^
+  ##     ^ functionPos
+  ##         ^ start  ^ end
+  ##
   ## a = get(b, len("hi"), c)
   ##                ^    ^
   ## ~~~
@@ -1487,7 +1500,7 @@ proc getFunctionValuePosSi*(
     return vpOr
   runningPos = vpOr.value.pos
 
-  # Lookup the variable's value.
+  # Lookup the built-in function variable's value.
   let valueOr = getVariable(variables, functionName, npBuiltIn)
   if valueOr.isMessage:
     let warningData = newWarningData(valueOr.message.messageId,
@@ -1879,6 +1892,281 @@ proc listLoop*(
 
   return newValuePosSiOr(funResult.value, runningPos)
 
+proc getCaseDefault(
+    env: var Env,
+    statement: Statement,
+    start: Natural,
+    variables: Variables,
+    foundMatch: bool,
+    matchValue: Value,
+  ): ValuePosSiOr =
+  ## Handle a case function default value.
+  ##
+  ## ~~~ statictea
+  ## a = case(cond, var, default) # comment
+  ##                   ^          ^
+  ## a = case(cond, getList(), default) # comment
+  ##                         ^          ^
+  ## a = case(cond, [1, len("1"), 2, len("abc")], default) # comment
+  ##                                            ^          ^
+  ## ~~~
+  var runningPos = start
+
+  # Look for a comma or right parentheses.
+  let corpO = matchCommaOrSymbol(statement.text, gRightParentheses, runningPos)
+  if not corpO.isSome:
+    # Expected comma or right parentheses.
+    return newValuePosSiOr(wMissingCommaParen, "", runningPos)
+  let (corp, corpLen) = corpO.getGroupLen()
+  runningPos += corpLen
+
+  var retValue: Value
+  if foundMatch:
+    # Skip the default if it exists.
+    if corp == ",":
+      let posOr = skipArg(statement, runningPos)
+      if posOr.isMessage:
+        return newValuePosSiOr(posOr.message)
+      runningPos = posOr.value
+    retValue = matchValue
+  else:
+    # Return the else case if it exists.
+    if corp == ")":
+      # None of the case conditions match the main condition and there is no else case.
+      return newValuePosSiOr(wMissingElse, "", runningPos)
+
+    # Get the default value.
+    let defaultOr = getValuePosSi(env, statement, runningPos, variables)
+    if defaultOr.isMessage:
+      return defaultOr
+    retValue = defaultOr.value.value
+    runningPos = defaultOr.value.pos
+
+  if corp == ",":
+    # Look for right parentheses and following white space.
+    let rightParenO = matchSymbol(statement.text, gRightParentheses, runningPos)
+    if not rightParenO.isSome:
+      # No matching end right parentheses.
+      return newValuePosSiOr(wNoMatchingParen, "", runningPos)
+    runningPos += rightParenO.get().length
+
+  result = newValuePosSiOr(retValue, runningPos)
+
+proc caseWithVariable(
+    env: var Env,
+    statement: Statement,
+    mainCondition: Value,
+    start: Natural,
+    variables: Variables,
+  ): ValuePosSiOr =
+  ## Handle a case function with a literal list for the cases. Only
+  ## execute the matching case and ignore the rest. If not a literal
+  ## case, return a warning.
+  ##
+  ## ~~~ statictea
+  ## a = case(cond, var, default) # comment
+  ##                ^             ^
+  ## a = case(cond, getList(), default) # comment
+  ##                ^                   ^
+  ## ~~~
+  var runningPos = start
+  var matchValue: Value
+  var foundMatch = false
+
+  # Get the list of cases.
+  var cases: Value
+  let casesOr = getValuePosSi(env, statement, runningPos, variables)
+  if casesOr.isMessage:
+    return casesOr
+  cases = casesOr.value.value
+  runningPos = casesOr.value.pos
+
+  if cases.kind != vkList:
+    # Expected list argument, got $1.
+    return newValuePosSiOr(wExpectedListArg, $cases.kind, runningPos)
+  let caseList = cases.listv.list
+
+  if caseList.len mod 2 != 0:
+    # Expected an even number of cases, got $1.
+    return newValuePosSiOr(wNotEvenCases, $caseList.len, runningPos)
+
+  for ix in countUp(0, caseList.len-1, 2):
+    let condition = caseList[ix]
+    if mainCondition.kind != condition.kind:
+      # A case condition is not the same type as the main condition.
+     return newValuePosSiOr(wCaseTypeMismatch, "", runningPos)
+
+    if condition == mainCondition:
+      foundMatch = true
+      matchValue = caseList[ix+1]
+      break
+
+  result = getCaseDefault(env, statement, runningPos, variables, foundMatch, matchValue)
+
+proc caseWithLiteral(
+    env: var Env,
+    statement: Statement,
+    mainCondition: Value,
+    start: Natural,
+    variables: Variables,
+    endSymbol: GroupSymbol,
+  ): ValuePosSiOr =
+  ## Handle a case function with a literal list for the cases. Only
+  ## execute the matching case and ignore the rest.
+  ##
+  ## ~~~ statictea
+  ## a = case(cond, [11, 1, 22, 2], default) # comment
+  ##                 ^                       ^
+  ## a = case(cond, list(11, 1, 22, 2), default) # comment
+  ##                     ^                       ^
+  ## ~~~
+  var runningPos = start
+  var foundMatch = false
+  var matchValue = newValue(0)
+
+  while true:
+    # Get the condition.
+    var condition: Value
+    if foundMatch:
+      let posOr = skipArg(statement, runningPos)
+      if posOr.isMessage:
+        return newValuePosSiOr(posOr.message)
+      runningPos = posOr.value
+    else:
+      let conditionOr = getValuePosSi(env, statement, runningPos, variables)
+      if conditionOr.isMessage:
+        return conditionOr
+      condition = conditionOr.value.value
+
+      if mainCondition.kind != condition.kind:
+        # A case condition is not the same type as the main condition.
+        return newValuePosSiOr(wCaseTypeMismatch, "", runningPos)
+
+      runningPos = conditionOr.value.pos
+
+    # Match the comma and whitespace.
+    let commaO = matchSymbol(statement.text, gComma, runningPos)
+    if not commaO.isSome:
+      # Expected a comma.
+      return newValuePosSiOr(wMissingComma, "", runningPos)
+    runningPos += commaO.get().length
+
+    if not foundMatch and condition == mainCondition:
+      # Get the matching case value.
+      let matchOr = getValuePosSi(env, statement, runningPos, variables)
+      if matchOr.isMessage:
+        return matchOr
+      foundMatch = true
+      matchValue = matchOr.value.value
+      runningPos = matchOr.value.pos
+    else:
+      # Skip the case value.
+      let posOr = skipArg(statement, runningPos)
+      if posOr.isMessage:
+        return newValuePosSiOr(posOr.message)
+      runningPos = posOr.value
+
+    # Look for a comma or right bracket/parentheses and trailing whitespace.
+    let corpO = matchCommaOrSymbol(statement.text, endSymbol, runningPos)
+    if not corpO.isSome:
+      var message: MessageId
+      if endSymbol == gRightParentheses:
+        # Expected comma or right parentheses.
+        message = wMissingCommaParen
+      else:
+        message = wMissingCommaBracket
+      return newValuePosSiOr(message, "", runningPos)
+    let (corp, corpLen) = corpO.getGroupLen()
+    runningPos += corpLen
+    if corp == "]" or corp == ")":
+      break
+
+  result = getCaseDefault(env, statement, runningPos, variables, foundMatch, matchValue)
+
+proc caseFunction*(
+    env: var Env,
+    statement: Statement,
+    functionPos: Natural,
+    start: Natural,
+    variables: Variables,
+  ): ValuePosSiOr =
+  ## Return the case function's value and position after. It
+  ## conditionally runs one of its arguments and skips the
+  ## others. Start points at the first argument of the function. The
+  ## position includes the trailing whitespace after the ending
+  ## parentheses.
+  ##
+  ## ~~~statictea
+  ## a = case(cond, [1, len("1"), 2, len("abc")], default) # comment
+  ##          ^                                            ^
+  ##
+  ## a = case(cond, list(1, len("1"), 2, len("abc")), default) # comment
+  ##          ^                                                ^
+  ##
+  ## pairs = [1, len("1"), 2, len("abc")]
+  ## a = case(cond, pairs, default) # comment
+  ##          ^                     ^
+  ##
+  ## a = case(cond, listMaker(), default) # comment
+  ##          ^                           ^
+  ## ~~~
+  var runningPos = start
+
+  # Get the main condition's value.
+  let vlcOr = getValuePosSi(env, statement, runningPos, variables)
+  if vlcOr.isMessage:
+    return vlcOr
+  let mainCondition = vlcOr.value.value
+  runningPos = vlcOr.value.pos
+
+  if mainCondition.kind != vkInt and mainCondition.kind != vkString:
+    # The case condition must be an int or a string value, got a $1.
+    return newValuePosSiOr(wExpectedIntOrString, $mainCondition.kind, start)
+
+  # Match the comma and whitespace.
+  let commaO = matchSymbol(statement.text, gComma, runningPos)
+  if not commaO.isSome:
+    # Expected a comma.
+    return newValuePosSiOr(wMissingComma, "", runningPos)
+  runningPos += commaO.get().length
+
+  var literalCase = false
+  var endSymbol = gRightParentheses
+  # Match a bracket and whitespace.
+  let bO = matchSymbol(statement.text, gLeftBracket, runningPos)
+  if bO.isSome:
+    runningPos += bO.get().length
+    literalCase = true
+    endSymbol = gRightBracket
+  else:
+    # Get the variable name.
+    let casesOr = getDotName(statement.text, runningPos)
+    if casesOr.isMessage:
+      return newValuePosSiOr(casesOr.message)
+    let cases = casesOr.value
+
+    case cases.kind
+    of vnkNormal, vnkGet:
+      literalCase = false
+    of vnkFunction:
+      if cases.dotName == "list":
+        literalCase = true
+        runningPos = casesOr.value.pos
+      else:
+        # Determine whether the variable is an alias to the built-in list function.
+        let funcVarOr = getVariable(variables, cases.dotName, npBuiltIn)
+        if funcVarOr.isValue:
+          let funcVar = funcVarOr.value
+          if funcVar.kind == vkFunc and funcVar.funcv.builtIn and
+              funcVar.funcv.signature.name == "list":
+            literalCase = true
+            runningPos = casesOr.value.pos
+
+  if literalCase:
+    result = caseWithLiteral(env, statement, mainCondition, runningPos, variables, endSymbol)
+  else:
+    result = caseWithVariable(env, statement, mainCondition, runningPos, variables)
+
 proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, variables:
     Variables, topLevel = false): ValuePosSiOr =
   ## Get the value, position and side effect from the statement. Start
@@ -1889,10 +2177,17 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
   ## a = 5  # statement
   ##     ^  ^
   ##
+  ## a = "string" # statement
+  ##     ^        ^
+  ##
   ## a = cmp(len(c), 4)
-  ##         ^         ^
+  ##     ^             ^
+  ##
   ## a = [1, 2, 3]
   ##     ^        ^
+  ##
+  ## if(true, 4)
+  ## ^          ^
   ## ~~~
 
   let rightType = getRightType(statement, start)
@@ -1962,6 +2257,9 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       of spListLoop:
         # Handle the special listLoop function.
         return listLoop(env, specialFunction, statement, rightName.pos, variables)
+      of spCase:
+        # Handle the special case function.
+        return caseFunction(env, statement, start, rightName.pos, variables)
       of spFunc:
         # Define a function in a code file and not nested.
         return newValuePosSiOr(wDefineFunction, "", start)
@@ -2043,7 +2341,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     result = bareReturn(env, statement, runningPos, variables)
   of spListLoop:
     result = listLoop(env, specialFunction, statement, runningPos, variables)
-  of spNotSpecial, spAnd, spOr, spFunc:
+  of spNotSpecial, spAnd, spOr, spFunc, spCase:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValuePosSiOr(wMissingLeftAndOpr, "", start)
   of spWarn, spLog:

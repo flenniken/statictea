@@ -65,6 +65,7 @@ Run a command and fill in the variables dictionaries.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
 * [listLoop](#listloop) &mdash; Make a new list from an existing list.
+* [caseFunction](#casefunction) &mdash; Return the case function's value and position after.
 * [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
 * [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, if0, return, warn, log and listLoop.
 * [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
@@ -120,13 +121,14 @@ The special functions.
 * spOr — or function
 * spFunc — func function
 * spListLoop — list with callback function
+* spCase — case function
 
 
 ~~~nim
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spIf0 = "if0", spWarn = "warn",
   spLog = "log", spReturn = "return", spAnd = "and", spOr = "or",
-  spFunc = "func", spListLoop = "listLoop"
+  spFunc = "func", spListLoop = "listLoop", spCase = "case"
 ~~~
 
 # SpecialFunctionOr
@@ -301,7 +303,7 @@ A variable name in a statement.
 
 * dotName — the dot name string
 * kind — the kind of name defined by the character following the name
-* pos — the position after the trailing whitespace
+* pos — the position after the trailing whitespace, including the ( for functions.
 
 
 ~~~nim
@@ -717,13 +719,22 @@ proc getArguments(env: var Env; statement: Statement; start: Natural;
 
 # getFunctionValuePosSi
 
-Return the function's value and the position after it. Start points at the
-first argument of the function. The position includes the trailing
-whitespace after the ending ).
+Return the function's value and the position after it. Start
+points at the first argument of the function. The position
+includes the trailing whitespace after the ending ). The
+functionName is the name of the function to call. The functionPos
+is the start position of the function.
+
+The listCase parameter true means brackets are used for
+the list function. A true topLevel parameter means the item
+pointed to by start is the first item after the equal sign (not
+an argument).
 
 ~~~javascript
 a = get(b, 2, c) # condition
-        ^        ^
+    ^ functionPos
+        ^ start  ^ end
+
 a = get(b, len("hi"), c)
                ^    ^
 ~~~
@@ -815,6 +826,36 @@ stopped = listLoop(list, new, callback, state)
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
               statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
+~~~
+
+# caseFunction
+
+Return the case function's value and position after. It
+conditionally runs one of its arguments and skips the
+others. Start points at the first argument of the function. The
+position includes the trailing whitespace after the ending
+parentheses.
+
+~~~javascript
+a = case(cond, [1, len("1"), 2, len("abc")], default) # comment
+         ^                                            ^
+
+a = case(cond, list(1, len("1"), 2, len("abc")), default) # comment
+         ^                                                ^
+
+pairs = [1, len("1"), 2, len("abc")]
+a = case(cond, pairs, default) # comment
+         ^                     ^
+
+a = case(cond, listMaker(), default) # comment
+         ^                           ^
+~~~
+
+
+~~~nim
+proc caseFunction(env: var Env; statement: Statement; functionPos: Natural;
+                  start: Natural; variables: Variables): ValuePosSiOr {.
+    raises: [Exception, KeyError], tags: [RootEffect].}
 ~~~
 
 # getValuePosSi
