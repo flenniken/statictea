@@ -494,7 +494,7 @@ proc parseRunCommandLine(argv: seq[string]): OpResultStr[RunArgs] {.
 </p>
 
 <pre class="nim-code">
-proc isRunFileLine(line: string): bool {.raises: [KeyError], tags: [].}
+proc isRunFileLine(line: string): bool
 </pre>
 
 <h3 id="isExpectedLine">isExpectedLine</h3>
@@ -503,7 +503,7 @@ proc isRunFileLine(line: string): bool {.raises: [KeyError], tags: [].}
 </p>
 
 <pre class="nim-code">
-proc isExpectedLine(line: string): bool {.raises: [KeyError], tags: [].}
+proc isExpectedLine(line: string): bool
 </pre>
 
 <h3 id="parseRunFileLine">parseRunFileLine</h3>
@@ -513,7 +513,7 @@ proc isExpectedLine(line: string): bool {.raises: [KeyError], tags: [].}
 
 <pre class="nim-code">
 proc parseRunFileLine(line: string): OpResultStr[RunFileLine] {.
-    raises: [KeyError, ValueError], tags: [].}
+    raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="parseExpectedLine">parseExpectedLine</h3>
@@ -523,7 +523,7 @@ proc parseRunFileLine(line: string): OpResultStr[RunFileLine] {.
 
 <pre class="nim-code">
 proc parseExpectedLine(line: string): OpResultStr[ExpectedLine] {.
-    raises: [KeyError, ValueError], tags: [].}
+    raises: [ValueError], tags: [].}
 </pre>
 
 <h3 id="openNewFile">openNewFile</h3>
@@ -543,8 +543,8 @@ proc openNewFile(folder: string; filename: string): OpResultStr[File] {.
 </p>
 
 <pre class="nim-code">
-proc getAnyLine(line: string): OpResultStr[AnyLine] {.
-    raises: [KeyError, ValueError], tags: [].}
+proc getAnyLine(line: string): OpResultStr[AnyLine] {.raises: [ValueError],
+    tags: [].}
 </pre>
 
 <h3 id="makeDirAndFiles">makeDirAndFiles</h3>
@@ -555,7 +555,7 @@ file lines and expected lines.
 
 <pre class="nim-code">
 proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles] {.
-    raises: [ValueError, Exception, IOError, OSError, KeyError],
+    raises: [ValueError, Exception, IOError, OSError],
     tags: [ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect].}
 </pre>
 
@@ -579,9 +579,8 @@ tests passed.
 
 <pre class="nim-code">
 proc runStfFilename(filename: string): int {.
-    raises: [ValueError, Exception, IOError, OSError, KeyError], tags: [
-    ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect, ExecIOEffect,
-    RootEffect].}
+    raises: [ValueError, Exception, IOError, OSError], tags: [ReadDirEffect,
+    WriteIOEffect, WriteDirEffect, ReadIOEffect, ExecIOEffect, RootEffect].}
 </pre>
 
 

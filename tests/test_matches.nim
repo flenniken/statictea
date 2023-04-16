@@ -659,3 +659,16 @@ suite "matches.nim":
     check testMatchMarkdownLink("[StaticTea](https://github.com/flenniken/statictea)", 0,
       some(newMatches(51, 0, "StaticTea", "https://github.com/flenniken/statictea")))
     check testMatchMarkdownLink("[desc]()", 0, none(Matches))
+
+  test "doc comment example 2":
+
+    ## Match a file and line number like: filename(234).
+    let line = "template.html(87)"
+    let pattern = r"^(.*)\(([0-9]+)\)$"
+    let matchesO = matchPatternCached(line, pattern, 0, 2)
+    check matchesO.isSome == true
+    let (filename, lineNum) = matchesO.get2Groups()
+    # let (length, filename, lineNum) = match0.get2Groups()
+    # check length == line.len
+    check filename == "template.html"
+    check lineNum == "87"

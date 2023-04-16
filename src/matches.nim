@@ -2,7 +2,11 @@
 
 import std/strutils
 import std/options
+import std/tables
 import regexes
+
+var compliledPatterns = initTable[string, CompilePattern]()
+  ## A cache of compiled regex patterns, mapping a pattern to CompilePattern.
 
 const
   commands*: array[6, string] = [
@@ -31,6 +35,26 @@ const
     ## StaticTea version regular expression pattern.  It has
     ## three components each with one to three digits: i.e. 1.2.3,
     ## 123.456.789, 0.1.0,... .
+
+proc matchPatternCached*(str: string, pattern: string,
+    start: Natural, numGroups: Natural): Option[Matches] =
+  ## Match a pattern in a string and cache the compiled regular
+  ## expression pattern for next time. Start is the index in the
+  ## string to start the search. NumGroups is the number of groups in
+  ## the pattern.
+
+  # Get the cached regex for the pattern or compile it and add it to
+  # the cache.
+  var regex: CompilePattern
+  if pattern in compliledPatterns:
+    regex = compliledPatterns[pattern]
+  else:
+    let regexO = compilePattern(pattern)
+    if not regexO.isSome:
+      return
+    regex = regexO.get()
+    compliledPatterns[pattern] = regex
+  result = matchRegex(str, regex, start, numGroups)
 
 proc parsePrepost*(str: string): Option[tuple[prefix: string, postfix:string]] =
   ## Parse the prepost item on the terminal command line.  A prefix is

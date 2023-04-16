@@ -45,7 +45,7 @@ check resultStringO.get() == "456456"
 * [regexes.nim](../../src/regexes.nim) &mdash; Nim source code.
 # Index
 
-* type: [CompilePattern](#compilepattern) &mdash; A cache of compiled regex patterns, mapping a pattern to CompilePattern.
+* type: [CompilePattern](#compilepattern) &mdash; 
 * type: [Matches](#matches) &mdash; Holds the result of a match.
 * type: [Replacement](#replacement) &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.
 * [newMatches](#newmatches) &mdash; Create a new Matches object with no groups.
@@ -71,12 +71,10 @@ check resultStringO.get() == "456456"
 * [matchRegex](#matchregex) &mdash; Match a regular expression pattern in a string.
 * [compilePattern](#compilepattern-1) &mdash; Compile the pattern and return a regex object.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
-* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern for next time.
 * [replaceMany](#replacemany) &mdash; Replace the patterns in the string with their replacements.
 
 # CompilePattern
 
-A cache of compiled regex patterns, mapping a pattern to CompilePattern.
 
 
 ~~~nim
@@ -328,20 +326,6 @@ Note: the pattern uses the anchored option.
 ~~~nim
 func matchPattern(str: string; pattern: string; start: Natural;
                   numGroups: Natural): Option[Matches]
-~~~
-
-# matchPatternCached
-
-Match a pattern in a string and cache the compiled regular
-expression pattern for next time. Start is the index in the
-string to start the search. NumGroups is the number of groups in
-the pattern.
-
-
-~~~nim
-proc matchPatternCached(str: string; pattern: string; start: Natural;
-                        numGroups: Natural): Option[Matches] {.
-    raises: [KeyError], tags: [].}
 ~~~
 
 # replaceMany

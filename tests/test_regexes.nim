@@ -219,19 +219,6 @@ suite "regexes.nim":
     check matchesO.isSome == true
     check matchesO.get().length == 6
 
-  test "doc comment example 2":
-
-    ## Match a file and line number like: filename(234).
-    let line = "template.html(87)"
-    let pattern = r"^(.*)\(([0-9]+)\)$"
-    let matchesO = matchPatternCached(line, pattern, 0, 2)
-    check matchesO.isSome == true
-    let (filename, lineNum) = matchesO.get2Groups()
-    # let (length, filename, lineNum) = match0.get2Groups()
-    # check length == line.len
-    check filename == "template.html"
-    check lineNum == "87"
-
   test "doc comment example 3":
 
     ## Replace the patterns in the string with their replacements.

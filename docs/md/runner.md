@@ -483,7 +483,7 @@ Return true when the line is a file line.
 
 
 ~~~nim
-proc isRunFileLine(line: string): bool {.raises: [KeyError], tags: [].}
+proc isRunFileLine(line: string): bool
 ~~~
 
 # isExpectedLine
@@ -492,7 +492,7 @@ Return true when the line is an expected line.
 
 
 ~~~nim
-proc isExpectedLine(line: string): bool {.raises: [KeyError], tags: [].}
+proc isExpectedLine(line: string): bool
 ~~~
 
 # parseRunFileLine
@@ -502,7 +502,7 @@ Parse a file command line.
 
 ~~~nim
 proc parseRunFileLine(line: string): OpResultStr[RunFileLine] {.
-    raises: [KeyError, ValueError], tags: [].}
+    raises: [ValueError], tags: [].}
 ~~~
 
 # parseExpectedLine
@@ -512,7 +512,7 @@ Parse an expected line.
 
 ~~~nim
 proc parseExpectedLine(line: string): OpResultStr[ExpectedLine] {.
-    raises: [KeyError, ValueError], tags: [].}
+    raises: [ValueError], tags: [].}
 ~~~
 
 # openNewFile
@@ -532,8 +532,8 @@ Return information about the stf line.
 
 
 ~~~nim
-proc getAnyLine(line: string): OpResultStr[AnyLine] {.
-    raises: [KeyError, ValueError], tags: [].}
+proc getAnyLine(line: string): OpResultStr[AnyLine] {.raises: [ValueError],
+    tags: [].}
 ~~~
 
 # makeDirAndFiles
@@ -544,7 +544,7 @@ file lines and expected lines.
 
 ~~~nim
 proc makeDirAndFiles(filename: string): OpResultStr[DirAndFiles] {.
-    raises: [ValueError, Exception, IOError, OSError, KeyError],
+    raises: [ValueError, Exception, IOError, OSError],
     tags: [ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect].}
 ~~~
 
@@ -568,9 +568,8 @@ tests passed.
 
 ~~~nim
 proc runStfFilename(filename: string): int {.
-    raises: [ValueError, Exception, IOError, OSError, KeyError], tags: [
-    ReadDirEffect, WriteIOEffect, WriteDirEffect, ReadIOEffect, ExecIOEffect,
-    RootEffect].}
+    raises: [ValueError, Exception, IOError, OSError], tags: [ReadDirEffect,
+    WriteIOEffect, WriteDirEffect, ReadIOEffect, ExecIOEffect, RootEffect].}
 ~~~
 
 

@@ -17,6 +17,7 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 
 <ul>
 <li>const:  <a href="#commands">commands</a> &mdash; The StaticTea commands.</li>
+<li> <a href="#matchPatternCached">matchPatternCached</a> &mdash; Match a pattern in a string and cache the compiled regular expression pattern for next time.</li>
 <li> <a href="#parsePrepost">parsePrepost</a> &mdash; Parse the prepost item on the terminal command line.</li>
 <li> <a href="#matchPrefix">matchPrefix</a> &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.</li>
 <li> <a href="#matchCommand">matchCommand</a> &mdash; Match statictea commands.</li>
@@ -61,6 +62,20 @@ Nim source code: <a href="../../src/matches.nim">matches.nim</a>
 <pre class="nim-code">
 commands: array[6, string] = ["nextline", "block", "replace", "#", ":",
                               "endblock"]
+</pre>
+
+<h3 id="matchPatternCached">matchPatternCached</h3>
+
+<p>Match a pattern in a string and cache the compiled regular
+expression pattern for next time. Start is the index in the
+string to start the search. NumGroups is the number of groups in
+the pattern.
+</p>
+
+<pre class="nim-code">
+proc matchPatternCached(str: string; pattern: string; start: Natural;
+                        numGroups: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 </pre>
 
 <h3 id="parsePrepost">parsePrepost</h3>

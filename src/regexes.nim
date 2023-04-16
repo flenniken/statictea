@@ -72,7 +72,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import std/re
 import std/options
-import std/tables
 
 const
   maxGroups = 10
@@ -81,11 +80,6 @@ const
 
 type
   CompilePattern* = Regex
-
-# todo: move cache to matches.nim
-
-var compliledPatterns = initTable[string, CompilePattern]()
-  ## A cache of compiled regex patterns, mapping a pattern to CompilePattern.
 
 type
   Matches* = object
@@ -110,8 +104,8 @@ func newMatches*(length: Natural, start: Natural): Matches =
   result = Matches(length: length, start: start)
 
 func newMatches*(length: Natural, start: Natural, group: string): Matches =
-  var groups = @[group]
   ## Create a new Matches object with one group.
+  var groups = @[group]
   result = Matches(groups: groups, length: length, start: start, numGroups: 1)
 
 func newMatches*(length: Natural, start: Natural, group1: string,
@@ -278,26 +272,6 @@ func matchPattern*(str: string, pattern: string,
   if not regexO.isSome:
     return
   result = matchRegex(str, regexO.get(), start, numGroups)
-
-proc matchPatternCached*(str: string, pattern: string,
-    start: Natural, numGroups: Natural): Option[Matches] =
-  ## Match a pattern in a string and cache the compiled regular
-  ## expression pattern for next time. Start is the index in the
-  ## string to start the search. NumGroups is the number of groups in
-  ## the pattern.
-
-  # Get the cached regex for the pattern or compile it and add it to
-  # the cache.
-  var regex: Regex
-  if pattern in compliledPatterns:
-    regex = compliledPatterns[pattern]
-  else:
-    let regexO = compilePattern(pattern)
-    if not regexO.isSome:
-      return
-    regex = regexO.get()
-    compliledPatterns[pattern] = regex
-  result = matchRegex(str, regex, start, numGroups)
 
 proc replaceMany*(str: string, replacements: seq[Replacement]): Option[string] =
   ## Replace the patterns in the string with their replacements.

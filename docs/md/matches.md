@@ -7,6 +7,7 @@ Methods for matching sub-strings.
 # Index
 
 * const: [commands](#commands) &mdash; The StaticTea commands.
+* [matchPatternCached](#matchpatterncached) &mdash; Match a pattern in a string and cache the compiled regular expression pattern for next time.
 * [parsePrepost](#parseprepost) &mdash; Parse the prepost item on the terminal command line.
 * [matchPrefix](#matchprefix) &mdash; Match lines that start with one of the prefixes in the given table plus optional following whitespace.
 * [matchCommand](#matchcommand) &mdash; Match statictea commands.
@@ -48,6 +49,20 @@ The StaticTea commands.
 ~~~nim
 commands: array[6, string] = ["nextline", "block", "replace", "#", ":",
                               "endblock"]
+~~~
+
+# matchPatternCached
+
+Match a pattern in a string and cache the compiled regular
+expression pattern for next time. Start is the index in the
+string to start the search. NumGroups is the number of groups in
+the pattern.
+
+
+~~~nim
+proc matchPatternCached(str: string; pattern: string; start: Natural;
+                        numGroups: Natural): Option[Matches] {.
+    raises: [KeyError], tags: [].}
 ~~~
 
 # parsePrepost
