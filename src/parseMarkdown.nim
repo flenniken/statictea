@@ -506,9 +506,8 @@ func parseLink*(text: string, start: Natural): Option[LinkItem] =
   ## ~~~
   let matchesO = matchMarkdownLink(text, start)
   if isSome(matchesO):
-    let matches = matchesO.get()
-    let (desc, link) = matchesO.get2Groups()
-    result = some(newLinkItem(start, start + matches.length, desc, link))
+    let (desc, link, length) = matchesO.get2GroupsLen()
+    result = some(newLinkItem(start, start + length, desc, link))
 
 func parseInlineMarkdown*(text: string): seq[InlineElement] =
   ## Parse the text looking for bold, italic, bold+italic and

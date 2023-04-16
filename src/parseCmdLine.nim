@@ -136,18 +136,17 @@ proc parseCmdLine*(prepostTable: PrepostTable,
   if not prefixMatchO.isSome():
     # No prefix so not a command line. No error.
     return
-  let prefixMatch = prefixMatchO.get()
-  lineParts.prefix = prefixMatch.getGroup()
+  let (prefix, length) = prefixMatchO.getGroupLen()
+  lineParts.prefix = prefix
 
   # Get the command.
-  let commandMatchO = matchCommand(line, prefixMatch.length)
+  let commandMatchO = matchCommand(line, length)
   if not isSome(commandMatchO):
     # No command found at column $1, treating it as a non-command line.
-    return newLinePartsOr(wNoCommand, "", prefixMatch.length+1)
-
-  var commandMatch = commandMatchO.get()
-  lineParts.command = commandMatch.getGroup()
-
+    return newLinePartsOr(wNoCommand, "", length+1)
+  let (cmd, _) = commandMatchO.getGroupLen()
+  lineParts.command = cmd
+  
   # Get the expected postfix. Not all prefixes have a postfix.
   assert prepostTable.hasKey(lineParts.prefix)
   lineParts.postfix = prepostTable[lineParts.prefix]
@@ -158,16 +157,15 @@ proc parseCmdLine*(prepostTable: PrepostTable,
   if not isSome(lastPartO):
     # The matching closing comment postfix was not found, expected: "$1".
     return newLinePartsOr(wNoPostfix, lineParts.postfix, 0)
-  var lastPart = lastPartO.get()
-  let (continuation, ending) = lastPart.get2Groups()
+  let (continuation, ending, lastPartLen) = lastPartO.get2GroupsLen()
   lineParts.continuation = if continuation == "": false else: true
 
   # We have a prefix, command and optional postfix.
 
-  let middleStart: int = prefixMatch.length + lineParts.command.len
-  let middleLength: int = line.len - middleStart - lastPart.length
+  let middleStart: int = length + lineParts.command.len
+  let middleLength: int = line.len - middleStart - lastPartLen
 
-  assert prefixMatch.length + lineParts.command.len + middleLength + lastPart.length == line.len
+  assert length + lineParts.command.len + middleLength + lastPartLen == line.len
 
   if middleLength > 0:
     # Make sure there is a space after the command.

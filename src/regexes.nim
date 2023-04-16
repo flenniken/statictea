@@ -17,13 +17,14 @@
 ##
 ## ~~~ nim
 ## let line = "template.html(87)"
-## let pattern = r"^(.*)\(([0-9]+)\)$"
-## let matchesO = matchPatternCached(line, pattern, 0, 2)
+## let pattern = r"^(.*)\(([0-9]+)\):$"
+## let matchesO = matchPattern(line, pattern, start = 0, groups = 2)
 ##
 ## check matchesO.isSome == true
-## let (filename, lineNum) = matchesO.get2Groups()
+## let (filename, lineNum, length) = matchesO.get2GroupsLen()
 ## check filename == "template.html"
 ## check lineNum == "87"
+## check length == 14
 ## ~~~
 ##
 ## Replace the patterns in the string with their replacements:
@@ -80,6 +81,7 @@ const
 
 type
   CompilePattern* = Regex
+    ## A compiled regular expression.
 
 type
   Matches* = object
@@ -108,114 +110,45 @@ func newMatches*(length: Natural, start: Natural, group: string): Matches =
   var groups = @[group]
   result = Matches(groups: groups, length: length, start: start, numGroups: 1)
 
-func newMatches*(length: Natural, start: Natural, group1: string,
-    group2: string): Matches =
+func newMatches*(length: Natural, start: Natural,
+    group1: string, group2: string): Matches =
   ## Create a new Matches object with two groups.
   var groups = @[group1, group2]
   result = Matches(groups: groups, length: length, start: start, numGroups: 2)
-
-func newMatches*(length: Natural, start: Natural, group1: string,
-    group2: string, group3: string): Matches =
-  ## Create a new Matches object with three groups.
-  var groups = @[group1, group2, group3]
-  result = Matches(groups: groups, length: length, start: start, numGroups: 3)
 
 proc newMatches*(length: Natural, start: Natural, groups: seq[string]): Matches =
   ## Create a Matches object with the given number of groups.
   result = Matches(length: length, start: start, groups: groups,
                    numGroups: groups.len)
 
-proc newMatches*(length: Natural, start: Natural, numGroups: Natural): Matches =
-  ## Create a Matches object with the given number of groups.
-  result = Matches(length: length, start: start, numGroups: numGroups)
-
-func newReplacement*(pattern: string, sub: string): Replacement =
-  ## Create a new Replacement object.
-  result = Replacement(pattern: pattern, sub: sub)
-
-func getGroup*(matches: Matches): string =
-  ## Get the group in matches.
-  if matches.groups.len > 0:
-    result = matches.groups[0]
-
-func getGroupLen*(matches: Matches): (string, Natural) =
-  ## Get the group in matches.
-  if matches.groups.len > 0:
-    result = (matches.groups[0], matches.length)
-
-func getGroup*(matchesO: Option[Matches]): string =
-  ## Get the group in matches.
-  assert(matchesO.isSome, "Not a match")
-  result = matchesO.get().getGroup()
-
 func getGroupLen*(matchesO: Option[Matches]): (string, Natural) =
-  ## Get the group in matches and the match length.
+  ## Get the one group in matchesO and the match length.
   assert(matchesO.isSome, "Not a match")
-  result = matchesO.get().getGroupLen()
-
-func get2Groups*(matches: Matches): (string, string) =
-  ## Get two groups in matches.
   var one: string
-  var two: string
+  let matches = matchesO.get()
   if matches.groups.len > 0:
     one = matches.groups[0]
-  if matches.groups.len > 1:
-    two = matches.groups[1]
-  result = (one, two)
-
-func get2GroupsLen*(matches: Matches): (string, string, Natural) =
-  ## Get two groups and length in matches.
-  var one: string
-  var two: string
-  if matches.groups.len > 0:
-    one = matches.groups[0]
-  if matches.groups.len > 1:
-    two = matches.groups[1]
-  result = (one, two, matches.length)
-
-func get2Groups*(matchesO: Option[Matches]): (string, string) =
-  ## Get two groups in matches.
-  assert(matchesO.isSome, "Not a match")
-  result = matchesO.get().get2Groups()
+  result = (one, matches.length)
 
 func get2GroupsLen*(matchesO: Option[Matches]): (string, string, Natural) =
   ## Get two groups and length in matchesO.
   assert(matchesO.isSome, "Not a match")
-  result = matchesO.get().get2GroupsLen()
-
-func get3Groups*(matches: Matches): (string, string, string) =
-  ## Get three groups in matches.
+  let matches = matchesO.get()
   var one: string
-  var two: string
-  var three: string
   if matches.groups.len > 0:
     one = matches.groups[0]
+  var two: string
   if matches.groups.len > 1:
     two = matches.groups[1]
-  if matches.groups.len > 2:
-    three = matches.groups[2]
-  result = (one, two, three)
+  result = (one, two, matches.length)
 
-func get3Groups*(matchesO: Option[Matches]): (string, string, string) =
-  ## Get three groups in matches.
-  assert(matchesO.isSome, "Not a match")
-  result = matchesO.get().get3Groups()
-
-func get3GroupsLen*(matchesO: Option[Matches]):
-    (string, string, string, Natural) =
-  ## Return the three groups and the length of the match.
-  let matches = matchesO.get()
-  let (one, two, three) = matches.get3Groups()
-  result = (one, two, three, matches.length)
-
-func getGroups*(matches: Matches, numGroups: Natural): seq[string] =
+func getGroups*(matchesO: Option[Matches], numGroups: Natural): seq[string] =
   ## Return the number of groups specified. If one of the groups doesn't
   ## exist, "" is returned for it.
-
-  assert(numGroups <= maxGroups, "Too many groups")
+  assert(matchesO.isSome, "Not a match")
+  let matches = matchesO.get()
   if numGroups > maxGroups:
     return
-
   var groups = newSeqOfCap[string](numGroups)
   for ix in countUp(0, numGroups-1):
     if ix < matches.groups.len:
@@ -224,37 +157,30 @@ func getGroups*(matches: Matches, numGroups: Natural): seq[string] =
       groups.add("")
   result = groups
 
-func getGroups*(matchesO: Option[Matches], numGroups: Natural): seq[string] =
-  ## Return the number of groups specified. If one of the groups doesn't
-  ## exist, "" is returned for it.
-  assert(matchesO.isSome, "Not a match")
-  result = matchesO.get().getGroups(numGroups)
-
 func matchRegex*(str: string, regex: CompilePattern, start: Natural,
     numGroups: Natural): Option[Matches] =
   ## Match a regular expression pattern in a string. Start is the
   ## index in the string to start the search. NumGroups is the number
   ## of groups in the pattern.
-
   if start >= str.len:
     return
-
-  assert(numGroups <= maxGroups, "Too many groups.")
   if numGroups > maxGroups:
     return
 
-  var groups = newSeq[string](maxGroups)
-  let length = matchLen(str, regex, groups, start)
+  var maxGroups = newSeq[string](maxGroups)
+  let length = matchLen(str, regex, maxGroups, start)
   if length != -1:
-    var matches = newMatches(length, start, numGroups)
-
-    for ix in 0 .. numGroups-1:
-      matches.groups.add(groups[ix])
-
-    result = some(matches)
+    if numGroups == 0:
+      result = some(newMatches(length, start))
+    else:
+      var groups: seq[string]
+      for ix in 0 .. numGroups-1:
+        groups.add(maxGroups[ix])
+      result = some(newMatches(length, start, groups))
 
 func compilePattern*(pattern: string): Option[CompilePattern] =
   ## Compile the pattern and return a regex object.
+  ## Note: the pattern uses the anchored option.
   try:
     let regex = re(pattern)
     result = some(regex)
@@ -272,6 +198,10 @@ func matchPattern*(str: string, pattern: string,
   if not regexO.isSome:
     return
   result = matchRegex(str, regexO.get(), start, numGroups)
+
+func newReplacement*(pattern: string, sub: string): Replacement =
+  ## Create a new Replacement object.
+  result = Replacement(pattern: pattern, sub: sub)
 
 proc replaceMany*(str: string, replacements: seq[Replacement]): Option[string] =
   ## Replace the patterns in the string with their replacements.

@@ -269,8 +269,9 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
   var replCmd = not_cmd
   if replCmdO.isSome:
-    let cmd = stringToReplCommand(replCmdO.getGroup())
-    runningPos += replCmdO.get().length
+    let (rCmd, length) = replCmdO.getGroupLen()
+    let cmd = stringToReplCommand(rCmd)
+    runningPos += length
     # q, h, v commands must be on a line by themself. If not, they are
     # treated as a statement line.
     case cmd

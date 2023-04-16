@@ -64,7 +64,7 @@ proc parsePrepost*(str: string): Option[tuple[prefix: string, postfix:string]] =
   let pattern = "([\x20-\x2b\x2d-\x7F]{1,20})(?:,([\x20-\x2b\x2d-\x7F]{1,20})){0,1}$"
   let matchesO = matchPattern(str, pattern, 0, 2)
   if matchesO.isSome:
-    let (prefix, postfix) = matchesO.get2Groups()
+    let (prefix, postfix, _) = matchesO.get2GroupsLen()
     result = some((prefix, postfix))
 
 proc matchPrefix*(line: string, prefixes: seq[string],
@@ -249,13 +249,13 @@ proc matchBoolExprOperator*(line: string, start: Natural): Option[Matches] =
   result = matchPatternCached(line, pattern, start, 2)
   if result.isSome:
     # Return one group.
-    var (a, b) = result.get2Groups()
+    var (a, b, length) = result.get2GroupsLen()
     var operator: string
     if a != "":
       operator = a
     else:
       operator = b
-    result = some(newMatches(result.get().length, start, operator))
+    result = some(newMatches(length, start, operator))
 
 proc matchCompareOperator*(line: string, start: Natural): Option[Matches] =
   ## Match the compare operators and the trailing whitespace.

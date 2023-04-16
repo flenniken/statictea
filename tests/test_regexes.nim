@@ -45,7 +45,7 @@ suite "regexes.nim":
     check m.groups[1] == "def"
 
   test "newMatches 3":
-    let m = newMatches(6, 3, "abc", "def", "ghi")
+    let m = newMatches(6, 3, @["abc", "def", "ghi"])
     check m.length == 6
     check m.start == 3
     check m.numGroups == 3
@@ -89,8 +89,9 @@ suite "regexes.nim":
     let pattern = r"^.*(def)$"
     let matchesO = matchPattern("  abc asdfasdfdef def", pattern, 0, 1)
     check matchesO.isSome
-    let one = matchesO.get().getGroup()
+    let (one, length) = matchesO.getGroupLen()
     check one == "def"
+    check length == 21
 
     let groups0 = getGroups(matchesO, 0)
     check groups0.len == 0
@@ -116,9 +117,10 @@ suite "regexes.nim":
 
     let matchesO = matchPattern("  abc asdfasdfdef def", pattern, 2, 2)
     check matchesO.isSome
-    let (one, two) = matchesO.get().get2Groups()
+    let (one, two, length) = matchesO.get2GroupsLen()
     check one == "abc"
     check two == "def"
+    check length == 19
 
     let groups0 = getGroups(matchesO, 0)
     check groups0.len == 0
@@ -139,21 +141,21 @@ suite "regexes.nim":
     let pattern = r"(abc).*(def)$"
     let matchesO = matchPattern("  abc asdfasdfdef def", pattern, 2, 2)
     check matchesO.isSome
-    let (one, two) = matchesO.get().get2Groups()
-    # check length == 19
+    let (one, two, length) = matchesO.get2GroupsLen()
     check one == "abc"
     check two == "def"
+    check length == 19
 
-  test "three groups":
+  test "groups":
     let pattern = r"^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
-    check testMatchPattern("999.888.777", pattern, 0, some(newMatches(11, 0, "999", "888", "777")), 3)
-    check testMatchPattern("5.67.8", pattern, 0, some(newMatches(6, 0, "5", "67", "8")), 3)
+    check testMatchPattern("999.888.777", pattern, 0, some(newMatches(11, 0, @["999", "888", "777"])), 3)
+    check testMatchPattern("5.67.8", pattern, 0, some(newMatches(6, 0, @["5", "67", "8"])), 3)
     let matchesO = matchPattern("5.67.8", pattern, 0, 3)
     check matchesO.isSome
-    let (one, two, three) = matchesO.get().get3Groups()
-    check one == "5"
-    check two == "67"
-    check three == "8"
+    let groups = matchesO.getGroups(3)
+    check groups[0] == "5"
+    check groups[1] == "67"
+    check groups[2] == "8"
 
   test "start not zero":
     # Using ^ to anchor doesn't work as I expect when start is not 0.
@@ -176,7 +178,7 @@ suite "regexes.nim":
     check testMatchPattern("yesmatch", "(yes)(match)", 0, some(newMatches(8, 0, "yes", "match")), 2)
 
   test "matchPattern 3 groups":
-    let eMatchesO = some(newMatches(3, 0, "y", "e", "s"))
+    let eMatchesO = some(newMatches(3, 0, @["y", "e", "s"]))
     check testMatchPattern("yesmatches", "(y)(e)(s)", 0, eMatchesO, 3)
 
   test "matchPattern length":

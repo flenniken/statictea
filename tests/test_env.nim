@@ -29,8 +29,7 @@ proc parseTimeStamp*(str: string): Option[DateTime] =
 proc parseFileLine*(line: string): Option[FileLine] =
   let matchesO = matchFileLine(line, 0)
   if matchesO.isSome:
-    let matches = matchesO.get()
-    let (filename, lineNumString) = matches.get2Groups()
+    let (filename, lineNumString, _) = matchesO.get2GroupsLen()
     let lineNum = parseUInt(lineNumString)
     result = some(FileLine(filename: filename, lineNum: lineNum))
 

@@ -667,8 +667,7 @@ suite "matches.nim":
     let pattern = r"^(.*)\(([0-9]+)\)$"
     let matchesO = matchPatternCached(line, pattern, 0, 2)
     check matchesO.isSome == true
-    let (filename, lineNum) = matchesO.get2Groups()
-    # let (length, filename, lineNum) = match0.get2Groups()
-    # check length == line.len
+    let (filename, lineNum, length) = matchesO.get2GroupsLen()
     check filename == "template.html"
     check lineNum == "87"
+    check length == line.len

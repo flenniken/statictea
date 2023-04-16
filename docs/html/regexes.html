@@ -27,13 +27,14 @@ Match a file and line number like: filename(234):
 
 </p><pre class="plain-code">
 let line = &quot;template.html(87)&quot;
-let pattern = r&quot;^(.*)\(([0-9]+)\)$&quot;
-let matchesO = matchPatternCached(line, pattern, 0, 2)
+let pattern = r&quot;^(.*)\(([0-9]+)\):$&quot;
+let matchesO = matchPattern(line, pattern, start = 0, groups = 2)
 
 check matchesO.isSome == true
-let (filename, lineNum) = matchesO.get2Groups()
+let (filename, lineNum, length) = matchesO.get2GroupsLen()
 check filename == &quot;template.html&quot;
 check lineNum == &quot;87&quot;
+check length == 14
 </pre>
 <p>
 Replace the patterns in the string with their replacements:
@@ -55,38 +56,27 @@ Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#CompilePattern">CompilePattern</a> &mdash; </li>
+<li>type:  <a href="#CompilePattern">CompilePattern</a> &mdash; A compiled regular expression.</li>
 <li>type:  <a href="#Matches">Matches</a> &mdash; Holds the result of a match.</li>
 <li>type:  <a href="#Replacement">Replacement</a> &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.</li>
 <li> <a href="#newMatches">newMatches</a> &mdash; Create a new Matches object with no groups.</li>
 <li> <a href="#newMatches-1">newMatches</a> &mdash; Create a new Matches object with one group.</li>
 <li> <a href="#newMatches-2">newMatches</a> &mdash; Create a new Matches object with two groups.</li>
-<li> <a href="#newMatches-3">newMatches</a> &mdash; Create a new Matches object with three groups.</li>
-<li> <a href="#newMatches-4">newMatches</a> &mdash; Create a Matches object with the given number of groups.</li>
-<li> <a href="#newMatches-5">newMatches</a> &mdash; Create a Matches object with the given number of groups.</li>
-<li> <a href="#newReplacement">newReplacement</a> &mdash; Create a new Replacement object.</li>
-<li> <a href="#getGroup">getGroup</a> &mdash; Get the group in matches.</li>
-<li> <a href="#getGroupLen">getGroupLen</a> &mdash; Get the group in matches.</li>
-<li> <a href="#getGroup-1">getGroup</a> &mdash; Get the group in matches.</li>
-<li> <a href="#getGroupLen-1">getGroupLen</a> &mdash; Get the group in matches and the match length.</li>
-<li> <a href="#get2Groups">get2Groups</a> &mdash; Get two groups in matches.</li>
-<li> <a href="#get2GroupsLen">get2GroupsLen</a> &mdash; Get two groups and length in matches.</li>
-<li> <a href="#get2Groups-1">get2Groups</a> &mdash; Get two groups in matches.</li>
-<li> <a href="#get2GroupsLen-1">get2GroupsLen</a> &mdash; Get two groups and length in matchesO.</li>
-<li> <a href="#get3Groups">get3Groups</a> &mdash; Get three groups in matches.</li>
-<li> <a href="#get3Groups-1">get3Groups</a> &mdash; Get three groups in matches.</li>
-<li> <a href="#get3GroupsLen">get3GroupsLen</a> &mdash; Return the three groups and the length of the match.</li>
+<li> <a href="#newMatches-3">newMatches</a> &mdash; Create a Matches object with the given number of groups.</li>
+<li> <a href="#getGroupLen">getGroupLen</a> &mdash; Get the one group in matchesO and the match length.</li>
+<li> <a href="#get2GroupsLen">get2GroupsLen</a> &mdash; Get two groups and length in matchesO.</li>
 <li> <a href="#getGroups">getGroups</a> &mdash; Return the number of groups specified.</li>
-<li> <a href="#getGroups-1">getGroups</a> &mdash; Return the number of groups specified.</li>
 <li> <a href="#matchRegex">matchRegex</a> &mdash; Match a regular expression pattern in a string.</li>
 <li> <a href="#compilePattern">compilePattern</a> &mdash; Compile the pattern and return a regex object.</li>
 <li> <a href="#matchPattern">matchPattern</a> &mdash; Match a regular expression pattern in a string.</li>
+<li> <a href="#newReplacement">newReplacement</a> &mdash; Create a new Replacement object.</li>
 <li> <a href="#replaceMany">replaceMany</a> &mdash; Replace the patterns in the string with their replacements.</li>
 </ul>
 
 <h3 id="CompilePattern">CompilePattern</h3>
 
-
+<p>A compiled regular expression.
+</p>
 
 <pre class="nim-code">
 CompilePattern = Regex
@@ -152,16 +142,6 @@ func newMatches(length: Natural; start: Natural; group1: string; group2: string)
 
 <h3 id="newMatches-3">newMatches</h3>
 
-<p>Create a new Matches object with three groups.
-</p>
-
-<pre class="nim-code">
-func newMatches(length: Natural; start: Natural; group1: string; group2: string;
-                group3: string): Matches
-</pre>
-
-<h3 id="newMatches-4">newMatches</h3>
-
 <p>Create a Matches object with the given number of groups.
 </p>
 
@@ -169,88 +149,16 @@ func newMatches(length: Natural; start: Natural; group1: string; group2: string;
 proc newMatches(length: Natural; start: Natural; groups: seq[string]): Matches
 </pre>
 
-<h3 id="newMatches-5">newMatches</h3>
-
-<p>Create a Matches object with the given number of groups.
-</p>
-
-<pre class="nim-code">
-proc newMatches(length: Natural; start: Natural; numGroups: Natural): Matches
-</pre>
-
-<h3 id="newReplacement">newReplacement</h3>
-
-<p>Create a new Replacement object.
-</p>
-
-<pre class="nim-code">
-func newReplacement(pattern: string; sub: string): Replacement
-</pre>
-
-<h3 id="getGroup">getGroup</h3>
-
-<p>Get the group in matches.
-</p>
-
-<pre class="nim-code">
-func getGroup(matches: Matches): string
-</pre>
-
 <h3 id="getGroupLen">getGroupLen</h3>
 
-<p>Get the group in matches.
-</p>
-
-<pre class="nim-code">
-func getGroupLen(matches: Matches): (string, Natural)
-</pre>
-
-<h3 id="getGroup-1">getGroup</h3>
-
-<p>Get the group in matches.
-</p>
-
-<pre class="nim-code">
-func getGroup(matchesO: Option[Matches]): string
-</pre>
-
-<h3 id="getGroupLen-1">getGroupLen</h3>
-
-<p>Get the group in matches and the match length.
+<p>Get the one group in matchesO and the match length.
 </p>
 
 <pre class="nim-code">
 func getGroupLen(matchesO: Option[Matches]): (string, Natural)
 </pre>
 
-<h3 id="get2Groups">get2Groups</h3>
-
-<p>Get two groups in matches.
-</p>
-
-<pre class="nim-code">
-func get2Groups(matches: Matches): (string, string)
-</pre>
-
 <h3 id="get2GroupsLen">get2GroupsLen</h3>
-
-<p>Get two groups and length in matches.
-</p>
-
-<pre class="nim-code">
-func get2GroupsLen(matches: Matches): (string, string, Natural)
-</pre>
-
-<h3 id="get2Groups-1">get2Groups</h3>
-
-<p>Get two groups in matches.
-</p>
-
-<pre class="nim-code">
-func get2Groups(matchesO: Option[Matches]): (string, string)
-</pre>
-
-<h3 id="get2GroupsLen-1">get2GroupsLen</h3>
 
 <p>Get two groups and length in matchesO.
 </p>
@@ -259,44 +167,7 @@ func get2Groups(matchesO: Option[Matches]): (string, string)
 func get2GroupsLen(matchesO: Option[Matches]): (string, string, Natural)
 </pre>
 
-<h3 id="get3Groups">get3Groups</h3>
-
-<p>Get three groups in matches.
-</p>
-
-<pre class="nim-code">
-func get3Groups(matches: Matches): (string, string, string)
-</pre>
-
-<h3 id="get3Groups-1">get3Groups</h3>
-
-<p>Get three groups in matches.
-</p>
-
-<pre class="nim-code">
-func get3Groups(matchesO: Option[Matches]): (string, string, string)
-</pre>
-
-<h3 id="get3GroupsLen">get3GroupsLen</h3>
-
-<p>Return the three groups and the length of the match.
-</p>
-
-<pre class="nim-code">
-func get3GroupsLen(matchesO: Option[Matches]): (string, string, string, Natural)
-</pre>
-
 <h3 id="getGroups">getGroups</h3>
-
-<p>Return the number of groups specified. If one of the groups doesn&#x27;t
-exist, &quot;&quot; is returned for it.
-</p>
-
-<pre class="nim-code">
-func getGroups(matches: Matches; numGroups: Natural): seq[string]
-</pre>
-
-<h3 id="getGroups-1">getGroups</h3>
 
 <p>Return the number of groups specified. If one of the groups doesn&#x27;t
 exist, &quot;&quot; is returned for it.
@@ -321,6 +192,7 @@ func matchRegex(str: string; regex: CompilePattern; start: Natural;
 <h3 id="compilePattern">compilePattern</h3>
 
 <p>Compile the pattern and return a regex object.
+Note: the pattern uses the anchored option.
 </p>
 
 <pre class="nim-code">
@@ -339,6 +211,15 @@ of groups in the pattern.
 <pre class="nim-code">
 func matchPattern(str: string; pattern: string; start: Natural;
                   numGroups: Natural): Option[Matches]
+</pre>
+
+<h3 id="newReplacement">newReplacement</h3>
+
+<p>Create a new Replacement object.
+</p>
+
+<pre class="nim-code">
+func newReplacement(pattern: string; sub: string): Replacement
 </pre>
 
 <h3 id="replaceMany">replaceMany</h3>

@@ -1,6 +1,6 @@
-## StaticTea functions and supporting types. The StaticTea language
-## functions start with "fun_", for example, the "fun_cmp_ffi"
-## function implements the "cmp" function for floats.
+## The statictea built-in functions and their documentation.  The
+## StaticTea language functions start with "fun_", for example, the
+## "fun_cmp_ffi" function implements the "cmp" function for floats.
 
 import std/options
 import std/tables
@@ -118,8 +118,7 @@ func parseNumber*(line: string, start: Natural): ValuePosSiOr =
 
   # The decimal point determines whether the number is an integer or
   # float.
-  let matches = matchesO.get()
-  let decimalPoint = matches.getGroup()
+  let (decimalPoint, length) = matchesO.getGroupLen()
   var valueAndPos: ValuePosSi
   if decimalPoint == ".":
     # Parse the float.
@@ -138,7 +137,7 @@ func parseNumber*(line: string, start: Natural): ValuePosSiOr =
     let (number, pos) = intAndPosO.get()
     valueAndPos = newValuePosSi(newValue(number), pos)
   # Note that we use the matches length so it includes the trailing whitespace.
-  result = newValuePosSiOr(newValuePosSi(valueAndPos.value, start + matches.length))
+  result = newValuePosSiOr(newValuePosSi(valueAndPos.value, start + length))
 
 func numberStringToNum(numString: string): FunResult =
   ## Convert the number string to a float or int, if possible.
@@ -771,10 +770,10 @@ func parseVersion*(version: string): Option[(int, int, int)] =
   let matchesO = matchVersionNotCached(version, 0)
   if not matchesO.isSome:
     return
-  let (g1, g2, g3) = matchesO.get3Groups()
-  let g1IntAndPosO = parseInteger(g1)
-  let g2IntAndPosO = parseInteger(g2)
-  let g3IntAndPosO = parseInteger(g3)
+  let g = matchesO.getGroups(3)
+  let g1IntAndPosO = parseInteger(g[0])
+  let g2IntAndPosO = parseInteger(g[1])
+  let g3IntAndPosO = parseInteger(g[2])
   result = some((int(g1IntAndPosO.get().number),
     int(g2IntAndPosO.get().number), int(g3IntAndPosO.get().number)))
 

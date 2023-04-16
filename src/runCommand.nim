@@ -1283,13 +1283,12 @@ proc bareIf*(
   if not commaSymbolO.isSome:
     # No matching end right parentheses.
     return newValuePosSiOr(wNoMatchingParen, "", runningPos)
-  let commaSymbol = commaSymbolO.get()
-  let foundSymbol = commaSymbol.getGroup()
+  let (foundSymbol, length) = commaSymbolO.getGroupLen()
   if foundSymbol == ",":
     # A bare IF without an assignment takes two arguments.
     return newValuePosSiOr(wBareIfTwoArguments, "", runningPos)
 
-  runningPos += commaSymbol.length
+  runningPos += length
 
   result = newValuePosSiOr(value2, runningPos, se2)
 
@@ -1341,9 +1340,8 @@ proc getArguments*(
         else:
           # Missing comma or right bracket.
           return newValuePosSiOr(wMissingCommaBracket, "", runningPos)
-      let commaSymbol = commaSymbolO.get()
-      runningPos = runningPos + commaSymbol.length
-      let foundSymbol = commaSymbol.getGroup()
+      let (foundSymbol, length) = commaSymbolO.getGroupLen()
+      runningPos += length
       if (foundSymbol == ")" and symbol == gRightParentheses) or
          (foundSymbol == "]" and symbol == gRightBracket):
         break
@@ -1543,7 +1541,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
     if not opO.isSome:
       # Expected a boolean expression operator, and, or, ==, !=, <, >, <=, >=.
       return newValuePosSiOr(wNotBoolOperator, "", runningPos)
-    let op = opO.getGroup()
+    let (op, length) = opO.getGroupLen()
     if (op == "and" or op == "or") and accum.kind != vkBool:
       # A boolean operator’s left value must be a bool.
       return newValuePosSiOr(wBoolOperatorLeft, "", runningPos)
@@ -1575,7 +1573,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
         # The comparison operator’s left value must be a number or string.
         return newValuePosSiOr(wCompareOperator, "", runningPos)
 
-    runningPos += opO.get().length
+    runningPos += length
 
     if sortCiruitTaken:
       # Sort ciruit the condition and skip past the closing right parentheses.
@@ -1614,8 +1612,8 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
       if not op2O.isSome:
         # Expected a compare operator, ==, !=, <, >, <=, >=.
         return newValuePosSiOr(wNotCompareOperator, "", runningPos)
-      let op2 = op2O.getGroup()
-      runningPos += op2O.get().length
+      let (op2, length2) = op2O.getGroupLen()
+      runningPos += length2
 
       # Return a value and position after handling any nested condition.
       let vlThirdOr = getValueOrNestedCond(env, statement, runningPos, variables)
@@ -2371,13 +2369,12 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     if not operatorO.isSome:
       # Missing operator, = or &=.
       return newVariableDataOr(wInvalidVariable, "", runningPos)
-    let match = operatorO.get()
-    let op = match.getGroup()
+    let (op, length) = operatorO.getGroupLen()
     if op == "=":
       operator = opEqual
     else:
       operator = opAppendList
-    runningPos = runningPos + match.length
+    runningPos = runningPos + length
 
     # Get the right hand side value and match the following whitespace.
     vlOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)

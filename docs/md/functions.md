@@ -1,8 +1,8 @@
 # functions.nim
 
-StaticTea functions and supporting types. The StaticTea language
-functions start with "fun_", for example, the "fun_cmp_ffi"
-function implements the "cmp" function for floats.
+The statictea built-in functions and their documentation.  The
+StaticTea language functions start with "fun_", for example, the
+"fun_cmp_ffi" function implements the "cmp" function for floats.
 
 
 * [functions.nim](../../src/functions.nim) &mdash; Nim source code.
