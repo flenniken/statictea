@@ -1,14 +1,17 @@
 ## Private module for experimenting.
 
-import std/terminal
-import std/strformat
+type
+  FunctionPtr* = proc (num: int): int {.noSideEffect.}
 
+func add2(num: int): int =
+  result = num + 2
 
-var file = open("term.txt", fmWrite)
-for color in low(ForegroundColor) .. high(ForegroundColor):
-  file.styledWrite(color, fmt"{color} some text" & "\n")
-file.close()
+proc add3(num: int): int =
+  result = num + 3
 
-echo "-------"
-let content = readFile("term.txt")
-echo content
+let pa: FunctionPtr = add2
+let pb: FunctionPtr = add3
+
+echo $pa(1)
+echo $pb(1)
+

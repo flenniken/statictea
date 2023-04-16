@@ -1963,7 +1963,7 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## log("always log")
   ## ~~~
 
-  tMapParameters("log", "si")
+  tMapParameters("log", "ss")
   let message = map["a"].stringv
   result = newFunResult(newValue(message))
 
@@ -2502,6 +2502,29 @@ func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
     return newFunResultWarn(wInvalidHtmlPlace, 1)
   result = newFunResult(newValue(str))
 
+func fun_echo_ss*(variables: Variables, arguments: seq[Value]): FunResult =
+  ## Echo a string to standard out. Return the same string. The
+  ## function has a bare form.
+  ##
+  ## ~~~statictea
+  ## echo = func(text: string) string
+  ## ~~~
+  ##
+  ## Examples:
+  ##
+  ## ~~~statictea
+  ## echo("debugging string")
+  ##
+  ## if(cond, echo("debugging string"))
+  ##
+  ## a = len(echo("len called"))
+  ##  #-> 10
+  ## ~~~
+  ##
+  tMapParameters("echo", "ss")
+  let message = map["a"].stringv
+  result = newFunResult(newValue(message))
+
 var functionsDict* = newTable[string, FunctionPtr]()
   ## Maps a built-in function name to a function pointer you can call.
 functionsDict["fun_add_fff"] = fun_add_fff
@@ -2516,6 +2539,7 @@ functionsDict["fun_cmp_ssobi"] = fun_cmp_ssobi
 functionsDict["fun_cmpVersion_ssi"] = fun_cmpVersion_ssi
 functionsDict["fun_dict_old"] = fun_dict_old
 functionsDict["fun_dup_sis"] = fun_dup_sis
+functionsDict["fun_echo_ss"] = fun_echo_ss
 functionsDict["fun_exists_dsb"] = fun_exists_dsb
 functionsDict["fun_find_ssoaa"] = fun_find_ssoaa
 functionsDict["fun_float_if"] = fun_float_if

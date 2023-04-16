@@ -130,13 +130,15 @@ PosOr = OpResultWarn[Natural]
 </li><li>spFunc — func function
 </li><li>spListLoop — list with callback function
 </li><li>spCase — case function
+</li><li>spEcho — echo function
 </li></ul>
 
 
 <pre class="nim-code">
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
-  spReturn = "return", spFunc = "func", spListLoop = "listLoop", spCase = "case"
+  spReturn = "return", spFunc = "func", spListLoop = "listLoop",
+  spCase = "case", spEcho = "echo"
 </pre>
 
 <h3 id="SpecialFunctionOr">SpecialFunctionOr</h3>

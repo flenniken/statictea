@@ -4,6 +4,7 @@ import std/options
 import std/strutils
 import std/tables
 import std/streams
+import std/strformat
 import runCommand
 import functions
 import parseCmdLine
@@ -3366,4 +3367,32 @@ o = {}
     let text = """a = case(22, [11, 1, 22, 2] . 55)"""
     let statement = newStatement(text, lineNum=1)
     let eVariableDataOr = newVariableDataOr(wMissingCommaParen, "", 28)
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "echo bare":
+    let message = "testing bare echo"
+    let text = fmt"""echo("{message}")"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(message))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "echo conditionally":
+    let message = "testing conditional echo"
+    let text = fmt"""if(true, echo("{message}"))"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(message))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "echo conditionally false":
+    let message = "should not show"
+    let text = fmt"""if(false, echo("{message}"))"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue(0))
+    check testRunStatement(statement, eVariableDataOr)
+
+  test "echo argument":
+    let message = "echo and use message"
+    let text = fmt"""a = len(echo("{message}"))"""
+    let statement = newStatement(text, lineNum=1)
+    let eVariableDataOr = newVariableDataOr("a", opEqual, newValue(message.len))
     check testRunStatement(statement, eVariableDataOr)

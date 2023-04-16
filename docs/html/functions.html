@@ -91,6 +91,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#escapeHtmlBody">escapeHtmlBody</a> &mdash; Excape text for placing in body html.</li>
 <li> <a href="#escapeHtmlAttribute">escapeHtmlAttribute</a> &mdash; Excape text for placing in an html attribute.</li>
 <li> <a href="#fun_html_sss">fun_html_sss</a> &mdash; Escape text for placing it in an html page.</li>
+<li> <a href="#fun_echo_ss">fun_echo_ss</a> &mdash; Echo a string to standard out.</li>
 <li> <a href="#functionsDict">functionsDict</a> &mdash; Maps a built-in function name to a function pointer you can call.</li>
 <li>type:  <a href="#BuiltInInfo">BuiltInInfo</a> &mdash; The built-in function information.</li>
 <li> <a href="#newBuiltInInfo">newBuiltInInfo</a> &mdash; Return a BuiltInInfo object.</li>
@@ -2081,6 +2082,33 @@ For more information about how to escape and what is safe see:
 
 <pre class="nim-code">
 func fun_html_sss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
+</pre>
+
+<h3 id="fun_echo_ss">fun_echo_ss</h3>
+
+<p>Echo a string to standard out. Return the same string. The
+function has a bare form.
+
+</p><pre class="tea-code">
+<span class="t-dotName">echo</span> = <span class="t-funcCall">func</span>(<span class="t-param">text</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">echo</span>(<span class="t-str">&quot;debugging string&quot;</span>)
+
+<span class="t-funcCall">if</span>(<span class="t-dotName">cond</span>, <span class="t-funcCall">echo</span>(<span class="t-str">&quot;debugging string&quot;</span>))
+
+<span class="t-dotName">a</span> = <span class="t-funcCall">len</span>(<span class="t-funcCall">echo</span>(<span class="t-str">&quot;len called&quot;</span>))
+ <span class="t-comment">#-&gt; 10
+</span></pre>
+<p>
+</p>
+
+<pre class="nim-code">
+func fun_echo_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 </pre>
 

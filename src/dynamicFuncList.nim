@@ -296,6 +296,28 @@ dup("", 3) # ""
 
 """
 
+  dc_fun_echo_ss = """
+Echo a string to standard out. Return the same string. The
+function has a bare form.
+
+~~~statictea
+echo = func(text: string) string
+~~~
+
+Examples:
+
+~~~statictea
+echo("debugging string")
+
+if(cond, echo("debugging string"))
+
+a = len(echo("len called"))
+ #-> 10
+~~~
+
+
+"""
+
   dc_fun_exists_dsb = """
 Determine whether a key exists in a dictionary. Return true when it
 exists, else false.
@@ -1523,6 +1545,7 @@ warn("always warn")
     info("fun_cmpVersion_ssi", dc_fun_cmpVersion_ssi, 44),
     info("fun_dict_old", dc_fun_dict_old, 37),
     info("fun_dup_sis", dc_fun_dup_sis, 39),
+    info("fun_echo_ss", dc_fun_echo_ss, 23),
     info("fun_exists_dsb", dc_fun_exists_dsb, 22),
     info("fun_find_ssoaa", dc_fun_find_ssoaa, 38),
     info("fun_float_if", dc_fun_float_if, 17),
@@ -1589,6 +1612,7 @@ warn("always warn")
     780,
     1179,
     1140,
+    2505,
     658,
     1067,
     824,

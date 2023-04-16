@@ -51,6 +51,7 @@ type
     ## * spFunc — func function
     ## * spListLoop — list with callback function
     ## * spCase — case function
+    ## * spEcho — echo function
     spNotSpecial = "not-special",
     spIf = "if",
     spWarn = "warn",
@@ -59,6 +60,7 @@ type
     spFunc = "func",
     spListLoop = "listLoop",
     spCase = "case",
+    spEcho = "echo",
 
   SpecialFunctionOr* = OpResultWarn[SpecialFunction]
     ## A SpecialFunction or a warning message.
@@ -1064,6 +1066,8 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
     result = spListLoop
   of "case":
     result = spCase
+  of "echo":
+    result = spEcho
   else:
     result = spNotSpecial
 
@@ -1431,14 +1435,20 @@ proc getFunctionValuePosSi*(
     return newValuePosSiOr(funResult.warningData.messageId,
       funResult.warningData.p1, warningPos)
 
-  var sideEffect: SideEffect
   # todo: use the signature function name instead?
   assert functionName != "return"
 
-  if functionName == "log":
-    sideEffect = seLogMessage
-  else:
+  # Set the side effect or do it, if special.
+  var sideEffect: SideEffect
+  let specialFunction = getSpecialFunction(funcVar)
+  case specialFunction:
+  of spNotSpecial, spIf, spListLoop, spCase, spFunc, spReturn, spWarn:
     sideEffect = seNone
+  of spEcho:
+    sideEffect = seNone
+    echo funResult.value.stringv
+  of spLog:
+    sideEffect = seLogMessage
 
   result = newValuePosSiOr(funResult.value, runningPos, sideEffect)
 
@@ -2162,8 +2172,8 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       of spFunc:
         # Define a function in a code file and not nested.
         return newValuePosSiOr(wDefineFunction, "", start)
-      of spNotSpecial, spReturn, spWarn, spLog:
-        # Handle normal functions and warn, return and log.
+      of spNotSpecial, spReturn, spWarn, spLog, spEcho:
+        # Handle normal functions and warn, return, log and echo.
         return getFunctionValuePosSi(env, rightName.dotName, start, statement,
           rightName.pos, variables, listCase=false)
 
@@ -2243,8 +2253,8 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   of spNotSpecial, spFunc, spCase:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValuePosSiOr(wMissingLeftAndOpr, "", start)
-  of spWarn, spLog:
-    # Handle a bare warn, or log function.
+  of spWarn, spLog, spEcho:
+    # Handle a bare warn, echo, or log function.
     result = getFunctionValuePosSi(env, $specialFunction, start,
       statement, runningPos, variables, listCase=false, topLevel = true)
 
@@ -2345,8 +2355,8 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
 
   case leftName.kind
   of vnkFunction:
-    # Handle bare function: if, return, warn, log and listLoop. A bare
-    # function does not assign a variable.
+    # Handle bare function: if, return, warn, log, listLoop and
+    # echo. A bare function does not assign a variable.
     vlOr = runBareFunction(env, statement, runningPos, variables, leftName)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)

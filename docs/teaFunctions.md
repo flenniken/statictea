@@ -22,6 +22,7 @@ variable or pass to another function.
 * [cmpVersion](#cmpversion) &mdash; Compare two StaticTea version numbers.
 * [dict](#dict) &mdash; Create a dictionary from a list of key, value pairs.
 * [dup](#dup) &mdash; Duplicate a string x times.
+* [echo](#echo) &mdash; Echo a string to standard out.
 * [exists](#exists) &mdash; Determine whether a key exists in a dictionary.
 * [find](#find) &mdash; Find the position of a substring in a string.
 * [float](#float) &mdash; Create a float from an int.
@@ -370,6 +371,29 @@ dup("abc", 1) # "abc"
 dup("abc", 2) # "abcabc"
 dup("", 3) # ""
 ~~~
+
+
+
+# echo
+
+Echo a string to standard out. Return the same string. The
+function has a bare form.
+
+~~~javascript
+echo = func(text: string) string
+~~~
+
+Examples:
+
+~~~javascript
+echo("debugging string")
+
+if(cond, echo("debugging string"))
+
+a = len(echo("len called"))
+ #-> 10
+~~~
+
 
 
 

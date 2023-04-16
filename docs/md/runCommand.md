@@ -118,12 +118,14 @@ The special functions.
 * spFunc — func function
 * spListLoop — list with callback function
 * spCase — case function
+* spEcho — echo function
 
 
 ~~~nim
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
-  spReturn = "return", spFunc = "func", spListLoop = "listLoop", spCase = "case"
+  spReturn = "return", spFunc = "func", spListLoop = "listLoop",
+  spCase = "case", spEcho = "echo"
 ~~~
 
 # SpecialFunctionOr

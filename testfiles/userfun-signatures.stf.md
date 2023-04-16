@@ -92,6 +92,7 @@ cmp(a: string, b: string, c: optional bool) int
 cmpVersion(a: string, b: string) int
 dict(a: optional list) dict
 dup(a: string, b: int) string
+echo(a: string) string
 exists(a: dict, b: string) bool
 find(a: string, b: string, c: optional any) any
 float(a: int) float

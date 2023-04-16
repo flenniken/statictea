@@ -81,6 +81,7 @@ StaticTea language functions start with "fun_", for example, the
 * [escapeHtmlBody](#escapehtmlbody) &mdash; Excape text for placing in body html.
 * [escapeHtmlAttribute](#escapehtmlattribute) &mdash; Excape text for placing in an html attribute.
 * [fun_html_sss](#fun_html_sss) &mdash; Escape text for placing it in an html page.
+* [fun_echo_ss](#fun_echo_ss) &mdash; Echo a string to standard out.
 * [functionsDict](#functionsdict) &mdash; Maps a built-in function name to a function pointer you can call.
 * type: [BuiltInInfo](#builtininfo) &mdash; The built-in function information.
 * [newBuiltInInfo](#newbuiltininfo) &mdash; Return a BuiltInInfo object.
@@ -2038,6 +2039,33 @@ For more information about how to escape and what is safe see:
 
 ~~~nim
 func fun_html_sss(variables: Variables; arguments: seq[Value]): FunResult {.
+    raises: [KeyError], tags: [].}
+~~~
+
+# fun_echo_ss
+
+Echo a string to standard out. Return the same string. The
+function has a bare form.
+
+~~~javascript
+echo = func(text: string) string
+~~~
+
+Examples:
+
+~~~javascript
+echo("debugging string")
+
+if(cond, echo("debugging string"))
+
+a = len(echo("len called"))
+ #-> 10
+~~~
+
+
+
+~~~nim
+func fun_echo_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ~~~
 
