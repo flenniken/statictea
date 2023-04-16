@@ -1448,6 +1448,7 @@ proc getFunctionValuePosSi*(
     sideEffect = seNone
     echo funResult.value.stringv
   of spLog:
+    # todo: handle log right here, no side effect value
     sideEffect = seLogMessage
 
   result = newValuePosSiOr(funResult.value, runningPos, sideEffect)
@@ -2402,18 +2403,16 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   case vlOr.value.sideEffect
   of seReturn:
     # Return function exit.
-    return newVariableDataOr("", opReturn, vlOr.value.value)
+    result = newVariableDataOr("", opReturn, vlOr.value.value)
   of seLogMessage:
     # Log statement exit.
-    return newVariableDataOr("", opLog, vlOr.value.value)
+    result = newVariableDataOr("", opLog, vlOr.value.value)
   of seIf2False:
     # False Bare IF or false two parameter IF.
-    return newVariableDataOr("", opIgnore, vlOr.value.value)
+    result = newVariableDataOr("", opIgnore, vlOr.value.value)
   of seNone:
-    discard
-
-  # Return the variable dot name and value.
-  result = newVariableDataOr(finalLeftName, operator, vlOr.value.value)
+    # Return the variable dot name and value.
+    result = newVariableDataOr(finalLeftName, operator, vlOr.value.value)
 
 proc skipSpaces*(text: string): Natural =
   ## Skip the leading spaces and tabs.
