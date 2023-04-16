@@ -21,7 +21,6 @@ variable or pass to another function.
 * [cmp](#cmp-1) &mdash; Compare two ints.
 * [cmp](#cmp-2) &mdash; Compare two strings.
 * [cmpVersion](#cmpversion) &mdash; Compare two StaticTea version numbers.
-* [concat](#concat) &mdash; Concatenate two strings.
 * [dict](#dict) &mdash; Create a dictionary from a list of key, value pairs.
 * [dup](#dup) &mdash; Duplicate a string x times.
 * [eq](#eq) &mdash; Return true when two floats are equal.
@@ -367,23 +366,6 @@ Examples:
 cmpVersion("1.2.5", "1.1.8") # 1
 cmpVersion("1.2.5", "1.3.0") # -1
 cmpVersion("1.2.5", "1.2.5") # 0
-~~~
-
-
-
-# concat
-
-Concatenate two strings. See the join function for more that two arguments.
-
-~~~javascript
-concat = func(a: string, b: string) string
-~~~
-
-Examples:
-
-~~~javascript
-concat("tea", " time") # "tea time"
-concat("a", "b") # "ab"
 ~~~
 
 
@@ -1001,24 +983,22 @@ int("notnum", "round", "nan") # nan
 # join
 
 Join a list of strings with a separator.  An optional parameter
-determines whether you skip empty strings or not. You can use an
-empty separator to concatenate the arguments.
+determines the separator, by default it is "".
 
 ~~~javascript
-join = func(strs: list, sep: string, skipEmpty: optional bool) string
+join = func(strs: list, sep: optional string) string
 ~~~
 
 Examples:
 
 ~~~javascript
 join(["a", "b"], ", ") # "a, b"
+join(["a", "b"]) # "ab"
 join(["a", "b"], "") # "ab"
 join(["a", "b", "c"], "") # "abc"
 join(["a"], ", ") # "a"
 join([""], ", ") # ""
-join(["a", "b"], "") # "ab"
 join(["a", "", "c"], "|") # "a||c"
-join(["a", "", "c"], "|", true) # "a|c"
 ~~~
 
 

@@ -46,7 +46,9 @@ listLoop(keys(f), funcList, addAllVars, addFuncVar)
 make-param = func(ix: int, name: string, params: list, signature: dict) bool
   ## Add the function name and type to the params list.
   type = signature.paramTypes[ix]
-  entry = format("{name}: {type}")
+  last = (ix == sub(len(signature.paramTypes),1))
+  optional = if( (last and signature.optional), "optional ", "")
+  entry = format("{name}: {optional}{type}")
   params &= entry
   return(false)
 
@@ -83,46 +85,45 @@ add(a: int, b: int) int
 anchors(a: list, b: string) list
 and(a: bool, b: bool) bool
 bool(a: any) bool
-case(a: int, b: list, c: any) any
-case(a: string, b: list, c: any) any
+case(a: int, b: list, c: optional any) any
+case(a: string, b: list, c: optional any) any
 cmp(a: float, b: float) int
 cmp(a: int, b: int) int
-cmp(a: string, b: string, c: bool) int
+cmp(a: string, b: string, c: optional bool) int
 cmpVersion(a: string, b: string) int
-concat(a: string, b: string) string
-dict(a: list) dict
+dict(a: optional list) dict
 dup(a: string, b: int) string
 eq(a: float, b: float) bool
 eq(a: int, b: int) bool
 eq(a: string, b: string) bool
 exists(a: dict, b: string) bool
-find(a: string, b: string, c: any) any
+find(a: string, b: string, c: optional any) any
 float(a: int) float
 float(a: string, b: any) any
 float(a: string) float
 format(a: string) string
 func(a: string) func
 functionDetails(a: func) dict
-get(a: dict, b: string, c: any) any
-get(a: list, b: int, c: any) any
+get(a: dict, b: string, c: optional any) any
+get(a: list, b: int, c: optional any) any
 gt(a: float, b: float) bool
 gt(a: int, b: int) bool
 gte(a: float, b: float) bool
 gte(a: int, b: int) bool
 html(a: string, b: string) string
-if0(a: int, b: any, c: any) any
-if(a: bool, b: any, c: any) any
-int(a: float, b: string) int
-int(a: string, b: string) int
+if0(a: int, b: any, c: optional any) any
+if(a: bool, b: any, c: optional any) any
+int(a: float, b: optional string) int
+int(a: string, b: optional string) int
 int(a: string, b: string, c: any) any
-join(a: list, b: string, c: int) string
-joinPath(a: list, b: string) string
+join(a: list, b: optional string) string
+joinPath(a: list, b: optional string) string
 keys(a: dict) list
 len(a: dict) int
 len(a: list) int
 len(a: string) int
 list(a: any) list
-listLoop(a: list, b: any, c: func, d: any) bool
+listLoop(a: list, b: any, c: func, d: optional any) bool
 log(a: string) string
 lower(a: string) string
 lt(a: float, b: float) bool
@@ -136,17 +137,17 @@ not(a: bool) bool
 or(a: bool, b: bool) bool
 parseCode(a: string) list
 parseMarkdown(a: string, b: string) list
-path(a: string, b: string) dict
+path(a: string, b: optional string) dict
 readJson(a: string) any
 replace(a: string, b: int, c: int, d: string) string
 replaceRe(a: string, b: list) string
 return(a: any) any
-slice(a: string, b: int, c: int) string
-sort(a: list, b: string, c: string) list
+slice(a: string, b: int, c: optional int) string
+sort(a: list, b: string, c: optional string) list
 sort(a: list, b: string, c: string, d: int) list
 sort(a: list, b: string, c: string, d: string) list
 startsWith(a: string, b: string) bool
-string(a: any, b: string) string
+string(a: any, b: optional string) string
 string(a: string, b: dict) string
 sub(a: float, b: float) float
 sub(a: int, b: int) int

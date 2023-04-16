@@ -32,7 +32,6 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_cmp_iii">fun_cmp_iii</a> &mdash; Compare two ints.</li>
 <li> <a href="#fun_cmp_ffi">fun_cmp_ffi</a> &mdash; Compare two floats.</li>
 <li> <a href="#fun_cmp_ssobi">fun_cmp_ssobi</a> &mdash; Compare two strings.</li>
-<li> <a href="#fun_concat_sss">fun_concat_sss</a> &mdash; Concatenate two strings.</li>
 <li> <a href="#fun_len_si">fun_len_si</a> &mdash; Number of unicode characters in a string.</li>
 <li> <a href="#fun_len_li">fun_len_li</a> &mdash; Number of elements in a list.</li>
 <li> <a href="#fun_len_di">fun_len_di</a> &mdash; Number of elements in a dictionary.</li>
@@ -76,7 +75,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_anchors_lsl">fun_anchors_lsl</a> &mdash; Create anchor names from heading names.</li>
 <li> <a href="#fun_type_as">fun_type_as</a> &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.</li>
 <li> <a href="#fun_joinPath_loss">fun_joinPath_loss</a> &mdash; Join the path components with a path separator.</li>
-<li> <a href="#fun_join_lsois">fun_join_lsois</a> &mdash; Join a list of strings with a separator.</li>
+<li> <a href="#fun_join_loss">fun_join_loss</a> &mdash; Join a list of strings with a separator.</li>
 <li> <a href="#fun_warn_ss">fun_warn_ss</a> &mdash; Return a warning message and skip the current statement.</li>
 <li> <a href="#fun_log_ss">fun_log_ss</a> &mdash; Log a message to the log file.</li>
 <li> <a href="#fun_return_aa">fun_return_aa</a> &mdash; Return is a special function that returns the value passed in and has has side effects.</li>
@@ -312,27 +311,6 @@ Examples:
 
 <pre class="nim-code">
 func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [].}
-</pre>
-
-<h3 id="fun_concat_sss">fun_concat_sss</h3>
-
-<p>Concatenate two strings. See the join function for more that two arguments.
-
-</p><pre class="tea-code">
-<span class="t-dotName">concat</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">string</span>, <span class="t-param">b</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
-</pre>
-<p>
-Examples:
-
-</p><pre class="tea-code">
-<span class="t-funcCall">concat</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot; time&quot;</span>) <span class="t-comment"># &quot;tea time&quot;
-</span><span class="t-funcCall">concat</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>) <span class="t-comment"># &quot;ab&quot;
-</span></pre>
-
-
-<pre class="nim-code">
-func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 </pre>
 
@@ -1611,32 +1589,30 @@ func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {
     raises: [KeyError], tags: [].}
 </pre>
 
-<h3 id="fun_join_lsois">fun_join_lsois</h3>
+<h3 id="fun_join_loss">fun_join_loss</h3>
 
 <p>Join a list of strings with a separator.  An optional parameter
-determines whether you skip empty strings or not. You can use an
-empty separator to concatenate the arguments.
+determines the separator, by default it is &quot;&quot;.
 
 </p><pre class="tea-code">
-<span class="t-dotName">join</span> = <span class="t-funcCall">func</span>(<span class="t-param">strs</span>: <span class="t-type">list</span>, <span class="t-param">sep</span>: <span class="t-type">string</span>, <span class="t-param">skipEmpty</span>: <span class="t-type">optional</span> <span class="t-type">bool</span>) <span class="t-type">string</span>
+<span class="t-dotName">join</span> = <span class="t-funcCall">func</span>(<span class="t-param">strs</span>: <span class="t-type">list</span>, <span class="t-param">sep</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">string</span>
 </pre>
 <p>
 Examples:
 
 </p><pre class="tea-code">
 <span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;, &quot;</span>) <span class="t-comment"># &quot;a, b&quot;
+</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>]) <span class="t-comment"># &quot;ab&quot;
 </span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># &quot;ab&quot;
 </span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># &quot;abc&quot;
 </span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>], <span class="t-str">&quot;, &quot;</span>) <span class="t-comment"># &quot;a&quot;
 </span><span class="t-funcCall">join</span>([<span class="t-str">&quot;&quot;</span>], <span class="t-str">&quot;, &quot;</span>) <span class="t-comment"># &quot;&quot;
-</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># &quot;ab&quot;
 </span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;|&quot;</span>) <span class="t-comment"># &quot;a||c&quot;
-</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;|&quot;</span>, <span class="t-dotName">true</span>) <span class="t-comment"># &quot;a|c&quot;
 </span></pre>
 
 
 <pre class="nim-code">
-func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_join_loss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 </pre>
 

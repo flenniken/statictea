@@ -103,7 +103,8 @@ MessageId = enum
   wNotFuncVariable, wImmutableDict, wImmutableList, wNewListInDict,
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
   wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace, wNotDictVariable,
-  wSpecifyF, wNotListVariable, wVarNameNotDotName, wInvalidParseMdType
+  wSpecifyF, wNotListVariable, wVarNameNotDotName, wInvalidParseMdType,
+  wExpectedIntOrString, wMissingComma
 </pre>
 
 <h3 id="Messages">Messages</h3>
@@ -153,8 +154,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "No template name. Use -h for help.", "Invalid position: got $1.", "",
     "The substring was not found and no default argument.",
     "The resulting duplicated string must be under 1024 characters, got: $1.",
-    "Specify arguments in pairs.",
-    "None of the case conditions match $1 and no else case.",
+    "Specify arguments in pairs.", "None of the case conditions match the main condition and there is no else case.",
     "You cannot assign to an existing variable.", "", "Invalid length: $1.", "",
     "", "Expected / or \\.",
     "The variables h - k, m - r are reserved variable names.", "",
@@ -275,7 +275,9 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     """Invalid html place, expected "body", or "attribute".""",
     "The variable is not a dictionary.", "Specify f or a function variable.",
     "The variable is not a list.", "Expected a variable name without dots.",
-    "Invalid parseMarkdown type, expected lite or inline."]
+    "Invalid parseMarkdown type, expected lite or inline.",
+    "The case condition must be an int or a string value, got a $1.",
+    "Expected a comma."]
 </pre>
 
 <h3 id="WarningData">WarningData</h3>

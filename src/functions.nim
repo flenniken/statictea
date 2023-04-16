@@ -374,25 +374,6 @@ func fun_cmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   let ret = cmpString(a, b, insensitive)
   result = newFunResult(newValue(ret))
 
-func fun_concat_sss*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Concatenate two strings. See the join function for more that two arguments.
-  ##
-  ## ~~~statictea
-  ## concat = func(a: string, b: string) string
-  ## ~~~
-  ##
-  ## Examples:
-  ##
-  ## ~~~statictea
-  ## concat("tea", " time") # "tea time"
-  ## concat("a", "b") # "ab"
-  ## ~~~
-
-  tMapParameters("concat", "sss")
-  var a = map["a"].stringv
-  let b = map["b"].stringv
-  result = newFunResult(newValue(a & b))
-
 func fun_len_si*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of unicode characters in a string.
   ##
@@ -1953,49 +1934,43 @@ func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult 
   tMapParameters("joinPath", "loss")
   result = joinPathList(map)
 
-func fun_join_lsois*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_join_loss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Join a list of strings with a separator.  An optional parameter
-  ## determines whether you skip empty strings or not. You can use an
-  ## empty separator to concatenate the arguments.
+  ## determines the separator, by default it is "".
   ##
   ## ~~~statictea
-  ## join = func(strs: list, sep: string, skipEmpty: optional bool) string
+  ## join = func(strs: list, sep: optional string) string
   ## ~~~
   ##
   ## Examples:
   ##
   ## ~~~statictea
   ## join(["a", "b"], ", ") # "a, b"
+  ## join(["a", "b"]) # "ab"
   ## join(["a", "b"], "") # "ab"
   ## join(["a", "b", "c"], "") # "abc"
   ## join(["a"], ", ") # "a"
   ## join([""], ", ") # ""
-  ## join(["a", "b"], "") # "ab"
   ## join(["a", "", "c"], "|") # "a||c"
-  ## join(["a", "", "c"], "|", true) # "a|c"
   ## ~~~
 
-  tMapParameters("join", "lsois")
+  tMapParameters("join", "loss")
 
   let list = map["a"].listv.list
-  let sep = map["b"].stringv
-  var skipEmpty = false
-  if "c" in map and map["c"].intv == 1:
-    skipEmpty = true
+  var sep: string
+  if "b" in map:
+    let sepValue = map["b"]
+    sep = sepValue.stringv
+  else:
+    sep = ""
   var ret: string
-  if list.len == 0:
-    return newFunResult(newValue(""))
-  if list.len > 0:
-    ret.add(list[0].stringv)
-  for value in list[1 .. list.len - 1]:
+  for ix, value in list:
+    if ix != 0:
+      ret.add(sep)
     if value.kind != vkString:
       # The join list items must be strings.
       return newFunResultWarn(wJoinListString, 0)
-    let str = value.stringv
-    if skipEmpty and str.len == 0:
-      continue
-    ret.add(sep)
-    ret.add(str)
+    ret.add(value.stringv)
   result = newFunResult(newValue(ret))
 
 func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -2910,7 +2885,6 @@ functionsDict["fun_cmp_ffi"] = fun_cmp_ffi
 functionsDict["fun_cmp_iii"] = fun_cmp_iii
 functionsDict["fun_cmp_ssobi"] = fun_cmp_ssobi
 functionsDict["fun_cmpVersion_ssi"] = fun_cmpVersion_ssi
-functionsDict["fun_concat_sss"] = fun_concat_sss
 functionsDict["fun_dict_old"] = fun_dict_old
 functionsDict["fun_dup_sis"] = fun_dup_sis
 functionsDict["fun_eq_ffb"] = fun_eq_ffb
@@ -2937,7 +2911,7 @@ functionsDict["fun_if0_iaoaa"] = fun_if0_iaoaa
 functionsDict["fun_int_fosi"] = fun_int_fosi
 functionsDict["fun_int_sosi"] = fun_int_sosi
 functionsDict["fun_int_ssaa"] = fun_int_ssaa
-functionsDict["fun_join_lsois"] = fun_join_lsois
+functionsDict["fun_join_loss"] = fun_join_loss
 functionsDict["fun_joinPath_loss"] = fun_joinPath_loss
 functionsDict["fun_keys_dl"] = fun_keys_dl
 functionsDict["fun_len_di"] = fun_len_di
@@ -3106,6 +3080,5 @@ proc makeFuncDictionary*(): VarsDict =
   if funcList.listv.list.len > 0:
     result[lastName] = funcList
 
-# todo: how to you make the dictionary at compile time?
 let funcsVarDict* = makeFuncDictionary()
   ## The f dictionary of built-in functions.

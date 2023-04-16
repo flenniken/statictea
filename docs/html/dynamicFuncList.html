@@ -24,7 +24,7 @@
   <span class="t-dotName">next</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">next-entry</span>, <span class="t-str">&quot;line&quot;</span>, <span class="t-dotName">start</span>)
   <span class="t-dotName">numLines</span> = <span class="t-funcCall">sub</span>(<span class="t-dotName">next</span>, <span class="t-dotName">start</span>)
 
-  <span class="t-dotName">key</span> = <span class="t-funcCall">concat</span>(<span class="t-str">&quot;k&quot;</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">start</span>))
+  <span class="t-dotName">key</span> = <span class="t-funcCall">join</span>([<span class="t-str">&quot;k&quot;</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">start</span>)])
   <span class="t-comment"># Skip dups that can happen in the included code.
 </span>  <span class="t-funcCall">if</span>(<span class="t-funcCall">exists</span>(<span class="t-dotName">starts</span>, <span class="t-dotName">key</span>), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
   <span class="t-dotName">starts</span>[<span class="t-dotName">key</span>] = <span class="t-dotName">numLines</span>
@@ -45,7 +45,7 @@
 </span>  <span class="t-dotName">newEntry.docComment</span> = <span class="t-funcCall">get</span>(<span class="t-dotName">entry</span>, <span class="t-str">&quot;description&quot;</span>, <span class="t-str">&quot;&quot;</span>)
 
   <span class="t-dotName">newEntry.lineNum</span> = <span class="t-dotName">entry.line</span>
-  <span class="t-dotName">newEntry.numLines</span> = <span class="t-dotName">state.starts</span>[<span class="t-funcCall">concat</span>(<span class="t-str">&quot;k&quot;</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">entry.line</span>))]
+  <span class="t-dotName">newEntry.numLines</span> = <span class="t-dotName">state.starts</span>[<span class="t-funcCall">join</span>([<span class="t-str">&quot;k&quot;</span>, <span class="t-funcCall">string</span>(<span class="t-dotName">entry.line</span>)])]
   <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">newEntry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 

@@ -277,22 +277,6 @@ cmpVersion("1.2.5", "1.2.5") # 0
 
 """
 
-  dc_fun_concat_sss = """
-Concatenate two strings. See the join function for more that two arguments.
-
-~~~statictea
-concat = func(a: string, b: string) string
-~~~
-
-Examples:
-
-~~~statictea
-concat("tea", " time") # "tea time"
-concat("a", "b") # "ab"
-~~~
-
-"""
-
   dc_fun_dict_old = """
 Create a dictionary from a list of key, value pairs.  The keys
 must be strings and the values can be any type.
@@ -878,26 +862,24 @@ int("notnum", "round", "nan") # nan
 
 """
 
-  dc_fun_join_lsois = """
+  dc_fun_join_loss = """
 Join a list of strings with a separator.  An optional parameter
-determines whether you skip empty strings or not. You can use an
-empty separator to concatenate the arguments.
+determines the separator, by default it is "".
 
 ~~~statictea
-join = func(strs: list, sep: string, skipEmpty: optional bool) string
+join = func(strs: list, sep: optional string) string
 ~~~
 
 Examples:
 
 ~~~statictea
 join(["a", "b"], ", ") # "a, b"
+join(["a", "b"]) # "ab"
 join(["a", "b"], "") # "ab"
 join(["a", "b", "c"], "") # "abc"
 join(["a"], ", ") # "a"
 join([""], ", ") # ""
-join(["a", "b"], "") # "ab"
 join(["a", "", "c"], "|") # "a||c"
-join(["a", "", "c"], "|", true) # "a|c"
 ~~~
 
 """
@@ -1857,7 +1839,6 @@ warn("always warn")
     info("fun_cmp_iii", dc_fun_cmp_iii, 21),
     info("fun_cmp_ssobi", dc_fun_cmp_ssobi, 33),
     info("fun_cmpVersion_ssi", dc_fun_cmpVersion_ssi, 44),
-    info("fun_concat_sss", dc_fun_concat_sss, 19),
     info("fun_dict_old", dc_fun_dict_old, 37),
     info("fun_dup_sis", dc_fun_dup_sis, 39),
     info("fun_eq_ffb", dc_fun_eq_ffb, 19),
@@ -1883,7 +1864,7 @@ warn("always warn")
     info("fun_int_fosi", dc_fun_int_fosi, 35),
     info("fun_int_sosi", dc_fun_int_sosi, 42),
     info("fun_int_ssaa", dc_fun_int_ssaa, 35),
-    info("fun_join_lsois", dc_fun_join_lsois, 45),
+    info("fun_join_loss", dc_fun_join_loss, 39),
     info("fun_joinPath_loss", dc_fun_joinPath_loss, 30),
     info("fun_keys_dl", dc_fun_keys_dl, 24),
     info("fun_len_di", dc_fun_len_di, 19),
@@ -1930,81 +1911,80 @@ warn("always warn")
   # so when there are changes the diffs are easier to read.
 
   functionStarts = [
-    660,
-    636,
-    1835,
-    2367,
-    1104,
-    754,
-    799,
+    641,
+    617,
+    1816,
+    2342,
+    1085,
+    735,
+    780,
     323,
     302,
     344,
-    854,
-    377,
-    1253,
-    1214,
-    2432,
-    2413,
-    2451,
-    732,
-    1141,
-    898,
-    941,
-    915,
-    2241,
-    2273,
-    2294,
-    500,
-    452,
-    2547,
-    2528,
-    2585,
-    2566,
-    2860,
-    539,
-    596,
-    968,
-    1003,
-    1045,
-    1956,
-    1926,
-    1602,
+    835,
+    1234,
+    1195,
+    2407,
+    2388,
+    2426,
+    713,
+    1122,
+    879,
+    922,
+    896,
+    2216,
+    2248,
+    2269,
+    481,
     433,
-    414,
-    396,
-    1290,
-    1311,
-    2026,
+    2522,
+    2503,
+    2560,
+    2541,
+    2835,
+    520,
+    577,
+    949,
+    984,
+    1026,
+    1937,
+    1907,
     1583,
-    2623,
-    2604,
-    2662,
-    2642,
-    2490,
-    2471,
-    2509,
-    2349,
-    2390,
-    2784,
-    2705,
-    1528,
-    2682,
-    1359,
-    1469,
-    2050,
-    1179,
-    1749,
-    1781,
-    1808,
-    2329,
-    2113,
-    2217,
-    707,
-    683,
-    1873,
-    1626,
+    414,
+    395,
+    377,
+    1271,
+    1292,
     2001,
+    1564,
+    2598,
+    2579,
+    2637,
+    2617,
+    2465,
+    2446,
+    2484,
+    2324,
+    2365,
+    2759,
+    2680,
+    1509,
+    2657,
+    1340,
+    1450,
+    2025,
+    1160,
+    1730,
+    1762,
+    1789,
+    2304,
+    2088,
+    2192,
+    688,
+    664,
+    1854,
+    1607,
+    1976,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

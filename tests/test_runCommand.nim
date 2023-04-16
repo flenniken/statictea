@@ -940,53 +940,11 @@ statement: tea = a123
 """
     check testWarnStatement(statement, wVariableMissing, 6, p1="a123", eErrLines = eErrLines)
 
-  test "warnStatement long":
-    let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, 899)""", lineNum=12)
-    let eErrLines: seq[string] = splitNewLines """
-template.html(12): w36: The variable 'a123' does not exist.
-statement: tea  =  concat(a123, len(hello), format(len(asdfom)), 123456...
-                          ^
-"""
-    check testWarnStatement(statement, wVariableMissing, 15, p1="a123", eErrLines = eErrLines)
-
-  test "warnStatement long":
-    let statement = newStatement(text="""tea  =  concat(a123, len(hello), format(len(asdfom)), 123456778, 1243123456, "this is a long statement", 678, test)""", lineNum=12)
-    let eErrLines: seq[string] = @[
-      """template.html(12): w36: The variable 'test' does not exist.""" & "\n",
-      """statement: ...is is a long statement", 678, test)""" & "\n",
-        "                                            ^\n",
-    ]
-    check testWarnStatement(statement, wVariableMissing, 110, p1="test", eErrLines = eErrLines)
-
-  test "warnStatement long2":
-    let statement = newStatement(text="""tea                         =        concat(a123, len(hello), format(len(asdfom)), 123456778, num,   "this is a long statement with more on each end of the statement.", 678, test)""", lineNum=12)
-    let eErrLines: seq[string] = @[
-      "template.html(12): w36: The variable 'num' does not exist.\n",
-      """statement: ...rmat(len(asdfom)), 123456778, num,   "this is a long stateme...""" & "\n",
-        "                                            ^\n",
-    ]
-    check testWarnStatement(statement, wVariableMissing, 94, p1="num", eErrLines = eErrLines)
-
   test "getFunctionValue":
     let statement = newStatement(text="""tea = len("abc") """, lineNum=16)
     let valueAndPos = newValuePosSi(newValue(3), 17)
     let eValuePosSiOr = newValuePosSiOr(valueAndPos)
     check testGetFunctionValuePosSi("len", statement, 10, eValuePosSiOr)
-
-  test "getFunctionValue 2 parameters":
-    let statement = newStatement(text="""tea = concat("abc", "def") """,
-      lineNum=16)
-    let valueAndPos = newValuePosSi(newValue("abcdef"), 27)
-    let eValuePosSiOr = newValuePosSiOr(valueAndPos)
-    check testGetFunctionValuePosSi("concat", statement, 13, eValuePosSiOr)
-
-  test "getFunctionValue nested":
-    let text = """tea = concat("abc", concat("xyz", "123")) """
-                 #0123456789 123456789 123456789 123456789 12345
-    let statement = newStatement(text)
-    let valueAndPos = newValuePosSi(newValue("abcxyz123"), 42)
-    let eValuePosSiOr = newValuePosSiOr(valueAndPos)
-    check testGetFunctionValuePosSi("concat", statement, 13, eValuePosSiOr)
 
   test "getFunctionValue missing )":
     let statement = newStatement(text="""tea = len("abc"""", lineNum=16)

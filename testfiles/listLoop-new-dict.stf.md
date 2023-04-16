@@ -28,7 +28,7 @@ $$ endblock
 ~~~ nim
 callback = func(ix: int, value: int, container: dict) bool
   ## Add key for each value mapping to its index.
-  key = concat("a", string(value))
+  key = join(["a", string(value)])
   container[key] = ix
   return(false)
 

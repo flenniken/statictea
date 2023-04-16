@@ -380,39 +380,6 @@ and the shared code has 0.
     check testProcessTemplate(templateContent = templateContent,
       serverJson = serverJson, eResultLines = eResultLines)
 
-#   test "output admin var missing":
-
-#     let templateContent = """
-# <!--$ nextline +-->
-# <!--$ : t.output = if( +-->
-# <!--$ :   exists("s.admin"), "skip", +-->
-# <!--$ :   "stderr"); +-->
-# <!--$ : msg = concat( +-->
-# <!--$ :   template(), "(", +-->
-# <!--$ :   getLineNumber(), ")", +-->
-# <!--$ :   "missing admin var") -->
-# {msg}
-# """
-#     let eResultLines = @[
-#       "template.html(45): missing admin var"
-#     ]
-#     check testProcessTemplate(templateContent = templateContent, eResultLines = eResultLines)
-
-#   test "output no output":
-
-#     let templateContent = """
-# <!--$ nextline +-->
-# <!--$ : t.output = if( +-->
-# <!--$ :   exists("s.admin"), "skip", +-->
-# <!--$ :   "stderr"); +-->
-# <!--$ : msg = concat( +-->
-# <!--$ :   template(), "(", +-->
-# <!--$ :   getLineNumber(), ")", +-->
-# <!--$ :   "missing admin var") -->
-# {msg}
-# """
-#     check testProcessTemplate(templateContent = templateContent)
-
   test "not a command":
 
     let templateContent = """

@@ -38,40 +38,41 @@ $$ : value = get(t.args, key)
 Command line from t.args:
 
 $$ block t.repeat = len(t.args.serverList)
-$$ : g.serverParts &= concat("--server ", get(t.args.serverList, t.row))
+$$ : g.serverParts &= join([" --server ", get(t.args.serverList, t.row)])
 $$ endblock
 $$ block t.repeat = len(t.args.codeList)
-$$ : g.codeFileParts &= concat("--code ", get(t.args.codeList, t.row))
+$$ : g.codeFileParts &= join([" --code ", get(t.args.codeList, t.row)])
 $$ endblock
 $$ block
-$$ : g.templateParts &= concat("--template ", t.args.templateFilename)
+$$ : g.templateParts &= join([" --template ", t.args.templateFilename])
 $$ endblock
 $$ block t.repeat = len(t.args.prepostList)
 $$ : prepost = get(t.args.prepostList, t.row)
-$$ : prefix = get(prepost, 0)
-$$ : postfix = get(prepost, 1)
-$$ : part = concat("--prepost '", concat(join(list(prefix, postfix), ",", 1), "'"))
+$$ : prefix = prepost[0]
+$$ : postfix = prepost[1]
+$$ : second = if((postfix == ""), "", format(",{postfix}"))
+$$ : part = format(" --prepost '{prefix}{second}'")
 $$ : g.prepostParts &= part
 $$ endblock
 $$ nextline
 $$ : parts &= "statictea"
-$$ : parts &= if(t.args.help, "--help", "")
-$$ : parts &= if(t.args.version, "--version", "")
-$$ : parts &= if(t.args.update, "--update", "")
-$$ : parts &= if(t.args.log, "--log", "")
-$$ : parts &= if(t.args.repl, "--repl", "")
+$$ : parts &= if(t.args.help, " --help", "")
+$$ : parts &= if(t.args.version, " --version", "")
+$$ : parts &= if(t.args.update, " --update", "")
+$$ : parts &= if(t.args.log, " --log", "")
+$$ : parts &= if(t.args.repl, " --repl", "")
 $$ :
-$$ : parts &= if0(len(t.args.resultFilename), "", +
-$$ :   concat("--result ", t.args.resultFilename))
+$$ : parts &= if((len(t.args.resultFilename) == 0), "", +
+$$ :   join([" --result ", t.args.resultFilename]))
 $$ :
 $$ : parts &= if0(len(t.args.logFilename), "", +
-$$ :   concat("--log ", t.args.logFilename))
+$$ :   join([" --log ", t.args.logFilename]))
 $$ :
-$$ : parts &= join(g.serverParts, " ")
-$$ : parts &= join(g.codeFileParts, " ")
-$$ : parts &= join(g.templateParts, " ")
-$$ : parts &= join(g.prepostParts, " ")
-$$ : cmd = join(parts, " ", 1)
+$$ : parts &= join(g.serverParts)
+$$ : parts &= join(g.codeFileParts)
+$$ : parts &= join(g.templateParts)
+$$ : parts &= join(g.prepostParts)
+$$ : cmd = join(parts)
   {cmd}
 ~~~
 

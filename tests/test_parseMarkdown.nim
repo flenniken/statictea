@@ -600,7 +600,7 @@ other: )␊
     let code = """
 tea = "tea"
 # hello
-asdf = concat("a", "b")
+asdf = join(["a", "b"])
 """
     let expected = """
 dotName: tea
@@ -610,12 +610,12 @@ other: ␊
 comment: #␠hello␊
 dotName: asdf
 other: ␠=␠
-funcCall: concat
-other: (
+funcCall: join
+other: ([
 str: "a"
 other: ,␠
 str: "b"
-other: )␊
+other: ])␊
 """
     check testHighlightCode(code, expected)
 

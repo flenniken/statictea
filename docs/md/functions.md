@@ -22,7 +22,6 @@ function implements the "cmp" function for floats.
 * [fun_cmp_iii](#fun_cmp_iii) &mdash; Compare two ints.
 * [fun_cmp_ffi](#fun_cmp_ffi) &mdash; Compare two floats.
 * [fun_cmp_ssobi](#fun_cmp_ssobi) &mdash; Compare two strings.
-* [fun_concat_sss](#fun_concat_sss) &mdash; Concatenate two strings.
 * [fun_len_si](#fun_len_si) &mdash; Number of unicode characters in a string.
 * [fun_len_li](#fun_len_li) &mdash; Number of elements in a list.
 * [fun_len_di](#fun_len_di) &mdash; Number of elements in a dictionary.
@@ -66,7 +65,7 @@ function implements the "cmp" function for floats.
 * [fun_anchors_lsl](#fun_anchors_lsl) &mdash; Create anchor names from heading names.
 * [fun_type_as](#fun_type_as) &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.
 * [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
-* [fun_join_lsois](#fun_join_lsois) &mdash; Join a list of strings with a separator.
+* [fun_join_loss](#fun_join_loss) &mdash; Join a list of strings with a separator.
 * [fun_warn_ss](#fun_warn_ss) &mdash; Return a warning message and skip the current statement.
 * [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file.
 * [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has has side effects.
@@ -301,27 +300,6 @@ cmp("Tea", "tea", false) # 0
 
 ~~~nim
 func fun_cmp_ssobi(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [].}
-~~~
-
-# fun_concat_sss
-
-Concatenate two strings. See the join function for more that two arguments.
-
-~~~javascript
-concat = func(a: string, b: string) string
-~~~
-
-Examples:
-
-~~~javascript
-concat("tea", " time") # "tea time"
-concat("a", "b") # "ab"
-~~~
-
-
-~~~nim
-func fun_concat_sss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ~~~
 
@@ -1580,32 +1558,30 @@ func fun_joinPath_loss(variables: Variables; arguments: seq[Value]): FunResult {
     raises: [KeyError], tags: [].}
 ~~~
 
-# fun_join_lsois
+# fun_join_loss
 
 Join a list of strings with a separator.  An optional parameter
-determines whether you skip empty strings or not. You can use an
-empty separator to concatenate the arguments.
+determines the separator, by default it is "".
 
 ~~~javascript
-join = func(strs: list, sep: string, skipEmpty: optional bool) string
+join = func(strs: list, sep: optional string) string
 ~~~
 
 Examples:
 
 ~~~javascript
 join(["a", "b"], ", ") # "a, b"
+join(["a", "b"]) # "ab"
 join(["a", "b"], "") # "ab"
 join(["a", "b", "c"], "") # "abc"
 join(["a"], ", ") # "a"
 join([""], ", ") # ""
-join(["a", "b"], "") # "ab"
 join(["a", "", "c"], "|") # "a||c"
-join(["a", "", "c"], "|", true) # "a|c"
 ~~~
 
 
 ~~~nim
-func fun_join_lsois(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_join_loss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
 ~~~
 

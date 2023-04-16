@@ -249,10 +249,6 @@ suite "functions.nim":
     listValue = newValue(@[value3, value])
     check testGetBestFunction(listValue, @[newValue(1), newValue(1)], newValueOr(wNotFunction))
 
-  test "getFunction concat":
-    var arguments = @[newValue(1), newValue(1)]
-    check testGetBestFunctionExists("concat", arguments, "sss")
-
   test "getFunction cmp ints":
     var arguments = @[newValue(1), newValue(1)]
     check testGetBestFunctionExists("cmp", arguments, "iii")
@@ -274,16 +270,6 @@ suite "functions.nim":
   test "getFunction float":
     var arguments = @[newValue("1.0"), newValue("default")]
     check testGetBestFunctionExists("float", arguments, "saa")
-
-  test "concat hello world":
-    var arguments = newValue(["Hello", " World"]).listv.list
-    let eFunResult = newFunResult(newValue("Hello World"))
-    check testFunction("concat", arguments, eFunResult)
-
-  test "concat empty string":
-    var arguments = newValue(["abc", ""]).listv.list
-    let eFunResult = newFunResult(newValue("abc"))
-    check testFunction("concat", arguments, eFunResult)
 
   test "len string":
     var arguments = newValue(["abc"]).listv.list
@@ -1567,20 +1553,18 @@ suite "functions.nim":
         newValue(""),
       ], newFunResult(newValue("ab")))
 
+  test "join ab":
+    let list = newValue(["a", "b"])
+    check testFunction("join", @[
+        newValue(list),
+      ], newFunResult(newValue("ab")))
+
   test "join a nothing b":
     let list = newValue(["a", "", "b"])
     check testFunction("join", @[
         newValue(list),
         newValue("|"),
       ], newFunResult(newValue("a||b")))
-
-  test "join a nothing b skipping empty":
-    let list = newValue(["a", "", "b"])
-    check testFunction("join", @[
-        newValue(list),
-        newValue("|"),
-        newValue(1),
-      ], newFunResult(newValue("a|b")))
 
   test "warn":
     let message = "my warning"

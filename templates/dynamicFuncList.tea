@@ -13,7 +13,7 @@ get-starts = func(ix: int, entry: dict, starts: dict, entries: list) bool
   next = get(next-entry, "line", start)
   numLines = sub(next, start)
 
-  key = concat("k", string(start))
+  key = join(["k", string(start)])
   # Skip dups that can happen in the included code.
   if(exists(starts, key), return(false))
   starts[key] = numLines
@@ -34,7 +34,7 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
   newEntry.docComment = get(entry, "description", "")
 
   newEntry.lineNum = entry.line
-  newEntry.numLines = state.starts[concat("k", string(entry.line))]
+  newEntry.numLines = state.starts[join(["k", string(entry.line)])]
   newList &= newEntry
   return(false)
 
