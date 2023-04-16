@@ -57,7 +57,6 @@ Run a command and fill in the variables dictionaries.
 * [skipArgument](#skipargument) &mdash; Skip past the argument.
 * [ifFunction](#iffunction) &mdash; Return the "if" function's value and position after.
 * [bareIf](#bareif) &mdash; Handle the bare IF.
-* [andOrFunctions](#andorfunctions) &mdash; Return the and/or function's value and the position after.
 * [getArguments](#getarguments) &mdash; Get the function arguments and the position of each.
 * [getFunctionValuePosSi](#getfunctionvaluepossi) &mdash; Return the function's value and the position after it.
 * [runBoolOp](#runboolop) &mdash; Evaluate the bool expression and return a bool value.
@@ -116,8 +115,6 @@ The special functions.
 * spWarn — warn function
 * spLog — log function
 * spReturn — return function
-* spAnd — and function
-* spOr — or function
 * spFunc — func function
 * spListLoop — list with callback function
 * spCase — case function
@@ -126,8 +123,7 @@ The special functions.
 ~~~nim
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
-  spReturn = "return", spAnd = "and", spOr = "or", spFunc = "func",
-  spListLoop = "listLoop", spCase = "case"
+  spReturn = "return", spFunc = "func", spListLoop = "listLoop", spCase = "case"
 ~~~
 
 # SpecialFunctionOr
@@ -677,22 +673,6 @@ if(c, warn("c is true"))
 ~~~nim
 proc bareIf(env: var Env; specialFunction: SpecialFunction;
             statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
-    raises: [Exception, KeyError], tags: [RootEffect].}
-~~~
-
-# andOrFunctions
-
-Return the and/or function's value and the position after. The and
-function stops on the first false. The or function stops on the
-first true. The rest of the arguments are skipped.
-Start points at the first parameter of the function. The position
-includes the trailing whitespace after the ending ).
-
-
-~~~nim
-proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
-                    statement: Statement; start: Natural; variables: Variables;
-                    listCase = false): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 ~~~
 

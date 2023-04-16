@@ -67,7 +67,6 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#skipArgument">skipArgument</a> &mdash; Skip past the argument.</li>
 <li> <a href="#ifFunction">ifFunction</a> &mdash; Return the "if" function's value and position after.</li>
 <li> <a href="#bareIf">bareIf</a> &mdash; Handle the bare IF.</li>
-<li> <a href="#andOrFunctions">andOrFunctions</a> &mdash; Return the and/or function's value and the position after.</li>
 <li> <a href="#getArguments">getArguments</a> &mdash; Get the function arguments and the position of each.</li>
 <li> <a href="#getFunctionValuePosSi">getFunctionValuePosSi</a> &mdash; Return the function's value and the position after it.</li>
 <li> <a href="#runBoolOp">runBoolOp</a> &mdash; Evaluate the bool expression and return a bool value.</li>
@@ -128,8 +127,6 @@ PosOr = OpResultWarn[Natural]
 </li><li>spWarn — warn function
 </li><li>spLog — log function
 </li><li>spReturn — return function
-</li><li>spAnd — and function
-</li><li>spOr — or function
 </li><li>spFunc — func function
 </li><li>spListLoop — list with callback function
 </li><li>spCase — case function
@@ -139,8 +136,7 @@ PosOr = OpResultWarn[Natural]
 <pre class="nim-code">
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
-  spReturn = "return", spAnd = "and", spOr = "or", spFunc = "func",
-  spListLoop = "listLoop", spCase = "case"
+  spReturn = "return", spFunc = "func", spListLoop = "listLoop", spCase = "case"
 </pre>
 
 <h3 id="SpecialFunctionOr">SpecialFunctionOr</h3>
@@ -700,22 +696,6 @@ position in the statement after the if.
 <pre class="nim-code">
 proc bareIf(env: var Env; specialFunction: SpecialFunction;
             statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
-    raises: [Exception, KeyError], tags: [RootEffect].}
-</pre>
-
-<h3 id="andOrFunctions">andOrFunctions</h3>
-
-<p>Return the and/or function&#x27;s value and the position after. The and
-function stops on the first false. The or function stops on the
-first true. The rest of the arguments are skipped.
-Start points at the first parameter of the function. The position
-includes the trailing whitespace after the ending ).
-</p>
-
-<pre class="nim-code">
-proc andOrFunctions(env: var Env; specialFunction: SpecialFunction;
-                    statement: Statement; start: Natural; variables: Variables;
-                    listCase = false): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 </pre>
 

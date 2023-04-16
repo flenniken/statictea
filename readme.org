@@ -451,7 +451,7 @@ statement is skipped.
 You can continue a long statement on the next line by using a "+"
 character at the end.
 
-You can have a bare if function on a statement and a few other
+You can have a bare IF function on a statement and a few other
 exceptions, see special forms [[#special-forms][Special Forms]].
 
 [[#contents][茶]]
@@ -1565,7 +1565,7 @@ statements etc. of a user or built-in function.
 :CUSTOM_ID: boolean-expression
 :END:
 
-You use a boolean expression with an if statement to make a
+You use a boolean expression with an IF statement to make a
 decision that controls code flow.
 
 A boolean expression is an infix expression wrapped with
@@ -1590,7 +1590,7 @@ You can write boolean expressions with the following operators:
 - <=
 - >=
 
-You typically use a boolean expression with an if statement. In
+You typically use a boolean expression with an IF statement. In
 the next example v is set to “s” because 3 is less than 5.
 
 #+BEGIN_SRC nim
@@ -1626,7 +1626,7 @@ You can use multiple and’s or or’s in an expression.  For example:
 (a < b or c > d or e == f)
 #+END_SRC
 
-If you mix and’s and or’s, you need to specify the precedence
+If you mix ANDs and ORs, you need to specify the precedence
 with parentheses. For example:
 
 #+BEGIN_SRC
@@ -1634,14 +1634,14 @@ with parentheses. For example:
 #+END_SRC
 
 The arguments are processed left to right and it uses short
-circuit evaluation. “Or” returns true on the first true argument
-and “and” returns false on the first false argument and the rest
+circuit evaluation. OR returns true on the first true argument
+and AND returns false on the first false argument and the rest
 are skipped.
 
 And and or work with bool arguments. The comparisons work with
 numbers and strings.
 
-“Not” is not a logical operator but it is a function.  You can
+NOT is not a logical operator but it is a function.  You can
 pass a logical expression to it to invert it.  Here are a couple
 of examples:
 
@@ -2011,7 +2011,7 @@ template.
 - [[#update-option][Update Option]]
 - [[#logging][Logging]]
 - [[#special-forms][Special Forms]]
-- [[#if-functions][If Functions]]
+- [[#if-function][IF Function]]
 - [[#docs-and-templates][Docs and Templates]]
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
@@ -2293,7 +2293,7 @@ the normal form:
 
 - case — conditionally evaluates its arguments
 - func - defines a function, see [[#user-functions][User Functions]]
-- if - conditionally evaluates its arguments and it has a bare form, see [[#if-functions][If Functions]]
+- if - conditionally evaluates its arguments and it has a bare form, see [[#if-function][IF Function]]
 - list - takes any number of arguments
 - listLoop — has a bare form
 - log - writes a message to the log file and has a bare form
@@ -2320,12 +2320,12 @@ a = case(22, [11, 1, 22, 2])
 
 [[#contents][茶]]
 
-** If Functions
+** IF Function
 :PROPERTIES:
-   :CUSTOM_ID: if-functions
+   :CUSTOM_ID: if-function
    :END:
 
-The if function is special in a few ways. It conditionally
+The IF function is special in a few ways. It conditionally
 evaluates its arguments and it can be used in a statement
 without an assignment.
 

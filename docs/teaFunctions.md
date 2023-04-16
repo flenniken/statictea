@@ -650,8 +650,9 @@ If the condition is true, return the second argument, else return
 the third argument.
 
 The IF functions are special in a couple of ways, see
-the If Functions section.  You usually use boolean infix
-expressions for the condition, see:
+the IF Function section.
+
+You usually use boolean infix expressions for the condition, see:
 the Boolean Expressions section.
 
 ~~~javascript

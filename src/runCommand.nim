@@ -48,8 +48,6 @@ type
     ## * spWarn — warn function
     ## * spLog — log function
     ## * spReturn — return function
-    ## * spAnd — and function
-    ## * spOr — or function
     ## * spFunc — func function
     ## * spListLoop — list with callback function
     ## * spCase — case function
@@ -58,8 +56,6 @@ type
     spWarn = "warn",
     spLog = "log",
     spReturn = "return",
-    spAnd = "and",
-    spOr = "or",
     spFunc = "func",
     spListLoop = "listLoop",
     spCase = "case",
@@ -1056,10 +1052,6 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
   case value.funcv.signature.name
   of "if":
     result = spIf
-  of "and":
-    result = spAnd
-  of "or":
-    result = spOr
   of "warn":
     result = spWarn
   of "return":
@@ -1133,7 +1125,7 @@ proc ifFunction*(
   let cond = vlcOr.value.value
   var runningPos = vlcOr.value.pos
 
-  # Get the boolean for IF..
+  # Get the boolean for IF.
   var condition = false
   if specialFunction == spIf:
     if cond.kind != vkBool:
@@ -1300,86 +1292,6 @@ proc bareIf*(
   runningPos += commaSymbol.length
 
   result = newValuePosSiOr(value2, runningPos, se2)
-
-proc andOrFunctions*(
-    env: var Env,
-    specialFunction: SpecialFunction,
-    statement: Statement,
-    start: Natural,
-    variables: Variables,
-    listCase = false
-  ): ValuePosSiOr =
-  ## Return the and/or function's value and the position after. The and
-  ## function stops on the first false. The or function stops on the
-  ## first true. The rest of the arguments are skipped.
-  ## Start points at the first parameter of the function. The position
-  ## includes the trailing whitespace after the ending ).
-  # cases:
-  #   c1 = and(a, b)  # test
-  #            ^      ^
-  #   c2 = or(a, b)  # test
-  #           ^      ^
-
-  # Get the first argument value.
-  let vlcOr = getValuePosSi(env, statement, start, variables)
-  if vlcOr.isMessage:
-    return vlcOr
-  let firstValue = vlcOr.value.value
-  var runningPos = vlcOr.value.pos
-
-  if firstValue.kind != vkBool:
-    # Expected bool argument got $1.
-    return newValuePosSiOr(wExpectedBool, $firstValue.kind, start)
-
-  let a = firstValue.boolv
-  var skip = if specialFunction == spAnd: a == false else: a == true
-
-  # Match the comma and whitespace.
-  let commaO = matchSymbol(statement.text, gComma, runningPos)
-  if not commaO.isSome:
-    # Expected two arguments.
-    return newValuePosSiOr(wTwoArguments, "", runningPos)
-  runningPos += commaO.get().length
-
-  # Handle the second parameter.
-  var secondValue: Value
-  var afterSecond: Natural
-  if skip:
-    let posOr = skipArg(statement, runningPos)
-    if posOr.isMessage:
-      return newValuePosSiOr(posOr.message)
-    afterSecond = posOr.value
-    secondValue = newValue(0)
-  else:
-    let vl2Or = getValuePosSi(env, statement, runningPos, variables)
-    if vl2Or.isMessage:
-      return vl2Or
-    afterSecond = vl2Or.value.pos
-    secondValue = vl2Or.value.value
-
-  var b: bool
-  if skip:
-    b = true
-  else:
-    if secondValue.kind != vkBool:
-      # Expected bool argument got $1.
-      return newValuePosSiOr(wExpectedBool, $secondValue.kind, runningPos)
-    b = secondValue.boolv
-  runningPos = afterSecond
-
-  # Match ) and trailing whitespace.
-  let parenO = matchSymbol(statement.text, gRightParentheses, runningPos)
-  if not parenO.isSome:
-    # Expected two arguments.
-    return newValuePosSiOr(wTwoArguments, "", runningPos)
-  runningPos += parenO.get().length
-
-  var value: bool
-  if specialFunction == spAnd:
-    value = a and b
-  else:
-    value = a or b
-  result = newValuePosSiOr(newValue(value), runningPos)
 
 proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
 
@@ -2243,9 +2155,6 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       of spIf:
         # Handle the special IF function.
         return ifFunction(env, specialFunction, statement, rightName.pos, variables, topLevel)
-      of spAnd, spOr:
-        # Handle the special AND/OR functions.
-        return andOrFunctions(env, specialFunction, statement, rightName.pos, variables)
       of spListLoop:
         # Handle the special listLoop function.
         return listLoop(env, specialFunction, statement, rightName.pos, variables)
@@ -2333,7 +2242,7 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
     result = bareReturn(env, statement, runningPos, variables)
   of spListLoop:
     result = listLoop(env, specialFunction, statement, runningPos, variables)
-  of spNotSpecial, spAnd, spOr, spFunc, spCase:
+  of spNotSpecial, spFunc, spCase:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValuePosSiOr(wMissingLeftAndOpr, "", start)
   of spWarn, spLog:

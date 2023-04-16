@@ -524,8 +524,9 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## the third argument.
   ##
   ## The IF functions are special in a couple of ways, see
-  ## the If Functions section.  You usually use boolean infix
-  ## expressions for the condition, see:
+  ## the IF Function section.
+  ##
+  ## You usually use boolean infix expressions for the condition, see:
   ## the Boolean Expressions section.
   ##
   ## ~~~statictea
