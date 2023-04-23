@@ -25,8 +25,8 @@ Nim source code: <a href="../../src/parseMarkdown.nim">parseMarkdown.nim</a>
 <li>type:  <a href="#InlineElement">InlineElement</a> &mdash; Parse markdown elements (parseInlineMarkdown).</li>
 <li>type:  <a href="#LinkItem">LinkItem</a> &mdash; A link item containing description and a link string and the start and end position in the text.</li>
 <li> <a href="#newLinkItem">newLinkItem</a> &mdash; Create a LinkItem object </li>
-<li> <a href="#newBlockElement">newBlockElement</a> &mdash; Create an Element object.</li>
-<li> <a href="#newInlineElement">newInlineElement</a> &mdash; Create an Element object.</li>
+<li> <a href="#newBlockElement">newBlockElement</a> &mdash; Create a BlockElement object.</li>
+<li> <a href="#newInlineElement">newInlineElement</a> &mdash; Create an InlineElement object.</li>
 <li> <a href="#newFragment">newFragment</a> &mdash; Create a new Fragment from start and end values.</li>
 <li> <a href="#newFragmentLen2">newFragmentLen2</a> &mdash; Create a new Fragment from start and length values.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of a Fragment.</li>
@@ -172,7 +172,7 @@ proc newLinkItem(start: Natural; finish: Natural; description: string;
 
 <h3 id="newBlockElement">newBlockElement</h3>
 
-<p>Create an Element object.
+<p>Create a BlockElement object.
 </p>
 
 <pre class="nim-code">
@@ -181,7 +181,7 @@ proc newBlockElement(tag: BlockElementTag; content: seq[string]): BlockElement
 
 <h3 id="newInlineElement">newInlineElement</h3>
 
-<p>Create an Element object.
+<p>Create an InlineElement object.
 </p>
 
 <pre class="nim-code">

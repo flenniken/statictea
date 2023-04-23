@@ -46,7 +46,7 @@ variable or pass to another function.
 * [len](#len-2) &mdash; Number of unicode characters in a string.
 * [list](#list) &mdash; Create a list of variables.
 * [listLoop](#listloop) &mdash; Loop over items in a list and fill in a container.
-* [log](#log) &mdash; Log a message to the log file.
+* [log](#log) &mdash; Log a message to the log file and return the same string.
 * [lower](#lower) &mdash; Lowercase a string.
 * [not](#not) &mdash; Boolean not.
 * [parseCode](#parsecode) &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.
@@ -673,8 +673,8 @@ For more information about how to escape and what is safe see:
 If the condition is true, return the second argument, else return
 the third argument.
 
-The IF functions are special in a couple of ways, see
-the IF Function section.
+The IF function is special in a couple of ways, see the IF
+Function section.
 
 You usually use boolean infix expressions for the condition, see:
 the Boolean Expressions section.
@@ -739,7 +739,8 @@ int(-6.3456, "truncate") # -6
 
 # int
 
-Create an int from a number string.
+Create an int from a number string. It generates a warning when
+the number string is not an int.
 
 ~~~javascript
 int = func(numString: string, roundOption: optional string) int
@@ -807,9 +808,9 @@ join = func(strs: list, sep: optional string) string
 Examples:
 
 ~~~javascript
-join(["a", "b"], ", ") # "a, b"
 join(["a", "b"]) # "ab"
 join(["a", "b"], "") # "ab"
+join(["a", "b"], ", ") # "a, b"
 join(["a", "b", "c"], "") # "abc"
 join(["a"], ", ") # "a"
 join([""], ", ") # ""
@@ -989,8 +990,9 @@ b5 = func(ix: int, value: int, container: list) bool
 
 # log
 
-Log a message to the log file.  You can call the log function
-without an assignment.
+Log a message to the log file and return the same string. The
+function has a bare form.  Logging needs to be turned on, see the
+Logging section.
 
 ~~~javascript
 log = func(message: string) string

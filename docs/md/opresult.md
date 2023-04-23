@@ -10,13 +10,13 @@ that tells why you cannot return the value.
 
 * type: [OpResultKind](#opresultkind) &mdash; The kind of OpResult object, either a message or a value.
 * type: [OpResult](#opresult) &mdash; Contains either a value or a message.
+* type: [OpResultWarn](#opresultwarn) &mdash; OpResultWarn holds either a value or warning data.
+* type: [OpResultId](#opresultid) &mdash; OpResultId holds either a value or a message id.
 * [isMessage](#ismessage) &mdash; Return true when the OpResult object contains a message.
 * [isValue](#isvalue) &mdash; Return true when the OpResult object contains a value.
 * [`$`](#) &mdash; Return a string representation of an OpResult object.
-* type: [OpResultWarn](#opresultwarn) &mdash; OpResultWarn holds either a value or warning data.
 * [opValueW](#opvaluew) &mdash; Create a new OpResultWarn object containing a value T.
 * [opMessageW](#opmessagew) &mdash; Create a new OpResultWarn object containing a warning.
-* type: [OpResultId](#opresultid) &mdash; OpResultId holds either a value or a message id.
 * [opValue](#opvalue) &mdash; Create a new OpResultId object containing a value T.
 * [opMessage](#opmessage) &mdash; Create a new OpResultId object containing a message id.
 
@@ -46,33 +46,6 @@ OpResult[T; T2] = object
       message*: T2
 ~~~
 
-# isMessage
-
-Return true when the OpResult object contains a message.
-
-
-~~~nim
-func isMessage(opResult: OpResult): bool
-~~~
-
-# isValue
-
-Return true when the OpResult object contains a value.
-
-
-~~~nim
-func isValue(opResult: OpResult): bool
-~~~
-
-# `$`
-
-Return a string representation of an OpResult object.
-
-
-~~~nim
-func `$`(opResult: OpResult): string
-~~~
-
 # OpResultWarn
 
 OpResultWarn holds either a value or warning data.  It's similar to
@@ -92,7 +65,7 @@ proc get_string(): OpResultWarn[string] =
 
 let strOr = get_string()
 if strOr.isMessage:
-  echo show_message(strOr.message)
+  echo strOr.message
 else:
   echo "value = " & $strOr.value
 ~~~
@@ -100,24 +73,6 @@ else:
 
 ~~~nim
 OpResultWarn[T] = OpResult[T, WarningData]
-~~~
-
-# opValueW
-
-Create a new OpResultWarn object containing a value T.
-
-
-~~~nim
-func opValueW[T](value: T): OpResultWarn[T]
-~~~
-
-# opMessageW
-
-Create a new OpResultWarn object containing a warning.
-
-
-~~~nim
-func opMessageW[T](message: WarningData): OpResultWarn[T]
 ~~~
 
 # OpResultId
@@ -147,6 +102,51 @@ else:
 
 ~~~nim
 OpResultId[T] = OpResult[T, MessageId]
+~~~
+
+# isMessage
+
+Return true when the OpResult object contains a message.
+
+
+~~~nim
+func isMessage(opResult: OpResult): bool
+~~~
+
+# isValue
+
+Return true when the OpResult object contains a value.
+
+
+~~~nim
+func isValue(opResult: OpResult): bool
+~~~
+
+# `$`
+
+Return a string representation of an OpResult object.
+
+
+~~~nim
+func `$`(opResult: OpResult): string
+~~~
+
+# opValueW
+
+Create a new OpResultWarn object containing a value T.
+
+
+~~~nim
+func opValueW[T](value: T): OpResultWarn[T]
+~~~
+
+# opMessageW
+
+Create a new OpResultWarn object containing a warning.
+
+
+~~~nim
+func opMessageW[T](message: WarningData): OpResultWarn[T]
 ~~~
 
 # opValue

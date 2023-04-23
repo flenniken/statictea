@@ -558,6 +558,11 @@ suite "functions.nim":
     let eFunResult = newFunResult(newValue("nan"))
     check testFunction("int", arguments, eFunResult)
 
+  test "int() not a number no default":
+    var arguments = @[newValue("notnum"), newValue("round"), newValue("nan")]
+    let eFunResult = newFunResult(newValue("nan"))
+    check testFunction("int", arguments, eFunResult)
+
   test "int() float number string to int":
     check testIntOk(newValue("2.34"), "round", 2)
     check testIntOk(newValue("-2.34"), "round", -2)

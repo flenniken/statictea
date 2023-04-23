@@ -66,7 +66,7 @@ StaticTea language functions start with "fun_", for example, the
 * [fun_joinPath_loss](#fun_joinpath_loss) &mdash; Join the path components with a path separator.
 * [fun_join_loss](#fun_join_loss) &mdash; Join a list of strings with a separator.
 * [fun_warn_ss](#fun_warn_ss) &mdash; Return a warning message and skip the current statement.
-* [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file.
+* [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file and return the same string.
 * [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has has side effects.
 * [fun_string_aoss](#fun_string_aoss) &mdash; Convert a variable to a string.
 * [fun_string_sds](#fun_string_sds) &mdash; Convert the dictionary variable to dot names.
@@ -429,8 +429,8 @@ func fun_get_dsoaa(variables: Variables; arguments: seq[Value]): FunResult {.
 If the condition is true, return the second argument, else return
 the third argument.
 
-The IF functions are special in a couple of ways, see
-the IF Function section.
+The IF function is special in a couple of ways, see the IF
+Function section.
 
 You usually use boolean infix expressions for the condition, see:
 the Boolean Expressions section.
@@ -801,7 +801,8 @@ func fun_int_fosi(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_int_sosi
 
-Create an int from a number string.
+Create an int from a number string. It generates a warning when
+the number string is not an int.
 
 ~~~javascript
 int = func(numString: string, roundOption: optional string) int
@@ -1500,9 +1501,9 @@ join = func(strs: list, sep: optional string) string
 Examples:
 
 ~~~javascript
-join(["a", "b"], ", ") # "a, b"
 join(["a", "b"]) # "ab"
 join(["a", "b"], "") # "ab"
+join(["a", "b"], ", ") # "a, b"
 join(["a", "b", "c"], "") # "abc"
 join(["a"], ", ") # "a"
 join([""], ", ") # ""
@@ -1544,8 +1545,9 @@ func fun_warn_ss(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_log_ss
 
-Log a message to the log file.  You can call the log function
-without an assignment.
+Log a message to the log file and return the same string. The
+function has a bare form.  Logging needs to be turned on, see the
+Logging section.
 
 ~~~javascript
 log = func(message: string) string

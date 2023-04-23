@@ -112,7 +112,7 @@ LineBuffer = object
 </p>
 
 <pre class="nim-code">
-proc getLineNum(lineBuffer: LineBuffer): int
+func getLineNum(lineBuffer: LineBuffer): int
 </pre>
 
 <h3 id="getMaxLineLen">getMaxLineLen</h3>
@@ -121,7 +121,7 @@ proc getLineNum(lineBuffer: LineBuffer): int
 </p>
 
 <pre class="nim-code">
-proc getMaxLineLen(lineBuffer: LineBuffer): int
+func getMaxLineLen(lineBuffer: LineBuffer): int
 </pre>
 
 <h3 id="getFilename">getFilename</h3>
@@ -130,7 +130,7 @@ proc getMaxLineLen(lineBuffer: LineBuffer): int
 </p>
 
 <pre class="nim-code">
-proc getFilename(lineBuffer: LineBuffer): string
+func getFilename(lineBuffer: LineBuffer): string
 </pre>
 
 <h3 id="getStream">getStream</h3>
@@ -139,7 +139,7 @@ proc getFilename(lineBuffer: LineBuffer): string
 </p>
 
 <pre class="nim-code">
-proc getStream(lineBuffer: LineBuffer): Stream
+func getStream(lineBuffer: LineBuffer): Stream
 </pre>
 
 <h3 id="newLineBuffer">newLineBuffer</h3>
@@ -148,7 +148,7 @@ proc getStream(lineBuffer: LineBuffer): Stream
 </p>
 
 <pre class="nim-code">
-proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
+func newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
                    bufferSize: int = defaultBufferSize; filename: string = ""): Option[
     LineBuffer]
 </pre>

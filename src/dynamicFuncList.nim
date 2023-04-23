@@ -582,8 +582,8 @@ For more information about how to escape and what is safe see:
 If the condition is true, return the second argument, else return
 the third argument.
 
-The IF functions are special in a couple of ways, see
-the IF Function section.
+The IF function is special in a couple of ways, see the IF
+Function section.
 
 You usually use boolean infix expressions for the condition, see:
 the Boolean Expressions section.
@@ -646,7 +646,8 @@ int(-6.3456, "truncate") # -6
 """
 
   dc_fun_int_sosi = """
-Create an int from a number string.
+Create an int from a number string. It generates a warning when
+the number string is not an int.
 
 ~~~statictea
 int = func(numString: string, roundOption: optional string) int
@@ -712,9 +713,9 @@ join = func(strs: list, sep: optional string) string
 Examples:
 
 ~~~statictea
-join(["a", "b"], ", ") # "a, b"
 join(["a", "b"]) # "ab"
 join(["a", "b"], "") # "ab"
+join(["a", "b"], ", ") # "a, b"
 join(["a", "b", "c"], "") # "abc"
 join(["a"], ", ") # "a"
 join([""], ", ") # ""
@@ -886,8 +887,9 @@ b5 = func(ix: int, value: int, container: list) bool
 """
 
   dc_fun_log_ss = """
-Log a message to the log file.  You can call the log function
-without an assignment.
+Log a message to the log file and return the same string. The
+function has a bare form.  Logging needs to be turned on, see the
+Logging section.
 
 ~~~statictea
 log = func(message: string) string
@@ -1559,7 +1561,7 @@ warn("always warn")
     info("fun_html_sss", dc_fun_html_sss, 40),
     info("fun_if_baoaa", dc_fun_if_baoaa, 41),
     info("fun_int_fosi", dc_fun_int_fosi, 35),
-    info("fun_int_sosi", dc_fun_int_sosi, 42),
+    info("fun_int_sosi", dc_fun_int_sosi, 43),
     info("fun_int_ssaa", dc_fun_int_ssaa, 35),
     info("fun_join_loss", dc_fun_join_loss, 39),
     info("fun_joinPath_loss", dc_fun_joinPath_loss, 30),
@@ -1569,7 +1571,7 @@ warn("always warn")
     info("fun_len_si", dc_fun_len_si, 18),
     info("fun_list_al", dc_fun_list_al, 21),
     info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 48),
-    info("fun_log_ss", dc_fun_log_ss, 24),
+    info("fun_log_ss", dc_fun_log_ss, 25),
     info("fun_lower_ss", dc_fun_lower_ss, 19),
     info("fun_not_bb", dc_fun_not_bb, 18),
     info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
@@ -1602,62 +1604,62 @@ warn("always warn")
   functionStarts = [
     586,
     562,
-    1761,
-    1030,
+    1762,
+    1031,
     680,
     725,
     322,
     301,
     343,
     780,
-    1179,
-    1140,
-    2505,
+    1180,
+    1141,
+    2507,
     658,
-    1067,
+    1068,
     824,
     867,
     841,
-    2161,
-    2193,
-    2214,
+    2163,
+    2195,
+    2216,
     480,
     432,
-    2465,
+    2467,
     521,
     894,
     929,
-    971,
-    1882,
-    1852,
-    1528,
+    972,
+    1883,
+    1853,
+    1529,
     413,
     394,
     376,
-    1216,
-    1237,
-    1946,
-    1509,
-    2269,
-    2389,
-    2310,
-    1454,
-    2287,
-    1285,
-    1395,
-    1970,
-    1105,
-    1675,
-    1707,
-    1734,
-    2249,
-    2033,
-    2137,
+    1217,
+    1238,
+    1947,
+    1510,
+    2271,
+    2391,
+    2312,
+    1455,
+    2289,
+    1286,
+    1396,
+    1972,
+    1106,
+    1676,
+    1708,
+    1735,
+    2251,
+    2035,
+    2139,
     633,
     609,
-    1799,
-    1552,
-    1921,
+    1800,
+    1553,
+    1922,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

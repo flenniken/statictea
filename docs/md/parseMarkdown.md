@@ -15,8 +15,8 @@ highlight statictea code.
 * type: [InlineElement](#inlineelement) &mdash; Parse markdown elements (parseInlineMarkdown).
 * type: [LinkItem](#linkitem) &mdash; A link item containing description and a link string and the start and end position in the text.
 * [newLinkItem](#newlinkitem) &mdash; Create a LinkItem object 
-* [newBlockElement](#newblockelement) &mdash; Create an Element object.
-* [newInlineElement](#newinlineelement) &mdash; Create an Element object.
+* [newBlockElement](#newblockelement) &mdash; Create a BlockElement object.
+* [newInlineElement](#newinlineelement) &mdash; Create an InlineElement object.
 * [newFragment](#newfragment) &mdash; Create a new Fragment from start and end values.
 * [newFragmentLen2](#newfragmentlen2) &mdash; Create a new Fragment from start and length values.
 * [`$`](#) &mdash; Return a string representation of a Fragment.
@@ -153,7 +153,7 @@ proc newLinkItem(start: Natural; finish: Natural; description: string;
 
 # newBlockElement
 
-Create an Element object.
+Create a BlockElement object.
 
 
 ~~~nim
@@ -162,7 +162,7 @@ proc newBlockElement(tag: BlockElementTag; content: seq[string]): BlockElement
 
 # newInlineElement
 
-Create an Element object.
+Create an InlineElement object.
 
 
 ~~~nim

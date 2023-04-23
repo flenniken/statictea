@@ -99,7 +99,7 @@ Return the current line number.
 
 
 ~~~nim
-proc getLineNum(lineBuffer: LineBuffer): int
+func getLineNum(lineBuffer: LineBuffer): int
 ~~~
 
 # getMaxLineLen
@@ -108,7 +108,7 @@ Return the maximum line length.
 
 
 ~~~nim
-proc getMaxLineLen(lineBuffer: LineBuffer): int
+func getMaxLineLen(lineBuffer: LineBuffer): int
 ~~~
 
 # getFilename
@@ -117,7 +117,7 @@ Return the filename of the stream, if there is one.
 
 
 ~~~nim
-proc getFilename(lineBuffer: LineBuffer): string
+func getFilename(lineBuffer: LineBuffer): string
 ~~~
 
 # getStream
@@ -126,7 +126,7 @@ Return the associated stream.
 
 
 ~~~nim
-proc getStream(lineBuffer: LineBuffer): Stream
+func getStream(lineBuffer: LineBuffer): Stream
 ~~~
 
 # newLineBuffer
@@ -135,7 +135,7 @@ Return a new LineBuffer for the given stream.
 
 
 ~~~nim
-proc newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
+func newLineBuffer(stream: Stream; maxLineLen: int = defaultMaxLineLen;
                    bufferSize: int = defaultBufferSize; filename: string = ""): Option[
     LineBuffer]
 ~~~

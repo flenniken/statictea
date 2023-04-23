@@ -46,7 +46,7 @@ check resultStringO.get() == "456456"
 * [regexes.nim](../../src/regexes.nim) &mdash; Nim source code.
 # Index
 
-* type: [CompilePattern](#compilepattern) &mdash; A compiled regular expression.
+* type: [CompiledPattern](#compiledpattern) &mdash; A compiled regular expression.
 * type: [Matches](#matches) &mdash; Holds the result of a match.
 * type: [Replacement](#replacement) &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.
 * [newMatches](#newmatches) &mdash; Create a new Matches object with no groups.
@@ -57,18 +57,18 @@ check resultStringO.get() == "456456"
 * [get2GroupsLen](#get2groupslen) &mdash; Get two groups and length in matchesO.
 * [getGroups](#getgroups) &mdash; Return the number of groups specified.
 * [matchRegex](#matchregex) &mdash; Match a regular expression pattern in a string.
-* [compilePattern](#compilepattern-1) &mdash; Compile the pattern and return a regex object.
+* [compilePattern](#compilepattern) &mdash; Compile the pattern and return a regex object.
 * [matchPattern](#matchpattern) &mdash; Match a regular expression pattern in a string.
 * [newReplacement](#newreplacement) &mdash; Create a new Replacement object.
 * [replaceMany](#replacemany) &mdash; Replace the patterns in the string with their replacements.
 
-# CompilePattern
+# CompiledPattern
 
 A compiled regular expression.
 
 
 ~~~nim
-CompilePattern = Regex
+CompiledPattern = Regex
 ~~~
 
 # Matches
@@ -172,7 +172,7 @@ of groups in the pattern.
 
 
 ~~~nim
-func matchRegex(str: string; regex: CompilePattern; start: Natural;
+func matchRegex(str: string; regex: CompiledPattern; start: Natural;
                 numGroups: Natural): Option[Matches]
 ~~~
 
@@ -183,7 +183,7 @@ Note: the pattern uses the anchored option.
 
 
 ~~~nim
-func compilePattern(pattern: string): Option[CompilePattern]
+func compilePattern(pattern: string): Option[CompiledPattern]
 ~~~
 
 # matchPattern

@@ -20,13 +20,13 @@ Nim source code: <a href="../../src/opresult.nim">opresult.nim</a>
 <ul>
 <li>type:  <a href="#OpResultKind">OpResultKind</a> &mdash; The kind of OpResult object, either a message or a value.</li>
 <li>type:  <a href="#OpResult">OpResult</a> &mdash; Contains either a value or a message.</li>
+<li>type:  <a href="#OpResultWarn">OpResultWarn</a> &mdash; OpResultWarn holds either a value or warning data.</li>
+<li>type:  <a href="#OpResultId">OpResultId</a> &mdash; OpResultId holds either a value or a message id.</li>
 <li> <a href="#isMessage">isMessage</a> &mdash; Return true when the OpResult object contains a message.</li>
 <li> <a href="#isValue">isValue</a> &mdash; Return true when the OpResult object contains a value.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of an OpResult object.</li>
-<li>type:  <a href="#OpResultWarn">OpResultWarn</a> &mdash; OpResultWarn holds either a value or warning data.</li>
 <li> <a href="#opValueW">opValueW</a> &mdash; Create a new OpResultWarn object containing a value T.</li>
 <li> <a href="#opMessageW">opMessageW</a> &mdash; Create a new OpResultWarn object containing a warning.</li>
-<li>type:  <a href="#OpResultId">OpResultId</a> &mdash; OpResultId holds either a value or a message id.</li>
 <li> <a href="#opValue">opValue</a> &mdash; Create a new OpResultId object containing a value T.</li>
 <li> <a href="#opMessage">opMessage</a> &mdash; Create a new OpResultId object containing a message id.</li>
 </ul>
@@ -57,33 +57,6 @@ OpResult[T; T2] = object
       message*: T2
 </pre>
 
-<h3 id="isMessage">isMessage</h3>
-
-<p>Return true when the OpResult object contains a message.
-</p>
-
-<pre class="nim-code">
-func isMessage(opResult: OpResult): bool
-</pre>
-
-<h3 id="isValue">isValue</h3>
-
-<p>Return true when the OpResult object contains a value.
-</p>
-
-<pre class="nim-code">
-func isValue(opResult: OpResult): bool
-</pre>
-
-<h3 id="a__">`$`</h3>
-
-<p>Return a string representation of an OpResult object.
-</p>
-
-<pre class="nim-code">
-func `$`(opResult: OpResult): string
-</pre>
-
 <h3 id="OpResultWarn">OpResultWarn</h3>
 
 <p>OpResultWarn holds either a value or warning data.  It&#x27;s similar to
@@ -103,7 +76,7 @@ proc get_string(): OpResultWarn[string] =
 
 let strOr = get_string()
 if strOr.isMessage:
-  echo show_message(strOr.message)
+  echo strOr.message
 else:
   echo &quot;value = &quot; &amp; $strOr.value
 </pre>
@@ -111,24 +84,6 @@ else:
 
 <pre class="nim-code">
 OpResultWarn[T] = OpResult[T, WarningData]
-</pre>
-
-<h3 id="opValueW">opValueW</h3>
-
-<p>Create a new OpResultWarn object containing a value T.
-</p>
-
-<pre class="nim-code">
-func opValueW[T](value: T): OpResultWarn[T]
-</pre>
-
-<h3 id="opMessageW">opMessageW</h3>
-
-<p>Create a new OpResultWarn object containing a warning.
-</p>
-
-<pre class="nim-code">
-func opMessageW[T](message: WarningData): OpResultWarn[T]
 </pre>
 
 <h3 id="OpResultId">OpResultId</h3>
@@ -158,6 +113,51 @@ else:
 
 <pre class="nim-code">
 OpResultId[T] = OpResult[T, MessageId]
+</pre>
+
+<h3 id="isMessage">isMessage</h3>
+
+<p>Return true when the OpResult object contains a message.
+</p>
+
+<pre class="nim-code">
+func isMessage(opResult: OpResult): bool
+</pre>
+
+<h3 id="isValue">isValue</h3>
+
+<p>Return true when the OpResult object contains a value.
+</p>
+
+<pre class="nim-code">
+func isValue(opResult: OpResult): bool
+</pre>
+
+<h3 id="a__">`$`</h3>
+
+<p>Return a string representation of an OpResult object.
+</p>
+
+<pre class="nim-code">
+func `$`(opResult: OpResult): string
+</pre>
+
+<h3 id="opValueW">opValueW</h3>
+
+<p>Create a new OpResultWarn object containing a value T.
+</p>
+
+<pre class="nim-code">
+func opValueW[T](value: T): OpResultWarn[T]
+</pre>
+
+<h3 id="opMessageW">opMessageW</h3>
+
+<p>Create a new OpResultWarn object containing a warning.
+</p>
+
+<pre class="nim-code">
+func opMessageW[T](message: WarningData): OpResultWarn[T]
 </pre>
 
 <h3 id="opValue">opValue</h3>

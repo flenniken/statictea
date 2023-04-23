@@ -92,11 +92,11 @@ proc newLinkItem*(start: Natural, finish: Natural, description: string, link: st
   result = LinkItem(start: start, finish: finish, description: description, link: link)
 
 proc newBlockElement*(tag: BlockElementTag, content: seq[string]): BlockElement =
-  ## Create an Element object.
+  ## Create a BlockElement object.
   result = BlockElement(tag: tag, content: content)
 
 proc newInlineElement*(tag: InlineElementTag, content: seq[string]): InlineElement =
-  ## Create an Element object.
+  ## Create an InlineElement object.
   result = InlineElement(tag: tag, content: content)
 
 proc clear(list: var seq[string]) =

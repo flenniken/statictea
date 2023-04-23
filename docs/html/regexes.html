@@ -56,7 +56,7 @@ Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>type:  <a href="#CompilePattern">CompilePattern</a> &mdash; A compiled regular expression.</li>
+<li>type:  <a href="#CompiledPattern">CompiledPattern</a> &mdash; A compiled regular expression.</li>
 <li>type:  <a href="#Matches">Matches</a> &mdash; Holds the result of a match.</li>
 <li>type:  <a href="#Replacement">Replacement</a> &mdash; Holds the regular expression pattern and its replacement for the replaceMany function.</li>
 <li> <a href="#newMatches">newMatches</a> &mdash; Create a new Matches object with no groups.</li>
@@ -73,13 +73,13 @@ Nim source code: <a href="../../src/regexes.nim">regexes.nim</a>
 <li> <a href="#replaceMany">replaceMany</a> &mdash; Replace the patterns in the string with their replacements.</li>
 </ul>
 
-<h3 id="CompilePattern">CompilePattern</h3>
+<h3 id="CompiledPattern">CompiledPattern</h3>
 
 <p>A compiled regular expression.
 </p>
 
 <pre class="nim-code">
-CompilePattern = Regex
+CompiledPattern = Regex
 </pre>
 
 <h3 id="Matches">Matches</h3>
@@ -185,7 +185,7 @@ of groups in the pattern.
 </p>
 
 <pre class="nim-code">
-func matchRegex(str: string; regex: CompilePattern; start: Natural;
+func matchRegex(str: string; regex: CompiledPattern; start: Natural;
                 numGroups: Natural): Option[Matches]
 </pre>
 
@@ -196,7 +196,7 @@ Note: the pattern uses the anchored option.
 </p>
 
 <pre class="nim-code">
-func compilePattern(pattern: string): Option[CompilePattern]
+func compilePattern(pattern: string): Option[CompiledPattern]
 </pre>
 
 <h3 id="matchPattern">matchPattern</h3>
