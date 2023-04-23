@@ -73,3 +73,4 @@ tmpl.txt(2); test log message
 ### Expected stdout == stdout.expected
 ### Expected stderr == stderr.expected
 ### Expected log.filtered == log.filtered.expected
+## Expected log.txt == empty

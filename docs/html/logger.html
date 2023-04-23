@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>logger.nim</title>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
+</head>
+<body>
+<h1>logger.nim</h1>
+
+<p>Log to a file.
+</p>
+
+Nim source code: <a href="../../src/logger.nim">logger.nim</a>
+
+<h1>Index</h1>
+
+<ul>
+<li>const:  <a href="#dtFormat">dtFormat</a> &mdash; The date time format in local time written to the log.</li>
+<li> <a href="#formatLogDateTime">formatLogDateTime</a> &mdash; Return a formatted time stamp for the log.</li>
+<li> <a href="#formatLogLine">formatLogLine</a> &mdash; Return a formatted log line.</li>
+<li> <a href="#openLogFile">openLogFile</a> &mdash; Open the log file.</li>
+<li> <a href="#closeLogFile">closeLogFile</a> &mdash; Close the log file.</li>
+<li> <a href="#logLine">logLine</a> &mdash; Append a message to the log file.</li>
+<li> <a href="#log">log</a> &mdash; Append the message to the log file including the current file and line number.</li>
+</ul>
+
+<h3 id="dtFormat">dtFormat</h3>
+
+<p>The date time format in local time written to the log.
+</p>
+
+<pre class="nim-code">
+dtFormat = "yyyy-MM-dd HH:mm:ss\'.\'fff"
+</pre>
+
+<h3 id="formatLogDateTime">formatLogDateTime</h3>
+
+<p>Return a formatted time stamp for the log.
+</p>
+
+<pre class="nim-code">
+func formatLogDateTime(dt: DateTime): string
+</pre>
+
+<h3 id="formatLogLine">formatLogLine</h3>
+
+<p>Return a formatted log line.
+</p>
+
+<pre class="nim-code">
+func formatLogLine(filename: string; lineNum: int; message: string; dt = now()): string {.
+    raises: [ValueError], tags: [].}
+</pre>
+
+<h3 id="openLogFile">openLogFile</h3>
+
+<p>Open the log file. Return true when it opened sucessfully.
+</p>
+
+<pre class="nim-code">
+proc openLogFile(logFilename: string): bool
+</pre>
+
+<h3 id="closeLogFile">closeLogFile</h3>
+
+<p>Close the log file.
+</p>
+
+<pre class="nim-code">
+proc closeLogFile()
+</pre>
+
+<h3 id="logLine">logLine</h3>
+
+<p>Append a message to the log file. If there is an error writing,
+close the log. Do nothing when the log is closed. A newline is
+added to the message.
+</p>
+
+<pre class="nim-code">
+proc logLine(filename: string; lineNum: int; message: string) {.
+    raises: [ValueError], tags: [TimeEffect, WriteIOEffect].}
+</pre>
+
+<h3 id="log">log</h3>
+
+<p>Append the message to the log file including the current file and
+line number.
+</p>
+
+<pre class="nim-code">
+template log(message: string)
+</pre>
+
+
+<p>⦿ This page was generated
+by <a href="https://github.com/flenniken/statictea/">statictea</a>
+from nim doc comments. ⦿</p>
+
+</body>
+</html>

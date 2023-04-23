@@ -11,6 +11,7 @@ import version
 import env
 import opresult
 import repl
+import logger
 when isMainModule:
   import std/os
   import timer
@@ -45,8 +46,8 @@ proc main*(env: var Env, argv: seq[string]) =
   if args.log:
     env.setupLogging(args.logFilename)
 
-  env.log("Starting: argv: $1\n" % $argv)
-  env.log("Version: $1\n" % staticteaVersion)
+  log("Starting: argv: $1" % $argv)
+  log("Version: $1" % staticteaVersion)
 
   # Setup control-c monitoring so ctrl-c stops the program.
   proc controlCHandler() {.noconv.} =
@@ -57,7 +58,7 @@ proc main*(env: var Env, argv: seq[string]) =
     processArgs(env, args)
   except:
     let msg = getCurrentExceptionMsg()
-    env.log(msg & "\n")
+    log(msg)
     # Unexpected exception: '$1'.
     env.warnNoFile(wUnexpectedException, msg)
     when not defined(release):
@@ -71,7 +72,7 @@ when isMainModule:
     var env = openEnv()
     main(env, commandLineParams())
     let rc = if env.warningsWritten > 0: QuitFailure else: QuitSuccess
-    env.log("Warnings: $1\n" % [$env.warningsWritten])
-    env.log("Duration: $1\n" % $timer.seconds())
+    log("Warnings: $1" % [$env.warningsWritten])
+    log("Duration: $1" % $timer.seconds())
     env.close()
     quit(rc)

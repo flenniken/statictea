@@ -52,7 +52,7 @@ hello world
 Starting: argv: @["-l", "log.txt", "-s", "hello.json", "-t", "hello.html"]
 Json filename: hello.json
 Json file size: 18
-Template lines: 2
+Number of template lines: 2
 Warnings: 0
 ~~~
 

@@ -2,19 +2,12 @@
 
 import std/streams
 import std/os
-import std/times
 import std/options
-import std/strutils
 import tempFile
 import messages
+import logger
 
 const
-  logWarnSize*: int64 = 1024 * 1024 * 1024
-    ## Warn the user when the log file gets over 1 GB.
-
-  dtFormat* = "yyyy-MM-dd HH:mm:ss'.'fff"
-    ## The date time format in local time written to the log.
-
   maxWarningsWritten* = 32
     ## The maximum number of warning messages to show.
 
@@ -37,7 +30,6 @@ type
     ##   might be a normal file for testing.
     ## * outStream — standard output stream; normally stdout but
     ##   might be a normal file for testing.
-    ## * logFile — the open log file
     ## * logFilename — the log filename
     ## * closeErrStream — whether to close err stream. You don't
     ##   close stderr.
@@ -54,7 +46,6 @@ type
     # These get set at the start.
     errStream*: Stream
     outStream*: Stream
-    logFile*: File
     logFilename*: string
 
     # You don't close the stderr or stdout.
@@ -88,9 +79,7 @@ proc close*(env: var Env) =
     if env.resultStream != nil:
       env.resultStream.close()
       env.resultStream = nil
-  if env.logFile != nil:
-    env.logFile.close()
-    env.logFile = nil
+  closeLogFile()
 
 proc outputWarning*(env: var Env, lineNum: Natural, message: string) =
   ## Write a message to the error stream and increment the warning
@@ -134,45 +123,6 @@ proc warnNoFile*(env: var Env, warningData: WarningData) =
   ## Write a formatted warning message to the error stream.
   warn(env, "nofile", 0, warningData.messageId, warningData.p1)
 
-func formatLogDateTime*(dt: DateTime): string =
-  ## Return a formatted time stamp for the log.
-  result = dt.format(dtFormat)
-
-func formatLogLine*(filename: string, lineNum: int, message: string, dt = now()):
-     string =
-  ## Return a formatted log line.
-  let dtString = formatLogDateTime(dt)
-  result = "$1; $2($3); $4" % [dtString, filename, $lineNum, message]
-
-proc logLine*(env: var Env, filename: string, lineNum: int, message: string) =
-  ## Append a message to the log file. If there is an error writing,
-  ## close the log. Do nothing when the log is closed. A newline is
-  ## not added to the line.
-  if env.logFile == nil:
-    return
-  let line = formatLogLine(filename, lineNum, message)
-  try:
-    # raise newException(IOError, "test io error")
-    env.logFile.write(line)
-  except:
-    # Unable to write to the log file: '$1'.
-    env.warnNoFile(wUnableToWriteLogFile, filename)
-    # Exception: '$1'.
-    env.warnNoFile(wExceptionMsg, getCurrentExceptionMsg())
-    # The stack trace is only available in the debug builds.
-    when not defined(release):
-      # Stack trace: '$1'.
-      env.warnNoFile(wStackTrace, getCurrentException().getStackTrace())
-    # Close the log file.  Only one warning goes out about it not working.
-    env.logFile.close()
-    env.logFile = nil
-
-template log*(env: var Env, message: string) =
-  ## Append the message to the log file. The current file and line
-  ## becomes part of the message.
-  let info = instantiationInfo()
-  logLine(env, info.filename, info.line, message)
-
 proc writeOut*(env: var Env, message: string) =
   ## Write a message to the output stream.
   env.outStream.writeLine(message)
@@ -181,29 +131,17 @@ proc writeErr*(env: var Env, message: string) =
   ## Write a message to the error stream.
   env.errStream.writeLine(message)
 
-proc checkLogSize*(env: var Env) =
-  ## Check the log file size and write a warning message when the file
-  ## is big.
-  if env.logFile != nil:
-    let logSize = env.logFile.getFileSize()
-    if logSize > logWarnSize:
-      # The log file is over 1 GB.
-      env.warnNoFile(wBigLogFile)
-
-proc openLogFile*(env: var Env, logFilename: string) =
+proc openEnvLogFile*(env: var Env, logFilename: string) =
   ## Open the log file and update the environment. If the log file
   ## cannot be opened, a warning is output and the environment is
   ## unchanged.
-  var file: File
-  if open(file, logFilename, fmAppend):
-    env.logFile = file
-    env.logFilename = logFilename
-  else:
+  if openLogFile(logFilename) == false:
     # Unable to open log file: '$1'.
     env.warnNoFile(wUnableToOpenLogFile, logFilename)
+  else:
+    env.logFilename = logFilename
 
-proc openEnv*(logFilename: string = "",
-                  warnSize: int64 = logWarnSize): Env =
+proc openEnv*(logFilename: string = ""): Env =
   ## Open and return the environment containing standard error and
   ## standard out as streams.
 
@@ -212,8 +150,7 @@ proc openEnv*(logFilename: string = "",
     outStream: newFileStream(stdout),
   )
 
-proc setupLogging*(env: var Env, logFilename: string = "",
-                  warnSize: int64 = logWarnSize) =
+proc setupLogging*(env: var Env, logFilename: string = "") =
   ## Turn on logging for the environment using the specified log file.
 
   # When no log filename, use the default.
@@ -222,9 +159,7 @@ proc setupLogging*(env: var Env, logFilename: string = "",
     filename = staticteaLog
   else:
     filename = logFilename
-
-  openLogFile(env, filename)
-  checkLogSize(env)
+  openEnvLogFile(env, filename)
 
 proc addExtraStreams*(env: var Env, templateFilename: string,
     resultFilename: string): Option[WarningData] =

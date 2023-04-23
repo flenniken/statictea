@@ -13,6 +13,7 @@ when defined(test):
   import comparelines
   import parseCmdLine
   import vartypes
+  import logger
 
   proc readXLines*(lb: var LineBuffer, maxLines: Natural = high(Natural)): seq[string] =
     ## Read lines from a LineBuffer returning line endings but don't
@@ -128,11 +129,9 @@ when defined(test):
     ## Close the log file, read its lines, then delete the
     ## file. Return the lines read but don't read more than maximum
     ## lines. Lines contain the line endings.
-    if env.logFile != nil:
-      env.logFile.close()
-      env.logFile = nil
-      result = readXLines(env.logFilename, maximum)
-      discard tryRemoveFile(env.logFilename)
+    closeLogFile()
+    result = readXLines(env.logFilename, maximum)
+    discard tryRemoveFile(env.logFilename)
 
   # A string stream content disappears when you close it where as a
   # file's content still exists on disk. To work with both types of
@@ -312,8 +311,7 @@ when defined(test):
       templateStream: templateStream,
       closeTemplateStream: true,
     )
-    openLogFile(result, logFilename)
-    checkLogSize(result)
+    openEnvLogFile(result, logFilename)
 
     result.resultStream = newStringStream()
     result.closeResultStream = true

@@ -35,7 +35,7 @@ Process the template.
 
 ~~~nim
 proc processTemplate(env: var Env; args: Args) {.
-    raises: [ValueError, IOError, OSError, Exception, KeyError], tags: [
+    raises: [ValueError, Exception, IOError, OSError, KeyError], tags: [
     TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect,
     ReadEnvEffect, WriteDirEffect].}
 ~~~

@@ -12,6 +12,7 @@ import readjson
 import opresult
 import runCommand
 import functions
+import logger
 
 proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
   ## Read json files and return a variable dictionary.  Skip a
@@ -19,12 +20,12 @@ proc readJsonFiles*(env: var Env, filenames: seq[string]): VarsDict =
 
   var varsDict = newVarsDict()
   for filename in filenames:
-    env.log("Json filename: $1\n" % filename)
+    log("Json filename: $1" % filename)
     let valueOr = readJsonFile(filename)
     if valueOr.isMessage:
       env.warn(filename, 0, valueOr.message)
     else:
-      env.log("Json file size: $1\n" % $getFileSize(filename))
+      log("Json file size: $1" % $getFileSize(filename))
       # Merge in the variables.
       for k, v in valueOr.value.dictv.dict.pairs:
         if k in varsDict:

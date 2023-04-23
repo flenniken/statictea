@@ -15,6 +15,7 @@ import vartypes
 import replacement
 import startingvars
 import opresult
+import logger
 
 proc collectCommand*(env: var Env, lb: var LineBuffer,
       prepostTable: PrepostTable, extraLine: var ExtraLine): CmdLines =
@@ -202,7 +203,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     if lastLine.kind == rlNormalLine:
       inOutExtraLine = newNormalLine(lastLine.line)
 
-  env.log("Template lines: $1\n" % $(lb.getLineNum()-1))
+  log("Number of template lines: $1" % $(lb.getLineNum()-1))
 
 proc processTemplate*(env: var Env, args: Args) =
   ## Process the template.

@@ -19,6 +19,7 @@ import unicodes
 import utf8decoder
 import parseCmdLine
 import signatures
+import logger
 
 const
   # Turn on showPos for testing to graphically show the start and end
@@ -2461,7 +2462,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
     of opIgnore:
       continue
     of opLog:
-      env.logLine(funcVar.funcv.filename, statement.lineNum, variableData.value.stringv & "\n")
+      logLine(funcVar.funcv.filename, statement.lineNum, variableData.value.stringv)
     of opReturn:
       # Validate return type.
       if not sameType(funcVar.funcv.signature.returnType, variableData.value.kind):
@@ -2499,7 +2500,7 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
   of opIgnore:
     result = lcAdd
   of opLog:
-    env.logLine(sourceFilename, statement.lineNum, variableData.value.stringv & "\n")
+    logLine(sourceFilename, statement.lineNum, variableData.value.stringv)
     result = lcAdd
   of opReturn:
     # Handle a return function exit.

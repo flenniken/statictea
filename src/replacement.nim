@@ -37,6 +37,7 @@ import variables
 import tempFile
 import opresult
 import args
+import logger
 
 type
   SegmentType = enum
@@ -317,7 +318,7 @@ proc writeTempSegments*(env: var Env, tempSegments: var TempSegments,
     # Write out completed lines.
     if segmentType == newline or segmentType == endline or segmentType == endVariable:
       if output == "log":
-        env.logLine(env.templateFilename, rLineNum-1, line)
+        logLine(env.templateFilename, rLineNum-1, line)
       else:
         assert(stream != nil)
         stream.write(line)

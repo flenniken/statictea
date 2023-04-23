@@ -19,7 +19,7 @@ duplicate variable and generate a warning.
 
 ~~~nim
 proc readJsonFiles(env: var Env; filenames: seq[string]): VarsDict {.
-    raises: [ValueError, IOError, OSError, Exception],
+    raises: [ValueError, Exception, IOError, OSError],
     tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect].}
 ~~~
 
@@ -49,7 +49,7 @@ the code files and setup the initial tea variables.
 
 ~~~nim
 proc getStartVariables(env: var Env; args: Args): Variables {.
-    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    raises: [ValueError, Exception, IOError, OSError, KeyError],
     tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
 ~~~
 

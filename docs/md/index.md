@@ -12,6 +12,7 @@ StaticTea nim source code documentation.
 * [gethelp.nim](gethelp.md) &mdash; Get the command line help message.
 * [jsondocraw.nim](jsondocraw.md) &mdash; Generate json data from a nim source file.
 * [linebuffer.nim](linebuffer.md) &mdash; Read lines from a stream without exceeding the maximum line length.
+* [logger.nim](logger.md) &mdash; Log to a file.
 * [matches.nim](matches.md) &mdash; Methods for matching sub-strings.
 * [messages.nim](messages.md) &mdash; Messages IDs and associated strings and routines to get them.
 * [opresult.nim](opresult.md) &mdash; OpResult holds either a value or a message.
