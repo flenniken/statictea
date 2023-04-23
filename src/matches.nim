@@ -5,8 +5,8 @@ import std/options
 import std/tables
 import regexes
 
-var compliledPatterns = initTable[string, CompilePattern]()
-  ## A cache of compiled regex patterns, mapping a pattern to CompilePattern.
+var compliledPatterns = initTable[string, CompiledPattern]()
+  ## A cache of compiled regex patterns, mapping a pattern to CompiledPattern.
 
 const
   commands*: array[6, string] = [
@@ -45,7 +45,7 @@ proc matchPatternCached*(str: string, pattern: string,
 
   # Get the cached regex for the pattern or compile it and add it to
   # the cache.
-  var regex: CompilePattern
+  var regex: CompiledPattern
   if pattern in compliledPatterns:
     regex = compliledPatterns[pattern]
   else:

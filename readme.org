@@ -307,11 +307,14 @@ see the [[#syntax][Syntax]] section.
 :CUSTOM_ID: continue-command
 :END:
 
-The continue command allows you to continue adding statements to
-the nextline, block and replace commands.
+The continue command (a colon) allows you to continue adding
+statements to the nextline, block and replace commands.
+
+We often refer to the command and its continue commands as the
+command (one logical unit).
 
 In the following example the nextline command continues on a
-second line and third line.
+second line and third line because of the two continue commands.
 
 template:
 
@@ -336,9 +339,26 @@ Earl Grey, Masala chai
 :END:
 
 The endblock command ends the replacement block for the block and
-replace commands. Only the endblock command ends them. All text
-until the endblock is part of the replacement block. This
-includes lines that look like commands. For example:
+replace commands.
+
+The endblock command ends the replacement block for the block and
+replace commands. For example:
+
+#+BEGIN_SRC
+$$ block
+replacement block text
+replacement block text
+$$ endblock
+
+$$ replace
+replacement block text
+replacement block text
+$$ endblock
+#+END_SRC
+
+Only the endblock command ends them. All text until the endblock
+is part of the replacement block. This includes lines that look
+like commands. For example:
 
 template:
 
@@ -366,8 +386,8 @@ fake nextline
 :END:
 
 A replacement block is a group of contiguous lines in a template
-between a command and its endblock. For the nextline command the
-block is one line.
+between a command and its endblock or for the nextline command,
+the one line after it.
 
 The block contains any number of bracketed variables for
 substitution. Each variable gets replaced with its value.
@@ -377,7 +397,58 @@ content. You control how many times the block repeats with the
 t.repeat variable.  You can skip and stop early with the return
 function. The t.row counts the number of times the block has
 repeated and you use its value to customize each repeated block.
-See [[#trow][t.row]] for an example.
+
+Below is an example that repeats the block three times and
+outputs 0, 1, 2:
+
+template:
+
+#+BEGIN_SRC
+$$ nextline t.repeat = 3
+{t.row}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+0
+1
+2
+#+END_SRC
+
+If a replacement block variable doesn't exist, the bracketed
+variable remains as is in the result, and a message is output to
+standard error. For example:
+
+template:
+
+#+BEGIN_SRC
+<!--$ block -->
+You're a {s.webmaster},
+I'm a {s.teaMaster}!
+<!--$ endblock -->
+#+END_SRC
+
+server json:
+
+#+BEGIN_SRC
+{
+ "webmaster": "html wizard"
+}
+#+END_SRC
+
+stderr:
+
+#+BEGIN_SRC
+template.html(3): w58: The replacement variable doesn't exist: s.teaMaster.
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+You're a html wizard,
+I'm a {s.teaMaster}!
+#+END_SRC
 
 [[#contents][茶]]
 
@@ -390,8 +461,15 @@ You create a new variable with a statement. A statement is an
 expression consisting of a variable name, an operator and a right
 hand side.
 
-The operator is an equal sign or an "&=". The equal sign appends
-to a dictionary and the &= appends to a list.
+For the example below, tea is the variable name, = is the
+operator and "Earl Grey" is the right hand side:
+
+#+BEGIN_SRC
+tea = "Earl Grey"
+#+END_SRC
+
+The operator is either an equal sign or an "&=". The equal sign
+appends to a dictionary and the &= appends to a list.
 
 The right hand side is either a variable, string, number, list,
 boolean expression or a function.
@@ -411,6 +489,16 @@ b &= 3
 Statements are allowed on the nextline, block, continue and
 replace commands.
 
+In the next example, the block command and the continue command
+contain a statement.
+
+#+BEGIN_SRC
+$$ block tea = "Earl Grey"
+$$ : a = 5
+$$ endblock
+#+END_SRC
+
+
 Most operations are done with functions. For example, to add 1 to
 t.row you use the add function.
 
@@ -422,24 +510,6 @@ Statements are executed from top to bottom. You can use the warn
 function to exit a statement early and use the return function to
 exit a command early.
 
-You can repeat the replacement block and vary the output using
-t.row. Below is an example that repeats the block three times and
-outputs 0, 1, 2:
-
-template:
-
-#+BEGIN_SRC
-$$ nextline t.repeat = 3
-{t.row}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-0
-1
-2
-#+END_SRC
 
 You have control over where the replacement block goes, either
 the result file, standard out, standard error, or the log file
@@ -770,10 +840,10 @@ l.tea = "earl grey"
 :CUSTOM_ID: code-variables
 :END:
 
-You create code variables with statements in code files. Code
-files are good for sharing common template variables between
-templates. The variables go in the o dictionary, see
-[[#code-files][Code Files]].
+You create code variables with statements in code files.  Code
+variables are good for sharing between templates.
+
+The variables go in the o dictionary, see [[#code-files][Code Files]].
 
 [[#contents][茶]]
 
@@ -784,9 +854,9 @@ templates. The variables go in the o dictionary, see
 
 You pass variables from the server to the template in json files.
 
-The variables are defined by the top level dictionary items. Each
-item's key is the name of a variable and the item's value is
-the variables' value.
+The variables are defined by the top level JSON dictionary
+items. Each item's key is the name of a variable and the item's
+value is the variables' value.
 
 You can use multiple server json files by specifying multiple
 files on the command line. The files are processed left to right.
@@ -1660,10 +1730,10 @@ function.
 :CUSTOM_ID: code-files
 :END:
 
-A code file is a list of statements. You use a code file for
-defining variables and templates fragments for use in one or more
-templates and for defining functions. The template designer
-controls the code files.
+A code file is a list of statements.  You use a code file for
+defining variables for templates.
+
+The template designer controls the code files.
 
 Here is an example of a code file that defines two variables, pi
 and footer.
@@ -1717,9 +1787,9 @@ o.x = a + 6
 You can use the listLoop function to loop over a list and build lists
 and dictionaries. It’s the looping method you use in code files.
 
-An error reading a statement stops processing the code file, for
-example an error in a multi-line string or an error with a + line
-continuation.
+Processing continues after a warning except for a problem reading
+a multi-line string or a problem with line continuation which
+stops processing the code file.
 
 Like template commands, the maximum line length is 1024 bytes and
 an ending plus sign continues a long statement on the next line.
@@ -1731,12 +1801,12 @@ an ending plus sign continues a long statement on the next line.
 :CUSTOM_ID: multiline-strings
 :END:
 
-Code files support multiline strings. They are useful for
-sharing template fragments without escaping characters.
+Code files support multiline strings which are triple quoted
+UTF-8 encode strings.
 
-Multiline strings are triple quoted UTF-8 encode strings. In the
-following example the header variable is assigned a two line
-string containing quotes and newlines.
+They are useful for sharing template fragments without escaping
+characters. In the following example the header variable is
+assigned a two line string containing quotes and newlines.
 
 #+BEGIN_SRC nim
 o.header = """
@@ -2028,13 +2098,8 @@ template.
    :END:
 
 When StaticTea detects a problem, a warning message is written to
-standard error, the problem is skipped, and processing
+standard error, the problem statement is skipped, and processing
 continues.
-
-For example, if a variable in a replacement block is used but it
-doesn't exist, the bracketed variable remains as is in the
-result, and a message is output to standard error. There are many
-other potential warnings.
 
 It’s good style to change your template to be free of messages.
 
@@ -2066,37 +2131,6 @@ Statictea returns success, return code 0, when there are no
 warning messages, else it returns 1. If you want to treat
 warnings as errors, check for the 1 return code.
 
-Example of running statictea when a variable is missing:
-
-template:
-
-#+BEGIN_SRC
-<!--$ block -->
-You're a {s.webmaster},
-I'm a {s.teaMaster}!
-<!--$ endblock -->
-#+END_SRC
-
-server json:
-
-#+BEGIN_SRC
-{
- "webmaster": "html wizard"
-}
-#+END_SRC
-
-stderr:
-
-#+BEGIN_SRC
-template.html(3): w58: The replacement variable doesn't exist: s.teaMaster.
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-You're a html wizard,
-I'm a {s.teaMaster}!
-#+END_SRC
 
 You can generate your own warnings messsage using the warn
 function. Like the system warning messages it skips the current
@@ -2104,10 +2138,10 @@ statement, increments the warning count and produces a non-zero
 return code.
 
 For example if the server item list should contain one or more
-items, you could output a warning when it's zero:
+items, you could output a warning when it's empty:
 
 #+BEGIN_SRC nim
-if0(s.items, warn("no items"))
+if((len(s.items) == 0), warn("no items"))
 #+END_SRC
 
 [[#contents][茶]]
@@ -2252,8 +2286,8 @@ information, the log is written to the current directory.
 statictea --log mylog.txt
 #+END_SRC
 
-When you write a replacement block to the log file, the template
-file and line number of the replacement block appear there.
+The template file and line number appear in the log.  For
+example:
 
 #+BEGIN_SRC
 2021-12-07 22:03:59.908; statictea.nim(42); Starting: argv: @["-l log.txt", "-t tmpl.txt", "-r result.txt"]
@@ -2444,11 +2478,11 @@ Statictea function documentation is built in to the program. The
 documentation is extracted from the nim functions.nim module
 which is the "source of truth".
 
-The nimble **dyfuncs** task extracts the docs and creates the nim
+The nimble *dyfuncs* task extracts the docs and creates the nim
 source file dynamicFunctions.nim which gets complied into statictea.
 
 Since the function documentation is built in you can display it using
-the ph REPL command.
+the ph REPL command, see [[#repl-environment][REPL Environment]].
 
 - [[src/dynamicFuncList.nim][src/dynamicFuncList.nim]]
 - [[templates/dynamicFuncList.nim][dynamicFuncList.nim]]

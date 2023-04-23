@@ -522,8 +522,8 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the condition is true, return the second argument, else return
   ## the third argument.
   ##
-  ## The IF functions are special in a couple of ways, see
-  ## the IF Function section.
+  ## The IF function is special in a couple of ways, see the IF
+  ## Function section.
   ##
   ## You usually use boolean infix expressions for the condition, see:
   ## the Boolean Expressions section.
@@ -927,7 +927,8 @@ func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
   result = convertFloatToInt(num, map)
 
 func fun_int_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Create an int from a number string.
+  ## Create an int from a number string. It generates a warning when
+  ## the number string is not an int.
   ##
   ## ~~~statictea
   ## int = func(numString: string, roundOption: optional string) int
@@ -1890,9 +1891,9 @@ func fun_join_loss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Examples:
   ##
   ## ~~~statictea
-  ## join(["a", "b"], ", ") # "a, b"
   ## join(["a", "b"]) # "ab"
   ## join(["a", "b"], "") # "ab"
+  ## join(["a", "b"], ", ") # "a, b"
   ## join(["a", "b", "c"], "") # "abc"
   ## join(["a"], ", ") # "a"
   ## join([""], ", ") # ""
@@ -1944,8 +1945,9 @@ func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   result = newFunResultWarn(wUserMessage, 0, message)
 
 func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Log a message to the log file.  You can call the log function
-  ## without an assignment.
+  ## Log a message to the log file and return the same string. The
+  ## function has a bare form.  Logging needs to be turned on, see the
+  ## Logging section.
   ##
   ## ~~~statictea
   ## log = func(message: string) string

@@ -80,7 +80,7 @@ const
     ## procedure.
 
 type
-  CompilePattern* = Regex
+  CompiledPattern* = Regex
     ## A compiled regular expression.
 
 type
@@ -157,7 +157,7 @@ func getGroups*(matchesO: Option[Matches], numGroups: Natural): seq[string] =
       groups.add("")
   result = groups
 
-func matchRegex*(str: string, regex: CompilePattern, start: Natural,
+func matchRegex*(str: string, regex: CompiledPattern, start: Natural,
     numGroups: Natural): Option[Matches] =
   ## Match a regular expression pattern in a string. Start is the
   ## index in the string to start the search. NumGroups is the number
@@ -178,14 +178,14 @@ func matchRegex*(str: string, regex: CompilePattern, start: Natural,
         groups.add(maxGroups[ix])
       result = some(newMatches(length, start, groups))
 
-func compilePattern*(pattern: string): Option[CompilePattern] =
+func compilePattern*(pattern: string): Option[CompiledPattern] =
   ## Compile the pattern and return a regex object.
   ## Note: the pattern uses the anchored option.
   try:
     let regex = re(pattern)
     result = some(regex)
   except:
-    result = none(CompilePattern)
+    result = none(CompiledPattern)
 
 func matchPattern*(str: string, pattern: string,
     start: Natural, numGroups: Natural): Option[Matches] =
@@ -206,7 +206,7 @@ func newReplacement*(pattern: string, sub: string): Replacement =
 proc replaceMany*(str: string, replacements: seq[Replacement]): Option[string] =
   ## Replace the patterns in the string with their replacements.
 
-  var subs: seq[tuple[pattern: CompilePattern, repl: string]]
+  var subs: seq[tuple[pattern: CompiledPattern, repl: string]]
   for r in replacements:
     let regexO = compilePattern(r.pattern)
     if not regexO.isSome:

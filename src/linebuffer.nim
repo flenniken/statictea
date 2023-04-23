@@ -45,23 +45,23 @@ type
     buffer: string
     filename: string
 
-proc getLineNum*(lineBuffer: LineBuffer): int =
+func getLineNum*(lineBuffer: LineBuffer): int =
   ## Return the current line number.
   result = lineBuffer.lineNum
 
-proc getMaxLineLen*(lineBuffer: LineBuffer): int =
+func getMaxLineLen*(lineBuffer: LineBuffer): int =
   ## Return the maximum line length.
   result = lineBuffer.maxLineLen
 
-proc getFilename*(lineBuffer: LineBuffer): string =
+func getFilename*(lineBuffer: LineBuffer): string =
   ## Return the filename of the stream, if there is one.
   result = lineBuffer.filename
 
-proc getStream*(lineBuffer: LineBuffer): Stream =
+func getStream*(lineBuffer: LineBuffer): Stream =
   ## Return the associated stream.
   result = lineBuffer.stream
 
-proc newLineBuffer*(stream: Stream,
+func newLineBuffer*(stream: Stream,
     maxLineLen: int = defaultMaxLineLen,
     bufferSize: int = defaultBufferSize,
     filename: string = ""): Option[LineBuffer] =
