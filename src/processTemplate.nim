@@ -98,9 +98,11 @@ proc processTemplateLines(env: var Env, variables: var Variables,
                           prepostTable: PrepostTable) =
   ## Process the given template file.
 
+  # log("processTemplateLines")
+  let sourceFilename = env.templateFilename
   # Allocate a buffer for reading lines. Return when not enough memory.
   let lineBufferO = newLineBuffer(env.templateStream,
-      filename=env.templateFilename)
+      filename=sourceFilename)
   if not lineBufferO.isSome():
     # Not enough memory for the line buffer.
     env.warnNoFile(wNotEnoughMemoryForLB)
@@ -131,7 +133,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
     # Run the command the first time.
     var row = 0
     tea["row"] = newValue(row)
-    loopControl = runCommand(env, cmdLines, variables)
+    loopControl = runCommand(env, sourceFilename, cmdLines, variables)
 
     # Show a warning when the replace command does not have t.content
     # set.
@@ -194,7 +196,7 @@ proc processTemplateLines(env: var Env, variables: var Variables,
       tea["row"] = newValue(row)
 
       # Run the command and fill in the variables.
-      loopControl = runCommand(env, cmdLines, variables)
+      loopControl = runCommand(env, sourceFilename, cmdLines, variables)
       if loopControl == lcStop:
         break
 

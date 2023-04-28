@@ -61,18 +61,17 @@ outputValues = ["result", "stdout", "stderr", "log", "skip"]
 <p>The statement operator types.
 
 </p><ul>
-<li>opIgnore — ignore the statement, e.g. comment or blank statement.
+<li>opIgnore — ignore the statement, e.g. comment, blank
+statement or a command with no assignment
 </li><li>opAppendDict (=) — append the value to the dictionary
 </li><li>opAppendList ($=) — append the value to the list
 </li><li>opReturn — stop or skip the current replacement iteration
-</li><li>opLog — log a message
 </li></ul>
 
 
 <pre class="nim-code">
 Operator = enum
-  opIgnore = "ignore", opEqual = "=", opAppendList = "&=", opReturn = "return",
-  opLog = "log"
+  opIgnore = "ignore", opEqual = "=", opAppendList = "&=", opReturn = "return"
 </pre>
 
 <h3 id="VariableData">VariableData</h3>

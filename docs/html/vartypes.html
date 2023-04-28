@@ -438,15 +438,13 @@ FunResult = object
 <li>seNone — no side effect, the normal case
 </li><li>seReturn — the return function; stop the command and
 either skip the replacement block or stop iterating
-</li><li>seLogMessage — the log function; write a message to the log file
 </li><li>seIf2False — the two parameter IF condition was false
 </li></ul>
 
 
 <pre class="nim-code">
 SideEffect = enum
-  seNone = "none", seReturn = "return", seLogMessage = "log",
-  seIf2False = "if2False"
+  seNone = "none", seReturn = "return", seIf2False = "if2False"
 </pre>
 
 <h3 id="ValuePosSi">ValuePosSi</h3>

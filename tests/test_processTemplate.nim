@@ -1410,3 +1410,25 @@ replacement block
     let content = ""
     let eOutLine = newOutOfLines()
     check testCollectCommand(inLine, content, 0, 1, eOutLine)
+
+  test "log in block":
+    let templateContent = """
+$$ block
+$$ : log("logging in template")
+line for result
+<!--$ endblock -->
+"""
+    let sharedCode = """
+log("in shared code")
+o.a = 5
+"""
+    let eResultLines = splitNewLines """
+line for result
+"""
+    let eLogLines = splitNewLines """
+XXXX-XX-XX XX:XX:XX.XXX; shared.tea(1); in shared code
+XXXX-XX-XX XX:XX:XX.XXX; template.html(2); logging in template
+XXXX-XX-XX XX:XX:XX.XXX; processTemplate.nim(*); Number of template lines: X
+"""
+    check testProcessTemplate(templateContent = templateContent, sharedCode = sharedCode,
+      eResultLines = eResultLines, eLogLines = eLogLines)

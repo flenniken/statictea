@@ -106,7 +106,8 @@ proc testGetValuePosSi(
   if vars == nil:
     vars = startVariables(funcs = funcsVarDict)
 
-  let valuePosSiOr = getValuePosSi(env, statement, start, vars)
+  let sourceFilename = "test.tea"
+  let valuePosSiOr = getValuePosSi(env, sourceFilename, statement, start, vars)
 
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
@@ -348,13 +349,14 @@ proc testGetFunctionValuePosSi(
     eErrLines: seq[string] = @[],
     eOutLines: seq[string] = @[],
     functionPos: Natural = 0,
+    sourceFilename = "test.tea",
   ): bool =
 
   let variables = startVariables(funcs = funcsVarDict)
 
   var env = openEnvTest("_testGetFunctionValuePosSi.txt")
   let valueAndPosOr = getFunctionValuePosSi(env, functionName, functionPos,
-    statement, start, variables, listCase=false)
+    sourceFilename, statement, start, variables, listCase=false)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   gotExpectedResult($valueAndPosOr, $eValuePosSiOr, statement.text)
@@ -376,8 +378,9 @@ proc testRunStatement(
   else:
     vars = variables
 
+  let sourceFilename = "test.tea"
   var env = openEnvTest("_testGetFunctionValuePosSi.txt")
-  let variableDataOr = runStatement(env, statement, vars)
+  let variableDataOr = runStatement(env, sourceFilename, statement, vars)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   gotExpectedResult($variableDataOr, $eVariableDataOr)
@@ -428,8 +431,9 @@ proc testGetCondition(
   let variables = startVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
 
+  let sourceFilename = "test.tea"
   var env = openEnvTest("_testGetFunctionValuePosSi.txt")
-  let valueAndPosOr = getCondition(env, statement, start, variables)
+  let valueAndPosOr = getCondition(env, sourceFilename, statement, start, variables)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   let eValuePosSiOr = newValuePosSiOr(newValue(eBool), ePos)
@@ -450,8 +454,9 @@ proc testGetConditionWarn(
   let variables = startVariables(funcs = funcsVarDict)
   let statement = newStatement(text)
 
+  let sourceFilename = "test.tea"
   var env = openEnvTest("_testGetConditionWarn.txt")
-  let valueAndPosOr = getCondition(env, statement, start, variables)
+  let valueAndPosOr = getCondition(env, sourceFilename, statement, start, variables)
   result = env.readCloseDeleteCompare(eLogLines, eErrLines, eOutLines)
 
   let eValuePosSiOr = newValuePosSiOr(eWarning, eP1, ePos)
@@ -610,12 +615,12 @@ proc testRunCodeFile(
   # Open err and log streams.
   var env = openEnvTest("_testRunCodeFile.log")
 
-  let filename = "testcode.tea"
-  createFile(filename, content)
-  defer: discard tryRemoveFile(filename)
+  let sourceFilename = "testcode.tea"
+  createFile(sourceFilename, content)
+  defer: discard tryRemoveFile(sourceFilename)
 
   var variables = startVariables(funcs = funcsVarDict)
-  runCodeFile(env, variables, filename)
+  runCodeFile(env, sourceFilename, variables)
 
   result = true
   if not env.readCloseDeleteCompare(eLogLines, eErrLines, showLog = showLog):
@@ -1034,7 +1039,7 @@ statement: tea = a123
 
   test "bare log":
     let statement = newStatement(text="""log("hello")""", lineNum=1)
-    let eVariableDataOr = newVariableDataOr("", opLog, newValue("hello"))
+    let eVariableDataOr = newVariableDataOr("", opIgnore, newValue("hello"))
     check testRunStatement(statement, eVariableDataOr)
 
   test "no equal sign":
@@ -2324,7 +2329,7 @@ nofile(0): w16: File not found: missing.
 
     var env = openEnvTest("_missingfile.log")
     var variables = startVariables()
-    runCodeFile(env, variables, "missing")
+    runCodeFile(env, "missing", variables)
     check env.readCloseDeleteCompare(eErrLines = eErrLines)
 
   test "runCodeFile no g access":

@@ -42,6 +42,7 @@ proc logLine*(filename: string, lineNum: int, message: string) =
   try:
     # raise newException(IOError, "test io error")
     logFile.write(line)
+    logFile.flushFile()
   except:
     # Close the log file.
     closeLogFile()

@@ -47,17 +47,16 @@ outputValues = ["result", "stdout", "stderr", "log", "skip"]
 
 The statement operator types.
 
-* opIgnore — ignore the statement, e.g. comment or blank statement.
+* opIgnore — ignore the statement, e.g. comment, blank
+statement or a command with no assignment
 * opAppendDict (=) — append the value to the dictionary
 * opAppendList ($=) — append the value to the list
 * opReturn — stop or skip the current replacement iteration
-* opLog — log a message
 
 
 ~~~nim
 Operator = enum
-  opIgnore = "ignore", opEqual = "=", opAppendList = "&=", opReturn = "return",
-  opLog = "log"
+  opIgnore = "ignore", opEqual = "=", opAppendList = "&=", opReturn = "return"
 ~~~
 
 # VariableData

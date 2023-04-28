@@ -55,7 +55,8 @@ type
     closeResultStream*: bool
 
     # The following streams get set after parsing the command line
-    # options.  The result stream may be stdout.
+    # options.  The result stream may be stdout and the templateStream
+    # may be stdin.
     templateFilename*: string
     templateStream*: Stream
     resultFilename*: string

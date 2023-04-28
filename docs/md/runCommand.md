@@ -654,9 +654,9 @@ a = if(cond, then)
 
 ~~~nim
 proc ifFunction(env: var Env; specialFunction: SpecialFunction;
-                statement: Statement; start: Natural; variables: Variables;
-                topLevel = false): ValuePosSiOr {.raises: [Exception, KeyError],
-    tags: [RootEffect].}
+                sourceFilename: string; statement: Statement; start: Natural;
+                variables: Variables; topLevel = false): ValuePosSiOr {.
+    raises: [Exception, KeyError], tags: [RootEffect].}
 ~~~
 
 # bareIf
@@ -674,8 +674,9 @@ if(c, warn("c is true"))
 
 ~~~nim
 proc bareIf(env: var Env; specialFunction: SpecialFunction;
-            statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
-    raises: [Exception, KeyError], tags: [RootEffect].}
+            sourceFilename: string; statement: Statement; start: Natural;
+            variables: Variables): ValuePosSiOr {.raises: [Exception, KeyError],
+    tags: [RootEffect].}
 ~~~
 
 # getArguments
@@ -692,8 +693,8 @@ newList = listLoop(return(3), callback, state)  # comment
 
 
 ~~~nim
-proc getArguments(env: var Env; statement: Statement; start: Natural;
-                  variables: Variables; listCase = false;
+proc getArguments(env: var Env; sourceFilename: string; statement: Statement;
+                  start: Natural; variables: Variables; listCase = false;
                   arguments: var seq[Value]; argumentStarts: var seq[Natural]): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 ~~~
@@ -723,10 +724,12 @@ a = get(b, len("hi"), c)
 
 ~~~nim
 proc getFunctionValuePosSi(env: var Env; functionName: string;
-                           functionPos: Natural; statement: Statement;
-                           start: Natural; variables: Variables;
-                           listCase = false; topLevel = false): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+                           functionPos: Natural; sourceFilename: string;
+                           statement: Statement; start: Natural;
+                           variables: Variables; listCase = false;
+                           topLevel = false): ValuePosSiOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 ~~~
 
 # runBoolOp
@@ -761,8 +764,8 @@ a = (5 < 3) # condition
 
 
 ~~~nim
-proc getCondition(env: var Env; statement: Statement; start: Natural;
-                  variables: Variables): ValuePosSiOr {.
+proc getCondition(env: var Env; sourceFilename: string; statement: Statement;
+                  start: Natural; variables: Variables): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 ~~~
 
@@ -780,7 +783,8 @@ a = dict[ "abc" ]
 
 
 ~~~nim
-proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
+proc getBracketedVarValue(env: var Env; sourceFilename: string;
+                          statement: Statement; start: Natural;
                           container: Value; variables: Variables): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 ~~~
@@ -805,7 +809,8 @@ stopped = listLoop(list, new, callback, state)
 
 ~~~nim
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
-              statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
+              sourceFilename: string; statement: Statement; start: Natural;
+              variables: Variables): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 ~~~
 
@@ -834,8 +839,8 @@ a = case(cond, listMaker(), default) # comment
 
 
 ~~~nim
-proc caseFunction(env: var Env; statement: Statement; functionPos: Natural;
-                  start: Natural; variables: Variables): ValuePosSiOr {.
+proc caseFunction(env: var Env; sourceFilename: string; statement: Statement;
+                  functionPos: Natural; start: Natural; variables: Variables): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 ~~~
 
@@ -861,9 +866,10 @@ a = if( bool(len(b)), d, e) # if
 
 
 ~~~nim
-proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
-                   variables: Variables; topLevel = false): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+proc getValuePosSi(env: var Env; sourceFilename: string; statement: Statement;
+                   start: Natural; variables: Variables; topLevel = false): ValuePosSiOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 ~~~
 
 # runBareFunction
@@ -880,9 +886,10 @@ return(5)
 
 
 ~~~nim
-proc runBareFunction(env: var Env; statement: Statement; start: Natural;
-                     variables: Variables; leftName: DotName): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+proc runBareFunction(env: var Env; sourceFilename: string; statement: Statement;
+                     start: Natural; variables: Variables; leftName: DotName): ValuePosSiOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 ~~~
 
 # getBracketDotName
@@ -913,8 +920,10 @@ operator and value.
 
 
 ~~~nim
-proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr {.
-    raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
+proc runStatement(env: var Env; sourceFilename: string; statement: Statement;
+                  variables: Variables): VariableDataOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 ~~~
 
 # skipSpaces
@@ -932,10 +941,10 @@ Run the given user function.
 
 
 ~~~nim
-proc callUserFunction(env: var Env; funcVar: Value; variables: Variables;
-                      arguments: seq[Value]): FunResult {.
+proc callUserFunction(env: var Env; sourceFilename: string; funcVar: Value;
+                      variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect].}
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 ~~~
 
 # runStatementAssignVar
@@ -945,10 +954,10 @@ skip, stop or continue to control the loop.
 
 
 ~~~nim
-proc runStatementAssignVar(env: var Env; statement: Statement;
-                           variables: var Variables; sourceFilename: string): LoopControl {.
+proc runStatementAssignVar(env: var Env; sourceFilename: string;
+                           statement: Statement; variables: var Variables): LoopControl {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect].}
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 ~~~
 
 # parseSignature
@@ -1003,9 +1012,10 @@ Run a command and fill in the variables dictionaries.
 
 
 ~~~nim
-proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl {.
+proc runCommand(env: var Env; sourceFilename: string; cmdLines: CmdLines;
+                variables: var Variables): LoopControl {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect].}
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 ~~~
 
 # runCodeFile
@@ -1014,7 +1024,7 @@ Run the code file and fill in the variables.
 
 
 ~~~nim
-proc runCodeFile(env: var Env; variables: var Variables; filename: string) {.
+proc runCodeFile(env: var Env; sourceFilename: string; variables: var Variables) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError],
     tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect, RootEffect, TimeEffect].}
 ~~~

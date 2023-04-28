@@ -27,16 +27,15 @@ type
   Operator* = enum
     ## The statement operator types.
     ##
-    ## * opIgnore — ignore the statement, e.g. comment or blank statement.
+    ## * opIgnore — ignore the statement, e.g. comment, blank
+    ## statement or a command with no assignment
     ## * opAppendDict (=) — append the value to the dictionary
     ## * opAppendList ($=) — append the value to the list
     ## * opReturn — stop or skip the current replacement iteration
-    ## * opLog — log a message
     opIgnore = "ignore",
     opEqual = "=",
     opAppendList = "&=",
     opReturn = "return",
-    opLog = "log",
 
   VariableData* = object
     ## The VariableData object holds the variable name, operator,
@@ -266,7 +265,7 @@ func assignTeaVariable(variables: var Variables, dotNameStr: string,
   of opAppendList:
     # You cannot append to a tea variable.
     return some(newWarningData(wAppendToTeaVar))
-  of opIgnore, opReturn, opLog:
+  of opIgnore, opReturn:
     discard
 
 proc assignVariable*(
@@ -381,7 +380,7 @@ proc assignVariable*(
 
     # Append the value to the list.
     lastComponent.listv.list.add(value)
-  of opIgnore, opReturn, opLog:
+  of opIgnore, opReturn:
     assert(false, "You cannot assign using the $1 operator." % $operator)
     discard
 

@@ -35,7 +35,7 @@ warning messages was written while processing the template.
 
 ~~~nim
 proc updateTemplate(env: var Env; args: Args) {.
-    raises: [ValueError, IOError, OSError, Exception, KeyError],
+    raises: [ValueError, Exception, IOError, OSError, KeyError],
     tags: [TimeEffect, WriteIOEffect, ReadDirEffect, ReadIOEffect, RootEffect].}
 ~~~
 

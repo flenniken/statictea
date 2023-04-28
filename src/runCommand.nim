@@ -1033,8 +1033,8 @@ func skipArg(statement: Statement, start: Natural): PosOr =
     showDebugPos(statement, pos, "^ f arg")
 
 # Forward reference to getValuePosSi since we call it recursively.
-proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variables:
-  Variables, topLevel = false): ValuePosSiOr
+proc getValuePosSi*(env: var Env, sourceFilename: string, statement: Statement,
+  start: Natural, variables: Variables, topLevel = false): ValuePosSiOr
 
 func getSpecialFunction(funcVar: Value): SpecialFunction =
   ## Return the function type given a function variable.
@@ -1074,6 +1074,7 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
 
 proc bareReturn(
     env: var Env,
+    sourceFilename: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1085,7 +1086,8 @@ proc bareReturn(
   ##         ^      ^
   # Get the argument value.
   var runningPos = start
-  let valueAndPosOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
+  let valueAndPosOr = getValuePosSi(env, sourceFilename, statement, runningPos,
+    variables, topLevel = true)
   if valueAndPosOr.isMessage:
     return valueAndPosOr
   var value = valueAndPosOr.value.value
@@ -1103,6 +1105,7 @@ proc bareReturn(
 proc ifFunction*(
     env: var Env,
     specialFunction: SpecialFunction,
+    sourceFilename: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1123,7 +1126,7 @@ proc ifFunction*(
   ## ~~~
 
   # Get the condition's value.
-  let vlcOr = getValuePosSi(env, statement, start, variables)
+  let vlcOr = getValuePosSi(env, sourceFilename, statement, start, variables)
   if vlcOr.isMessage:
     return vlcOr
 
@@ -1156,7 +1159,7 @@ proc ifFunction*(
     runningPos = posOr.value
   else:
     # Get the second value.
-    vl2Or = getValuePosSi(env, statement, runningPos, variables)
+    vl2Or = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
     if vl2Or.isMessage:
       return vl2Or
     runningPos = vl2Or.value.pos
@@ -1181,7 +1184,7 @@ proc ifFunction*(
         return newValuePosSiOr(posOr.message)
       runningPos = posOr.value
     else:
-      vl3Or = getValuePosSi(env, statement, runningPos, variables)
+      vl3Or = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
       if vl3Or.isMessage:
         return vl3Or
       runningPos = vl3Or.value.pos
@@ -1206,6 +1209,7 @@ proc ifFunction*(
 proc bareIf*(
     env: var Env,
     specialFunction: SpecialFunction,
+    sourceFilename: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1222,7 +1226,8 @@ proc bareIf*(
   var runningPos = start
 
   # Get the condition's value.
-  let vlcOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
+  let vlcOr = getValuePosSi(env, sourceFilename, statement, runningPos,
+    variables, topLevel = true)
   if vlcOr.isMessage:
     return vlcOr
   let cond = vlcOr.value.value
@@ -1270,12 +1275,13 @@ proc bareIf*(
       if isSome(spaceMatchO):
         runningPos += spaceMatchO.get().length
 
-      valueAndPosOr = bareReturn(env, statement, runningPos, variables)
+      valueAndPosOr = bareReturn(env, sourceFilename, statement, runningPos, variables)
       if valueAndPosOr.isMessage:
         return valueAndPosOr
       se2 = valueAndPosOr.value.sideEffect
     else:
-      valueAndPosOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
+      valueAndPosOr = getValuePosSi(env, sourceFilename, statement, runningPos,
+        variables, topLevel = true)
       if valueAndPosOr.isMessage:
         return valueAndPosOr
       se2 = valueAndPosOr.value.sideEffect
@@ -1297,10 +1303,12 @@ proc bareIf*(
 
   result = newValuePosSiOr(value2, runningPos, se2)
 
-proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables, arguments: seq[Value]): FunResult
+proc callUserFunction*(env: var Env, sourceFilename: string, funcVar: Value,
+  variables: Variables, arguments: seq[Value]): FunResult
 
 proc getArguments*(
     env: var Env,
+    sourceFilename: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1329,7 +1337,7 @@ proc getArguments*(
   else:
     # Get the arguments to the function.
     while true:
-      let vlOr = getValuePosSi(env, statement, runningPos, variables)
+      let vlOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
       if vlOr.isMessage:
         return vlOr
       arguments.add(vlOr.value.value)
@@ -1371,6 +1379,7 @@ proc getFunctionValuePosSi*(
     env: var Env,
     functionName: string,
     functionPos: Natural,
+    sourceFilename: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1401,8 +1410,8 @@ proc getFunctionValuePosSi*(
   var runningPos = start
   var arguments: seq[Value]
   var argumentStarts: seq[Natural]
-  let vpOr = getArguments(env, statement, runningPos, variables, listCase,
-    arguments, argumentStarts)
+  let vpOr = getArguments(env, sourceFilename, statement, runningPos,
+    variables, listCase, arguments, argumentStarts)
   if vpOr.isMessage:
     return vpOr
   runningPos = vpOr.value.pos
@@ -1429,7 +1438,7 @@ proc getFunctionValuePosSi*(
   if funcVar.funcv.builtIn:
     funResult = funcVar.funcv.functionPtr(variables, arguments)
   else:
-    funResult = callUserFunction(env, funcVar, variables, arguments)
+    funResult = callUserFunction(env, sourceFilename, funcVar, variables, arguments)
 
   if funResult.kind == frWarning:
     let warningPos = warningParameterPos(funResult.parameter, argumentStarts, start, functionPos)
@@ -1449,8 +1458,7 @@ proc getFunctionValuePosSi*(
     sideEffect = seNone
     echo funResult.value.stringv
   of spLog:
-    # todo: handle log right here, no side effect value
-    sideEffect = seLogMessage
+    logLine(sourceFilename, statement.lineNum, funResult.value.stringv)
 
   result = newValuePosSiOr(funResult.value, runningPos, sideEffect)
 
@@ -1492,11 +1500,11 @@ func runCompareOp*(left: Value, op: string, right: Value): Value =
   result = newValue(b)
 
 # Forward reference since we call getCondition recursively.
-proc getCondition*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables): ValuePosSiOr
+proc getCondition*(env: var Env, sourceFilename: string, statement: Statement,
+    start: Natural, variables: Variables): ValuePosSiOr
 
-proc getValueOrNestedCond(env: var Env, statement: Statement, start: Natural,
-    variables: Variables): ValuePosSiOr =
+proc getValueOrNestedCond(env: var Env, sourceFilename: string,
+    statement: Statement, start: Natural, variables: Variables): ValuePosSiOr =
   ## Return a value and position after it. If start points at a nested
   ## condition, handle it.
 
@@ -1504,11 +1512,11 @@ proc getValueOrNestedCond(env: var Env, statement: Statement, start: Natural,
   let parenO = matchSymbol(statement.text, gLeftParentheses, runningPos)
   if parenO.isSome:
     # Found a left parenetheses, get the nested condition.
-    result = getCondition(env, statement, start, variables)
+    result = getCondition(env, sourceFilename, statement, start, variables)
   else:
-    result = getValuePosSi(env, statement, start, variables)
+    result = getValuePosSi(env, sourceFilename, statement, start, variables)
 
-proc getCondition*(env: var Env, statement: Statement, start: Natural,
+proc getCondition*(env: var Env, sourceFilename: string, statement: Statement, start: Natural,
     variables: Variables): ValuePosSiOr =
   ## Return the bool value of the condition expression and the
   ## position after it.  The start index points at the ( left
@@ -1532,7 +1540,8 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
   runningPos += parenO.get().length
 
   # Return a value and position after handling any nested condition.
-  var accumOr = getValueOrNestedCond(env, statement, runningPos, variables)
+  var accumOr = getValueOrNestedCond(env, sourceFilename,
+    statement, runningPos, variables)
   if accumOr.isMessage:
     return accumOr
   var accum = accumOr.value.value
@@ -1598,7 +1607,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
       return newValuePosSiOr(newValue(shortCiruitResult), runningPos)
 
     # Return a value and position after handling any nestedcondition.
-    let vlRightOr = getValueOrNestedCond(env, statement, runningPos, variables)
+    let vlRightOr = getValueOrNestedCond(env, sourceFilename, statement, runningPos, variables)
     if vlRightOr.isMessage:
       return vlRightOr
     let xyz = runningPos
@@ -1628,7 +1637,7 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
       runningPos += length2
 
       # Return a value and position after handling any nested condition.
-      let vlThirdOr = getValueOrNestedCond(env, statement, runningPos, variables)
+      let vlThirdOr = getValueOrNestedCond(env, sourceFilename, statement, runningPos, variables)
       if vlThirdOr.isMessage:
         return vlThirdOr
 
@@ -1642,8 +1651,8 @@ proc getCondition*(env: var Env, statement: Statement, start: Natural,
 
     accum = newValue(bValue)
 
-proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
-    container: Value, variables: Variables): ValuePosSiOr =
+proc getBracketedVarValue*(env: var Env, sourceFilename: string, statement: Statement,
+    start: Natural, container: Value, variables: Variables): ValuePosSiOr =
   ## Return the value of the bracketed variable and the position after
   ## the trailing whitespace.. Start points at the the first argument.
   ##
@@ -1660,7 +1669,7 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
   assert(container.kind == vkList or container.kind == vkDict, "expected list or dict")
 
   # Get the index/key value.
-  let vAndPosOr = getValuePosSi(env, statement, runningPos, variables)
+  let vAndPosOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
   if vAndPosOr.isMessage:
     return vAndPosOr
   let indexValue = vAndPosOr.value.value
@@ -1703,7 +1712,7 @@ proc getBracketedVarValue*(env: var Env, statement: Statement, start: Natural,
 
   return newValuePosSiOr(value, runningPos)
 
-proc funListLoop(env: var Env, variables: Variables,
+proc funListLoop(env: var Env, sourceFilename: string, variables: Variables,
     arguments: seq[Value]
   ): FunResult =
   ## Build and return a new item by calling the callback for each item
@@ -1752,7 +1761,7 @@ proc funListLoop(env: var Env, variables: Variables,
     callbackArgs.add(container)
     if "d" in map:
       callbackArgs.add(map["d"])
-    let callResult = callUserFunction(env, callbackVar, variables, callbackArgs)
+    let callResult = callUserFunction(env, sourceFilename, callbackVar, variables, callbackArgs)
     if callResult.kind == frWarning:
       # Note: if the warning is a signature type issue, add another
       # signature check above.
@@ -1768,6 +1777,7 @@ proc funListLoop(env: var Env, variables: Variables,
 proc listLoop*(
     env: var Env,
     specialFunction: SpecialFunction,
+    sourceFilename: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1790,13 +1800,13 @@ proc listLoop*(
   var runningPos = start
   var arguments: seq[Value]
   var argumentStarts: seq[Natural]
-  let vpOr = getArguments(env, statement, runningPos, variables, false,
-    arguments, argumentStarts)
+  let vpOr = getArguments(env, sourceFilename, statement, runningPos,
+    variables, false, arguments, argumentStarts)
   if vpOr.isMessage:
     return vpOr
   runningPos = vpOr.value.pos
 
-  let funResult = funListLoop(env, variables, arguments)
+  let funResult = funListLoop(env, sourceFilename, variables, arguments)
   if funResult.kind == frWarning:
     # todo: pass in functionPos
     let functionPos = 0
@@ -1808,6 +1818,7 @@ proc listLoop*(
 
 proc getCaseDefault(
     env: var Env,
+    sourceFilename: string,
     statement: Statement,
     start: Natural,
     variables: Variables,
@@ -1850,7 +1861,7 @@ proc getCaseDefault(
       return newValuePosSiOr(wMissingElse, "", runningPos)
 
     # Get the default value.
-    let defaultOr = getValuePosSi(env, statement, runningPos, variables)
+    let defaultOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
     if defaultOr.isMessage:
       return defaultOr
     retValue = defaultOr.value.value
@@ -1868,6 +1879,7 @@ proc getCaseDefault(
 
 proc caseWithVariable(
     env: var Env,
+    sourceFilename: string,
     statement: Statement,
     mainCondition: Value,
     start: Natural,
@@ -1889,7 +1901,7 @@ proc caseWithVariable(
 
   # Get the list of cases.
   var cases: Value
-  let casesOr = getValuePosSi(env, statement, runningPos, variables)
+  let casesOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
   if casesOr.isMessage:
     return casesOr
   cases = casesOr.value.value
@@ -1915,10 +1927,12 @@ proc caseWithVariable(
       matchValue = caseList[ix+1]
       break
 
-  result = getCaseDefault(env, statement, runningPos, variables, foundMatch, matchValue)
+  result = getCaseDefault(env, sourceFilename, statement, runningPos,
+    variables, foundMatch, matchValue)
 
 proc caseWithLiteral(
     env: var Env,
+    sourceFilename: string,
     statement: Statement,
     mainCondition: Value,
     start: Natural,
@@ -1947,7 +1961,7 @@ proc caseWithLiteral(
         return newValuePosSiOr(posOr.message)
       runningPos = posOr.value
     else:
-      let conditionOr = getValuePosSi(env, statement, runningPos, variables)
+      let conditionOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
       if conditionOr.isMessage:
         return conditionOr
       condition = conditionOr.value.value
@@ -1967,7 +1981,7 @@ proc caseWithLiteral(
 
     if not foundMatch and condition == mainCondition:
       # Get the matching case value.
-      let matchOr = getValuePosSi(env, statement, runningPos, variables)
+      let matchOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
       if matchOr.isMessage:
         return matchOr
       foundMatch = true
@@ -1995,10 +2009,12 @@ proc caseWithLiteral(
     if corp == "]" or corp == ")":
       break
 
-  result = getCaseDefault(env, statement, runningPos, variables, foundMatch, matchValue)
+  result = getCaseDefault(env, sourceFilename, statement, runningPos,
+    variables, foundMatch, matchValue)
 
 proc caseFunction*(
     env: var Env,
+    sourceFilename: string,
     statement: Statement,
     functionPos: Natural,
     start: Natural,
@@ -2027,7 +2043,7 @@ proc caseFunction*(
   var runningPos = start
 
   # Get the main condition's value.
-  let vlcOr = getValuePosSi(env, statement, runningPos, variables)
+  let vlcOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables)
   if vlcOr.isMessage:
     return vlcOr
   let mainCondition = vlcOr.value.value
@@ -2077,12 +2093,14 @@ proc caseFunction*(
             runningPos = casesOr.value.pos
 
   if literalCase:
-    result = caseWithLiteral(env, statement, mainCondition, runningPos, variables, endSymbol)
+    result = caseWithLiteral(env, sourceFilename, statement, mainCondition,
+      runningPos, variables, endSymbol)
   else:
-    result = caseWithVariable(env, statement, mainCondition, runningPos, variables)
+    result = caseWithVariable(env, sourceFilename, statement, mainCondition,
+      runningPos, variables)
 
-proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, variables:
-    Variables, topLevel = false): ValuePosSiOr =
+proc getValuePosSiWorker(env: var Env, sourceFilename: string, statement: Statement,
+    start: Natural, variables: Variables, topLevel = false): ValuePosSiOr =
   ## Get the value, position and side effect from the statement. Start
   ## points at the right hand side of the statement. The return pos is
   ## the first character after trailing whitespace.
@@ -2125,11 +2143,11 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
     let startSymbol = startSymbolO.get()
 
     # Get the list. The literal list [...] and list(...) are similar.
-    result = getFunctionValuePosSi(env, "list", start, statement,
+    result = getFunctionValuePosSi(env, "list", start, sourceFilename, statement,
       start+startSymbol.length, variables, listCase=true)
 
   of rtCondition:
-    result = getCondition(env, statement, start, variables)
+    result = getCondition(env, sourceFilename, statement, start, variables)
 
   of rtVariable:
     # Get the variable name.
@@ -2164,20 +2182,22 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
       case specialFunction:
       of spIf:
         # Handle the special IF function.
-        return ifFunction(env, specialFunction, statement, rightName.pos, variables, topLevel)
+        return ifFunction(env, specialFunction, sourceFilename, statement,
+          rightName.pos, variables, topLevel)
       of spListLoop:
         # Handle the special listLoop function.
-        return listLoop(env, specialFunction, statement, rightName.pos, variables)
+        return listLoop(env, specialFunction, sourceFilename, statement,
+          rightName.pos, variables)
       of spCase:
         # Handle the special case function.
-        return caseFunction(env, statement, start, rightName.pos, variables)
+        return caseFunction(env, sourceFilename, statement, start, rightName.pos, variables)
       of spFunc:
         # Define a function in a code file and not nested.
         return newValuePosSiOr(wDefineFunction, "", start)
       of spNotSpecial, spReturn, spWarn, spLog, spEcho:
         # Handle normal functions and warn, return, log and echo.
-        return getFunctionValuePosSi(env, rightName.dotName, start, statement,
-          rightName.pos, variables, listCase=false)
+        return getFunctionValuePosSi(env, rightName.dotName, start, sourceFilename,
+          statement, rightName.pos, variables, listCase=false)
 
     of vnkGet:
       # a = list[2] or a = dict["key"]
@@ -2186,10 +2206,11 @@ proc getValuePosSiWorker(env: var Env, statement: Statement, start: Natural, var
         # The container variable must be a list or dictionary got $1.
         return newValuePosSiOr(wIndexNotListOrDict, $container.kind, start)
 
-      return getBracketedVarValue(env, statement, rightName.pos, valueOr.value, variables)
+      return getBracketedVarValue(env, sourceFilename, statement,
+        rightName.pos, valueOr.value, variables)
 
-proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variables:
-  Variables, topLevel = false): ValuePosSiOr =
+proc getValuePosSi*(env: var Env, sourceFilename: string, statement: Statement,
+  start: Natural, variables: Variables, topLevel = false): ValuePosSiOr =
   ## Return the value and position of the item that the start
   ## parameter points at which is a string, number, variable, list, or
   ## condition.  The position returned includes the trailing
@@ -2211,7 +2232,7 @@ proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variable
   when showPos:
     showDebugPos(statement, start, "^ s")
 
-  result = getValuePosSiWorker(env, statement, start, variables, topLevel)
+  result = getValuePosSiWorker(env, sourceFilename, statement, start, variables, topLevel)
 
   when showPos:
     var pos: Natural
@@ -2221,8 +2242,8 @@ proc getValuePosSi*(env: var Env, statement: Statement, start: Natural, variable
       pos = result.value.pos
     showDebugPos(statement, pos, "^ f")
 
-proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
-    variables: Variables, leftName: DotName): ValuePosSiOr =
+proc runBareFunction*(env: var Env, sourceFilename: string, statement: Statement,
+    start: Natural, variables: Variables, leftName: DotName): ValuePosSiOr =
   ## Handle bare function: if, return, warn, log and listLoop. A
   ## bare function does not assign a variable.
   ##
@@ -2247,18 +2268,18 @@ proc runBareFunction*(env: var Env, statement: Statement, start: Natural,
   case specialFunction:
   of spIf:
     # Handle the special bare if function.
-    result = bareIf(env, specialFunction, statement, runningPos, variables)
+    result = bareIf(env, specialFunction, sourceFilename, statement, runningPos, variables)
   of spReturn:
-    result = bareReturn(env, statement, runningPos, variables)
+    result = bareReturn(env, sourceFilename, statement, runningPos, variables)
   of spListLoop:
-    result = listLoop(env, specialFunction, statement, runningPos, variables)
+    result = listLoop(env, specialFunction, sourceFilename, statement, runningPos, variables)
   of spNotSpecial, spFunc, spCase:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValuePosSiOr(wMissingLeftAndOpr, "", start)
   of spWarn, spLog, spEcho:
     # Handle a bare warn, echo, or log function.
     result = getFunctionValuePosSi(env, $specialFunction, start,
-      statement, runningPos, variables, listCase=false, topLevel = true)
+      sourceFilename, statement, runningPos, variables, listCase=false, topLevel = true)
 
 proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: DotName): ValuePosSiOr =
@@ -2332,7 +2353,8 @@ proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
 
   result = newValuePosSiOr(newValue(dotName), runningPos)
 
-proc runStatement*(env: var Env, statement: Statement, variables: Variables): VariableDataOr =
+proc runStatement*(env: var Env, sourceFilename: string, statement: Statement,
+    variables: Variables): VariableDataOr =
   ## Run one statement and return the variable dot name string,
   ## operator and value.
 
@@ -2359,7 +2381,7 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   of vnkFunction:
     # Handle bare function: if, return, warn, log, listLoop and
     # echo. A bare function does not assign a variable.
-    vlOr = runBareFunction(env, statement, runningPos, variables, leftName)
+    vlOr = runBareFunction(env, sourceFilename, statement, runningPos, variables, leftName)
     if vlOr.isMessage:
       return newVariableDataOr(vlOr.message)
     finalLeftName = ""
@@ -2389,7 +2411,8 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
     runningPos = runningPos + length
 
     # Get the right hand side value and match the following whitespace.
-    vlOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
+    vlOr = getValuePosSi(env, sourceFilename, statement, runningPos,
+      variables, topLevel = true)
 
   if vlOr.isMessage:
     return newVariableDataOr(vlOr.message)
@@ -2405,9 +2428,6 @@ proc runStatement*(env: var Env, statement: Statement, variables: Variables): Va
   of seReturn:
     # Return function exit.
     result = newVariableDataOr("", opReturn, vlOr.value.value)
-  of seLogMessage:
-    # Log statement exit.
-    result = newVariableDataOr("", opLog, vlOr.value.value)
   of seIf2False:
     # False Bare IF or false two parameter IF.
     result = newVariableDataOr("", opIgnore, vlOr.value.value)
@@ -2421,8 +2441,8 @@ proc skipSpaces*(text: string): Natural =
   if isSome(spacesO):
     result = spacesO.get().length
 
-proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
-    arguments: seq[Value]): FunResult =
+proc callUserFunction*(env: var Env, sourceFilename: string, funcVar: Value,
+    variables: Variables, arguments: seq[Value]): FunResult =
   ## Run the given user function.
   assert funcVar.kind == vkFunc
   assert funcVar.funcv.builtIn == false
@@ -2440,7 +2460,7 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
   for statement in funcVar.funcv.statements:
 
     # Run the statement.
-    let variableDataOr = runStatement(env, statement, userVariables)
+    let variableDataOr = runStatement(env, sourceFilename, statement, userVariables)
     if variableDataOr.isMessage:
       env.warnStatement(statement, variableDataOr.message, funcVar.funcv.filename)
       # Return success so another message is not shown.
@@ -2461,8 +2481,6 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
         return newFunResultWarn(wSuccess)
     of opIgnore:
       continue
-    of opLog:
-      logLine(funcVar.funcv.filename, statement.lineNum, variableData.value.stringv)
     of opReturn:
       # Validate return type.
       if not sameType(funcVar.funcv.signature.returnType, variableData.value.kind):
@@ -2477,13 +2495,13 @@ proc callUserFunction*(env: var Env, funcVar: Value, variables: Variables,
   # Out of lines; missing the function's return statement.
   result = newFunResultWarn(wNoReturnStatement)
 
-proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var Variables,
-    sourceFilename: string): LoopControl =
+proc runStatementAssignVar*(env: var Env, sourceFilename: string, statement: Statement,
+    variables: var Variables): LoopControl =
   ## Run a statement and assign the variable if appropriate. Return
   ## skip, stop or continue to control the loop.
 
   # Run the statement and get the variable, operator and value.
-  let variableDataOr = runStatement(env, statement, variables)
+  let variableDataOr = runStatement(env, sourceFilename, statement, variables)
   if variableDataOr.isMessage:
     env.warnStatement(statement, variableDataOr.message, sourceFilename = sourceFilename)
     return lcAdd
@@ -2498,9 +2516,6 @@ proc runStatementAssignVar*(env: var Env, statement: Statement, variables: var V
       env.warnStatement(statement, warningDataO.get(), sourceFilename)
     result = lcAdd
   of opIgnore:
-    result = lcAdd
-  of opLog:
-    logLine(sourceFilename, statement.lineNum, variableData.value.stringv)
     result = lcAdd
   of opReturn:
     # Handle a return function exit.
@@ -2768,7 +2783,7 @@ proc defineUserFunctionAssignVar*(env: var Env, lb: var LineBuffer, statement: S
     env.warnStatement(statement, warningDataO.get(), sourceFilename)
   return true
 
-proc runCommand*(env: var Env, cmdLines: CmdLines,
+proc runCommand*(env: var Env, sourceFilename: string, cmdLines: CmdLines,
     variables: var Variables): LoopControl =
   ## Run a command and fill in the variables dictionaries.
 
@@ -2780,8 +2795,7 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
   for statement in yieldStatements(cmdLines):
 
     # Run the statement.
-    let loopControl = runStatementAssignVar(env, statement, variables,
-      env.templateFilename)
+    let loopControl = runStatementAssignVar(env, sourceFilename, statement, variables)
 
     # Stop looping when we get a return.
     if loopControl == lcStop or loopControl == lcSkip:
@@ -2794,27 +2808,27 @@ proc runCommand*(env: var Env, cmdLines: CmdLines,
 
   result = lcAdd
 
-proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
+proc runCodeFile*(env: var Env, sourceFilename: string, variables: var Variables) =
   ## Run the code file and fill in the variables.
 
-  if not fileExists(filename):
+  if not fileExists(sourceFilename):
     # File not found: $1.
-    env.warnNoFile(wFileNotFound, filename)
+    env.warnNoFile(wFileNotFound, sourceFilename)
     return
 
   # Create a stream out of the file.
   var stream: Stream
-  stream = newFileStream(filename)
+  stream = newFileStream(sourceFilename)
   if stream == nil:
     # Unable to open file: $1.
-    env.warnNoFile(wUnableToOpenFile, filename)
+    env.warnNoFile(wUnableToOpenFile, sourceFilename)
     return
   defer:
     # Close the stream and file.
     stream.close()
 
   # Allocate a buffer for reading lines. Return when not enough memory.
-  let lineBufferO = newLineBuffer(stream, filename = filename)
+  let lineBufferO = newLineBuffer(stream, filename = sourceFilename)
   if not lineBufferO.isSome():
     # Not enough memory for the line buffer.
     env.warnNoFile(wNotEnoughMemoryForLB)
@@ -2832,20 +2846,20 @@ proc runCodeFile*(env: var Env, variables: var Variables, filename: string) =
     # assign the variable. A true return value means the statement(s)
     # were processed and maybe errors output. A false means the
     # statement should be processed as a regular statement.
-    if defineUserFunctionAssignVar(env, lb, statement, variables, filename, codeFile=true):
+    if defineUserFunctionAssignVar(env, lb, statement, variables, sourceFilename, codeFile=true):
       continue
 
     # Process a regular statement.
-    let loopControl = runStatementAssignVar(env, statement, variables, filename)
+    let loopControl = runStatementAssignVar(env, sourceFilename, statement, variables)
     if loopControl == lcStop:
       break
     elif loopControl == lcSkip:
       # Use '...return(\"stop\")...' in a code file.
       let warningData = newWarningData(wUseStop)
-      env.warnStatement(statement, warningData, sourceFilename = filename)
+      env.warnStatement(statement, warningData, sourceFilename = sourceFilename)
 
 proc runCodeFiles*(env: var Env, variables: var Variables, codeList: seq[string]) =
   ## Run each code file and populate the variables.
-  for filename in codeList:
-    runCodeFile(env, variables, filename)
+  for sourceFilename in codeList:
+    runCodeFile(env, sourceFilename, variables)
     resetVariables(variables)

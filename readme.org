@@ -510,7 +510,6 @@ Statements are executed from top to bottom. You can use the warn
 function to exit a statement early and use the return function to
 exit a command early.
 
-
 You have control over where the replacement block goes, either
 the result file, standard out, standard error, or the log file
 using the t.output variable.
@@ -2265,12 +2264,8 @@ See the [[#replace-command][replace command]] for update examples.
    :CUSTOM_ID: logging
    :END:
 
-Statictea writes statistics to the log file.  Template commands
-can also write to the log file.
-
-Log information is appended to the file.  When the file size
-exceeds 1 GB, a warning message is generated each time a template
-is processed.
+Statictea appends statistics to the log file.  Template commands
+can also append to the log file.
 
 Logging is off by default. You turn it on with the log option.
 If you don't specify a filename, the log lines are written to the
@@ -2322,7 +2317,7 @@ side, for example:
 a = len(“tea”)
 #+END_SRC
 
-Below are the list of special functions and how the deviate from
+Below are the list of special functions and how they deviate from
 the normal form:
 
 - case — conditionally evaluates its arguments

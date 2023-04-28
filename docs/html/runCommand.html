@@ -677,9 +677,9 @@ position includes the trailing whitespace after the ending ).
 
 <pre class="nim-code">
 proc ifFunction(env: var Env; specialFunction: SpecialFunction;
-                statement: Statement; start: Natural; variables: Variables;
-                topLevel = false): ValuePosSiOr {.raises: [Exception, KeyError],
-    tags: [RootEffect].}
+                sourceFilename: string; statement: Statement; start: Natural;
+                variables: Variables; topLevel = false): ValuePosSiOr {.
+    raises: [Exception, KeyError], tags: [RootEffect].}
 </pre>
 
 <h3 id="bareIf">bareIf</h3>
@@ -697,8 +697,9 @@ position in the statement after the if.
 
 <pre class="nim-code">
 proc bareIf(env: var Env; specialFunction: SpecialFunction;
-            statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
-    raises: [Exception, KeyError], tags: [RootEffect].}
+            sourceFilename: string; statement: Statement; start: Natural;
+            variables: Variables): ValuePosSiOr {.raises: [Exception, KeyError],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="getArguments">getArguments</h3>
@@ -715,8 +716,8 @@ effect is returned, else a 0 value and seNone is returned.
 
 
 <pre class="nim-code">
-proc getArguments(env: var Env; statement: Statement; start: Natural;
-                  variables: Variables; listCase = false;
+proc getArguments(env: var Env; sourceFilename: string; statement: Statement;
+                  start: Natural; variables: Variables; listCase = false;
                   arguments: var seq[Value]; argumentStarts: var seq[Natural]): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
@@ -746,10 +747,12 @@ an argument).
 
 <pre class="nim-code">
 proc getFunctionValuePosSi(env: var Env; functionName: string;
-                           functionPos: Natural; statement: Statement;
-                           start: Natural; variables: Variables;
-                           listCase = false; topLevel = false): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+                           functionPos: Natural; sourceFilename: string;
+                           statement: Statement; start: Natural;
+                           variables: Variables; listCase = false;
+                           topLevel = false): ValuePosSiOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="runBoolOp">runBoolOp</h3>
@@ -784,8 +787,8 @@ the ending ).
 
 
 <pre class="nim-code">
-proc getCondition(env: var Env; statement: Statement; start: Natural;
-                  variables: Variables): ValuePosSiOr {.
+proc getCondition(env: var Env; sourceFilename: string; statement: Statement;
+                  start: Natural; variables: Variables): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
@@ -803,7 +806,8 @@ the trailing whitespace.. Start points at the the first argument.
 
 
 <pre class="nim-code">
-proc getBracketedVarValue(env: var Env; statement: Statement; start: Natural;
+proc getBracketedVarValue(env: var Env; sourceFilename: string;
+                          statement: Statement; start: Natural;
                           container: Value; variables: Variables): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 </pre>
@@ -828,7 +832,8 @@ parentheses.
 
 <pre class="nim-code">
 proc listLoop(env: var Env; specialFunction: SpecialFunction;
-              statement: Statement; start: Natural; variables: Variables): ValuePosSiOr {.
+              sourceFilename: string; statement: Statement; start: Natural;
+              variables: Variables): ValuePosSiOr {.
     raises: [KeyError, Exception], tags: [RootEffect].}
 </pre>
 
@@ -857,8 +862,8 @@ parentheses.
 
 
 <pre class="nim-code">
-proc caseFunction(env: var Env; statement: Statement; functionPos: Natural;
-                  start: Natural; variables: Variables): ValuePosSiOr {.
+proc caseFunction(env: var Env; sourceFilename: string; statement: Statement;
+                  functionPos: Natural; start: Natural; variables: Variables): ValuePosSiOr {.
     raises: [Exception, KeyError], tags: [RootEffect].}
 </pre>
 
@@ -884,9 +889,10 @@ an argument).
 
 
 <pre class="nim-code">
-proc getValuePosSi(env: var Env; statement: Statement; start: Natural;
-                   variables: Variables; topLevel = false): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+proc getValuePosSi(env: var Env; sourceFilename: string; statement: Statement;
+                   start: Natural; variables: Variables; topLevel = false): ValuePosSiOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="runBareFunction">runBareFunction</h3>
@@ -903,9 +909,10 @@ bare function does not assign a variable.
 
 
 <pre class="nim-code">
-proc runBareFunction(env: var Env; statement: Statement; start: Natural;
-                     variables: Variables; leftName: DotName): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+proc runBareFunction(env: var Env; sourceFilename: string; statement: Statement;
+                     start: Natural; variables: Variables; leftName: DotName): ValuePosSiOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="getBracketDotName">getBracketDotName</h3>
@@ -936,8 +943,10 @@ operator and value.
 </p>
 
 <pre class="nim-code">
-proc runStatement(env: var Env; statement: Statement; variables: Variables): VariableDataOr {.
-    raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
+proc runStatement(env: var Env; sourceFilename: string; statement: Statement;
+                  variables: Variables): VariableDataOr {.
+    raises: [KeyError, Exception, ValueError],
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="skipSpaces">skipSpaces</h3>
@@ -955,10 +964,10 @@ proc skipSpaces(text: string): Natural {.raises: [KeyError], tags: [].}
 </p>
 
 <pre class="nim-code">
-proc callUserFunction(env: var Env; funcVar: Value; variables: Variables;
-                      arguments: seq[Value]): FunResult {.
+proc callUserFunction(env: var Env; sourceFilename: string; funcVar: Value;
+                      variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect].}
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="runStatementAssignVar">runStatementAssignVar</h3>
@@ -968,10 +977,10 @@ skip, stop or continue to control the loop.
 </p>
 
 <pre class="nim-code">
-proc runStatementAssignVar(env: var Env; statement: Statement;
-                           variables: var Variables; sourceFilename: string): LoopControl {.
+proc runStatementAssignVar(env: var Env; sourceFilename: string;
+                           statement: Statement; variables: var Variables): LoopControl {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect].}
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="parseSignature">parseSignature</h3>
@@ -1026,9 +1035,10 @@ proc defineUserFunctionAssignVar(env: var Env; lb: var LineBuffer;
 </p>
 
 <pre class="nim-code">
-proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): LoopControl {.
+proc runCommand(env: var Env; sourceFilename: string; cmdLines: CmdLines;
+                variables: var Variables): LoopControl {.
     raises: [KeyError, Exception, ValueError, IOError, OSError],
-    tags: [RootEffect, WriteIOEffect, TimeEffect].}
+    tags: [RootEffect, TimeEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="runCodeFile">runCodeFile</h3>
@@ -1037,7 +1047,7 @@ proc runCommand(env: var Env; cmdLines: CmdLines; variables: var Variables): Loo
 </p>
 
 <pre class="nim-code">
-proc runCodeFile(env: var Env; variables: var Variables; filename: string) {.
+proc runCodeFile(env: var Env; sourceFilename: string; variables: var Variables) {.
     raises: [ValueError, IOError, OSError, Exception, KeyError],
     tags: [ReadDirEffect, WriteIOEffect, ReadIOEffect, RootEffect, TimeEffect].}
 </pre>

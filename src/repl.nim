@@ -293,11 +293,11 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
   # If not a REPL command, run the statement, add to the variables,
   # then return.
+  let sourceFilename = "repl.tea"
   if replCmd == not_cmd:
     # Run the
     let statement = newStatement(line, 1)
-    let loopControl = runStatementAssignVar(env, statement, variables,
-      "repl.tea")
+    let loopControl = runStatementAssignVar(env, sourceFilename, statement, variables)
     if loopControl == lcStop:
       return true
     return false
@@ -326,7 +326,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     let statement = newStatement(line, 1)
     # echo "statement: " & $statement
     # echo "runningPos: " & $runningPos
-    let vlOr = getValuePosSi(env, statement, runningPos, variables, topLevel = true)
+    let vlOr = getValuePosSi(env, sourceFilename, statement, runningPos, variables, topLevel = true)
     # echo "vlOr: " & $vlOr
 
     if vlOr.isMessage:
