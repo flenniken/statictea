@@ -339,9 +339,6 @@ Earl Grey, Masala chai
 :END:
 
 The endblock command ends the replacement block for the block and
-replace commands.
-
-The endblock command ends the replacement block for the block and
 replace commands. For example:
 
 #+BEGIN_SRC
@@ -391,6 +388,10 @@ the one line after it.
 
 The block contains any number of bracketed variables for
 substitution. Each variable gets replaced with its value.
+
+You have control over where the replacement block goes, either
+the result file, standard out, standard error, or the log file
+using the t.output variable.
 
 You can repeat the block to make lists and other repeating
 content. You control how many times the block repeats with the
@@ -509,10 +510,6 @@ num = add(t.row, 1)
 Statements are executed from top to bottom. You can use the warn
 function to exit a statement early and use the return function to
 exit a command early.
-
-You have control over where the replacement block goes, either
-the result file, standard out, standard error, or the log file
-using the t.output variable.
 
 If there is a syntax error or a function generates a warning, the
 statement is skipped.
@@ -667,8 +664,8 @@ A variable name starts with a letter followed by letters, digits,
 hyphens and underscores and ends with a letter or a digit. It is
 limited to a total of 64 ASCII characters.
 
-Some single letters are reserved for important dictionaries, see
-the next section.
+Some single letters are reserved for important dictionaries,
+[[#single-letter-dictionaries][Single Letter Dictionaries]].
 
 Example variable names:
 

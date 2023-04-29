@@ -843,7 +843,7 @@ Create an int from a number string. If the string is not a number,
 return the default value.
 
 ~~~javascript
-int = func(numString: string, roundOption: string, default: optional any) any
+int = func(numString: string, roundOption: string, default: any) any
 ~~~
 
 Round options:
@@ -1464,9 +1464,8 @@ parameter you specify the separator to use, either "/", "\" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
-If the separator already exists between components, a new one
-is not added. If a component is "", the platform separator is
-used for it.
+A warning is generated if a component contains a separator.  If a
+component is "", the platform separator is used for it.
 
 ~~~javascript
 joinPath = func(components: list, separator: optional string) string
@@ -1475,12 +1474,17 @@ joinPath = func(components: list, separator: optional string) string
 Examples:
 
 ~~~javascript
-joinPath(["images", "tea"]) # "images/tea"
-joinPath(["images", "tea"], "/") # "images/tea"
-joinPath(["images", "tea"], "\\") # "images\\tea"
-joinPath(["images/", "tea"]) # "images/tea"
-joinPath(["", "tea"]) # "/tea"
-joinPath(["/", "tea"]) # "/tea"
+joinPath(["tea", "pot"]) # tea/pot
+joinPath(["tea", "hot", ""]) # tea/hot/
+joinPath(["", "tea", "cool"]) # /tea/cool
+joinPath(["", "tea", "cool", ""]) # /tea/cool/
+joinPath([]) # ""
+joinPath([""]) # /
+joinPath(["abc"]) # abc
+joinPath(["", "tea"]) # /tea
+joinPath(["tea", ""]) # tea/
+joinPath(["", "tea"], "/") # /tea
+joinPath(["net:", "", "", "cold"], "\\") # net:\\cold
 ~~~
 
 

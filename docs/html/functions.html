@@ -858,7 +858,7 @@ func fun_int_sosi(variables: Variables; arguments: seq[Value]): FunResult {.
 return the default value.
 
 </p><pre class="tea-code">
-<span class="t-dotName">int</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>, <span class="t-param">roundOption</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
+<span class="t-dotName">int</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>, <span class="t-param">roundOption</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">any</span>) <span class="t-type">any</span>
 </pre>
 <p>
 Round options:
@@ -1493,9 +1493,8 @@ parameter you specify the separator to use, either &quot;/&quot;, &quot;\&quot; 
 &quot;&quot;. If you specify &quot;&quot; or leave off the parameter, the current
 platform separator is used.
 
-</p><p>If the separator already exists between components, a new one
-is not added. If a component is &quot;&quot;, the platform separator is
-used for it.
+</p><p>A warning is generated if a component contains a separator.  If a
+component is &quot;&quot;, the platform separator is used for it.
 
 </p><pre class="tea-code">
 <span class="t-dotName">joinPath</span> = <span class="t-funcCall">func</span>(<span class="t-param">components</span>: <span class="t-type">list</span>, <span class="t-param">separator</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">string</span>
@@ -1504,12 +1503,17 @@ used for it.
 Examples:
 
 </p><pre class="tea-code">
-<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) <span class="t-comment"># &quot;images/tea&quot;
-</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images&quot;</span>, <span class="t-str">&quot;tea&quot;</span>], <span class="t-str">&quot;/&quot;</span>) <span class="t-comment"># &quot;images/tea&quot;
-</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images&quot;</span>, <span class="t-str">&quot;tea&quot;</span>], <span class="t-str">&quot;\\&quot;</span>) <span class="t-comment"># &quot;images\\tea&quot;
-</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;images/&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) <span class="t-comment"># &quot;images/tea&quot;
-</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) <span class="t-comment"># &quot;/tea&quot;
-</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;/&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) <span class="t-comment"># &quot;/tea&quot;
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;pot&quot;</span>]) <span class="t-comment"># tea/pot
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;hot&quot;</span>, <span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># tea/hot/
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;cool&quot;</span>]) <span class="t-comment"># /tea/cool
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;cool&quot;</span>, <span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># /tea/cool/
+</span><span class="t-funcCall">joinPath</span>([]) <span class="t-comment"># &quot;&quot;
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># /
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;abc&quot;</span>]) <span class="t-comment"># abc
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) <span class="t-comment"># /tea
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># tea/
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>], <span class="t-str">&quot;/&quot;</span>) <span class="t-comment"># /tea
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;net:&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;cold&quot;</span>], <span class="t-str">&quot;\\&quot;</span>) <span class="t-comment"># net:\\cold
 </span></pre>
 
 

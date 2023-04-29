@@ -683,7 +683,7 @@ Create an int from a number string. If the string is not a number,
 return the default value.
 
 ~~~statictea
-int = func(numString: string, roundOption: string, default: optional any) any
+int = func(numString: string, roundOption: string, default: any) any
 ~~~
 
 Round options:
@@ -732,9 +732,8 @@ parameter you specify the separator to use, either "/", "\" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
-If the separator already exists between components, a new one
-is not added. If a component is "", the platform separator is
-used for it.
+A warning is generated if a component contains a separator.  If a
+component is "", the platform separator is used for it.
 
 ~~~statictea
 joinPath = func(components: list, separator: optional string) string
@@ -743,12 +742,17 @@ joinPath = func(components: list, separator: optional string) string
 Examples:
 
 ~~~statictea
-joinPath(["images", "tea"]) # "images/tea"
-joinPath(["images", "tea"], "/") # "images/tea"
-joinPath(["images", "tea"], "\\") # "images\\tea"
-joinPath(["images/", "tea"]) # "images/tea"
-joinPath(["", "tea"]) # "/tea"
-joinPath(["/", "tea"]) # "/tea"
+joinPath(["tea", "pot"]) # tea/pot
+joinPath(["tea", "hot", ""]) # tea/hot/
+joinPath(["", "tea", "cool"]) # /tea/cool
+joinPath(["", "tea", "cool", ""]) # /tea/cool/
+joinPath([]) # ""
+joinPath([""]) # /
+joinPath(["abc"]) # abc
+joinPath(["", "tea"]) # /tea
+joinPath(["tea", ""]) # tea/
+joinPath(["", "tea"], "/") # /tea
+joinPath(["net:", "", "", "cold"], "\\") # net:\\cold
 ~~~
 
 """
@@ -1564,7 +1568,7 @@ warn("always warn")
     info("fun_int_sosi", dc_fun_int_sosi, 43),
     info("fun_int_ssaa", dc_fun_int_ssaa, 35),
     info("fun_join_loss", dc_fun_join_loss, 39),
-    info("fun_joinPath_loss", dc_fun_joinPath_loss, 30),
+    info("fun_joinPath_loss", dc_fun_joinPath_loss, 34),
     info("fun_keys_dl", dc_fun_keys_dl, 24),
     info("fun_len_di", dc_fun_len_di, 19),
     info("fun_len_li", dc_fun_len_li, 19),
@@ -1590,7 +1594,7 @@ warn("always warn")
     info("fun_string_sds", dc_fun_string_sds, 24),
     info("fun_sub_fff", dc_fun_sub_fff, 25),
     info("fun_sub_iii", dc_fun_sub_iii, 24),
-    info("fun_type_as", dc_fun_type_as, 53),
+    info("fun_type_as", dc_fun_type_as, 58),
     info("fun_values_dl", dc_fun_values_dl, 123),
     info("fun_warn_ss", dc_fun_warn_ss, 25),
   ]
@@ -1614,52 +1618,52 @@ warn("always warn")
     780,
     1180,
     1141,
-    2507,
+    2516,
     658,
     1068,
     824,
     867,
     841,
-    2163,
-    2195,
-    2216,
+    2172,
+    2204,
+    2225,
     480,
     432,
-    2467,
+    2476,
     521,
     894,
     929,
     972,
-    1883,
-    1853,
+    1892,
+    1858,
     1529,
     413,
     394,
     376,
     1217,
     1238,
-    1947,
+    1956,
     1510,
-    2271,
-    2391,
-    2312,
+    2280,
+    2400,
+    2321,
     1455,
-    2289,
+    2298,
     1286,
     1396,
-    1972,
+    1981,
     1106,
     1676,
     1708,
     1735,
-    2251,
-    2035,
-    2139,
+    2260,
+    2044,
+    2148,
     633,
     609,
     1800,
     1553,
-    1922,
+    1931,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

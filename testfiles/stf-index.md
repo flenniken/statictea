@@ -28,6 +28,7 @@ Stf (single test file) tests found in the testfiles folder.
 * [if-3-parameters](../testfiles/if-3-parameters.stf.md) &mdash; Test the three parameter if functions.
 * [if-two-parameters](../testfiles/if-two-parameters.stf.md) &mdash; Test the IF statement with two parameters.
 * [int-section](../testfiles/int-section.stf.md) &mdash; Test the int type.
+* [joinPath](../testfiles/joinPath.stf.md) &mdash; Test the joinPath function.
 * [json-get](../testfiles/json-get.stf.md) &mdash; Test that you can access non-variable name keys with get.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.
 * [list-literal](../testfiles/list-literal.stf.md) &mdash; Test literal lists.

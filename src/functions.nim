@@ -974,7 +974,7 @@ func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## return the default value.
   ##
   ## ~~~statictea
-  ## int = func(numString: string, roundOption: string, default: optional any) any
+  ## int = func(numString: string, roundOption: string, default: any) any
   ## ~~~
   ##
   ## Round options:
@@ -1838,16 +1838,21 @@ func joinPathList(map: VarsDict): FunResult =
         return newFunResultWarn(wExpectedSeparator, 0)
 
   var ret: string
+  var first = true
   for value in map["a"].listv.list:
     var component = value.stringv
+    if separator in component:
+      # The component $1 contains a path separator.
+      return newFunResultWarn(wComponentContainsSep, 0, component)
     if component == "":
-      component.add(separator)
-    # Add the separator between components if there isn't already
-    # one between them.
-    if not (ret == "" or ret.endsWith(separator) or
-        component.startsWith(separator)):
       ret.add(separator)
-    ret.add(component)
+    elif not first:
+      if not ret.endsWith(separator):
+        ret.add(separator)
+      ret.add(component)
+    else:
+      ret.add(component)
+    first = false
   result = newFunResult(newValue(ret))
 
 func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -1858,9 +1863,8 @@ func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## "". If you specify "" or leave off the parameter, the current
   ## platform separator is used.
   ##
-  ## If the separator already exists between components, a new one
-  ## is not added. If a component is "", the platform separator is
-  ## used for it.
+  ## A warning is generated if a component contains a separator.  If a
+  ## component is "", the platform separator is used for it.
   ##
   ## ~~~statictea
   ## joinPath = func(components: list, separator: optional string) string
@@ -1869,12 +1873,17 @@ func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## Examples:
   ##
   ## ~~~statictea
-  ## joinPath(["images", "tea"]) # "images/tea"
-  ## joinPath(["images", "tea"], "/") # "images/tea"
-  ## joinPath(["images", "tea"], "\\") # "images\\tea"
-  ## joinPath(["images/", "tea"]) # "images/tea"
-  ## joinPath(["", "tea"]) # "/tea"
-  ## joinPath(["/", "tea"]) # "/tea"
+  ## joinPath(["tea", "pot"]) # tea/pot
+  ## joinPath(["tea", "hot", ""]) # tea/hot/
+  ## joinPath(["", "tea", "cool"]) # /tea/cool
+  ## joinPath(["", "tea", "cool", ""]) # /tea/cool/
+  ## joinPath([]) # ""
+  ## joinPath([""]) # /
+  ## joinPath(["abc"]) # abc
+  ## joinPath(["", "tea"]) # /tea
+  ## joinPath(["tea", ""]) # tea/
+  ## joinPath(["", "tea"], "/") # /tea
+  ## joinPath(["net:", "", "", "cold"], "\\") # net:\\cold
   ## ~~~
 
   tMapParameters("joinPath", "loss")

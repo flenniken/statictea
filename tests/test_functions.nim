@@ -1459,18 +1459,6 @@ suite "functions.nim":
       ], newFunResult(newValue(r"images\tea")))
 
     check testFunction("joinPath", @[
-        newValue([newValue("images/"), newValue("tea")])
-      ], newFunResult(newValue("images/tea")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("images"), newValue("/tea")])
-      ], newFunResult(newValue("images/tea")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("images/green"), newValue("tea")])
-      ], newFunResult(newValue("images/green/tea")))
-
-    check testFunction("joinPath", @[
         newValue([newValue(""), newValue("tea")])
       ], newFunResult(newValue("/tea")))
 
@@ -1478,35 +1466,12 @@ suite "functions.nim":
         newValue([newValue(""), newValue("tea"), newValue("")])
       ], newFunResult(newValue("/tea/")))
 
-    check testFunction("joinPath", @[
-        newValue([newValue("/"), newValue("tea"), newValue("/")])
-      ], newFunResult(newValue("/tea/")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("/tea/")])
-      ], newFunResult(newValue("/tea/")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("/")])
-      ], newFunResult(newValue("/")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("/images"), newValue("tea")])
-      ], newFunResult(newValue("/images/tea")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("/var/"), newValue("log/tea")])
-      ], newFunResult(newValue("/var/log/tea")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("/var/"), newValue("log/tea/")])
-      ], newFunResult(newValue("/var/log/tea/")))
-
-    check testFunction("joinPath", @[
-        newValue([newValue("/var/"), newValue("/log/tea/")])
-      ], newFunResult(newValue("/var//log/tea/")))
-
   test "joinPath invalid separator":
+    let arguments = @[newValue([newValue("/tea")])]
+    let eFunResult = newFunResultWarn(wComponentContainsSep, 0, "/tea")
+    check testFunction("joinPath", arguments, eFunResult)
+
+  test "joinPath sep in component":
     let arguments = @[newEmptyListValue(), newValue("h")]
     let eFunResult = newFunResultWarn(wExpectedSeparator, 0)
     check testFunction("joinPath", arguments, eFunResult)
