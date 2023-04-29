@@ -421,8 +421,8 @@ func fun_len_di*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## ~~~statictea
   ## len(dict()) # 0
-  ## len(dict("a", 4)) # 1
-  ## len(dict("a", 4, "b", 3)) # 2
+  ## len(dict(["a", 4])) # 1
+  ## len(dict(["a", 4, "b", 3])) # 2
   ## ~~~
 
   tMapParameters("len", "di")
@@ -492,7 +492,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Examples:
   ##
   ## ~~~statictea
-  ## d = dict("tea", "Earl Grey")
+  ## d = dict(["tea", "Earl Grey"])
   ## get(d, "tea") # "Earl Grey"
   ## get(d, "coffee", "Tea") # "Tea"
   ## ~~~
@@ -500,7 +500,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Using dot notation:
   ##
   ## ~~~statictea
-  ## d = dict("tea", "Earl Grey")
+  ## d = dict(["tea", "Earl Grey"])
   ## d.tea => "Earl Grey"
   ## ~~~
 
@@ -666,7 +666,7 @@ func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Examples:
   ##
   ## ~~~statictea
-  ## d = dict("tea", "Earl")
+  ## d = dict(["tea", "Earl"])
   ## exists(d, "tea") # true
   ## exists(d, "coffee") # false
   ## ~~~
@@ -1058,7 +1058,7 @@ func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## bool(3.3) # true
   ## bool([8]) # true
   ## bool("tea") # true
-  ## bool(dict("tea", 2)) # true
+  ## bool(dict(["tea", 2])) # true
   ## ~~~
 
   tMapParameters("bool", "ab")
@@ -1139,8 +1139,9 @@ func fun_slice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
   result = slice(str, start, length)
 
 func fun_dup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Duplicate a string x times.  The result is a new string built by
+  ## Duplicate a string x times. The result is a new string built by
   ## concatenating the string to itself the specified number of times.
+  ## The resulting string must be less than or equal to 1024 bytes.
   ##
   ## ~~~statictea
   ## dup = func(pattern: string, count: int) string

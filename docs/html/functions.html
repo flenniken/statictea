@@ -353,8 +353,8 @@ Examples:
 
 </p><pre class="tea-code">
 <span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>()) <span class="t-comment"># 0
-</span><span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>)) <span class="t-comment"># 1
-</span><span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">3</span>)) <span class="t-comment"># 2
+</span><span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>])) <span class="t-comment"># 1
+</span><span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">3</span>])) <span class="t-comment"># 2
 </span></pre>
 
 
@@ -417,7 +417,7 @@ same as get without the default.
 </p><p>Examples:
 
 </p><pre class="tea-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>)
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>])
 <span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># &quot;Earl Grey&quot;
 </span><span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;coffee&quot;</span>, <span class="t-str">&quot;Tea&quot;</span>) <span class="t-comment"># &quot;Tea&quot;
 </span></pre>
@@ -425,7 +425,7 @@ same as get without the default.
 Using dot notation:
 
 </p><pre class="tea-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>)
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>])
 <span class="t-dotName">d.tea</span> =&gt; <span class="t-str">&quot;Earl Grey&quot;</span>
 </pre>
 
@@ -572,7 +572,7 @@ exists, else false.
 Examples:
 
 </p><pre class="tea-code">
-<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl&quot;</span>)
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl&quot;</span>])
 <span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># true
 </span><span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;coffee&quot;</span>) <span class="t-comment"># false
 </span></pre>
@@ -925,7 +925,7 @@ False values by variable types:
 </span><span class="t-funcCall">bool</span>(<span class="t-num">3.3</span>) <span class="t-comment"># true
 </span><span class="t-funcCall">bool</span>([<span class="t-num">8</span>]) <span class="t-comment"># true
 </span><span class="t-funcCall">bool</span>(<span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># true
-</span><span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">2</span>)) <span class="t-comment"># true
+</span><span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">2</span>])) <span class="t-comment"># true
 </span></pre>
 
 
@@ -993,8 +993,9 @@ func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_dup_sis">fun_dup_sis</h3>
 
-<p>Duplicate a string x times.  The result is a new string built by
+<p>Duplicate a string x times. The result is a new string built by
 concatenating the string to itself the specified number of times.
+The resulting string must be less than or equal to 1024 bytes.
 
 </p><pre class="tea-code">
 <span class="t-dotName">dup</span> = <span class="t-funcCall">func</span>(<span class="t-param">pattern</span>: <span class="t-type">string</span>, <span class="t-param">count</span>: <span class="t-type">int</span>) <span class="t-type">string</span>

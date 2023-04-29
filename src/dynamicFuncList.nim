@@ -90,7 +90,7 @@ bool(5) # true
 bool(3.3) # true
 bool([8]) # true
 bool("tea") # true
-bool(dict("tea", 2)) # true
+bool(dict(["tea", 2])) # true
 ~~~
 
 """
@@ -277,8 +277,9 @@ dict(["a", 5, "b", 33, "c", 0])
 """
 
   dc_fun_dup_sis = """
-Duplicate a string x times.  The result is a new string built by
+Duplicate a string x times. The result is a new string built by
 concatenating the string to itself the specified number of times.
+The resulting string must be less than or equal to 1024 bytes.
 
 ~~~statictea
 dup = func(pattern: string, count: int) string
@@ -329,7 +330,7 @@ exists = func(dictionary: dict, key: string) bool
 Examples:
 
 ~~~statictea
-d = dict("tea", "Earl")
+d = dict(["tea", "Earl"])
 exists(d, "tea") # true
 exists(d, "coffee") # false
 ~~~
@@ -505,7 +506,7 @@ same as get without the default.
 Examples:
 
 ~~~statictea
-d = dict("tea", "Earl Grey")
+d = dict(["tea", "Earl Grey"])
 get(d, "tea") # "Earl Grey"
 get(d, "coffee", "Tea") # "Tea"
 ~~~
@@ -513,7 +514,7 @@ get(d, "coffee", "Tea") # "Tea"
 Using dot notation:
 
 ~~~statictea
-d = dict("tea", "Earl Grey")
+d = dict(["tea", "Earl Grey"])
 d.tea => "Earl Grey"
 ~~~
 
@@ -785,8 +786,8 @@ Examples:
 
 ~~~statictea
 len(dict()) # 0
-len(dict("a", 4)) # 1
-len(dict("a", 4, "b", 3)) # 2
+len(dict(["a", 4])) # 1
+len(dict(["a", 4, "b", 3])) # 2
 ~~~
 
 """
@@ -1550,7 +1551,7 @@ warn("always warn")
     info("fun_cmp_ssobi", dc_fun_cmp_ssobi, 33),
     info("fun_cmpVersion_ssi", dc_fun_cmpVersion_ssi, 44),
     info("fun_dict_old", dc_fun_dict_old, 37),
-    info("fun_dup_sis", dc_fun_dup_sis, 39),
+    info("fun_dup_sis", dc_fun_dup_sis, 40),
     info("fun_echo_ss", dc_fun_echo_ss, 23),
     info("fun_exists_dsb", dc_fun_exists_dsb, 22),
     info("fun_find_ssoaa", dc_fun_find_ssoaa, 38),
@@ -1608,7 +1609,7 @@ warn("always warn")
   functionStarts = [
     586,
     562,
-    1762,
+    1763,
     1031,
     680,
     725,
@@ -1616,54 +1617,54 @@ warn("always warn")
     301,
     343,
     780,
-    1180,
+    1181,
     1141,
-    2516,
+    2517,
     658,
     1068,
     824,
     867,
     841,
-    2172,
-    2204,
-    2225,
+    2173,
+    2205,
+    2226,
     480,
     432,
-    2476,
+    2477,
     521,
     894,
     929,
     972,
-    1892,
-    1858,
-    1529,
+    1893,
+    1859,
+    1530,
     413,
     394,
     376,
-    1217,
-    1238,
-    1956,
-    1510,
-    2280,
-    2400,
-    2321,
-    1455,
-    2298,
-    1286,
-    1396,
-    1981,
+    1218,
+    1239,
+    1957,
+    1511,
+    2281,
+    2401,
+    2322,
+    1456,
+    2299,
+    1287,
+    1397,
+    1982,
     1106,
-    1676,
-    1708,
-    1735,
-    2260,
-    2044,
-    2148,
+    1677,
+    1709,
+    1736,
+    2261,
+    2045,
+    2149,
     633,
     609,
-    1800,
-    1553,
-    1931,
+    1801,
+    1554,
+    1932,
   ]
     ## Dynamically generated array of starting line numbers for each
     ## built-in function in the functions.nim file.

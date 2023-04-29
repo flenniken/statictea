@@ -268,71 +268,6 @@ result:
 
 [[#contents][茶]]
 
-** Comment Command
-:PROPERTIES:
-:CUSTOM_ID: comment-command
-:END:
-
-You can comment templates with the comment command.  Comments
-are line based and use the # character. They do not appear in the
-result.
-
-template:
-
-#+BEGIN_SRC
-<!--$ # The main tea groups. -->
-There are five main groups of teas:
-white, green, oolong, black, and pu'erh.
-You make Oolong Tea in five time
-intensive steps.
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-There are five main groups of teas:
-white, green, oolong, black, and pu'erh.
-You make Oolong Tea in five time
-intensive steps.
-#+END_SRC
-
-You can also comment in statements with # to the end of the line,
-see the [[#syntax][Syntax]] section.
-
-
-[[#contents][茶]]
-
-** Continue Command
-:PROPERTIES:
-:CUSTOM_ID: continue-command
-:END:
-
-The continue command (a colon) allows you to continue adding
-statements to the nextline, block and replace commands.
-
-We often refer to the command and its continue commands as the
-command (one logical unit).
-
-In the following example the nextline command continues on a
-second line and third line because of the two continue commands.
-
-template:
-
-#+BEGIN_SRC
-$$ nextline
-$$ : tea = "Earl Grey"
-$$ : tea2 = "Masala chai"
-{tea}, {tea2}
-#+END_SRC
-
-result:
-
-#+BEGIN_SRC
-Earl Grey, Masala chai
-#+END_SRC
-
-[[#contents][茶]]
-
 ** Endblock Command
 :PROPERTIES:
 :CUSTOM_ID: endblock-command
@@ -374,6 +309,70 @@ result:
 fake nextline
 <!--$ nextline -->
 #+END_SRC
+
+[[#contents][茶]]
+
+** Continue Command
+:PROPERTIES:
+:CUSTOM_ID: continue-command
+:END:
+
+The continue command (a colon) allows you to continue adding
+statements to the nextline, block and replace commands.
+
+We often refer to the command and its continue commands as the
+command (one logical unit).
+
+In the following example the nextline command continues on a
+second line and third line because of the two continue commands.
+
+template:
+
+#+BEGIN_SRC
+$$ nextline
+$$ : tea = "Earl Grey"
+$$ : tea2 = "Masala chai"
+{tea}, {tea2}
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+Earl Grey, Masala chai
+#+END_SRC
+
+[[#contents][茶]]
+
+** Comment Command
+:PROPERTIES:
+:CUSTOM_ID: comment-command
+:END:
+
+You can comment templates with the comment command.  Comments
+are line based and use the # character. They do not appear in the
+result.
+
+template:
+
+#+BEGIN_SRC
+<!--$ # The main tea groups. -->
+There are five main groups of teas:
+white, green, oolong, black, and pu'erh.
+You make Oolong Tea in five time
+intensive steps.
+#+END_SRC
+
+result:
+
+#+BEGIN_SRC
+There are five main groups of teas:
+white, green, oolong, black, and pu'erh.
+You make Oolong Tea in five time
+intensive steps.
+#+END_SRC
+
+You can also comment in statements with # to the end of the line,
+see the [[#syntax][Syntax]] section.
 
 [[#contents][茶]]
 
@@ -688,7 +687,7 @@ for each iteration based on t.row.
 #+BEGIN_SRC
 $$ nextline
 $$ : t.repeat = 3
-$$ : name = format(“a{t.row}”)
+$$ : name = format("a{t.row}")
 {name}
 #+END_SRC
 
@@ -716,7 +715,7 @@ f.cmp
 entry.name
 #+END_SRC
 
-You can leave off the “l” prefix from your non-function local
+You can leave off the "l" prefix from your non-function local
 variables, they are assumed to be in the local dictionary.
 
 Equivalent statements:
@@ -726,7 +725,7 @@ a = 5
 l.a = 5
 #+END_SRC
 
-You can leave off the “f” prefix from built-in functions you
+You can leave off the "f" prefix from built-in functions you
 call, they are assumed to be in the function dictionary.  A
 function call is a variable followed by a left parentheses.
 
@@ -801,7 +800,7 @@ are not reset like local variables.
 Shared code cannot see or set g variables.
 
 #+BEGIN_SRC nim
-g.title = “Teas of the World”
+g.title = "Teas of the World"
 g.names &= entry.name
 #+END_SRC
 
@@ -887,7 +886,7 @@ it:
 #+BEGIN_SRC nim
 u.myCmp = func(…) int
 …
-a = u.myCmp(“3”, “4”)
+a = u.myCmp("3", "4")
 #+END_SRC
 
 [[#contents][茶]]
@@ -1136,7 +1135,7 @@ result:
 Setting t.repeat to 0 is good for building test lists.
 
 When you view the following template fragment in a browser it
-shows one item in the list, “{tea}”.
+shows one item in the list, "{tea}".
 
 template:
 
@@ -1270,13 +1269,13 @@ information.
 
 StaticTea variable types:
 
-- [[#string-type][String Type]]
-- [[#int-type][Int Type]]
-- [[#float-type][Float Type]]
-- [[#dict-type][Dict Type]]
-- [[#list-type][List Type]]
-- [[#bool-type][Bool Type]]
-- [[#func-type][Func Type]]
+- [[#string-type][String]]
+- [[#int-type][Int]]
+- [[#float-type][Float]]
+- [[#dict-type][Dict]]
+- [[#list-type][List]]
+- [[#bool-type][Bool]]
+- [[#func-type][Func]]
 
 [[#contents][茶]]
 
@@ -1397,7 +1396,7 @@ creates an empty dict d and a dict d2 with 2 elements.
 
 #+BEGIN_SRC
 d = dict()
-d2 = dict("one", 1, "two", 2))
+d2 = dict(["one", 1, "two", 2])
 #+END_SRC
 
 You can append to a dict using dot name notation:
@@ -1435,7 +1434,7 @@ The get function has an optional default parameter that's used
 when the key doesn't exist (the z case below).
 
 #+BEGIN_SRC nim
-d = dict("x", 100, "y", 200)
+d = dict(["x", 100, "y", 200])
 x = get(d, "x") # => 100
 y = get(d, "y") # => 200
 z = get(d, "z", 300) # => 300
@@ -1511,10 +1510,17 @@ get(list, 0) => 1
 get(list, 1) => 3.3
 get(list, 2) => "a"
 get(list, 3, 99) => 99
+get(list, -1) => "a"
+get(list, -2) => 3.3
+get(list, -3) => 1
+get(list, -4, 99) => 99
 
 list[0] => 1
 list[1] => 3.3
 list[2] => "a"
+list[-1] => "a"
+list[-2] => 3.3
+list[-3] => 1
 #+END_SRC
 
 [[#contents][茶]]
@@ -1524,7 +1530,8 @@ list[2] => "a"
 :CUSTOM_ID: bool-type
 :END:
 
-A bool is a true or false value.
+A bool is a true or false value. You typically use the boolean
+type with IF statements and [[#boolean-expression][Boolean Expression]]s.
 
 You can create a bool value using true or false or with the bool
 function.
@@ -1534,14 +1541,6 @@ a = true
 b = false
 c = bool(0) # false
 d = bool(1) # true (not 0)
-#+END_SRC
-
-True and false are variables in the local dictionary.  It's not
-recommended, but you can define variables called true and false
-in other dictionaries.
-
-#+BEGIN_SRC nim
-s.true = "server true"
 #+END_SRC
 
 [[#contents][茶]]
@@ -1564,7 +1563,7 @@ same name. There are three cmp functions so the f dictionary
 value for it is a list of three function variables:
 
 #+BEGIN_SRC nim
-cmp => ["cmp","cmp","cmp"]
+f.cmp => ["cmp","cmp","cmp"]
 #+END_SRC
 
 You can call a list of func variables. The function called is
@@ -1578,7 +1577,7 @@ value = f.cmp(1,2)
 #+END_SRC
 
 You can call a func variable directly. In the following example
-the “a” func variable is defined to be equal to the second
+the "a" func variable is defined to be equal to the second
 built-in cmp function.
 
 #+BEGIN_SRC nim
@@ -1657,22 +1656,22 @@ You can write boolean expressions with the following operators:
 - >=
 
 You typically use a boolean expression with an IF statement. In
-the next example v is set to “s” because 3 is less than 5.
+the next example v is set to "s" because 3 is less than 5.
 
 #+BEGIN_SRC nim
-v = if((3 < 5), “s”, “l”) #=> “s”
+v = if((3 < 5), "s", "l") #=> "s"
 #+END_SRC
 
 Note: a conditional is wrapped in parentheses and there is no
 name on the left, so the following statement is invalid:
 
 #+BEGIN_SRC
-v = if(3 < 5, “s”, “l”)
+v = if(3 < 5, "s", "l")
        ^ invalid syntax
 #+END_SRC
 
 The comparisons have the highest precedence, then the logical
-“and” and “or”.  Highest precedence to lowest:
+"and" and "or".  Highest precedence to lowest:
 
 - <, >, ==, !=, <=, >=
 - and, or
@@ -1704,7 +1703,7 @@ circuit evaluation. OR returns true on the first true argument
 and AND returns false on the first false argument and the rest
 are skipped.
 
-And and or work with bool arguments. The comparisons work with
+AND and OR work with bool arguments. The comparisons work with
 numbers and strings.
 
 NOT is not a logical operator but it is a function.  You can
@@ -1749,10 +1748,10 @@ code file for sharing with templates. The code populates the o
 dictionary that is available to the template commands.
 
 #+BEGIN_SRC nim
-o.header = “””
+o.header = """
 <!doctype html>
 <html lang="en">
-“””
+"""
 #+END_SRC
 
 You use the header in a template’s replace command
@@ -1935,7 +1934,7 @@ aren’t any brackets, and no line terminators.
 Here is how you call the example function:
 
 #+BEGIN_SRC nim
-a = u.mycmp(“1”, "2")
+a = u.mycmp("1", "2")
 #+END_SRC
 
 *Function Signature:*
@@ -2009,8 +2008,8 @@ The StaticTea command line options:
 
 - help -- show options and usage help then quit
 - version -- show the version number then quit
-- server -- a server json file. You can specify multiple server
-  options.
+- server -- a server json file  You can specify multiple server
+  files, see [[#server-json-variables][Server Json Variables]].
 - code -- a shared code file. You can specify multiple shared
   options, see [[#code-files][Code Files]].
 - template -- the template file, or "stdin" for input from
@@ -2018,7 +2017,7 @@ The StaticTea command line options:
 - result -- the result file. When not specified, standard out is
   used.
 - update -- update the template replace blocks. See the
-  [[#replace-command][Replace Command]].
+  [[#update-option][Update Option]].
 - prepost -- a command prefix and postfix. You can specify
   multiple prepost options. When you specify a value, the
   defaults are no longer used. See the [[#prefix-postfix][Prefix
@@ -2147,20 +2146,30 @@ if((len(s.items) == 0), warn("no items"))
    :CUSTOM_ID: prefix-postfix
    :END:
 
-You make the template commands look like comments tailored for
-your template file type. This allows you to edit the template
-using its native editors and run other native tools.  For example,
-you can edit a StaticTea html template with an html editor and
-validate it online with w3.org's validator.
+The prefix and postfix are the leading and ending comment
+characters your template uses.  For html they are "<!–" and "–>".
+
+You tell statictea what they are then you use them in the
+template so all the statictea commands are comments.
+
+This allows you to edit the template using its native editors and
+run other native tools. For html, you can view it in a browser,
+edit with an html editor and validate it online with w3.org’s
+validator.
 
 Comment syntax varies depending on the type of template file and
 sometimes depending on the location within the file. StaticTea
 supports several varieties and you can specify others.
 
-You want to distinguish StaticTea commands from normal comments
-when you create your own. The convention is to add a $ as the
-last character of the prefix and only use $ with StaticTea
-commands and space for normal comments.
+You want to distinguish StaticTea commands from the file’s normal
+comments so it is clear which comments are which. Normal comments
+appear in the result and StaticTea comments don’t.  The
+convention is to add a $ as the last character of the prefix.
+
+#+BEGIN_SRC
+<!- normal html comment ->
+<!-$ # statictea comment ->
+#+END_SRC
 
 Some file types, like markdown, don't support comments, for
 them use $$.
@@ -2311,13 +2320,14 @@ A normal statement has a left side, an operator, and a right hand
 side, for example:
 
 #+BEGIN_SRC nim
-a = len(“tea”)
+a = len("tea")
 #+END_SRC
 
 Below are the list of special functions and how they deviate from
 the normal form:
 
 - case — conditionally evaluates its arguments
+- echo — writes a message to standard out and has a bare form
 - func - defines a function, see [[#user-functions][User Functions]]
 - if - conditionally evaluates its arguments and it has a bare form, see [[#if-function][IF Function]]
 - list - takes any number of arguments
@@ -2328,17 +2338,18 @@ the normal form:
 - warn — exits the statement with a warning and has a bare form
 
 If the form doesn't have an assignment it's called a bare
-function. The warn, return, if, listLoop and log have bare forms.
+function. The echo, warn, return, if, listLoop and log have bare forms.
 
 Special Form Examples:
 
 #+BEGIN_SRC nim
 v = list(1,2,3,4,5,6,7)
 v = if(b, 5, 6)
-if(c, warn(“abc”))
-if(c, return(“abc”))
+if(c, warn("abc"))
+if(c, return("abc"))
 newList &= if( (x > 5), value)
-warn(“the tea is hot”)
+warn("the tea is hot")
+echo("the tea is delicious")
 return(1)
 log("log message")
 a = case(22, [11, 1, 22, 2])
@@ -2359,9 +2370,9 @@ There are three basic forms, a three parameter form, a two
 parameter form and a bare two parameter form. Here are examples:
 
 #+BEGIN_SRC nim
-tea = if(cond, “black”, “green”)
+tea = if(cond, "black", "green")
 newList &= if(cond, value)
-if(cond, return(“stop”))
+if(cond, return("stop"))
 #+END_SRC
 
 *Three Parameter Form*
@@ -2393,10 +2404,11 @@ d.tea = if(cond, value)
 *Bare Two Parameter Form*
 
 The bare two parameter form doesn’t have an assignment. You use
-it with the warn and return functions for their side effects.
+it with the echo, warn and return functions for their side
+effects.
 
 #+BEGIN_SRC nim
-if(c, return(“stop”))
+if(c, return("stop"))
 if(c, warn("buy more tea!"))
 #+END_SRC
 
@@ -2622,7 +2634,7 @@ statictea -x -o codefile.tea -s in.json
 tea>
 #+END_SRC
 
-In the following example the statement “z = 5” is entered then
+In the following example the statement "z = 5" is entered then
 z is printed. P is short for print.
 
 #+BEGIN_SRC

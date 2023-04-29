@@ -342,8 +342,8 @@ Examples:
 
 ~~~javascript
 len(dict()) # 0
-len(dict("a", 4)) # 1
-len(dict("a", 4, "b", 3)) # 2
+len(dict(["a", 4])) # 1
+len(dict(["a", 4, "b", 3])) # 2
 ~~~
 
 
@@ -406,7 +406,7 @@ same as get without the default.
 Examples:
 
 ~~~javascript
-d = dict("tea", "Earl Grey")
+d = dict(["tea", "Earl Grey"])
 get(d, "tea") # "Earl Grey"
 get(d, "coffee", "Tea") # "Tea"
 ~~~
@@ -414,7 +414,7 @@ get(d, "coffee", "Tea") # "Tea"
 Using dot notation:
 
 ~~~javascript
-d = dict("tea", "Earl Grey")
+d = dict(["tea", "Earl Grey"])
 d.tea => "Earl Grey"
 ~~~
 
@@ -561,7 +561,7 @@ exists = func(dictionary: dict, key: string) bool
 Examples:
 
 ~~~javascript
-d = dict("tea", "Earl")
+d = dict(["tea", "Earl"])
 exists(d, "tea") # true
 exists(d, "coffee") # false
 ~~~
@@ -906,7 +906,7 @@ bool(5) # true
 bool(3.3) # true
 bool([8]) # true
 bool("tea") # true
-bool(dict("tea", 2)) # true
+bool(dict(["tea", 2])) # true
 ~~~
 
 
@@ -974,8 +974,9 @@ func fun_slice_siois(variables: Variables; arguments: seq[Value]): FunResult {.
 
 # fun_dup_sis
 
-Duplicate a string x times.  The result is a new string built by
+Duplicate a string x times. The result is a new string built by
 concatenating the string to itself the specified number of times.
+The resulting string must be less than or equal to 1024 bytes.
 
 ~~~javascript
 dup = func(pattern: string, count: int) string
