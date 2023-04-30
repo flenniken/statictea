@@ -79,7 +79,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_log_ss">fun_log_ss</a> &mdash; Log a message to the log file and return the same string.</li>
 <li> <a href="#fun_return_aa">fun_return_aa</a> &mdash; Return is a special function that returns the value passed in and has has side effects.</li>
 <li> <a href="#fun_string_aoss">fun_string_aoss</a> &mdash; Convert a variable to a string.</li>
-<li> <a href="#fun_string_sds">fun_string_sds</a> &mdash; Convert the dictionary variable to dot names.</li>
+<li> <a href="#fun_string_dsss">fun_string_dsss</a> &mdash; Convert the dictionary variable to dot names.</li>
 <li> <a href="#fun_format_ss">fun_format_ss</a> &mdash; Format a string using replacement variables similar to a replacement block.</li>
 <li> <a href="#fun_func_sp">fun_func_sp</a> &mdash; Define a function.</li>
 <li> <a href="#fun_functionDetails_pd">fun_functionDetails_pd</a> &mdash; Return the function details in a dictionary.</li>
@@ -1722,7 +1722,9 @@ fn =&gt; cmp
 <p>
 dn:
 
-</p><p>Same as JSON except the following.
+</p><p>Note: see the other string function with the dictionary name parameter.
+
+</p><p>Same as JSON except the following:
 
 </p><pre class="plain-code">
 d =&gt;
@@ -1747,13 +1749,13 @@ func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
 </pre>
 
-<h3 id="fun_string_sds">fun_string_sds</h3>
+<h3 id="fun_string_dsss">fun_string_dsss</h3>
 
 <p>Convert the dictionary variable to dot names. You specify the
 name of the dictionary and the dict variable.
 
 </p><pre class="tea-code">
-<span class="t-dotName">string</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictName</span>: <span class="t-type">string</span>: <span class="t-param">d</span>: <span class="t-type">dict</span>) <span class="t-type">string</span>
+<span class="t-dotName">string</span> = <span class="t-funcCall">func</span>(<span class="t-param">d</span>: <span class="t-type">dict</span>, <span class="t-param">stype</span>: <span class="t-type">string</span>, <span class="t-param">dictName</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
 </pre>
 <p>
 Example:
@@ -1763,7 +1765,7 @@ Example:
 {<span class="t-str">&quot;x&quot;</span>:<span class="t-num">1</span>, <span class="t-str">&quot;y&quot;</span>:<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;z&quot;</span>:{<span class="t-str">&quot;a&quot;</span>:<span class="t-num">8</span>}}
 “””
 <span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-dotName">json</span>)
-<span class="t-dotName">a</span> = <span class="t-funcCall">string</span>(<span class="t-str">&quot;teas&quot;</span>, <span class="t-dotName">d</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">string</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;dn&quot;</span>, <span class="t-str">&quot;teas&quot;</span>)
 
 <span class="t-comment"># a =&gt;
 </span><span class="t-dotName">teas.x</span> = <span class="t-num">1</span>
@@ -1773,7 +1775,7 @@ Example:
 
 
 <pre class="nim-code">
-func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_string_dsss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
 </pre>
 

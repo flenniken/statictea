@@ -18,7 +18,7 @@ $statictea \
 ### File tmpl.txt
 
 ~~~
-$$ block dn = string("container", o.container)
+$$ block dn = string(o.container, "dn", "container")
 {dn}
 $$ endblock
 ~~~

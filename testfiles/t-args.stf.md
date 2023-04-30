@@ -21,7 +21,7 @@ $statictea \
 ### File tmpl.txt
 
 ~~~
-$$ nextline args = string("t.args", t.args)
+$$ nextline args = string(t.args, "dn", "t.args")
 {args}
 ~~~
 

@@ -35,7 +35,7 @@ o.cmp = get(f, "cmp", 0)
 ~~~
 The o dictionary variables:
 
-$$ block vars = string("o", o)
+$$ block vars = string(o, "dn", "o")
 {vars}
 $$ endblock
 
@@ -44,8 +44,8 @@ $$ : ooh = "o"
 $$ : a = 5
 $$ : localDict = dict(["a", 1])
 $$ : emptyLocalDict = dict()
-$$ : g.dotNames = string("l", l)
-$$ : g.dotNames2 = string("", l)
+$$ : g.dotNames = string(l, "dn", "l")
+$$ : g.dotNames2 = string(l, "dn", "")
 $$ : g.varsJson = string(l, "json")
 The local variables as rb:
 

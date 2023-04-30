@@ -2097,7 +2097,9 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## dn:
   ##
-  ## Same as JSON except the following.
+  ## Note: see the other string function with the dictionary name parameter.
+  ##
+  ## Same as JSON except the following:
   ##
   ## ~~~
   ## d =>
@@ -2146,12 +2148,12 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
 
   result = newFunResult(newValue(str))
 
-func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_string_dsss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert the dictionary variable to dot names. You specify the
   ## name of the dictionary and the dict variable.
   ##
   ## ~~~statictea
-  ## string = func(dictName: string: d: dict) string
+  ## string = func(d: dict, stype: string, dictName: string) string
   ## ~~~
   ##
   ## Example:
@@ -2161,17 +2163,21 @@ func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
   ## {"x":1, "y":"tea", "z":{"a":8}}
   ## “””
   ## d = readJson(json)
-  ## a = string("teas", d)
+  ## a = string(d, "dn", "teas")
   ##
   ## # a =>
   ## teas.x = 1
   ## teas.y = "tea"
   ## teas.z.a = 8
   ## ~~~
-  tMapParameters("string", "sds")
-  let name = map["a"].stringv
-  let dict = map["b"].dictv.dict
-  let str = dotNameRep(dict, name)
+  tMapParameters("string", "dsss")
+  let dict = map["a"].dictv.dict
+  let stype = map["b"].stringv
+  if stype != "dn":
+    # Pass "dn" for stype.
+    return newFunResultWarn(wPassDn, 1)
+  let dictName = map["c"].stringv
+  let str = dotNameRep(dict, dictName)
   result = newFunResult(newValue(str))
 
 func fun_format_ss*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -2600,7 +2606,7 @@ functionsDict["fun_sort_lssil"] = fun_sort_lssil
 functionsDict["fun_sort_lsssl"] = fun_sort_lsssl
 functionsDict["fun_startsWith_ssb"] = fun_startsWith_ssb
 functionsDict["fun_string_aoss"] = fun_string_aoss
-functionsDict["fun_string_sds"] = fun_string_sds
+functionsDict["fun_string_dsss"] = fun_string_dsss
 functionsDict["fun_sub_iii"] = fun_sub_iii
 functionsDict["fun_sub_fff"] = fun_sub_fff
 functionsDict["fun_type_as"] = fun_type_as

@@ -1407,7 +1407,9 @@ fn => cmp
 
 dn:
 
-Same as JSON except the following.
+Note: see the other string function with the dictionary name parameter.
+
+Same as JSON except the following:
 
 ~~~
 d =>
@@ -1428,12 +1430,12 @@ a =>
 
 """
 
-  dc_fun_string_sds = """
+  dc_fun_string_dsss = """
 Convert the dictionary variable to dot names. You specify the
 name of the dictionary and the dict variable.
 
 ~~~statictea
-string = func(dictName: string: d: dict) string
+string = func(d: dict, stype: string, dictName: string) string
 ~~~
 
 Example:
@@ -1443,7 +1445,7 @@ json = “””
 {"x":1, "y":"tea", "z":{"a":8}}
 “””
 d = readJson(json)
-a = string("teas", d)
+a = string(d, "dn", "teas")
 
 # a =>
 teas.x = 1
@@ -1600,8 +1602,8 @@ warn("always warn")
     info("fun_sort_lssil", dc_fun_sort_lssil, 27),
     info("fun_sort_lsssl", dc_fun_sort_lsssl, 27),
     info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 20),
-    info("fun_string_aoss", dc_fun_string_aoss, 104),
-    info("fun_string_sds", dc_fun_string_sds, 28),
+    info("fun_string_aoss", dc_fun_string_aoss, 106),
+    info("fun_string_dsss", dc_fun_string_dsss, 32),
     info("fun_sub_fff", dc_fun_sub_fff, 25),
     info("fun_sub_iii", dc_fun_sub_iii, 24),
     info("fun_type_as", dc_fun_type_as, 58),
@@ -1628,18 +1630,18 @@ warn("always warn")
     780,
     1181,
     1141,
-    2526,
+    2532,
     658,
     1068,
     824,
     867,
     841,
-    2177,
-    2209,
-    2230,
+    2183,
+    2215,
+    2236,
     480,
     432,
-    2486,
+    2492,
     521,
     894,
     929,
@@ -1654,11 +1656,11 @@ warn("always warn")
     1239,
     1957,
     1511,
-    2285,
-    2410,
-    2331,
+    2291,
+    2416,
+    2337,
     1456,
-    2303,
+    2309,
     1287,
     1397,
     1982,
@@ -1666,9 +1668,9 @@ warn("always warn")
     1677,
     1709,
     1736,
-    2265,
+    2271,
     2045,
-    2149,
+    2151,
     633,
     609,
     1801,

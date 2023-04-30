@@ -1589,20 +1589,28 @@ suite "functions.nim":
       eFunResult)
 
   test "string dictionary":
-    var dict = newVarsDict()
-    dict["abc"] = newValue("str")
-    dict["eight"] = newValue(8)
-    var sub = newVarsDict()
-    sub["x"] = newValue("tea")
-    sub["y"] = newValue(4)
-    dict["sub"] = newValue(sub)
+    let json = """
+{
+  "abc": "str",
+  "eight": 8,
+  "sub": {
+    "x": "tea",
+    "y": 4
+  }
+}
+"""
+    var dictOr = readJsonString(json)
+
     let expected = """
 d.abc = "str"
 d.eight = 8
 d.sub.x = "tea"
 d.sub.y = 4"""
-    check testFunction("string", @[newValue("d"), newValue(dict)],
+    check testFunction("string", @[dictOr.value, newValue("dn"), newValue("d")],
       newFunResult(newValue(expected)))
+
+    check testFunction("string", @[dictOr.value, newValue("asdf"), newValue("d")],
+      newFunResultWarn(wPassDn, 1))
 
   test "format":
     let str = newValue("hello")

@@ -56,7 +56,7 @@ You can show the l using the second string function.
 $$ block
 $$ : a = 5
 $$ : b = dict()
-$$ : g.strDn2 = string("l", l)
+$$ : g.strDn2 = string(l, "dn", "l")
 {g.strDn2}
 $$ endblock
 
@@ -65,7 +65,7 @@ You can show the l using the second string function or not.
 $$ block
 $$ : a = 5
 $$ : b = dict()
-$$ : g.strDn3 = string("", l)
+$$ : g.strDn3 = string(l, "dn", "")
 {g.strDn3}
 $$ endblock
 ~~~

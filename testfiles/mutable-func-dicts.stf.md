@@ -19,7 +19,7 @@ $statictea \
 ~~~
 $$ block path = string(o.path, "dn")
 $$ : d = string(o.d, "dn")
-$$ : signature = string("signature", o.fd.signature)
+$$ : signature = string(o.fd.signature, "dn", "signature")
 Path:
 
 {path}

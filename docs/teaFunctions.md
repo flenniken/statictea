@@ -1525,7 +1525,9 @@ fn => cmp
 
 dn:
 
-Same as JSON except the following.
+Note: see the other string function with the dictionary name parameter.
+
+Same as JSON except the following:
 
 ~~~
 d =>
@@ -1552,7 +1554,7 @@ Convert the dictionary variable to dot names. You specify the
 name of the dictionary and the dict variable.
 
 ~~~javascript
-string = func(dictName: string: d: dict) string
+string = func(d: dict, stype: string, dictName: string) string
 ~~~
 
 Example:
@@ -1562,7 +1564,7 @@ json = “””
 {"x":1, "y":"tea", "z":{"a":8}}
 “””
 d = readJson(json)
-a = string("teas", d)
+a = string(d, "dn", "teas")
 
 # a =>
 teas.x = 1

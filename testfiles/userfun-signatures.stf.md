@@ -132,7 +132,7 @@ sort(a: list, b: string, c: string, d: int) list
 sort(a: list, b: string, c: string, d: string) list
 startsWith(a: string, b: string) bool
 string(a: any, b: optional string) string
-string(a: string, b: dict) string
+string(a: dict, b: string, c: string) string
 sub(a: float, b: float) float
 sub(a: int, b: int) int
 type(a: any) string

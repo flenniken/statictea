@@ -69,7 +69,7 @@ StaticTea language functions start with "fun_", for example, the
 * [fun_log_ss](#fun_log_ss) &mdash; Log a message to the log file and return the same string.
 * [fun_return_aa](#fun_return_aa) &mdash; Return is a special function that returns the value passed in and has has side effects.
 * [fun_string_aoss](#fun_string_aoss) &mdash; Convert a variable to a string.
-* [fun_string_sds](#fun_string_sds) &mdash; Convert the dictionary variable to dot names.
+* [fun_string_dsss](#fun_string_dsss) &mdash; Convert the dictionary variable to dot names.
 * [fun_format_ss](#fun_format_ss) &mdash; Format a string using replacement variables similar to a replacement block.
 * [fun_func_sp](#fun_func_sp) &mdash; Define a function.
 * [fun_functionDetails_pd](#fun_functiondetails_pd) &mdash; Return the function details in a dictionary.
@@ -1689,7 +1689,9 @@ fn => cmp
 
 dn:
 
-Same as JSON except the following.
+Note: see the other string function with the dictionary name parameter.
+
+Same as JSON except the following:
 
 ~~~
 d =>
@@ -1714,13 +1716,13 @@ func fun_string_aoss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, Exception, ValueError], tags: [RootEffect].}
 ~~~
 
-# fun_string_sds
+# fun_string_dsss
 
 Convert the dictionary variable to dot names. You specify the
 name of the dictionary and the dict variable.
 
 ~~~javascript
-string = func(dictName: string: d: dict) string
+string = func(d: dict, stype: string, dictName: string) string
 ~~~
 
 Example:
@@ -1730,7 +1732,7 @@ json = “””
 {"x":1, "y":"tea", "z":{"a":8}}
 “””
 d = readJson(json)
-a = string("teas", d)
+a = string(d, "dn", "teas")
 
 # a =>
 teas.x = 1
@@ -1740,7 +1742,7 @@ teas.z.a = 8
 
 
 ~~~nim
-func fun_string_sds(variables: Variables; arguments: seq[Value]): FunResult {.
+func fun_string_dsss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError, ValueError, Exception], tags: [RootEffect].}
 ~~~
 
