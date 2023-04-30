@@ -2472,7 +2472,7 @@ statictea's embedded docs by looping over the f dictionary and
 fetching each function's docComment. The nimble *funcdocs* task
 builds the template.
 
-- [[docs/teaFunctions.md][Functions]]
+- [[docs/md/teaFunctions.md][Functions]]
 - [[templates/teaFunctions.md][teaFunctions.md]] (view raw)
 - [[templates/teaFunctions.tea][teaFunctions.tea]]
 
@@ -2569,7 +2569,7 @@ Nimble Tasks:
 - *dochix*:  Create html docs index (docs/html/index.html).
 - *jsonix*:  Display docs index json.
 - *json*:  Display a source file's json doc comments; specify part of the name.
-- *teafuncs*:  Create the function docs (docs/teaFunctions.md).
+- *teafuncs*:  Create the function docs (docs/md/teaFunctions.md).
 - *dyfuncs*:  Create the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).
 - *dotsrc*:  Create source module dependency graph (docs/staticteadep.svg).
 - *dotsys*:  Create system modules dependency graph (docs/staticteadep2.svg).
@@ -2868,7 +2868,7 @@ nimble release
 - [[#run-statictea][Run StaticTea]]
 - [[#how-to][How To]]
 - [[#miscellaneous][Miscellaneous (+15)]]
-- [[docs/teaFunctions.md][Functions]]
+- [[docs/md/teaFunctions.md][Functions]]
 
 * Tea Info                                                            :notoc:
 

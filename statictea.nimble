@@ -572,14 +572,6 @@ proc createDependencyGraph2() =
   rmFile(src_dot2_dot)
   rmFile(statictea2Dot)
 
-# proc echoGrip() =
-#   echo """
-# The grip app is good for viewing github markdown locally.
-#   grip --quiet readme.org &
-#   http://localhost:6419/docs/index.md
-#   http://localhost:6419/docs/teaFunctions.md
-#   http://localhost:6419/testfiles/stf-index.md"""
-
 proc taskDocmix() =
   ## Create the index html file.
 
@@ -750,9 +742,8 @@ proc taskFuncDocs() =
   let statictea = fmt"bin/{dirName}/statictea"
   let tFile = "templates/teaFunctions.md"
   let teaFile = "templates/teaFunctions.tea"
-  let result = "docs/teaFunctions.md"
+  let result = "docs/md/teaFunctions.md"
 
-  # Build the docs/teaFunctions.md file.
   # echo fmt"make {result}"
   let cmd = fmt"{statictea} -t {tFile} -o {teaFile} -r {result}"
   exec cmd
@@ -1055,7 +1046,7 @@ task json, "\tDisplay a source file's json doc comments; specify part of the nam
       rmFile(jsonFilename)
       break
 
-task teafuncs, "Create the function docs (docs/teaFunctions.md).":
+task teafuncs, "Create the function docs (docs/md/teaFunctions.md).":
   taskFuncDocs()
 
 task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).":
