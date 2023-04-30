@@ -17,7 +17,7 @@ Nim source code: <a href="../../src/args.nim">args.nim</a>
 
 <ul>
 <li>type:  <a href="#Prepost">Prepost</a> &mdash; Prepost holds one prefix and its associated postfix.</li>
-<li>type:  <a href="#PrepostTable">PrepostTable</a> &mdash; The prefix postfix pairs stored in an ordered dictionary.</li>
+<li>type:  <a href="#PrepostTable">PrepostTable</a> &mdash; The prefix postfix pairs stored in an ordered dictionary mapping the prefix to the postfix.</li>
 <li>type:  <a href="#Args">Args</a> &mdash; Args holds all the command line arguments.</li>
 <li>type:  <a href="#ArgsOr">ArgsOr</a> &mdash; The args or a warning.</li>
 <li> <a href="#makeUserPrepostTable">makeUserPrepostTable</a> &mdash; Return the user's ordered table that maps prefixes to postfixes.</li>
@@ -46,7 +46,8 @@ Prepost = object
 
 <h3 id="PrepostTable">PrepostTable</h3>
 
-<p>The prefix postfix pairs stored in an ordered dictionary.
+<p>The prefix postfix pairs stored in an ordered dictionary
+mapping the prefix to the postfix.
 </p>
 
 <pre class="nim-code">

@@ -1629,7 +1629,7 @@ return a function value.
 </pre>
 <p>
 In a template command a return controls the replacement block
-looping by returning “skip” and “stop”.
+looping by returning &quot;skip&quot; and &quot;stop&quot;.
 
 </p><pre class="tea-code">
 <span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">&quot;stop&quot;</span>))
@@ -1646,7 +1646,7 @@ t.row is 2.
 
 </p><pre class="plain-code">
 $$ block t.repeat = 4
-$$ : if((t.row == 2), return(“skip”))
+$$ : if((t.row == 2), return(&quot;skip&quot;))
 {t.row}
 $$ endblock
 </pre>
@@ -1759,10 +1759,14 @@ name of the dictionary and the dict variable.
 Example:
 
 </p><pre class="tea-code">
-<span class="t-dotName">d</span> = {<span class="t-str">&quot;x&quot;</span>,<span class="t-num">1</span>, <span class="t-str">&quot;y&quot;</span>:<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;z&quot;</span>:{<span class="t-str">&quot;a&quot;</span>:<span class="t-num">8</span>}}
-<span class="t-funcCall">string</span>(<span class="t-str">&quot;teas&quot;</span>, <span class="t-dotName">d</span>) =&gt;
+<span class="t-dotName">json</span> = “””
+{<span class="t-str">&quot;x&quot;</span>:<span class="t-num">1</span>, <span class="t-str">&quot;y&quot;</span>:<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;z&quot;</span>:{<span class="t-str">&quot;a&quot;</span>:<span class="t-num">8</span>}}
+“””
+<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-dotName">json</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">string</span>(<span class="t-str">&quot;teas&quot;</span>, <span class="t-dotName">d</span>)
 
-<span class="t-dotName">teas.x</span> = <span class="t-num">1</span>
+<span class="t-comment"># a =&gt;
+</span><span class="t-dotName">teas.x</span> = <span class="t-num">1</span>
 <span class="t-dotName">teas.y</span> = <span class="t-str">&quot;tea&quot;</span>
 <span class="t-dotName">teas.z.a</span> = <span class="t-num">8</span>
 </pre>
@@ -1920,12 +1924,17 @@ func fun_not_bb(variables: Variables; arguments: seq[Value]): FunResult {.
 Examples:
 
 </p><pre class="tea-code">
-<span class="t-dotName">a</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;\\&quot;</span>t<span class="t-dotName">ea</span>\\<span class="t-str">&quot;&quot;</span>) <span class="t-comment"># &quot;tea&quot;
+<span class="t-dotName">a</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;\\&quot;</span>t<span class="t-dotName">ea</span>\\<span class="t-str">&quot;&quot;</span>) <span class="t-comment"># tea
 </span><span class="t-dotName">b</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;4.5&quot;</span>) <span class="t-comment"># 4.5
 </span><span class="t-dotName">c</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;[1,2,3]&quot;</span>) <span class="t-comment"># [1, 2, 3]
-</span><span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;{\\&quot;</span>a\\<span class="t-str">&quot;:1, \\&quot;</span>b\\<span class="t-str">&quot;: 2}&quot;</span>)
-  <span class="t-comment"># {&quot;a&quot;: 1, &quot;b&quot;, 2}
-</span></pre>
+</span>
+<span class="t-dotName">json</span> = “””
+{<span class="t-str">&quot;a&quot;</span>:<span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>: <span class="t-num">2</span>}
+“””
+<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-dotName">json</span>) =&gt;
+
+{<span class="t-str">&quot;a&quot;</span>: <span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>}
+</pre>
 
 
 <pre class="nim-code">
@@ -1954,11 +1963,11 @@ Block list elements:
 <li><b>p</b> — A paragraph element is one string, possibly containing
 newlines.
 </li><li><b>code</b> — A code element is three strings. The first string is
-the code start line, for example “~~~” or “~~~nim”.  The second
+the code start line, for example &quot;~~~&quot; or &quot;~~~nim&quot;.  The second
 string (with newlines) contains the text of the block.  The third
-string is the ending line, for example “~~~”.
+string is the ending line, for example &quot;~~~&quot;.
 </li><li><b>bullets</b> — A bullets element contains a string (with newlines)
-for each bullet point.  The leading “* “ is not part of the
+for each bullet point.  The leading &quot;* &quot; is not part of the
 string.
 
 </li></ul>

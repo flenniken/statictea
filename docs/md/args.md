@@ -7,7 +7,7 @@ Types for handling command line arguments.
 # Index
 
 * type: [Prepost](#prepost) &mdash; Prepost holds one prefix and its associated postfix.
-* type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary.
+* type: [PrepostTable](#preposttable) &mdash; The prefix postfix pairs stored in an ordered dictionary mapping the prefix to the postfix.
 * type: [Args](#args) &mdash; Args holds all the command line arguments.
 * type: [ArgsOr](#argsor) &mdash; The args or a warning.
 * [makeUserPrepostTable](#makeuserpreposttable) &mdash; Return the user's ordered table that maps prefixes to postfixes.
@@ -35,7 +35,8 @@ Prepost = object
 
 # PrepostTable
 
-The prefix postfix pairs stored in an ordered dictionary.
+The prefix postfix pairs stored in an ordered dictionary
+mapping the prefix to the postfix.
 
 
 ~~~nim

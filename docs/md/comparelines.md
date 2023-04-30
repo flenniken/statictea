@@ -10,7 +10,7 @@ Compare lines of text.
 * [opValueStr](#opvaluestr) &mdash; Return an OpResultStr with a value.
 * [opMessageStr](#opmessagestr) &mdash; Return an OpResultStr with a message why the value cannot be returned.
 * [splitNewLines](#splitnewlines) &mdash; Split lines and keep the line endings.
-* [linesSideBySide](#linessidebyside) &mdash; Show the two sets of lines side by side (above and below).
+* [linesSideBySide](#linessidebyside) &mdash; Show the two sets of lines side by side.
 * [testLinesSideBySide](#testlinessidebyside) &mdash; If the two strings are equal, return true, else show the differences and return false.
 * [compareFiles](#comparefiles) &mdash; Compare two files and return the differences.
 
@@ -53,7 +53,8 @@ func splitNewLines(content: string): seq[string]
 
 # linesSideBySide
 
-Show the two sets of lines side by side (above and below).
+Show the two sets of lines side by side.  For each pair of lines
+one is above and one is below.
 
 
 ~~~nim

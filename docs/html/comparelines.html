@@ -20,7 +20,7 @@ Nim source code: <a href="../../src/comparelines.nim">comparelines.nim</a>
 <li> <a href="#opValueStr">opValueStr</a> &mdash; Return an OpResultStr with a value.</li>
 <li> <a href="#opMessageStr">opMessageStr</a> &mdash; Return an OpResultStr with a message why the value cannot be returned.</li>
 <li> <a href="#splitNewLines">splitNewLines</a> &mdash; Split lines and keep the line endings.</li>
-<li> <a href="#linesSideBySide">linesSideBySide</a> &mdash; Show the two sets of lines side by side (above and below).</li>
+<li> <a href="#linesSideBySide">linesSideBySide</a> &mdash; Show the two sets of lines side by side.</li>
 <li> <a href="#testLinesSideBySide">testLinesSideBySide</a> &mdash; If the two strings are equal, return true, else show the differences and return false.</li>
 <li> <a href="#compareFiles">compareFiles</a> &mdash; Compare two files and return the differences.</li>
 </ul>
@@ -64,7 +64,8 @@ func splitNewLines(content: string): seq[string]
 
 <h3 id="linesSideBySide">linesSideBySide</h3>
 
-<p>Show the two sets of lines side by side (above and below).
+<p>Show the two sets of lines side by side.  For each pair of lines
+one is above and one is below.
 </p>
 
 <pre class="nim-code">

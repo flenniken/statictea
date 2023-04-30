@@ -2002,7 +2002,7 @@ func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## ~~~
   ##
   ## In a template command a return controls the replacement block
-  ## looping by returning “skip” and “stop”.
+  ## looping by returning "skip" and "stop".
   ##
   ## ~~~statictea
   ## if(c, return("stop"))
@@ -2017,7 +2017,7 @@ func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## ~~~
   ## $$ block t.repeat = 4
-  ## $$ : if((t.row == 2), return(“skip”))
+  ## $$ : if((t.row == 2), return("skip"))
   ## {t.row}
   ## $$ endblock
   ## ~~~
@@ -2157,9 +2157,13 @@ func fun_string_sds*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Example:
   ##
   ## ~~~statictea
-  ## d = {"x",1, "y":"tea", "z":{"a":8}}
-  ## string("teas", d) =>
+  ## json = “””
+  ## {"x":1, "y":"tea", "z":{"a":8}}
+  ## “””
+  ## d = readJson(json)
+  ## a = string("teas", d)
   ##
+  ## # a =>
   ## teas.x = 1
   ## teas.y = "tea"
   ## teas.z.a = 8
@@ -2306,11 +2310,16 @@ func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Examples:
   ##
   ## ~~~statictea
-  ## a = readJson("\\"tea\\"") # "tea"
+  ## a = readJson("\\"tea\\"") # tea
   ## b = readJson("4.5") # 4.5
   ## c = readJson("[1,2,3]") # [1, 2, 3]
-  ## d = readJson("{\\"a\\":1, \\"b\\": 2}")
-  ##   # {"a": 1, "b", 2}
+  ##
+  ## json = “””
+  ## {"a":1, "b": 2}
+  ## “””
+  ## d = readJson(json) =>
+  ## 
+  ## {"a": 1, "b", 2}
   ## ~~~
   tMapParameters("readJson", "sa")
   let json = map["a"].stringv
@@ -2336,11 +2345,11 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ## * **p** — A paragraph element is one string, possibly containing
   ## newlines.
   ## * **code** — A code element is three strings. The first string is
-  ## the code start line, for example “~~~” or “~~~nim”.  The second
+  ## the code start line, for example "~~~" or "~~~nim".  The second
   ## string (with newlines) contains the text of the block.  The third
-  ## string is the ending line, for example “~~~”.
+  ## string is the ending line, for example "~~~".
   ## * **bullets** — A bullets element contains a string (with newlines)
-  ## for each bullet point.  The leading “* “ is not part of the
+  ## for each bullet point.  The leading "* " is not part of the
   ## string.
   ##
   ## ~~~statictea

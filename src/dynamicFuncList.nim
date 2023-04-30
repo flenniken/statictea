@@ -998,11 +998,11 @@ Block list elements:
 * **p** — A paragraph element is one string, possibly containing
 newlines.
 * **code** — A code element is three strings. The first string is
-the code start line, for example “~~~” or “~~~nim”.  The second
+the code start line, for example "~~~" or "~~~nim".  The second
 string (with newlines) contains the text of the block.  The third
-string is the ending line, for example “~~~”.
+string is the ending line, for example "~~~".
 * **bullets** — A bullets element contains a string (with newlines)
-for each bullet point.  The leading “* “ is not part of the
+for each bullet point.  The leading "* " is not part of the
 string.
 
 ~~~statictea
@@ -1079,11 +1079,16 @@ readJson = func(json: string) any
 Examples:
 
 ~~~statictea
-a = readJson("\\"tea\\"") # "tea"
+a = readJson("\\"tea\\"") # tea
 b = readJson("4.5") # 4.5
 c = readJson("[1,2,3]") # [1, 2, 3]
-d = readJson("{\\"a\\":1, \\"b\\": 2}")
-  # {"a": 1, "b", 2}
+
+json = “””
+{"a":1, "b": 2}
+“””
+d = readJson(json) =>
+
+{"a": 1, "b", 2}
 ~~~
 
 """
@@ -1195,7 +1200,7 @@ if(c, return(5))
 ~~~
 
 In a template command a return controls the replacement block
-looping by returning “skip” and “stop”.
+looping by returning "skip" and "stop".
 
 ~~~statictea
 if(c, return("stop"))
@@ -1210,7 +1215,7 @@ t.row is 2.
 
 ~~~
 $$ block t.repeat = 4
-$$ : if((t.row == 2), return(“skip”))
+$$ : if((t.row == 2), return("skip"))
 {t.row}
 $$ endblock
 ~~~
@@ -1434,9 +1439,13 @@ string = func(dictName: string: d: dict) string
 Example:
 
 ~~~statictea
-d = {"x",1, "y":"tea", "z":{"a":8}}
-string("teas", d) =>
+json = “””
+{"x":1, "y":"tea", "z":{"a":8}}
+“””
+d = readJson(json)
+a = string("teas", d)
 
+# a =>
 teas.x = 1
 teas.y = "tea"
 teas.z.a = 8
@@ -1582,7 +1591,7 @@ warn("always warn")
     info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
     info("fun_parseMarkdown_ssl", dc_fun_parseMarkdown_ssl, 79),
     info("fun_path_sosd", dc_fun_path_sosd, 55),
-    info("fun_readJson_sa", dc_fun_readJson_sa, 23),
+    info("fun_readJson_sa", dc_fun_readJson_sa, 28),
     info("fun_replace_siiss", dc_fun_replace_siiss, 110),
     info("fun_replaceRe_sls", dc_fun_replaceRe_sls, 33),
     info("fun_return_aa", dc_fun_return_aa, 63),
@@ -1592,7 +1601,7 @@ warn("always warn")
     info("fun_sort_lsssl", dc_fun_sort_lsssl, 27),
     info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 20),
     info("fun_string_aoss", dc_fun_string_aoss, 104),
-    info("fun_string_sds", dc_fun_string_sds, 24),
+    info("fun_string_sds", dc_fun_string_sds, 28),
     info("fun_sub_fff", dc_fun_sub_fff, 25),
     info("fun_sub_iii", dc_fun_sub_iii, 24),
     info("fun_type_as", dc_fun_type_as, 58),
@@ -1619,18 +1628,18 @@ warn("always warn")
     780,
     1181,
     1141,
-    2517,
+    2526,
     658,
     1068,
     824,
     867,
     841,
-    2173,
-    2205,
-    2226,
+    2177,
+    2209,
+    2230,
     480,
     432,
-    2477,
+    2486,
     521,
     894,
     929,
@@ -1645,11 +1654,11 @@ warn("always warn")
     1239,
     1957,
     1511,
-    2281,
-    2401,
-    2322,
+    2285,
+    2410,
+    2331,
     1456,
-    2299,
+    2303,
     1287,
     1397,
     1982,
@@ -1657,7 +1666,7 @@ warn("always warn")
     1677,
     1709,
     1736,
-    2261,
+    2265,
     2045,
     2149,
     633,

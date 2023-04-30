@@ -12,7 +12,8 @@ type
     postfix*: string
 
   PrepostTable* = OrderedTable[string, string]
-    ## The prefix postfix pairs stored in an ordered dictionary.
+    ## The prefix postfix pairs stored in an ordered dictionary
+    ## mapping the prefix to the postfix.
 
   Args* = object
     ## Args holds all the command line arguments.

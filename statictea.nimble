@@ -1059,11 +1059,13 @@ task teafuncs, "Create the function docs (docs/teaFunctions.md).":
   taskFuncDocs()
 
 task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).":
-  # Extract the statictea function metadata from the functions.json file to create dynamicFuncList.nim":
+  # Extract the statictea function metadata from the functions.json
+  # file to create dynamicFuncList.nim":
 
-  # Build the release version of statictea. This makes sure functions.nim builds.
-  echo fmt"Build statictea release version"
-  buildRelease()
+  # Build the release version of statictea. This makes sure
+  # functions.nim builds.
+  # echo fmt"Build statictea release version"
+  # buildRelease()
 
   let statictea = fmt"bin/{dirName}/statictea"
   let tFile = "templates/dynamicFuncList.nim"
@@ -1072,16 +1074,18 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
   let functionsFile = "test_functions.nim"
 
   # Build the functions.json file.
+  echo "make JSON file from functions.nim"
   let jsonName = makeJsonDoc("functions.nim")
 
   # Build the dynamicFuncList.nim file.
+  rmFile(result)
   echo fmt"make {result}"
   let cmd = fmt"{statictea} -s {jsonName} -t {tFile} -o {teaFile} -r {result}"
   runCmd(cmd)
 
   rmFile(jsonName)
 
-  # Buld the functions.nim file.
+  # Build the functions.nim file.
   let cmd2 = get_test_module_cmd(functionsFile, force = true)
   exec cmd2
 

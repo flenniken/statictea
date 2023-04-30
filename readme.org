@@ -1435,9 +1435,9 @@ when the key doesn't exist (the z case below).
 
 #+BEGIN_SRC nim
 d = dict(["x", 100, "y", 200])
-x = get(d, "x") # => 100
-y = get(d, "y") # => 200
-z = get(d, "z", 300) # => 300
+x = get(d, "x") # 100
+y = get(d, "y") # 200
+z = get(d, "z", 300) # 300
 #+END_SRC
 
 The server json data becomes the s dictionary. For the example
@@ -1506,21 +1506,21 @@ You can access list elements with the get function or bracket notation:
 
 #+BEGIN_SRC nim
 list = list(1, 3.3, "a")
-get(list, 0) => 1
-get(list, 1) => 3.3
-get(list, 2) => "a"
-get(list, 3, 99) => 99
-get(list, -1) => "a"
-get(list, -2) => 3.3
-get(list, -3) => 1
-get(list, -4, 99) => 99
+get(list, 0) # 1
+get(list, 1) # 3.3
+get(list, 2) # "a"
+get(list, 3, 99) # 99
+get(list, -1) # "a"
+get(list, -2) # 3.3
+get(list, -3) # 1
+get(list, -4, 99) # 99
 
-list[0] => 1
-list[1] => 3.3
-list[2] => "a"
-list[-1] => "a"
-list[-2] => 3.3
-list[-3] => 1
+list[0] # 1
+list[1] # 3.3
+list[2] # "a"
+list[-1] # "a"
+list[-2] # 3.3
+list[-3] # 1
 #+END_SRC
 
 [[#contents][茶]]
@@ -1587,7 +1587,7 @@ l.a = f.cmp[1]
 You call it with parentheses:
 
 #+BEGIN_SRC nim
-b = l.a(4, 7) #=> -1
+b = l.a(4, 7) #-1
 #+END_SRC
 
 You can have multiple functions with the same name as long as
@@ -1641,7 +1641,7 @@ In the following example the (3 == 4) is an expression and the e
 variable is assigned false because 3 does not equal 4.
 
 #+BEGIN_SRC nim
-e = (3 == 4) #=> false
+e = (3 == 4) # false
 #+END_SRC
 
 You can write boolean expressions with the following operators:
@@ -1659,7 +1659,7 @@ You typically use a boolean expression with an IF statement. In
 the next example v is set to "s" because 3 is less than 5.
 
 #+BEGIN_SRC nim
-v = if((3 < 5), "s", "l") #=> "s"
+v = if((3 < 5), "s", "l") # "s"
 #+END_SRC
 
 Note: a conditional is wrapped in parentheses and there is no
@@ -2458,7 +2458,7 @@ A second set of nim source documents exist for HTML. They are
 designed for viewing locally on your machine and for testing. The
 HTML templates share the same tea code files with the markdown
 templates. The nimble *dochix* task builds the module index and
-the *docsh* task builds one or more HTML modules docs.
+the *doch* task builds one or more HTML modules docs.
 
 - Open docs/html/index.html in your browser.
 - [[templates/nimModuleIndex2.html][nimModuleIndex2.html]] HTML template
@@ -2512,6 +2512,12 @@ highlighter.
 
 - [[templates/tea2html.html][tea2html.html]] -- HTML template
 - [[templates/tea2html.tea][tea2html.tea]] -- tea code file for the template
+
+*Dev Index*
+
+The dev.html file in the root folder is a master index to the svg
+files and to all the markdown and html documents. It’s handy for
+developers with the source code for debugging the docs.
 
 [[#contents][茶]]
 
@@ -2715,9 +2721,9 @@ cmp = func(a: float, b: float) int
 
 Examples:
 
-cmp(7.8, 9.1) => -1
-cmp(8.4, 8.4) => 0
-cmp(9.3, 2.2) => 1
+cmp(7.8, 9.1) # -1
+cmp(8.4, 8.4) # 0
+cmp(9.3, 2.2) # 1
 #+END_SRC
 
 [[#contents][茶]]
