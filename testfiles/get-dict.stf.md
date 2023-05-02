@@ -1,8 +1,8 @@
 stf file, version 0.1.0
 
-# Get Function
+# Get Dict
 
-Test the get function.
+Test the get function with dictionaries.
 
 ### File cmd.sh command
 
@@ -31,39 +31,43 @@ $$ endblock
 {
   "tea": "Earl Grey",
   "num": 1,
-  "float": 3.14159
+  "float": 3.14159,
+  "1": 1,
 }
 ~~~
 
 ### File shared.tea
 
 ~~~
+e = "test failed"
 o.tea = s.tea
 o.num = s.num
 o.float = s.float
 
-if( (get(s, "tea") != "Earl Grey"), "error")
-if( (get(s, "num") != 1), "error")
-if( (get(s, "float") != 3.14159), "error")
+if( (get(s, "tea") != "Earl Grey"), warn(e))
+if( (get(s, "num") != 1), warn(e))
+if( (get(s, "float") != 3.14159), warn(e))
 
 o["a"] = "apple"
-if( (o.a != "apple"), "error")
+if( (o.a != "apple"), warn(e))
 
 key = "b"
 o[key] = "banana"
-if( (o.b != "banana"), "error")
+if( (o.b != "banana"), warn(e))
 
 key1 = "key1"
 o[key1] = "one"
-if( (get(o, key1) != "one"), "error")
+if( (get(o, key1) != "one"), warn(e))
 
-if( (get(s, "missing", 123) != 123), "error")
+if( (get(s, "1") != 1), warn(e))
+
+if( (get(s, "missing", 123) != 123), warn(e))
 
 d = dict(["tea", "Earl Grey"])
-if( (get(d, "tea") != "Earl Grey"), "error")
-if( (get(d, "coffee", "water") != "water"), "error")
+if( (get(d, "tea") != "Earl Grey"), warn(e))
+if( (get(d, "coffee", "water") != "water"), warn(e))
 
-if( (d.tea != "Earl Grey"), "error")
+if( (d.tea != "Earl Grey"), warn(e))
 
 ~~~
 
