@@ -494,7 +494,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## ~~~statictea
   ## d = dict(["tea", "Earl Grey"])
   ## get(d, "tea") # "Earl Grey"
-  ## get(d, "coffee", "Tea") # "Tea"
+  ## get(d, "coffee", "water") # "water"
   ## ~~~
   ##
   ## Using dot notation:
