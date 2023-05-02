@@ -508,7 +508,7 @@ Examples:
 ~~~statictea
 d = dict(["tea", "Earl Grey"])
 get(d, "tea") # "Earl Grey"
-get(d, "coffee", "Tea") # "Tea"
+get(d, "coffee", "water") # "water"
 ~~~
 
 Using dot notation:
