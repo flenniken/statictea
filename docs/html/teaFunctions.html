@@ -23,7 +23,7 @@
 <span class="t-dotName">add-vars</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">key</span>: <span class="t-type">string</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Add all the func variables with the key name to the new list.
 </span>  <span class="t-dotName">funcList</span> = <span class="t-dotName">f</span>[<span class="t-dotName">key</span>]
-  <span class="t-funcCall">listLoop</span>(<span class="t-dotName">funcList</span>, <span class="t-dotName">newList</span>, <span class="t-dotName">u.add-func-var</span>)
+  <span class="t-funcCall">loop</span>(<span class="t-dotName">funcList</span>, <span class="t-dotName">newList</span>, <span class="t-dotName">u.add-func-var</span>)
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-dotName">get-name</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">funcVar</span>: <span class="t-type">func</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
@@ -57,7 +57,7 @@
 <span class="t-comment"># Create a flat list of all the function variables in the f
 </span><span class="t-comment"># dictionary.
 </span><span class="t-dotName">flatFuncList</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-funcCall">keys</span>(<span class="t-dotName">f</span>), <span class="t-dotName">flatFuncList</span>, <span class="t-dotName">add-vars</span>)
+<span class="t-funcCall">loop</span>(<span class="t-funcCall">keys</span>(<span class="t-dotName">f</span>), <span class="t-dotName">flatFuncList</span>, <span class="t-dotName">add-vars</span>)
 
 <span class="t-comment"># Get the anchor type based on the template type.
 </span><span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">t.args.resultFilename</span>)
@@ -66,14 +66,14 @@
 <span class="t-comment"># Get a list of all the function names then make that into anchor
 </span><span class="t-comment"># names.
 </span><span class="t-dotName">names</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">flatFuncList</span>, <span class="t-dotName">names</span>, <span class="t-dotName">get-name</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">flatFuncList</span>, <span class="t-dotName">names</span>, <span class="t-dotName">get-name</span>)
 <span class="t-dotName">anchors</span> = <span class="t-funcCall">anchors</span>(<span class="t-dotName">names</span>, <span class="t-dotName">type</span>)
 
 <span class="t-comment"># Create a list of dictionaries, one dictionary for each function
 </span><span class="t-comment"># variable in the f function dictionary.  Each dictionary contains,
 </span><span class="t-comment"># the function name, doc comment, anchor name and a short description.
 </span><span class="t-dotName">o.entries</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">flatFuncList</span>, <span class="t-dotName">o.entries</span>, <span class="t-dotName">make-entry</span>, <span class="t-dotName">anchors</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">flatFuncList</span>, <span class="t-dotName">o.entries</span>, <span class="t-dotName">make-entry</span>, <span class="t-dotName">anchors</span>)
 
 </pre>
 

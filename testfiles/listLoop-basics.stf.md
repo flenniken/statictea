@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # List Loop
 
-Test the listLoop function example in the function documentation.
+Test the loop function example in the function documentation.
 
 ### File cmd.sh command
 
@@ -34,7 +34,7 @@ b5 = func(ix: int, value: int, container: list) bool
 
 o.container = []
 list = [2,4,6,8]
-listLoop(list, o.container, b5)
+loop(list, o.container, b5)
 ~~~
 
 ### File result.expected

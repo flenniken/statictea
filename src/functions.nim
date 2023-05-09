@@ -1237,7 +1237,7 @@ func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## ~~~
   result = newFunResult(newValue(arguments, mutable = Mutable.append))
 
-func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResult =
+func fun_loop_lapoab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Loop over items in a list and fill in a container. A callback
   ## function is called for each item in the list and it decides what
   ## goes in the container.
@@ -1248,7 +1248,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   ## ignore it using a bare form.
   ##
   ## ~~~statictea
-  ## listLoop = func(a: list, container: any, listCallback: func, state: optional any) bool
+  ## loop = func(a: list, container: any, listCallback: func, state: optional any) bool
   ## ~~~
   ##
   ## The callback gets passed the index to the item, its value, the
@@ -1266,7 +1266,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   ## ~~~statictea
   ## o.container = []
   ## list = [2,4,6,8]
-  ## listLoop(list, o.container, b5)
+  ## loop(list, o.container, b5)
   ## # o.container => [6, 8]
   ## ~~~
   ##
@@ -1282,7 +1282,7 @@ func fun_listLoop_lapoab*(variables: Variables, arguments: seq[Value]): FunResul
   # Note: This function is handled in runCommand as a special
   # case. This code is not run. It is here for the function list and
   # for documentation.
-  assert(false, "Unexpectedly hit listLoop in functions.nim.")
+  assert(false, "Unexpectedly hit loop in functions.nim.")
   result = newFunResult(newValue(0))
 
 func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult =
@@ -2591,7 +2591,7 @@ functionsDict["fun_len_di"] = fun_len_di
 functionsDict["fun_len_li"] = fun_len_li
 functionsDict["fun_len_si"] = fun_len_si
 functionsDict["fun_list_al"] = fun_list_al
-functionsDict["fun_listLoop_lapoab"] = fun_listLoop_lapoab
+functionsDict["fun_loop_lapoab"] = fun_loop_lapoab
 functionsDict["fun_log_ss"] = fun_log_ss
 functionsDict["fun_lower_ss"] = fun_lower_ss
 functionsDict["fun_parseMarkdown_ssl"] = fun_parseMarkdown_ssl

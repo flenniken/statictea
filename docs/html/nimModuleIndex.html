@@ -33,7 +33,7 @@
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-dotName">entries</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.modules</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">make-entry</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">s.modules</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">make-entry</span>)
 
 <span class="t-comment"># Sort the list of entries by name.
 </span><span class="t-dotName">o.entries</span> = <span class="t-funcCall">sort</span>(<span class="t-dotName">entries</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-str">&quot;name&quot;</span>)

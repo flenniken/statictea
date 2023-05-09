@@ -36,12 +36,12 @@ addFuncVar = func(ix: int, funcVar: func, funcList: list) bool
 
 addAllVars = func(ix: int, key: string, funcList: list, addFuncVar: func) bool
   ## Add all the func variables to the function list.
-  listLoop(f[key], funcList, addFuncVar)
+  loop(f[key], funcList, addFuncVar)
   return(false)
 
 # Create a list of all the f dictionary function variables.
 funcList = []
-listLoop(keys(f), funcList, addAllVars, addFuncVar)
+loop(keys(f), funcList, addAllVars, addFuncVar)
 
 make-param = func(ix: int, name: string, params: list, signature: dict) bool
   ## Add the function name and type to the params list.
@@ -55,7 +55,7 @@ make-param = func(ix: int, name: string, params: list, signature: dict) bool
 signature-string = func(signature: dict, make-param: func) string
   ## Return a signature string given a signature dictionary.
   params = []
-  listLoop(signature.paramNames, params, make-param, signature)
+  loop(signature.paramNames, params, make-param, signature)
   paramStr = join(params, ", ")
   return(format("{signature.name}({paramStr}) {signature.returnType}"))
 
@@ -74,7 +74,7 @@ o.signatures = []
 state = dict()
 state.signature-string = signature-string
 state.make-param = make-param
-listLoop(funcList, o.signatures, make-signature, state)
+loop(funcList, o.signatures, make-signature, state)
 ~~~
 
 ### File result.expected
@@ -115,8 +115,8 @@ len(a: dict) int
 len(a: list) int
 len(a: string) int
 list(a: any) list
-listLoop(a: list, b: any, c: func, d: optional any) bool
 log(a: string) string
+loop(a: list, b: any, c: func, d: optional any) bool
 lower(a: string) string
 not(a: bool) bool
 parseCode(a: string) list

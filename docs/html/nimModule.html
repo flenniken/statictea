@@ -44,7 +44,7 @@
 </span>  <span class="t-dotName">inlineElements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">text</span>, <span class="t-str">&quot;inline&quot;</span>)
   <span class="t-dotName">json</span> = <span class="t-funcCall">string</span>(<span class="t-dotName">inlineElements</span>, <span class="t-str">&quot;vl&quot;</span>)
   <span class="t-dotName">inlineFrags</span> = []
-  <span class="t-funcCall">listLoop</span>(<span class="t-dotName">inlineElements</span>, <span class="t-dotName">inlineFrags</span>, <span class="t-dotName">u.handle-html-inline</span>)
+  <span class="t-funcCall">loop</span>(<span class="t-dotName">inlineElements</span>, <span class="t-dotName">inlineFrags</span>, <span class="t-dotName">u.handle-html-inline</span>)
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">inlineFrags</span>, <span class="t-str">&quot;&quot;</span>))
 
 <span class="t-dotName">u.handle-html-bullet</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">bullet</span>: <span class="t-type">string</span>, <span class="t-param">lines</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
@@ -82,7 +82,7 @@
 
   <span class="t-dotName">codeBlock</span> = <span class="t-dotName">item</span>[<span class="t-num">1</span>]
   <span class="t-dotName">ret</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">class</span> == <span class="t-str">&quot;tea-code&quot;</span>), +
-    <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">parseCode</span>(<span class="t-dotName">codeBlock</span>), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-fragment</span>), +
+    <span class="t-funcCall">loop</span>(<span class="t-funcCall">parseCode</span>(<span class="t-dotName">codeBlock</span>), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-fragment</span>), +
     <span class="t-funcCall">u.handle-plain-code</span>(<span class="t-dotName">codeBlock</span>, <span class="t-dotName">lines</span>))
     
   <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;/pre&gt;\n&quot;</span>
@@ -92,7 +92,7 @@
   <span class="t-doc">## Format the &quot;bullets&quot; md element list as html.
 </span>  <span class="t-dotName">lines</span> = []
   <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;ul&gt;\n&quot;</span>
-  <span class="t-funcCall">listLoop</span>(<span class="t-dotName">item</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-bullet</span>)
+  <span class="t-funcCall">loop</span>(<span class="t-dotName">item</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-bullet</span>)
   <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;/ul&gt;\n&quot;</span>
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
 
@@ -111,7 +111,7 @@
 </span>  <span class="t-doc">## bullet lists and code blocks.
 </span>  <span class="t-dotName">elements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">mdDesc</span>, <span class="t-str">&quot;lite&quot;</span>)
   <span class="t-dotName">lines</span> = []
-  <span class="t-funcCall">listLoop</span>(<span class="t-dotName">elements</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-element</span>)
+  <span class="t-funcCall">loop</span>(<span class="t-dotName">elements</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-element</span>)
   <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
 
 <span class="t-dotName">u.get-name</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
@@ -177,7 +177,7 @@
 
 <span class="t-comment"># Create the link anchors for all the heading names.
 </span><span class="t-dotName">names</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">names</span>, <span class="t-dotName">u.get-name</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">names</span>, <span class="t-dotName">u.get-name</span>)
 <span class="t-dotName">anchors</span> = <span class="t-funcCall">anchors</span>(<span class="t-dotName">names</span>, <span class="t-dotName">templateType</span>)
 
 <span class="t-comment"># Use the filename without path info for the module name.
@@ -193,7 +193,7 @@
 <span class="t-dotName">state.anchors</span> = <span class="t-dotName">anchors</span>
 <span class="t-dotName">state.templateType</span> = <span class="t-dotName">templateType</span>
 <span class="t-dotName">o.entries</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">o.entries</span>, <span class="t-dotName">u.get-entry</span>, <span class="t-dotName">state</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">o.entries</span>, <span class="t-dotName">u.get-entry</span>, <span class="t-dotName">state</span>)
 
 </pre>
 

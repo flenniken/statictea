@@ -73,10 +73,10 @@ Nim source code: <a href="../../src/runCommand.nim">runCommand.nim</a>
 <li> <a href="#runCompareOp">runCompareOp</a> &mdash; Evaluate the comparison and return a bool value.</li>
 <li> <a href="#getCondition">getCondition</a> &mdash; Return the bool value of the condition expression and the position after it.</li>
 <li> <a href="#getBracketedVarValue">getBracketedVarValue</a> &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.</li>
-<li> <a href="#listLoop">listLoop</a> &mdash; Make a new list from an existing list.</li>
+<li> <a href="#loop">loop</a> &mdash; Make a new list from an existing list.</li>
 <li> <a href="#caseFunction">caseFunction</a> &mdash; Return the case function's value and position after.</li>
 <li> <a href="#getValuePosSi">getValuePosSi</a> &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.</li>
-<li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, return, warn, log and listLoop.</li>
+<li> <a href="#runBareFunction">runBareFunction</a> &mdash; Handle bare function: if, return, warn, log and loop.</li>
 <li> <a href="#getBracketDotName">getBracketDotName</a> &mdash; Convert var[key] to a dot name.</li>
 <li> <a href="#runStatement">runStatement</a> &mdash; Run one statement and return the variable dot name string, operator and value.</li>
 <li> <a href="#skipSpaces">skipSpaces</a> &mdash; Skip the leading spaces and tabs.</li>
@@ -137,8 +137,8 @@ PosOr = OpResultWarn[Natural]
 <pre class="nim-code">
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
-  spReturn = "return", spFunc = "func", spListLoop = "listLoop",
-  spCase = "case", spEcho = "echo"
+  spReturn = "return", spFunc = "func", spListLoop = "loop", spCase = "case",
+  spEcho = "echo"
 </pre>
 
 <h3 id="SpecialFunctionOr">SpecialFunctionOr</h3>
@@ -708,9 +708,9 @@ proc bareIf(env: var Env; specialFunction: SpecialFunction;
 argument has a side effect, the return value and pos and side
 effect is returned, else a 0 value and seNone is returned.
 </p><pre class="tea-code">
-<span class="t-dotName">newList</span> = <span class="t-funcCall">listLoop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)  <span class="t-comment"># comment
+<span class="t-dotName">newList</span> = <span class="t-funcCall">loop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)  <span class="t-comment"># comment
 </span>                   ^                       ^
-<span class="t-dotName">newList</span> = <span class="t-funcCall">listLoop</span>(<span class="t-funcCall">return</span>(<span class="t-num">3</span>), <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)  <span class="t-comment"># comment
+<span class="t-dotName">newList</span> = <span class="t-funcCall">loop</span>(<span class="t-funcCall">return</span>(<span class="t-num">3</span>), <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)  <span class="t-comment"># comment
 </span>                          ^ ^
 </pre>
 
@@ -812,29 +812,29 @@ proc getBracketedVarValue(env: var Env; sourceFilename: string;
     raises: [Exception, KeyError], tags: [RootEffect].}
 </pre>
 
-<h3 id="listLoop">listLoop</h3>
+<h3 id="loop">loop</h3>
 
 <p>Make a new list from an existing list. The callback function is
 called for each item in the list and determines what goes in the
 new list.  See funList_lpoal in functions.nim for more
 information.
 
-</p><p>Return the listLoop value and the ending position.  Start
+</p><p>Return the loop value and the ending position.  Start
 points at the first parameter of the function. The position
 includes the trailing whitespace after the ending right
 parentheses.
 
 </p><pre class="tea-code">
-<span class="t-dotName">stopped</span> = <span class="t-funcCall">listLoop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">new</span>, <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)
+<span class="t-dotName">stopped</span> = <span class="t-funcCall">loop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">new</span>, <span class="t-dotName">callback</span>, <span class="t-dotName">state</span>)
                    ^                          ^
 </pre>
 
 
 <pre class="nim-code">
-proc listLoop(env: var Env; specialFunction: SpecialFunction;
-              sourceFilename: string; statement: Statement; start: Natural;
-              variables: Variables): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+proc loop(env: var Env; specialFunction: SpecialFunction;
+          sourceFilename: string; statement: Statement; start: Natural;
+          variables: Variables): ValuePosSiOr {.raises: [KeyError, Exception],
+    tags: [RootEffect].}
 </pre>
 
 <h3 id="caseFunction">caseFunction</h3>
@@ -897,7 +897,7 @@ proc getValuePosSi(env: var Env; sourceFilename: string; statement: Statement;
 
 <h3 id="runBareFunction">runBareFunction</h3>
 
-<p>Handle bare function: if, return, warn, log and listLoop. A
+<p>Handle bare function: if, return, warn, log and loop. A
 bare function does not assign a variable.
 
 </p><pre class="tea-code">

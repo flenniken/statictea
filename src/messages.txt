@@ -264,7 +264,7 @@ w248 wCallbackReturnType "Expected the func variable's return type to be a bool,
 w249 wCallbackNumParams "Expected the func variable has 3 or 4 parameters but it has 1."
 w250 wCallbackIntParam "Expected the func variable's first parameter to be an int, got $1."
 w251 wExpectedVariable "Expected a variable."
-w252 wMissingStateVar "The listLoop state argument exists but the callback doesn't have a state parameter."
+w252 wMissingStateVar "The loop state argument exists but the callback doesn't have a state parameter."
 w253 wCallbackListParam ""
 w254 wStateRequired "The func variable has a required state parameter but it is being not passed to it."
 w255 wReturnArgument "Invalid return; use a bare return in a user function or use it in a bare if statement."

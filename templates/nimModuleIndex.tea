@@ -22,7 +22,7 @@ make-entry = func(ix: int, module: dict, entries: list) bool
   return(false)
 
 entries = []
-listLoop(s.modules, entries, make-entry)
+loop(s.modules, entries, make-entry)
 
 # Sort the list of entries by name.
 o.entries = sort(entries, "ascending", "sensitive", "name")

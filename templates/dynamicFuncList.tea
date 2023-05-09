@@ -40,13 +40,13 @@ get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
 
 # Make a dictionary mapping a function's start line to its number of lines.
 starts = dict()
-listLoop(s.entries, starts, get-starts, s.entries)
+loop(s.entries, starts, get-starts, s.entries)
 
 # Create a list of dictionaries, one dictionary per statictea function.
 state = dict()
 state.starts = starts
 entries = []
-listLoop(s.entries, entries, get-entry, state)
+loop(s.entries, entries, get-entry, state)
 
 # Sort the entries by function name. Use insensitive compare so
 # function cmp_ comes before cmpV.

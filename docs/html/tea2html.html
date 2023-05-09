@@ -24,7 +24,7 @@
 
 <span class="t-comment"># Syntax highlight the server code.
 </span><span class="t-dotName">highlightedFrags</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-funcCall">parseCode</span>(<span class="t-dotName">s.text</span>), <span class="t-dotName">highlightedFrags</span>, <span class="t-dotName">u.handle-fragment</span>)
+<span class="t-funcCall">loop</span>(<span class="t-funcCall">parseCode</span>(<span class="t-dotName">s.text</span>), <span class="t-dotName">highlightedFrags</span>, <span class="t-dotName">u.handle-fragment</span>)
 <span class="t-dotName">o.htmlText</span> = <span class="t-funcCall">join</span>(<span class="t-dotName">highlightedFrags</span>)
 
 </pre>

@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # Needle in a Haystack
 
-Use listLoop to find a needle in a haystack.
+Use loop to find a needle in a haystack.
 
 ### File cmd.sh command
 
@@ -40,7 +40,7 @@ $$ endblock
 
 ### File tea1.tea
 
-How to tell whether an element exists in a list using listLoop.
+How to tell whether an element exists in a list using loop.
 
 ~~~ nim
 item-exists = func(ix: int, value: int, needle: int) bool
@@ -49,7 +49,7 @@ item-exists = func(ix: int, value: int, needle: int) bool
 
 haystack = [5,6,2,3,4,2]
 needle = 2
-found = listLoop(haystack, needle, l.item-exists)
+found = loop(haystack, needle, l.item-exists)
 
 o.tea1 = dict()
 o.tea1.haystack = haystack
@@ -71,7 +71,7 @@ item-index = func(ix: int, value: int, d: dict) bool
 haystack = [5,6,2,3,4,2]
 d = dict()
 d.needle = 6
-found = listLoop(haystack, d, l.item-index)
+found = loop(haystack, d, l.item-index)
 
 o.tea2 = dict()
 o.tea2.haystack = haystack
@@ -80,14 +80,14 @@ o.tea2.d.found = found
 
 d2 = dict()
 d2.needle = 8
-found2 = listLoop(haystack, d2, l.item-index)
+found2 = loop(haystack, d2, l.item-index)
 
 o.tea2.d2 = d2
 o.tea2.d2.found = found2
 
 d3 = dict()
 d3.needle = 2
-found3 = listLoop(haystack, d3, l.item-index)
+found3 = loop(haystack, d3, l.item-index)
 
 o.tea2.d3 = d3
 o.tea2.d3.found = found3

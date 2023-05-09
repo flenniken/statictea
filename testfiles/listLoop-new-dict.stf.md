@@ -2,7 +2,7 @@ stf file, version 0.1.0
 
 # List Loop Dict
 
-Test the listLoop function where it creates a dictionary.
+Test the loop function where it creates a dictionary.
 
 ### File cmd.sh command
 
@@ -34,7 +34,7 @@ callback = func(ix: int, value: int, container: dict) bool
 
 o.container = dict()
 list = [2,4,5,1]
-stopped = listLoop(list, o.container, callback)
+stopped = loop(list, o.container, callback)
 ~~~
 
 ### File result.expected

@@ -35,9 +35,9 @@ Stf (single test file) tests found in the testfiles folder.
 * [json-get](../testfiles/json-get.stf.md) &mdash; Test that you can access non-variable name keys with get.
 * [len](../testfiles/len.stf.md) &mdash; Test the len function.
 * [list-literal](../testfiles/list-literal.stf.md) &mdash; Test literal lists.
-* [listLoop-basics](../testfiles/listLoop-basics.stf.md) &mdash; Test the listLoop function example in the function documentation.
-* [listLoop-needle](../testfiles/listLoop-needle.stf.md) &mdash; Use listLoop to find a needle in a haystack.
-* [listLoop-new-dict](../testfiles/listLoop-new-dict.stf.md) &mdash; Test the listLoop function where it creates a dictionary.
+* [listLoop-basics](../testfiles/listLoop-basics.stf.md) &mdash; Test the loop function example in the function documentation.
+* [listLoop-needle](../testfiles/listLoop-needle.stf.md) &mdash; Use loop to find a needle in a haystack.
+* [listLoop-new-dict](../testfiles/listLoop-new-dict.stf.md) &mdash; Test the loop function where it creates a dictionary.
 * [localvars-basics](../testfiles/localvars-basics.stf.md) &mdash; Test the readme local variables section.
 * [log-function](../testfiles/log-function.stf.md) &mdash; Test the log function.
 * [log-path](../testfiles/log-path.stf.md) &mdash; Test the default log path is written to when you specify -l without a filename.

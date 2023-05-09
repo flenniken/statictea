@@ -51,13 +51,13 @@
 
 <span class="t-comment"># Make a dictionary mapping a function&#x27;s start line to its number of lines.
 </span><span class="t-dotName">starts</span> = <span class="t-funcCall">dict</span>()
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">starts</span>, <span class="t-dotName">get-starts</span>, <span class="t-dotName">s.entries</span>)
 
 <span class="t-comment"># Create a list of dictionaries, one dictionary per statictea function.
 </span><span class="t-dotName">state</span> = <span class="t-funcCall">dict</span>()
 <span class="t-dotName">state.starts</span> = <span class="t-dotName">starts</span>
 <span class="t-dotName">entries</span> = []
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">get-entry</span>, <span class="t-dotName">state</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">get-entry</span>, <span class="t-dotName">state</span>)
 
 <span class="t-comment"># Sort the entries by function name. Use insensitive compare so
 </span><span class="t-comment"># function cmp_ comes before cmpV.

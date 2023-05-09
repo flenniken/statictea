@@ -59,7 +59,7 @@ type
     spLog = "log",
     spReturn = "return",
     spFunc = "func",
-    spListLoop = "listLoop",
+    spListLoop = "loop",
     spCase = "case",
     spEcho = "echo",
 
@@ -1063,7 +1063,7 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
     result = spLog
   of "func":
     result = spFunc
-  of "listLoop":
+  of "loop":
     result = spListLoop
   of "case":
     result = spCase
@@ -1320,9 +1320,9 @@ proc getArguments*(
   ## argument has a side effect, the return value and pos and side
   ## effect is returned, else a 0 value and seNone is returned.
   ## ~~~statictea
-  ## newList = listLoop(list, callback, state)  # comment
+  ## newList = loop(list, callback, state)  # comment
   ##                    ^                       ^
-  ## newList = listLoop(return(3), callback, state)  # comment
+  ## newList = loop(return(3), callback, state)  # comment
   ##                           ^ ^
   ## ~~~
 
@@ -1712,14 +1712,14 @@ proc getBracketedVarValue*(env: var Env, sourceFilename: string, statement: Stat
 
   return newValuePosSiOr(value, runningPos)
 
-proc funListLoop(env: var Env, sourceFilename: string, variables: Variables,
+proc funLoop(env: var Env, sourceFilename: string, variables: Variables,
     arguments: seq[Value]
   ): FunResult =
   ## Build and return a new item by calling the callback for each item
   ## in the given list.
 
-  # listLoop(a: list, container: any, callback: func, state: optional any) bool
-  let signatureO = newSignatureO("listLoop", "lapoab")
+  # loop(a: list, container: any, callback: func, state: optional any) bool
+  let signatureO = newSignatureO("loop", "lapoab")
   let funResult = mapParameters(signatureO.get(), arguments)
   if funResult.kind == frWarning:
     return funResult
@@ -1740,7 +1740,7 @@ proc funListLoop(env: var Env, sourceFilename: string, variables: Variables,
     # Expected the func variable's first parameter to be an int, got $1.
     return newFunResultWarn(wCallbackIntParam, 2, $signature.params[0].paramType)
   if "d" in map and signature.params.len == 3:
-    # The listLoop state argument exists but the callback doesn't have a state parameter.
+    # The loop state argument exists but the callback doesn't have a state parameter.
     return newFunResultWarn(wMissingStateVar, 3, "")
   if not signature.optional and signature.params.len == 4 and not ("d" in map):
     # The func variable has a required state parameter but it is being not passed to it.
@@ -1774,7 +1774,7 @@ proc funListLoop(env: var Env, sourceFilename: string, variables: Variables,
 
   result = newFunResult(newValue(stopped))
 
-proc listLoop*(
+proc loop*(
     env: var Env,
     specialFunction: SpecialFunction,
     sourceFilename: string,
@@ -1787,13 +1787,13 @@ proc listLoop*(
   ## new list.  See funList_lpoal in functions.nim for more
   ## information.
   ##
-  ## Return the listLoop value and the ending position.  Start
+  ## Return the loop value and the ending position.  Start
   ## points at the first parameter of the function. The position
   ## includes the trailing whitespace after the ending right
   ## parentheses.
   ##
   ## ~~~statictea
-  ## stopped = listLoop(list, new, callback, state)
+  ## stopped = loop(list, new, callback, state)
   ##                    ^                          ^
   ## ~~~
   # Get all the function arguments.
@@ -1806,7 +1806,7 @@ proc listLoop*(
     return vpOr
   runningPos = vpOr.value.pos
 
-  let funResult = funListLoop(env, sourceFilename, variables, arguments)
+  let funResult = funLoop(env, sourceFilename, variables, arguments)
   if funResult.kind == frWarning:
     # todo: pass in functionPos
     let functionPos = 0
@@ -2185,8 +2185,8 @@ proc getValuePosSiWorker(env: var Env, sourceFilename: string, statement: Statem
         return ifFunction(env, specialFunction, sourceFilename, statement,
           rightName.pos, variables, topLevel)
       of spListLoop:
-        # Handle the special listLoop function.
-        return listLoop(env, specialFunction, sourceFilename, statement,
+        # Handle the special loop function.
+        return loop(env, specialFunction, sourceFilename, statement,
           rightName.pos, variables)
       of spCase:
         # Handle the special case function.
@@ -2244,7 +2244,7 @@ proc getValuePosSi*(env: var Env, sourceFilename: string, statement: Statement,
 
 proc runBareFunction*(env: var Env, sourceFilename: string, statement: Statement,
     start: Natural, variables: Variables, leftName: DotName): ValuePosSiOr =
-  ## Handle bare function: if, return, warn, log and listLoop. A
+  ## Handle bare function: if, return, warn, log and loop. A
   ## bare function does not assign a variable.
   ##
   ## ~~~statictea
@@ -2272,7 +2272,7 @@ proc runBareFunction*(env: var Env, sourceFilename: string, statement: Statement
   of spReturn:
     result = bareReturn(env, sourceFilename, statement, runningPos, variables)
   of spListLoop:
-    result = listLoop(env, specialFunction, sourceFilename, statement, runningPos, variables)
+    result = loop(env, specialFunction, sourceFilename, statement, runningPos, variables)
   of spNotSpecial, spFunc, spCase:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).
     result = newValuePosSiOr(wMissingLeftAndOpr, "", start)
@@ -2379,7 +2379,7 @@ proc runStatement*(env: var Env, sourceFilename: string, statement: Statement,
 
   case leftName.kind
   of vnkFunction:
-    # Handle bare function: if, return, warn, log, listLoop and
+    # Handle bare function: if, return, warn, log, loop and
     # echo. A bare function does not assign a variable.
     vlOr = runBareFunction(env, sourceFilename, statement, runningPos, variables, leftName)
     if vlOr.isMessage:

@@ -50,7 +50,7 @@ StaticTea language functions start with "fun_", for example, the
 * [fun_dup_sis](#fun_dup_sis) &mdash; Duplicate a string x times.
 * [fun_dict_old](#fun_dict_old) &mdash; Create a dictionary from a list of key, value pairs.
 * [fun_list_al](#fun_list_al) &mdash; Create a list of variables.
-* [fun_listLoop_lapoab](#fun_listloop_lapoab) &mdash; Loop over items in a list and fill in a container.
+* [fun_loop_lapoab](#fun_loop_lapoab) &mdash; Loop over items in a list and fill in a container.
 * [fun_replace_siiss](#fun_replace_siiss) &mdash; Replace a substring specified by its position and length with another string.
 * [fun_replaceRe_sls](#fun_replacere_sls) &mdash; Replace multiple parts of a string using regular expressions.
 * [parsePath](#parsepath) &mdash; Parse the given file path into its component pieces.
@@ -1049,7 +1049,7 @@ a = ["a", 5, "b"]
 func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
 
-# fun_listLoop_lapoab
+# fun_loop_lapoab
 
 Loop over items in a list and fill in a container. A callback
 function is called for each item in the list and it decides what
@@ -1061,7 +1061,7 @@ returns whether the callback stopped early or not and you can
 ignore it using a bare form.
 
 ~~~javascript
-listLoop = func(a: list, container: any, listCallback: func, state: optional any) bool
+loop = func(a: list, container: any, listCallback: func, state: optional any) bool
 ~~~
 
 The callback gets passed the index to the item, its value, the
@@ -1079,7 +1079,7 @@ The following example makes a new list [6, 8] from the list
 ~~~javascript
 o.container = []
 list = [2,4,6,8]
-listLoop(list, o.container, b5)
+loop(list, o.container, b5)
 # o.container => [6, 8]
 ~~~
 
@@ -1094,7 +1094,7 @@ b5 = func(ix: int, value: int, container: list) bool
 
 
 ~~~nim
-func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_loop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 ~~~
 
 # fun_replace_siiss

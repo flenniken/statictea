@@ -12,7 +12,7 @@ u.add-func-var = func(ix: int, funcVar: func, newList: list) bool
 add-vars = func(ix: int, key: string, newList: list) bool
   ## Add all the func variables with the key name to the new list.
   funcList = f[key]
-  listLoop(funcList, newList, u.add-func-var)
+  loop(funcList, newList, u.add-func-var)
   return(false)
 
 get-name = func(ix: int, funcVar: func, newList: list) bool
@@ -46,7 +46,7 @@ make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
 # Create a flat list of all the function variables in the f
 # dictionary.
 flatFuncList = []
-listLoop(keys(f), flatFuncList, add-vars)
+loop(keys(f), flatFuncList, add-vars)
 
 # Get the anchor type based on the template type.
 path = path(t.args.resultFilename)
@@ -55,11 +55,11 @@ type = if((path.ext == ".md"), "github", "html")
 # Get a list of all the function names then make that into anchor
 # names.
 names = []
-listLoop(flatFuncList, names, get-name)
+loop(flatFuncList, names, get-name)
 anchors = anchors(names, type)
 
 # Create a list of dictionaries, one dictionary for each function
 # variable in the f function dictionary.  Each dictionary contains,
 # the function name, doc comment, anchor name and a short description.
 o.entries = []
-listLoop(flatFuncList, o.entries, make-entry, anchors)
+loop(flatFuncList, o.entries, make-entry, anchors)

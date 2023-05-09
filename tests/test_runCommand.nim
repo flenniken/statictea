@@ -2781,7 +2781,7 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop":
+  test "loop":
     let content = """
 copy = func(ix: int, value: int, newList: list) bool
   ## Copy list.
@@ -2790,7 +2790,7 @@ copy = func(ix: int, value: int, newList: list) bool
 
 newList = []
 ls = [1, 1, 2, 3, 5, 8]
-stopped = listLoop(ls, newList, l.copy)
+stopped = loop(ls, newList, l.copy)
 """
     let eVarRep = """
 l.copy = "copy"
@@ -2803,7 +2803,7 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "bare listLoop":
+  test "bare loop":
     let content = """
 copy = func(ix: int, value: int, newList: list) bool
   ## Copy list.
@@ -2812,7 +2812,7 @@ copy = func(ix: int, value: int, newList: list) bool
 
 newList = []
 ls = [1, 1, 2, 3, 5, 8]
-listLoop(ls, newList, l.copy)
+loop(ls, newList, l.copy)
 """
     let eVarRep = """
 l.copy = "copy"
@@ -2824,7 +2824,7 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop b5":
+  test "loop b5":
     let content = """
 b5 = func(ix: int, value: int, newList: list) bool
   ## Use items bigger than 5.
@@ -2834,7 +2834,7 @@ b5 = func(ix: int, value: int, newList: list) bool
 
 ls = [1, 1, 2, 7, 5, 8]
 newList = []
-stopped = listLoop(ls, newList, l.b5)
+stopped = loop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
@@ -2847,7 +2847,7 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop b5 with state":
+  test "loop b5 with state":
     let content = """
 b5 = func(ix: int, value: int, newList: list, state: int) bool
   ## Use items bigger than 5.
@@ -2857,7 +2857,7 @@ b5 = func(ix: int, value: int, newList: list, state: int) bool
 
 ls = [1, 1, 2, 7, 5, 8]
 newList = []
-stopped = listLoop(ls, newList, l.b5, 3)
+stopped = loop(ls, newList, l.b5, 3)
 """
     let eVarRep = """
 l.b5 = "b5"
@@ -2870,7 +2870,7 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop no state":
+  test "loop no state":
     let content = """
 b5 = func(ix: int, value: int, newList: list, state: int) bool
   ## copy
@@ -2880,7 +2880,7 @@ b5 = func(ix: int, value: int, newList: list, state: int) bool
 ls = [1, 1, 2, 3, 5, 8]
 # No state passed.
 newList = []
-stopped = listLoop(ls, newList, l.b5)
+stopped = loop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
@@ -2890,12 +2890,12 @@ o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(9): w254: The func variable has a required state parameter but it is being not passed to it.
-statement: stopped = listLoop(ls, newList, l.b5)
-                                           ^
+statement: stopped = loop(ls, newList, l.b5)
+                                       ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop state optional":
+  test "loop state optional":
     let content = """
 b5 = func(ix: int, value: int, newList: list, state: optional int) bool
   ## copy
@@ -2905,7 +2905,7 @@ b5 = func(ix: int, value: int, newList: list, state: optional int) bool
 ls = [1, 1, 2, 3, 5, 8]
 # No state passed.
 newList = []
-stopped = listLoop(ls, newList, l.b5)
+stopped = loop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
@@ -2918,7 +2918,7 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop stop early":
+  test "loop stop early":
     let content = """
 b5 = func(ix: int, value: int, newList: list) bool
   ## Stop on 3
@@ -2928,7 +2928,7 @@ b5 = func(ix: int, value: int, newList: list) bool
 
 newList = []
 ls = [1, 1, 2, 3, 5, 8]
-stopped = listLoop(ls, newList, l.b5)
+stopped = loop(ls, newList, l.b5)
 """
     let eVarRep = """
 l.b5 = "b5"
@@ -2941,9 +2941,9 @@ o = {}
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop warning":
+  test "loop warning":
     let content = """
-stopped = listLoop([1], )
+stopped = loop([1], )
 """
     let eVarRep = """
 l = {}
@@ -2951,15 +2951,15 @@ o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(1): w33: Expected a string, number, variable, list or condition.
-statement: stopped = listLoop([1], )
-                                   ^
+statement: stopped = loop([1], )
+                               ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
-  test "listLoop to many args":
+  test "loop to many args":
     let content = """
 newList = []
-stopped = listLoop([1], newList, f.cmp[0], 2, 4)
+stopped = loop([1], newList, f.cmp[0], 2, 4)
 """
     let eVarRep = """
 l.newList = []
@@ -2967,14 +2967,14 @@ o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(2): w180: The function requires at most 4 arguments.
-statement: stopped = listLoop([1], newList, f.cmp[0], 2, 4)
-                                                         ^
+statement: stopped = loop([1], newList, f.cmp[0], 2, 4)
+                                                     ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
   test "funListLoop 3 or 4":
     let content = """
-stopped = listLoop([1], [], f.cmp[0])
+stopped = loop([1], [], f.cmp[0])
 """
     let eVarRep = """
 l = {}
@@ -2982,8 +2982,8 @@ o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(1): w249: Expected the func variable has 3 or 4 parameters but it has 1.
-statement: stopped = listLoop([1], [], f.cmp[0])
-                                       ^
+statement: stopped = loop([1], [], f.cmp[0])
+                                   ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -2995,7 +2995,7 @@ b5 = func(ix: float, value: int, newList: list, state: int) bool
   return(false)
 
 newList = []
-stopped = listLoop([1], newList, b5, 2)
+stopped = loop([1], newList, b5, 2)
 """
     let eVarRep = """
 l.b5 = "b5"
@@ -3004,8 +3004,8 @@ o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
 testcode.tea(7): w250: Expected the func variable's first parameter to be an int, got float.
-statement: stopped = listLoop([1], newList, b5, 2)
-                                            ^
+statement: stopped = loop([1], newList, b5, 2)
+                                        ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -3018,7 +3018,7 @@ b5 = func(ix: int, value: int, newList: list) bool
 
 newList = []
 ls = [1, 2, 3]
-stopped = listLoop(ls, newList, b5, 2)
+stopped = loop(ls, newList, b5, 2)
 """
     let eVarRep = """
 l.b5 = "b5"
@@ -3027,9 +3027,9 @@ l.ls = [1,2,3]
 o = {}
 """
     let eErrLines: seq[string] = splitNewLines """
-testcode.tea(8): w252: The listLoop state argument exists but the callback doesn't have a state parameter.
-statement: stopped = listLoop(ls, newList, b5, 2)
-                                               ^
+testcode.tea(8): w252: The loop state argument exists but the callback doesn't have a state parameter.
+statement: stopped = loop(ls, newList, b5, 2)
+                                           ^
 """
     check testRunCodeFile(content, eVarRep, eErrLines=eErrLines)
 
@@ -3042,7 +3042,7 @@ b5 = func(ix: int, value: int, newList: list) bool
 
 newList = []
 ls = [1, 2, 3]
-stopped = listLoop(ls, newList, b5)
+stopped = loop(ls, newList, b5)
 """
     let eVarRep = """
 l.b5 = "b5"

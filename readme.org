@@ -1779,7 +1779,7 @@ a = 5
 o.x = a + 6
 #+END_SRC
 
-You can use the listLoop function to loop over a list and build lists
+You can use the loop function to loop over a list and build lists
 and dictionaries. It’s the looping method you use in code files.
 
 Processing continues after a warning except for a problem reading
@@ -1894,7 +1894,7 @@ count = len(str)
 You can define your own functions in code files.
 
 User defined functions are important for sharing common code, as
-conditional code blocks, looping (listLoop) and as callbacks for
+conditional code blocks, looping (loop) and as callbacks for
 building lists and dictionaries.
 
 In the following example we define a function called u.mycmp and
@@ -2351,14 +2351,14 @@ the normal form:
 - func - defines a function, see [[#user-functions][User Functions]]
 - if - conditionally evaluates its arguments and it has a bare form, see [[#if-function][IF Function]]
 - list - takes any number of arguments
-- listLoop — has a bare form
+- loop — has a bare form
 - log - writes a message to the log file and has a bare form
 - return - exits the command block or function with a return
   value and has a bare form
 - warn — exits the statement with a warning and has a bare form
 
 If the form doesn't have an assignment it's called a bare
-function. The echo, warn, return, if, listLoop and log have bare forms.
+function. The echo, warn, return, if, loop and log have bare forms.
 
 Special Form Examples:
 
@@ -2712,7 +2712,7 @@ anchors     float            joinPath  parseMarkdown  string
 bool        format           keys      path           sub
 case        func             len       readJson       type
 cmp         functionDetails  list      replace        values
-cmpVersion  get              listLoop  replaceRe      warn
+cmpVersion  get              loop      replaceRe      warn
 dict        html             log       return
 dup         if               lower     slice
 exists      int              not       sort

@@ -63,10 +63,10 @@ Run a command and fill in the variables dictionaries.
 * [runCompareOp](#runcompareop) &mdash; Evaluate the comparison and return a bool value.
 * [getCondition](#getcondition) &mdash; Return the bool value of the condition expression and the position after it.
 * [getBracketedVarValue](#getbracketedvarvalue) &mdash; Return the value of the bracketed variable and the position after the trailing whitespace.
-* [listLoop](#listloop) &mdash; Make a new list from an existing list.
+* [loop](#loop) &mdash; Make a new list from an existing list.
 * [caseFunction](#casefunction) &mdash; Return the case function's value and position after.
 * [getValuePosSi](#getvaluepossi) &mdash; Return the value and position of the item that the start parameter points at which is a string, number, variable, list, or condition.
-* [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, return, warn, log and listLoop.
+* [runBareFunction](#runbarefunction) &mdash; Handle bare function: if, return, warn, log and loop.
 * [getBracketDotName](#getbracketdotname) &mdash; Convert var[key] to a dot name.
 * [runStatement](#runstatement) &mdash; Run one statement and return the variable dot name string, operator and value.
 * [skipSpaces](#skipspaces) &mdash; Skip the leading spaces and tabs.
@@ -124,8 +124,8 @@ The special functions.
 ~~~nim
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
-  spReturn = "return", spFunc = "func", spListLoop = "listLoop",
-  spCase = "case", spEcho = "echo"
+  spReturn = "return", spFunc = "func", spListLoop = "loop", spCase = "case",
+  spEcho = "echo"
 ~~~
 
 # SpecialFunctionOr
@@ -685,9 +685,9 @@ Get the function arguments and the position of each. If an
 argument has a side effect, the return value and pos and side
 effect is returned, else a 0 value and seNone is returned.
 ~~~javascript
-newList = listLoop(list, callback, state)  # comment
+newList = loop(list, callback, state)  # comment
                    ^                       ^
-newList = listLoop(return(3), callback, state)  # comment
+newList = loop(return(3), callback, state)  # comment
                           ^ ^
 ~~~
 
@@ -789,29 +789,29 @@ proc getBracketedVarValue(env: var Env; sourceFilename: string;
     raises: [Exception, KeyError], tags: [RootEffect].}
 ~~~
 
-# listLoop
+# loop
 
 Make a new list from an existing list. The callback function is
 called for each item in the list and determines what goes in the
 new list.  See funList_lpoal in functions.nim for more
 information.
 
-Return the listLoop value and the ending position.  Start
+Return the loop value and the ending position.  Start
 points at the first parameter of the function. The position
 includes the trailing whitespace after the ending right
 parentheses.
 
 ~~~javascript
-stopped = listLoop(list, new, callback, state)
+stopped = loop(list, new, callback, state)
                    ^                          ^
 ~~~
 
 
 ~~~nim
-proc listLoop(env: var Env; specialFunction: SpecialFunction;
-              sourceFilename: string; statement: Statement; start: Natural;
-              variables: Variables): ValuePosSiOr {.
-    raises: [KeyError, Exception], tags: [RootEffect].}
+proc loop(env: var Env; specialFunction: SpecialFunction;
+          sourceFilename: string; statement: Statement; start: Natural;
+          variables: Variables): ValuePosSiOr {.raises: [KeyError, Exception],
+    tags: [RootEffect].}
 ~~~
 
 # caseFunction
@@ -874,7 +874,7 @@ proc getValuePosSi(env: var Env; sourceFilename: string; statement: Statement;
 
 # runBareFunction
 
-Handle bare function: if, return, warn, log and listLoop. A
+Handle bare function: if, return, warn, log and loop. A
 bare function does not assign a variable.
 
 ~~~javascript

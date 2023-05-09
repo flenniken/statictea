@@ -93,7 +93,7 @@ MessageId = enum
   wInvalidIndexValue, wNotVariableName, wNotIndexString, wTwoParamIfArg,
   wInvalidAnchorType, wUserFunction, wInvalidHtmlPlace, wNotDictVariable,
   wSpecifyF, wNotListVariable, wVarNameNotDotName, wInvalidParseMdType,
-  wExpectedIntOrString, wMissingComma
+  wExpectedIntOrString, wMissingComma, wComponentContainsSep, wPassDn
 ~~~
 
 # Messages
@@ -245,7 +245,7 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "Expected the func variable\'s return type to be a bool, got: $1.",
     "Expected the func variable has 3 or 4 parameters but it has 1.",
     "Expected the func variable\'s first parameter to be an int, got $1.",
-    "Expected a variable.", "The listLoop state argument exists but the callback doesn\'t have a state parameter.",
+    "Expected a variable.", "The loop state argument exists but the callback doesn\'t have a state parameter.",
     "", "The func variable has a required state parameter but it is being not passed to it.", "Invalid return; use a bare return in a user function or use it in a bare if statement.",
     "A variable starts with an ascii letter.",
     "A variable contains ascii letters, digits, underscores and hypens.",
@@ -266,7 +266,8 @@ Messages: array[low(MessageId) .. high(MessageId), string] = ["Success.", "",
     "The variable is not a list.", "Expected a variable name without dots.",
     "Invalid parseMarkdown type, expected lite or inline.",
     "The case condition must be an int or a string value, got a $1.",
-    "Expected a comma."]
+    "Expected a comma.", "The component \'$1\' contains a path separator.",
+    """Pass "dn" for stype."""]
 ~~~
 
 # WarningData

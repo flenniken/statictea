@@ -848,50 +848,6 @@ a = ["a", 5, "b"]
 
 """
 
-  dc_fun_listLoop_lapoab = """
-Loop over items in a list and fill in a container. A callback
-function is called for each item in the list and it decides what
-goes in the container.
-
-You pass a list to loop over, a container to fill in, a
-callback function, and an optional state variable. The function
-returns whether the callback stopped early or not and you can
-ignore it using a bare form.
-
-~~~statictea
-listLoop = func(a: list, container: any, listCallback: func, state: optional any) bool
-~~~
-
-The callback gets passed the index to the item, its value, the
-container and the state variable.  The callback looks at the
-information and adds to the container when appropriate. The
-callback returns true to stop iterating.
-
-~~~statictea
-listCallback = func(ix: int, item: any, container: any, state: optional any) bool
-~~~
-
-The following example makes a new list [6, 8] from the list
-[2,4,6,8].  The callback is called b5.
-
-~~~statictea
-o.container = []
-list = [2,4,6,8]
-listLoop(list, o.container, b5)
-# o.container => [6, 8]
-~~~
-
-Below is the definition of the b5 callback function.
-
-~~~statictea
-b5 = func(ix: int, value: int, container: list) bool
-  ## Collect values greater than 5.
-  container &= if( (value > 5), value)
-  return(false)
-~~~
-
-"""
-
   dc_fun_log_ss = """
 Log a message to the log file and return the same string. The
 function has a bare form.  Logging needs to be turned on, see the
@@ -911,6 +867,50 @@ You can log unconditionally using a bare log statement:
 
 ~~~statictea
 log("always log")
+~~~
+
+"""
+
+  dc_fun_loop_lapoab = """
+Loop over items in a list and fill in a container. A callback
+function is called for each item in the list and it decides what
+goes in the container.
+
+You pass a list to loop over, a container to fill in, a
+callback function, and an optional state variable. The function
+returns whether the callback stopped early or not and you can
+ignore it using a bare form.
+
+~~~statictea
+loop = func(a: list, container: any, listCallback: func, state: optional any) bool
+~~~
+
+The callback gets passed the index to the item, its value, the
+container and the state variable.  The callback looks at the
+information and adds to the container when appropriate. The
+callback returns true to stop iterating.
+
+~~~statictea
+listCallback = func(ix: int, item: any, container: any, state: optional any) bool
+~~~
+
+The following example makes a new list [6, 8] from the list
+[2,4,6,8].  The callback is called b5.
+
+~~~statictea
+o.container = []
+list = [2,4,6,8]
+loop(list, o.container, b5)
+# o.container => [6, 8]
+~~~
+
+Below is the definition of the b5 callback function.
+
+~~~statictea
+b5 = func(ix: int, value: int, container: list) bool
+  ## Collect values greater than 5.
+  container &= if( (value > 5), value)
+  return(false)
 ~~~
 
 """
@@ -1587,8 +1587,8 @@ warn("always warn")
     info("fun_len_li", dc_fun_len_li, 19),
     info("fun_len_si", dc_fun_len_si, 18),
     info("fun_list_al", dc_fun_list_al, 21),
-    info("fun_listLoop_lapoab", dc_fun_listLoop_lapoab, 48),
     info("fun_log_ss", dc_fun_log_ss, 25),
+    info("fun_loop_lapoab", dc_fun_loop_lapoab, 48),
     info("fun_lower_ss", dc_fun_lower_ss, 19),
     info("fun_not_bb", dc_fun_not_bb, 18),
     info("fun_parseCode_sl", dc_fun_parseCode_sl, 45),
@@ -1654,8 +1654,8 @@ warn("always warn")
     394,
     376,
     1219,
-    1240,
     1958,
+    1240,
     1512,
     2292,
     2417,

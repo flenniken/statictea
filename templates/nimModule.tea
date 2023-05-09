@@ -33,7 +33,7 @@ u.inline-html = func(text: string) string
   inlineElements = parseMarkdown(text, "inline")
   json = string(inlineElements, "vl")
   inlineFrags = []
-  listLoop(inlineElements, inlineFrags, u.handle-html-inline)
+  loop(inlineElements, inlineFrags, u.handle-html-inline)
   return(join(inlineFrags, ""))
 
 u.handle-html-bullet = func(ix: int, bullet: string, lines: list) bool
@@ -71,7 +71,7 @@ u.html-code = func(item: list) string
 
   codeBlock = item[1]
   ret = if((class == "tea-code"), +
-    listLoop(parseCode(codeBlock), lines, u.handle-html-fragment), +
+    loop(parseCode(codeBlock), lines, u.handle-html-fragment), +
     u.handle-plain-code(codeBlock, lines))
     
   lines &= "</pre>\n"
@@ -81,7 +81,7 @@ u.html-bullets = func(item: list) string
   ## Format the "bullets" md element list as html.
   lines = []
   lines &= "<ul>\n"
-  listLoop(item, lines, u.handle-html-bullet)
+  loop(item, lines, u.handle-html-bullet)
   lines &= "</ul>\n"
   return(join(lines, ""))
 
@@ -100,7 +100,7 @@ u.get-html-description = func(mdDesc: string) string
   ## bullet lists and code blocks.
   elements = parseMarkdown(mdDesc, "lite")
   lines = []
-  listLoop(elements, lines, u.handle-html-element)
+  loop(elements, lines, u.handle-html-element)
   return(join(lines, ""))
 
 u.get-name = func(ix: int, entry: dict, newList: list) bool
@@ -166,7 +166,7 @@ templateType = if((path.ext == ".md"), "github", "html")
 
 # Create the link anchors for all the heading names.
 names = []
-listLoop(s.entries, names, u.get-name)
+loop(s.entries, names, u.get-name)
 anchors = anchors(names, templateType)
 
 # Use the filename without path info for the module name.
@@ -182,4 +182,4 @@ state = dict()
 state.anchors = anchors
 state.templateType = templateType
 o.entries = []
-listLoop(s.entries, o.entries, u.get-entry, state)
+loop(s.entries, o.entries, u.get-entry, state)

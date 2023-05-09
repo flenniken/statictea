@@ -60,7 +60,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_dup_sis">fun_dup_sis</a> &mdash; Duplicate a string x times.</li>
 <li> <a href="#fun_dict_old">fun_dict_old</a> &mdash; Create a dictionary from a list of key, value pairs.</li>
 <li> <a href="#fun_list_al">fun_list_al</a> &mdash; Create a list of variables.</li>
-<li> <a href="#fun_listLoop_lapoab">fun_listLoop_lapoab</a> &mdash; Loop over items in a list and fill in a container.</li>
+<li> <a href="#fun_loop_lapoab">fun_loop_lapoab</a> &mdash; Loop over items in a list and fill in a container.</li>
 <li> <a href="#fun_replace_siiss">fun_replace_siiss</a> &mdash; Replace a substring specified by its position and length with another string.</li>
 <li> <a href="#fun_replaceRe_sls">fun_replaceRe_sls</a> &mdash; Replace multiple parts of a string using regular expressions.</li>
 <li> <a href="#parsePath">parsePath</a> &mdash; Parse the given file path into its component pieces.</li>
@@ -1068,7 +1068,7 @@ Examples:
 func fun_list_al(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
-<h3 id="fun_listLoop_lapoab">fun_listLoop_lapoab</h3>
+<h3 id="fun_loop_lapoab">fun_loop_lapoab</h3>
 
 <p>Loop over items in a list and fill in a container. A callback
 function is called for each item in the list and it decides what
@@ -1080,7 +1080,7 @@ returns whether the callback stopped early or not and you can
 ignore it using a bare form.
 
 </p><pre class="tea-code">
-<span class="t-dotName">listLoop</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">list</span>, <span class="t-param">container</span>: <span class="t-type">any</span>, <span class="t-param">listCallback</span>: <span class="t-type">func</span>, <span class="t-param">state</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">bool</span>
+<span class="t-dotName">loop</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">list</span>, <span class="t-param">container</span>: <span class="t-type">any</span>, <span class="t-param">listCallback</span>: <span class="t-type">func</span>, <span class="t-param">state</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">bool</span>
 </pre>
 <p>
 The callback gets passed the index to the item, its value, the
@@ -1098,7 +1098,7 @@ The following example makes a new list [6, 8] from the list
 </p><pre class="tea-code">
 <span class="t-dotName">o.container</span> = []
 <span class="t-dotName">list</span> = [<span class="t-num">2</span>,<span class="t-num">4</span>,<span class="t-num">6</span>,<span class="t-num">8</span>]
-<span class="t-funcCall">listLoop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">o.container</span>, <span class="t-dotName">b5</span>)
+<span class="t-funcCall">loop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">o.container</span>, <span class="t-dotName">b5</span>)
 <span class="t-comment"># o.container =&gt; [6, 8]
 </span></pre>
 <p>
@@ -1113,7 +1113,7 @@ Below is the definition of the b5 callback function.
 
 
 <pre class="nim-code">
-func fun_listLoop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
+func fun_loop_lapoab(variables: Variables; arguments: seq[Value]): FunResult
 </pre>
 
 <h3 id="fun_replace_siiss">fun_replace_siiss</h3>
