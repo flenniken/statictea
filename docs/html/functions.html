@@ -775,7 +775,8 @@ func fun_float_saa(variables: Variables; arguments: seq[Value]): FunResult {.
 
 <h3 id="fun_int_fosi">fun_int_fosi</h3>
 
-<p>Create an int from a float.
+<p>Create an int from a float. When the float value is out of range,
+a warning is generated.
 
 </p><pre class="tea-code">
 <span class="t-dotName">int</span> = <span class="t-funcCall">func</span>(<span class="t-param">num</span>: <span class="t-type">float</span>, <span class="t-param">roundOption</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">int</span>

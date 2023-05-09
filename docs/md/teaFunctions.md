@@ -707,7 +707,8 @@ if(c, return("skip"))
 
 # int
 
-Create an int from a float.
+Create an int from a float. When the float value is out of range,
+a warning is generated.
 
 ~~~javascript
 int = func(num: float, roundOption: optional string) int

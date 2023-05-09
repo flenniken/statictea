@@ -57,15 +57,17 @@ o.get5 = func() int
   ## Return 5.
   return(5)
 
-u.get6 = func() int
+u.get6 = func(msg: string) int
   ## Return 6.
+  a = 3
+  echo(string(l, "dn", "l"))
   return(6)
 
 o.nested = func(o: dict) int
   ## Return get5 value.
   length = len("tea")
   # You have access to u functions without passing them in.
-  v = u.get6()
+  v = u.get6("hi")
 
   return(l.o.get5())
 
@@ -105,6 +107,8 @@ The variables available inside "internalVars" function.
 ### File stdout.expected
 
 ~~~
+l.msg = "hi"
+l.a = 3
 ~~~
 
 ### File stderr.expected

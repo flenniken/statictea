@@ -667,7 +667,7 @@ proc runCommands*(folder: string, runFileLines: seq[RunFileLine]):
             runFileLine.filename
           result = 1
       elif cmdRc != 0:
-        echo "$1 generated a non-zero return code." %
+        echo "$1 generated a non-zero return code. If this is expected, use the nonZeroReturn file attribute." %
           runFileLine.filename
         result = 1
 

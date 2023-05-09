@@ -892,7 +892,8 @@ func fun_float_saa*(variables: Variables, arguments: seq[Value]): FunResult =
     result = newFunResult(newValue(float(result.value.intv)))
 
 func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Create an int from a float.
+  ## Create an int from a float. When the float value is out of range,
+  ## a warning is generated.
   ##
   ## ~~~statictea
   ## int = func(num: float, roundOption: optional string) int

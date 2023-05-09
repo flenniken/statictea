@@ -851,7 +851,7 @@ You pass variables from the server to the template in json files.
 
 The variables are defined by the top level JSON dictionary
 items. Each item's key is the name of a variable and the item's
-value is the variables' value.
+value is the variable's value.
 
 You can use multiple server json files by specifying multiple
 files on the command line. The files are processed left to right.
@@ -1811,7 +1811,14 @@ o.header = """
 #+END_SRC
 
 Both the leading and ending triple quotes end the line. Nothing
-follows the quotes except the lf or crlf.
+follows the quotes except the lf or crlf. The following example
+is invalid because the leading triple quote does not end the
+line:
+
+#+BEGIN_SRC
+msg = """not valid"""
+         ^ syntax error
+#+END_SRC
 
 The next couple of examples compare multiline strings with normal
 strings.
@@ -1890,8 +1897,8 @@ User defined functions are important for sharing common code, as
 conditional code blocks, looping (listLoop) and as callbacks for
 building lists and dictionaries.
 
-In the following example we define a function called mycmp and
-assign the result to the mycmp function variable. The function
+In the following example we define a function called u.mycmp and
+assign the result to the u.mycmp function variable. The function
 takes two string parameters called numStr1 and numStr2 and it
 returns an integer.
 
@@ -1964,12 +1971,25 @@ the function.
 
 *Function Local Variables:*
 
-The function‘s local variables and its arguments are stored in a
+The function‘s local variables and its arguments are stored in
 the function’s own l dictionary which exists while the function
 runs and is separate from the tea code local variables.
 
 It contains the parameters and their argument values and local
-variables used in the function.
+variables used in the function. The example below prints the l
+dictionary
+
+#+BEGIN_SRC
+u.get6 = func(msg: string) int
+  ## Return 6.
+  a = 3
+  echo(string(l, "dn", "l"))
+  return(6)
+
+# output:
+l.msg = "hi"
+l.a = 3
+#+END_SRC
 
 You have access to f and u dictionaries inside the function. To
 access other external variables, you need to pass them in.
