@@ -1213,7 +1213,6 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
       var value = pairs[ix+1]
       dict[key.stringv] = value
 
-  # todo: should be restrict mutable to empty dicts?
   result = newFunResult(newValue(dict, mutable = Mutable.append))
 
 func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =

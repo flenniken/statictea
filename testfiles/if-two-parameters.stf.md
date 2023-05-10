@@ -24,18 +24,25 @@ $$ endblock
 ### File shared.tea
 
 ~~~ nim
-warn("todo: not done")
-# if(true, warn("expected this"))
-# if(false, warn("should not hit this"))
+if(true, warn("expected this"))
+if(false, warn("should not hit this"))
 
-# a1 = if(true, warn("expected this"))
-# a2 = if(false, warn("should not hit this"))
+a1 = if(true, warn("expected this"))
+if(exists(l, "a1"), warn("failed"))
 
-# a3 = if(true, 5)
-# a4 = if(false, 6)
+a2 = if(false, warn("should not hit this"))
+if(exists(l, "a2"), warn("failed"))
 
-# teas &= if(true, "Eary Grey")
-# teas &= if(false, "Beer")
+a3 = if(true, 5)
+if((a3 != 5), warn("failed"))
+
+a4 = if(false, 6)
+if(exists(l, "a4"), warn("failed"))
+
+teas &= if(true, "Eary Grey")
+teas &= if(false, "Beer")
+
+echo(string(teas))
 ~~~
 
 ### File result.expected
@@ -46,12 +53,14 @@ warn("todo: not done")
 ### File stdout.expected
 
 ~~~
+["Eary Grey"]
 ~~~
 
 ### File stderr.expected
 
 ~~~
-shared.tea(1): todo: not done
+shared.tea(1): expected this
+shared.tea(4): expected this
 ~~~
 
 ### Expected result == result.expected

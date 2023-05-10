@@ -29,7 +29,6 @@ $$ : p2n = d2.signature.paramNames[1]
 $$ : p2t = d2.signature.paramTypes[1]
 $$ : rt = d2.signature.returnType
 $$ : docComment = d2.docComment
-$$ : # todo: add a stripEnding function?
 $$ : statements = join(d2.statements, "\n")
 {d1}
 
