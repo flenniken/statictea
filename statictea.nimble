@@ -655,7 +655,7 @@ proc myFileNewer(a: string, b: string): bool =
   else:
     result = false
 
-func removeExt(filename: string): string =
+func removePathAndExt(filename: string): string =
   ## Return the filename without path or extension information.
   let (dir, name, ext) = splitFile(filename)
   result = name
@@ -668,7 +668,7 @@ proc taskDocm(namePart: string, forceRebuild = false) =
     if not (namePart.toLower in basename.toLower) and namePart != "docm":
       continue
 
-    let name = removeExt(basename)
+    let name = removePathAndExt(basename)
     let srcFile = fmt"src/{name}.nim"
     let resultFile = fmt"docs/md/{name}.md"
 
@@ -709,7 +709,7 @@ proc taskDoch(namePart: string, forceRebuild = false) =
     if not (namePart.toLower in basename.toLower) and namePart != "doch":
       continue
 
-    let name = removeExt(basename)
+    let name = removePathAndExt(basename)
     let srcFile = fmt"src/{name}.nim"
     let resultFile = fmt"docs/html/{name}.html"
 
@@ -952,8 +952,9 @@ proc taskTea2Html(teaBasename: string) =
   let server = "docs/file.json"
   let templateFile = "templates/tea2html.html"
   let teaFile = "templates/tea2html.tea"
-  let name = removeExt(filename)
-  let result = fmt"docs/html/{name}.html"
+  let name = removePathAndExt(filename)
+  # echo fmt"teaBasename = {teaBasename}"
+  let result = fmt"docs/html/{teaBasename}.html"
 
   # Create the server json file with the tea file as a string element.
   let text = jsonQuote(slurp(filename))
