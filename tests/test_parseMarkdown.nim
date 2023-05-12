@@ -1,6 +1,6 @@
 import std/unittest
 import std/strutils
-import std/strFormat
+import std/strformat
 import std/options
 import parseMarkdown
 import sharedtestcode

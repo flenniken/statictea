@@ -16,6 +16,7 @@ Create a random number and add it to the server.json file as a
 variable.
 
 ~~~
+#!/bin/bash
 printf "{\"random\": \"%s%s\"}\n" $RANDOM $RANDOM > server.json
 ~~~
 
@@ -36,6 +37,7 @@ Create the random.txt file from the log line containing the random
 number.
 
 ~~~
+#!/bin/bash
 if [[ $OSTYPE == 'darwin'* ]]; then
   log=~/Library/Logs/statictea.log
 else
@@ -50,16 +52,11 @@ The template creates the result.txt file with the same random number
 line that gets logged.
 
 ~~~
-$$ nextline
+$$ nextline if((s.random == ""), warn("no random number"))
 Random number {s.random}
 $$ nextline t.output = "log"
 Random number {s.random}
 ~~~
-
-Expected make.server.json == empty
-Expected server.json == empty
-Expected random.txt == empty
-Expected result == empty
 
 ### Expected result == random.txt
 ### Expected stdout == empty
