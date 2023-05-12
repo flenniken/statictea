@@ -302,13 +302,13 @@ func fun_cmp_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two ints. Returns -1 for less, 0 for equal and 1 for
   ## greater than.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmp = func(a: int, b: int) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmp(7, 9) # -1
   ## cmp(8, 8) # 0
   ## cmp(9, 2) # 1
@@ -323,13 +323,13 @@ func fun_cmp_ffi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Compare two floats. Returns -1 for less, 0 for equal and 1 for
   ## greater than.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmp = func(a: float, b: float) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmp(7.8, 9.1) # -1
   ## cmp(8.4, 8.4) # 0
   ## cmp(9.3, 2.2) # 1
@@ -347,13 +347,13 @@ func fun_cmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## You have the option to compare case insensitive. Case sensitive
   ## is the default.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmp = func(a: string, b: string, insensitive: optional bool) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cmp("coffee", "tea") # -1
   ## cmp("tea", "tea") # 0
   ## cmp("Tea", "tea") # 1
@@ -376,13 +376,13 @@ func fun_cmp_ssobi*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_len_si*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of unicode characters in a string.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## len = func(str: string) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## len("tea") # 3
   ## len("añyóng") # 6
   ## ~~~
@@ -394,13 +394,13 @@ func fun_len_si*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_len_li*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of elements in a list.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## len = func(list: list) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## len(list()) # 0
   ## len(list(1)) # 1
   ## len(list(4, 5)) # 2
@@ -413,13 +413,13 @@ func fun_len_li*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_len_di*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Number of elements in a dictionary.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## len = func(dictionary: dict) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## len(dict()) # 0
   ## len(dict(["a", 4])) # 1
   ## len(dict(["a", 4, "b", 3])) # 2
@@ -436,13 +436,13 @@ func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## last element. It is short hand for len - 1. Index -2 is len - 2,
   ## etc.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## get = func(list: list, index: int, default: optional any) any
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## list = list(4, "a", 10)
   ## get(list, 0) # 4
   ## get(list, 1) # "a"
@@ -456,7 +456,7 @@ func fun_get_lioaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## You can also use bracket notation to access list items.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## a = teas[0]
   ## ~~~
 
@@ -482,7 +482,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## default value is returned if specified, else a warning is
   ## generated.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## get = func(dictionary: dict, key: string, default: optional any) any
   ## ~~~
   ##
@@ -491,7 +491,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## d = dict(["tea", "Earl Grey"])
   ## get(d, "tea") # "Earl Grey"
   ## get(d, "coffee", "water") # "water"
@@ -499,7 +499,7 @@ func fun_get_dsoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Using dot notation:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## d = dict(["tea", "Earl Grey"])
   ## d.tea => "Earl Grey"
   ## ~~~
@@ -528,13 +528,13 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## You usually use boolean infix expressions for the condition, see:
   ## the Boolean Expressions section.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## if = func(condition: bool, then: any, else: optional any) any
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## a = if(true, "tea", "beer") # tea
   ## b = if(false, "tea", "beer") # beer
   ## v = 6
@@ -546,7 +546,7 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## useful when using a warn or return function for its side effects.
   ## The if takes two arguments when there is no assignment.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## if(c, warn("c is true"))
   ## if(c, return("skip"))
   ## ~~~
@@ -562,13 +562,13 @@ func fun_if_baoaa*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_add_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Add two integers. A warning is generated on overflow.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## add = func(a: int, b: int) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## add(1, 2) # 3
   ## add(3, -2) # 1
   ## add(-2, -5) # -7
@@ -586,13 +586,13 @@ func fun_add_iii*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_add_fff*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Add two floats. A warning is generated on overflow.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## add = func(a: float, b: float) float
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## add(1.5, 2.3) # 3.8
   ## add(3.2, -2.2) # 1.0
   ## ~~~
@@ -609,13 +609,13 @@ func fun_add_fff*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_sub_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Subtract two integers. A warning is generated on overflow.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## sub = func(a: int, b: int) int
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## sub(3, 1) # 2
   ## add(3, -2) # 5
   ## add(1, 5) # -4
@@ -633,13 +633,13 @@ func fun_sub_iii*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_sub_fff*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Subtract two floats. A warning is generated on overflow.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## sub = func(a: float, b: float) float
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## sub(4.5, 2.3) # 2.2
   ## sub(1.0, 2.2) # -1.2
   ## ~~~
@@ -659,13 +659,13 @@ func fun_exists_dsb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Determine whether a key exists in a dictionary. Return true when it
   ## exists, else false.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## exists = func(dictionary: dict, key: string) bool
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## d = dict(["tea", "Earl"])
   ## exists(d, "tea") # true
   ## exists(d, "coffee") # false
@@ -695,13 +695,13 @@ func fun_case_iloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the pairs argument is a literal list, only the matching case is
   ## executed and the other ones are skipped.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## case = case(condition: int, pairs: list, default: optional any) any
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## cases = list(0, "tea", 1, "water", 2, "beer")
   ## case(0, cases) # "tea"
   ## case(1, cases) # "water"
@@ -740,13 +740,13 @@ func fun_case_sloaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## If the pairs argument is a literal list, only the matching case is
   ## executed and the other ones are skipped.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## case = func(condition: string, pairs: list, default: optional any) any
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## pairs = list("tea", 15, "water", 2.3, "beer", "cold")
   ## case("tea", pairs) # 15
   ## case("water", pairs) # 2.3
@@ -824,13 +824,13 @@ func fun_cmpVersion_ssi*(variables: Variables, arguments: seq[Value]): FunResult
 func fun_float_if*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from an int.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## float = func(num: int) float
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## float(2) # 2.0
   ## float(-33) # -33.0
   ## ~~~
@@ -841,13 +841,13 @@ func fun_float_if*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_float_sf*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from a number string.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## float = func(numString: string) float
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## float("2") # 2.0
   ## float("2.4") # 2.4
   ## float("33") # 33.0
@@ -868,13 +868,13 @@ func fun_float_saa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a float from a number string. If the string is not a
   ## number, return the default.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## float = func(numString: string, default: optional any) any
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## float("2") # 2.0
   ## float("notnum", "nan") # nan
   ## ~~~
@@ -895,7 +895,7 @@ func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a float. When the float value is out of range,
   ## a warning is generated.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## int = func(num: float, roundOption: optional string) int
   ## ~~~
   ##
@@ -908,7 +908,7 @@ func fun_int_fosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## int(2.34) # 2
   ## int(2.34, "round") # 2
   ## int(-2.34, "round") # -2
@@ -931,7 +931,7 @@ func fun_int_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a number string. It generates a warning when
   ## the number string is not an int.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## int = func(numString: string, roundOption: optional string) int
   ## ~~~
   ##
@@ -944,7 +944,7 @@ func fun_int_sosi*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## int("2") # 2
   ## int("2.34") # 2
   ## int("-2.34", "round") # -2
@@ -974,7 +974,7 @@ func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an int from a number string. If the string is not a number,
   ## return the default value.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## int = func(numString: string, roundOption: string, default: any) any
   ## ~~~
   ##
@@ -987,7 +987,7 @@ func fun_int_ssaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## int("2", "round", "nan") # 2
   ## int("notnum", "round", "nan") # nan
   ## ~~~
@@ -1032,7 +1032,7 @@ func boolConditions*(cond: Value): bool =
 func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create an bool from a value.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## bool = func(value: Value) bool
   ## ~~~
   ##
@@ -1048,7 +1048,7 @@ func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## bool(0) # false
   ## bool(0.0) # false
   ## bool([]) # false
@@ -1072,13 +1072,13 @@ func fun_find_ssoaa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## generated when the substring is missing and you don't specify a
   ## default value.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## find = func(str: string, substring: string, default: optional any) any
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ##        0123456789 1234567
   ## msg = "Tea time at 3:30."
   ## find(msg, "Tea") # 0
@@ -1112,13 +1112,13 @@ func fun_slice_siois*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## The start index and length are by unicode characters not bytes.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## slice = func(str: string, start: int, length: optional int) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## slice("Earl Grey", 1, 3) # "arl"
   ## slice("Earl Grey", 6) # "rey"
   ## slice("añyóng", 0, 3) # "añy"
@@ -1144,13 +1144,13 @@ func fun_dup_sis*(variables: Variables, arguments: seq[Value]): FunResult =
   ## concatenating the string to itself the specified number of times.
   ## The resulting string must be less than or equal to 1024 bytes.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## dup = func(pattern: string, count: int) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## dup("=", 3) # "==="
   ## dup("abc", 0) # ""
   ## dup("abc", 1) # "abc"
@@ -1183,13 +1183,13 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a dictionary from a list of key, value pairs.  The keys
   ## must be strings and the values can be any type.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## dict = func(pairs: optional list) dict
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## dict() # {}
   ## dict(["a", 5]) # {"a": 5}
   ## dict(["a", 5, "b", 33, "c", 0])
@@ -1218,13 +1218,13 @@ func fun_dict_old*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_list_al*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list of variables. You can also create a list with brackets.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## list = func(...) list
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## a = list()
   ## a = list(1)
   ## a = list(1, 2, 3)
@@ -1246,7 +1246,7 @@ func fun_loop_lapoab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## returns whether the callback stopped early or not and you can
   ## ignore it using a bare form.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## loop = func(a: list, container: any, listCallback: func, state: optional any) bool
   ## ~~~
   ##
@@ -1255,14 +1255,14 @@ func fun_loop_lapoab*(variables: Variables, arguments: seq[Value]): FunResult =
   ## information and adds to the container when appropriate. The
   ## callback returns true to stop iterating.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## listCallback = func(ix: int, item: any, container: any, state: optional any) bool
   ## ~~~
   ##
   ## The following example makes a new list [6, 8] from the list
   ## [2,4,6,8].  The callback is called b5.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## o.container = []
   ## list = [2,4,6,8]
   ## loop(list, o.container, b5)
@@ -1271,7 +1271,7 @@ func fun_loop_lapoab*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Below is the definition of the b5 callback function.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## b5 = func(ix: int, value: int, container: list) bool
   ##   ## Collect values greater than 5.
   ##   container &= if( (value > 5), value)
@@ -1289,7 +1289,7 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## another string.  You can use the function to insert and append to
   ## a string as well.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## replace = func(str: string, start: int, length: int, replacement: string) string
   ## ~~~
   ##
@@ -1301,7 +1301,7 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## Examples:
   ##
   ## Replace:
-  ## ~~~statictea
+  ## ~~~ statictea
   ## replace("Earl Grey", 5, 4, "of Sandwich")
   ##   => "Earl of Sandwich"
   ## replace("123", 0, 1, "abcd") # abcd23
@@ -1313,18 +1313,18 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## replace("123", 2, 1, "abcd") # 12abcd
   ## ~~~
   ## Insert:
-  ## ~~~statictea
+  ## ~~~ statictea
   ## replace("123", 0, 0, "abcd") # abcd123
   ## replace("123", 1, 0, "abcd") # 1abcd23
   ## replace("123", 2, 0, "abcd") # 12abcd3
   ## replace("123", 3, 0, "abcd") # 123abcd
   ## ~~~
   ## Append:
-  ## ~~~statictea
+  ## ~~~ statictea
   ## replace("123", 3, 0, "abcd") # 123abcd
   ## ~~~
   ## Delete:
-  ## ~~~statictea
+  ## ~~~ statictea
   ## replace("123", 0, 1, "") # 23
   ## replace("123", 0, 2, "") # 3
   ## replace("123", 0, 3, "") # ""
@@ -1335,7 +1335,7 @@ func fun_replace_siiss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## replace("123", 2, 1, "") # 12
   ## ~~~
   ## Edge Cases:
-  ## ~~~statictea
+  ## ~~~ statictea
   ## replace("", 0, 0, "") #
   ## replace("", 0, 0, "a") # a
   ## replace("", 0, 0, "ab") # ab
@@ -1400,13 +1400,13 @@ func fun_replaceRe_sls*(variables: Variables, arguments: seq[Value]): FunResult 
   ## You specify one or more pairs of regex patterns and their string
   ## replacements.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## replaceRe = func(str: string, pairs: list) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## list = list("abc", "456", "def", "")
   ## replaceRe("abcdefabc", list))
   ##   # "456456"
@@ -1461,13 +1461,13 @@ func fun_path_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## slash or or backslash. When no separator, the current
   ## system separator is used.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## path = func(filename: string, separator: optional string) dict
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## path("src/functions.nim") => {
   ##   "filename": "functions.nim",
   ##   "basename": "functions",
@@ -1511,13 +1511,13 @@ func fun_path_sosd*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_lower_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Lowercase a string.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## lower = func(str: string) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## lower("Tea") # "tea"
   ## lower("TEA") # "tea"
   ## lower("TEĀ") # "teā"
@@ -1530,13 +1530,13 @@ func fun_lower_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_keys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list from the keys in a dictionary.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## keys = func(dictionary: dict) list
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## d = dict("a", 1, "b", 2, "c", 3)
   ## keys(d) # ["a", "b", "c"]
   ## values(d) # [1, 2, 3]
@@ -1554,13 +1554,13 @@ func fun_keys_dl*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_values_dl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Create a list out of the values in the specified dictionary.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## values = func(dictionary: dict) list
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## d = dict("a", "apple", "b", 2, "c", 3)
   ## keys(d) # ["a", "b", "c"]
   ## values(d) # ["apple", 2, 3]
@@ -1682,13 +1682,13 @@ func fun_sort_lsosl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## * **insensitive** — sort strings case insensitive. Case
   ## sensitive is the default.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## sort = func(values: list, order: string, insensitive: optional string) list
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## ints = list(4, 3, 5, 5, 2, 4)
   ## sort(list, "ascending") # [2, 3, 4, 4, 5, 5]
   ## sort(list, "descending") # [5, 5, 4, 4, 3, 2]
@@ -1716,13 +1716,13 @@ func fun_sort_lssil*(variables: Variables, arguments: seq[Value]): FunResult =
   ## must exist in each list, be the same type and be an int, float,
   ## or string.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## sort = func(lists: list, order: string, case: string, index: int) list
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## l1 = list(4, 3, 1)
   ## l2 = list(2, 3, 4)
   ## listOfLists = list(l1, l2)
@@ -1743,13 +1743,13 @@ func fun_sort_lsssl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## each dictionary, be the same type and be an int, float or
   ## string.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## sort = func(dicts: list, order: string, case: string, key: string) list
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## d1 = dict("name", "Earl Gray", "weight", 1.2)
   ## d2 = dict("name", "Tea Pot", "weight", 3.5)
   ## dicts = list(d1, d2)
@@ -1765,7 +1765,7 @@ func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## names or Github markdown internal links. It handles duplicate
   ## heading names.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## anchors = func(names: list, type: string) list
   ## ~~~
   ##
@@ -1776,10 +1776,10 @@ func fun_anchors_lsl*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## list = list("Tea", "Water", "Tea")
   ## a = anchors(list, "github")
-  ##   # ["tea", "water", "tea-1"]
+  ## # ["tea", "water", "tea-1"]
   ## ~~~
 
   tMapParameters("anchors", "lsl")
@@ -1802,13 +1802,13 @@ func fun_type_as*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return the argument type, one of: int, float, string, list,
   ## dict, bool or func.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## type = func(variable: any) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## type(2) # "int"
   ## type(3.14159) # "float"
   ## type("Tea") # "string"
@@ -1867,13 +1867,13 @@ func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## A warning is generated if a component contains a separator.  If a
   ## component is "", the platform separator is used for it.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## joinPath = func(components: list, separator: optional string) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## joinPath(["tea", "pot"]) # tea/pot
   ## joinPath(["tea", "hot", ""]) # tea/hot/
   ## joinPath(["", "tea", "cool"]) # /tea/cool
@@ -1894,13 +1894,13 @@ func fun_join_loss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Join a list of strings with a separator.  An optional parameter
   ## determines the separator, by default it is "".
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## join = func(strs: list, sep: optional string) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## join(["a", "b"]) # "ab"
   ## join(["a", "b"], "") # "ab"
   ## join(["a", "b"], ", ") # "a, b"
@@ -1933,19 +1933,19 @@ func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return a warning message and skip the current statement.
   ## You can call the warn function without an assignment.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## warn = func(message: string) string
   ## ~~~
   ##
   ## You can warn conditionally in a bare if statement:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## if(cond, warn("message is 0"))
   ## ~~~
   ##
   ## You can warn unconditionally using a bare warn statement:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## warn("always warn")
   ## ~~~
 
@@ -1959,19 +1959,19 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## function has a bare form.  Logging needs to be turned on, see the
   ## Logging section.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## log = func(message: string) string
   ## ~~~
   ##
   ## You can log conditionally in a bare if statement:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## if(c, log("log this message when c is 0"))
   ## ~~~
   ##
   ## You can log unconditionally using a bare log statement:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## log("always log")
   ## ~~~
 
@@ -1983,28 +1983,28 @@ func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return is a special function that returns the value passed in and
   ## has has side effects.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## return = func(value: any) any
   ## ~~~
   ##
   ## In a function, the return completes the function and returns
   ## the value of it.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## return(false)
   ## ~~~
   ##
   ## You can also use it with a bare IF statement to conditionally
   ## return a function value.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## if(c, return(5))
   ## ~~~
   ##
   ## In a template command a return controls the replacement block
   ## looping by returning "skip" and "stop".
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## if(c, return("stop"))
   ## if(c, return("skip"))
   ## ~~~
@@ -2046,7 +2046,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a variable to a string. You specify the variable and
   ## optionally the type of output you want.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## string = func(var: any, stype: optional string) string
   ## ~~~
   ##
@@ -2064,7 +2064,7 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Examples variables:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## str = "Earl Grey"
   ## pi = 3.14159
   ## one = 1
@@ -2152,13 +2152,13 @@ func fun_string_dsss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert the dictionary variable to dot names. You specify the
   ## name of the dictionary and the dict variable.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## string = func(d: dict, stype: string, dictName: string) string
   ## ~~~
   ##
   ## Example:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## json = “””
   ## {"x":1, "y":"tea", "z":{"a":8}}
   ## “””
@@ -2184,13 +2184,13 @@ func fun_format_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Format a string using replacement variables similar to a
   ## replacement block. To enter a left bracket use two in a row.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## format = func(str: string) string
   ## ~~~
   ##
   ## Example:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## let first = "Earl"
   ## let last = "Grey"
   ## str = format("name: {first} {last}")
@@ -2199,7 +2199,7 @@ func fun_format_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## To enter a left bracket use two in a row.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## str = format("use two {{ to get one")
   ##   # "use two { to get one"
   ## ~~~
@@ -2215,13 +2215,13 @@ func fun_format_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_func_sp*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Define a function.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## func = func(name: type, ...) retType
   ## ~~~
   ##
   ## Example:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## mycmp = func(numStr1: string, numStr2: string) int
   ##   ## Compare two number strings
   ##   ## and return 1, 0, or -1.
@@ -2236,14 +2236,14 @@ func fun_func_sp*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_functionDetails_pd*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return the function details in a dictionary.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## functionDetails = func(funcVar: func) dict
   ## ~~~
   ##
   ## The following example defines a simple function then gets its
   ## function details.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## mycmp = func(numStr1: string, numStr2: string) int
   ##   ## Compare two number strings and return 1, 0, or -1.
   ##   return(cmp(int(numStr1), int(numStr2)))
@@ -2272,13 +2272,13 @@ func fun_startsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult
   ## Check whether a string starts with the given prefix. Return true
   ## when it does, else false.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## startsWith = func(str: string, str: prefix) bool
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## a = startsWith("abcdef", "abc") # true
   ## b = startsWith("abcdef", "abf") # false
   ## ~~~
@@ -2291,13 +2291,13 @@ func fun_startsWith_ssb*(variables: Variables, arguments: seq[Value]): FunResult
 func fun_not_bb*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Boolean not.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## not = func(value: bool) bool
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## not(true) # false
   ## not(false) # true
   ## ~~~
@@ -2309,13 +2309,13 @@ func fun_not_bb*(variables: Variables, arguments: seq[Value]): FunResult =
 func fun_readJson_sa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Convert a JSON string to a variable.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## readJson = func(json: string) any
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## a = readJson("\\"tea\\"") # tea
   ## b = readJson("4.5") # 4.5
   ## c = readJson("[1,2,3]") # [1, 2, 3]
@@ -2342,7 +2342,7 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ## * **lite** — parse paragraphs, bullets and code blocks. See list elements below.
   ## * **inline** — parse inline attributes, bold, italics, bold+italics and links
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## parseMarkdown = func(mdText: string, type: string) list
   ## ~~~
   ##
@@ -2358,7 +2358,7 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ## for each bullet point.  The leading "* " is not part of the
   ## string.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## lite = parseMarkdown(description, "lite")
   ## lite => [
   ##   ["p", ["the paragraph which may contain newlines"]]
@@ -2417,7 +2417,7 @@ func fun_parseCode_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Parse a string of StaticTea code into fragments useful for
   ## syntax highlighting.  Return a list of tagged fragments.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## parseCode = func(code: string) list
   ## ~~~
   ##
@@ -2436,7 +2436,7 @@ func fun_parseCode_sl*(variables: Variables, arguments: seq[Value]): FunResult =
   ##
   ## Example:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## frags = parseCode("a = 5")
   ## frags => [
   ##   ["dotName", "a"],
@@ -2492,7 +2492,7 @@ proc escapeHtmlAttribute*(text: string): string =
 func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Escape text for placing it in an html page.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## html = func(text: string, place: string) string
   ## ~~~
   ##
@@ -2502,7 +2502,7 @@ func fun_html_sss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## * **attribute** — in an html attribute
   ## * **url** — url encoding (percent encoding)
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## name = html("Mad <Hatter>", "body")
   ##   # "Mad &lt;Hatter&gt;"
   ##
@@ -2533,13 +2533,13 @@ func fun_echo_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Echo a string to standard out. Return the same string. The
   ## function has a bare form.
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## echo = func(text: string) string
   ## ~~~
   ##
   ## Examples:
   ##
-  ## ~~~statictea
+  ## ~~~ statictea
   ## echo("debugging string")
   ##
   ## if(cond, echo("debugging string"))

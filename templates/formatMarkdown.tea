@@ -1,0 +1,131 @@
+## Format a statictea markdown description for html or github
+## markdown.  Return a dictionary with two elements, the description
+## and the first sentence.
+
+u.html-link = func(linkElement: list) string
+  ## Convert the inline link element into an html link.
+  tag = linkElement[0]
+  # if((tag != "link"), warn(format("expected a link element got: {tag}")))
+  if((tag != "link"), return(""))
+  eList = linkElement[1]
+  linkDesc = html(eList[0], "body")
+  url = html(eList[1], "url")
+  return(format("<a href=\"{url}\">{linkDesc}</a>"))
+
+u.handle-html-inline = func(ix: int, inLineElement: list, lines: list) bool
+  ## Format the inline md element as html and add it to lines.
+  tag = inLineElement[0]
+  eList = inLineElement[1]
+  text = html(eList[0], "body")
+  lines &= case(tag, [ +
+    "normal", text, +
+    "bold", join(["<b>", text, "</b>"], ""), +
+    "italic", join(["<i>", text, "</i>"], ""), +
+    "boldItalic", join(["<b><i>", text, "</i></b>"], ""), +
+    "link", u.html-link(inLineElement) ])
+  return(false)
+
+u.inline-html = func(text: string) string
+  ## Convert the inline text to html with bold, italic and links
+  ## formatted.
+  inlineElements = parseMarkdown(text, "inline")
+  inlineFrags = []
+  loop(inlineElements, inlineFrags, u.handle-html-inline)
+  return(join(inlineFrags, ""))
+
+u.handle-html-bullet = func(ix: int, bullet: string, lines: list) bool
+  ## Make the bullet text into an html bullet and add it to lines.
+  text = u.inline-html(bullet)
+  lines &= join(["<li>", text, "</li>"], "")
+  return(false)
+
+u.html-paragraph = func(item: list) string
+  ## Return html given a "p" element md list.
+  text = item[0]
+  inlineText = u.inline-html(text)
+  return(join(["<p>", inlineText, "</p>"], ""))
+
+u.handle-html-fragment = func(ix: int, fragment: list, frags: list) bool
+  ## Highlight the fragment for html and add it to the frags list.
+  tag = fragment[0]
+  str = html(fragment[1], "body")
+  # Wrap each fragment with a span element except the "other" element.
+  frags &= if((tag == "other"), str, +
+    format("<span class=\"t-{tag}\">{str}</span>"))
+  return(false)
+
+u.handle-plain-code = func(codeBlock: string, frags: list) bool
+  ## Add the plain code block (not tea code) to the frags list.
+  frags &= html(codeBlock, "body")
+  return(false)
+
+u.html-code = func(item: list) string
+  ## Format the "code" md element list as html.
+  lines = []
+  teaCode = find(item[0], "statictea", -1)
+  class = if((teaCode == -1), "plain-code", "tea-code")
+  lines &= format("<pre class=\"{class}\">\n")
+
+  codeBlock = item[1]
+  ret = if((class == "tea-code"), +
+    loop(parseCode(codeBlock), lines, u.handle-html-fragment), +
+    u.handle-plain-code(codeBlock, lines))
+    
+  lines &= "</pre>\n"
+  return(join(lines, ""))
+
+u.html-bullets = func(item: list) string
+  ## Format the "bullets" md element list as html.
+  lines = []
+  lines &= "<ul>\n"
+  loop(item, lines, u.handle-html-bullet)
+  lines &= "</ul>\n"
+  return(join(lines, ""))
+
+u.handle-html-element = func(ix: int, element: list, lines: list) bool
+  ## Format the md element as html and add it to lines.
+  l.fn = case(element[0], [ +
+    "p", u.html-paragraph, +
+    "code", u.html-code, +
+    "bullets", u.html-bullets +
+  ])
+  lines &= l.fn(element[1])
+  return(false)
+
+u.get-html-description = func(mdDesc: string) string
+  ## Parse the description markdown text and return html paragraphs,
+  ## bullet lists and code blocks.
+  elements = parseMarkdown(mdDesc, "lite")
+  lines = []
+  loop(elements, lines, u.handle-html-element)
+  return(join(lines, ""))
+
+u.get-name = func(ix: int, entry: dict, newList: list) bool
+  ## Add the entry name to the list.
+  newList &= entry.name
+  return(false)
+
+u.format-md-description = func(mdDesc: string, templateType: string) dict
+  ## Format the statictea markdown description for html or github
+  ## markdown. TemplateType is either "md" or "html". For md replace
+  ## the statictea code blocks with javascript so the code is
+  ## highlighted by github. Return a dictionary with two elements,
+  ## description and sentence. Sentence is the first sentence of the
+  ## description.
+
+  # Use the first sentence for the short description.
+  pos = find(mdDesc, ".", -1)
+  short = if((pos == -1), mdDesc, slice(mdDesc, 0, add(pos, 1)))
+  sentence = replaceRe(short, ["\n", " "])
+  
+  # Convert the markdown description to html for the html
+  # template. For md switch statictea code blocks to javascript.
+  description = if((templateType == "html"), +
+    u.get-html-description(mdDesc), +
+    replaceRe(mdDesc, ["~~~\\s*statictea", "~~~javascript"]))
+
+  # Return both the discription and the first sentence.
+  ret = dict()
+  ret.description = description
+  ret.sentence = sentence
+  return(ret)

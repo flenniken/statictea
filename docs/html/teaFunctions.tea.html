@@ -10,18 +10,18 @@
 
 <pre>
 <span class="t-doc">## Create a list of dictionaries (o.entries), one dictionary for each
-</span><span class="t-doc">## function in the f function dictionary.  Each dictionary contains,
-</span><span class="t-doc">## the function name, doc comment, anchor name and a short description.
-</span>
-<span class="t-doc">## The nimble task teafuncs runs the template.
+</span><span class="t-doc">## function in the f function dictionary.  Each dictionary entry
+</span><span class="t-doc">## contains, function name, doc comment, anchor name and the first
+</span><span class="t-doc">## sentence. The nimble task teafuncsh runs the template.
 </span>
 <span class="t-dotName">u.add-func-var</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">funcVar</span>: <span class="t-type">func</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
-  <span class="t-doc">## Add the function variable to the list.
+  <span class="t-doc">## Add the given function variable to the list.
 </span>  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">funcVar</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
 <span class="t-dotName">add-vars</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">key</span>: <span class="t-type">string</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
-  <span class="t-doc">## Add all the func variables with the key name to the new list.
+  <span class="t-doc">## Add all the func variables with the given key name to the new
+</span>  <span class="t-doc">## list.
 </span>  <span class="t-dotName">funcList</span> = <span class="t-dotName">f</span>[<span class="t-dotName">key</span>]
   <span class="t-funcCall">loop</span>(<span class="t-dotName">funcList</span>, <span class="t-dotName">newList</span>, <span class="t-dotName">u.add-func-var</span>)
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
@@ -32,25 +32,27 @@
   <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">fd.signature.name</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
-<span class="t-dotName">make-entry</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">funcVar</span>: <span class="t-type">func</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>, <span class="t-param">anchors</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+<span class="t-dotName">make-entry</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">funcVar</span>: <span class="t-type">func</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>, <span class="t-param">state</span>: <span class="t-type">dict</span>) <span class="t-type">bool</span>
   <span class="t-doc">## Make a dictionary of function details for the given function
-</span>  <span class="t-doc">## variable and add it to the new list.
+</span>  <span class="t-doc">## variable and add it to the new list. Each entry contains the name
+</span>  <span class="t-doc">## of the function, its anchor name, its description, and the first
+</span>  <span class="t-doc">## sentence of the description.
 </span>
-  <span class="t-comment"># Look up the function details.
+  <span class="t-dotName">entry</span> = <span class="t-funcCall">dict</span>()
+
+  <span class="t-comment"># Get the function name from the function variable.
 </span>  <span class="t-dotName">fd</span> = <span class="t-funcCall">functionDetails</span>(<span class="t-dotName">funcVar</span>)
-
-  <span class="t-comment"># Make a dictionary containing the function name, its doc comments
-</span>  <span class="t-comment"># and its doc comment&#x27;s first sentence.
-</span>  <span class="t-dotName">entry</span> = <span class="t-funcCall">dict</span>()
   <span class="t-dotName">entry.name</span> = <span class="t-dotName">fd.signature.name</span>
-  <span class="t-dotName">entry.docComment</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">fd.docComment</span>, [<span class="t-str">&quot;~~~statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>])
 
-  <span class="t-dotName">ax</span> = <span class="t-dotName">fd.docComment</span>
-  <span class="t-dotName">pos</span> = <span class="t-funcCall">find</span>(<span class="t-dotName">ax</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>)
-  <span class="t-dotName">text</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">pos</span> == <span class="t-num">-1</span>), <span class="t-dotName">ax</span>, <span class="t-funcCall">slice</span>(<span class="t-dotName">ax</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-dotName">pos</span>, <span class="t-num">1</span>)))
-  <span class="t-dotName">entry.sentence</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">text</span>, [<span class="t-str">&quot;\n&quot;</span>, <span class="t-str">&quot; &quot;</span>])
+  <span class="t-comment"># Format the description for the template type, either markdown or
+</span>  <span class="t-comment"># html.
+</span>  <span class="t-dotName">dest</span> = <span class="t-funcCall">u.format-md-description</span>(<span class="t-dotName">fd.docComment</span>, <span class="t-dotName">state.templateType</span>)
+  <span class="t-dotName">entry.description</span> = <span class="t-dotName">dest.description</span>
+  <span class="t-dotName">entry.sentence</span> = <span class="t-dotName">dest.sentence</span>
 
-  <span class="t-dotName">entry.anchorName</span> = <span class="t-dotName">anchors</span>[<span class="t-dotName">ix</span>]
+  <span class="t-comment"># Get the anchor name for the function. The name is dependent on its
+</span>  <span class="t-comment"># order.
+</span>  <span class="t-dotName">entry.anchorName</span> = <span class="t-dotName">state.anchors</span>[<span class="t-dotName">ix</span>]
   <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">entry</span>
   <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
 
@@ -59,21 +61,24 @@
 </span><span class="t-dotName">flatFuncList</span> = []
 <span class="t-funcCall">loop</span>(<span class="t-funcCall">keys</span>(<span class="t-dotName">f</span>), <span class="t-dotName">flatFuncList</span>, <span class="t-dotName">add-vars</span>)
 
-<span class="t-comment"># Get the anchor type based on the template type.
+<span class="t-comment"># Determine the template type from the template&#x27;s extension.
 </span><span class="t-dotName">path</span> = <span class="t-funcCall">path</span>(<span class="t-dotName">t.args.resultFilename</span>)
-<span class="t-dotName">type</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">path.ext</span> == <span class="t-str">&quot;.md&quot;</span>), <span class="t-str">&quot;github&quot;</span>, <span class="t-str">&quot;html&quot;</span>)
+<span class="t-dotName">templateType</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">path.ext</span> == <span class="t-str">&quot;.md&quot;</span>), <span class="t-str">&quot;github&quot;</span>, <span class="t-str">&quot;html&quot;</span>)
 
 <span class="t-comment"># Get a list of all the function names then make that into anchor
 </span><span class="t-comment"># names.
 </span><span class="t-dotName">names</span> = []
 <span class="t-funcCall">loop</span>(<span class="t-dotName">flatFuncList</span>, <span class="t-dotName">names</span>, <span class="t-dotName">get-name</span>)
-<span class="t-dotName">anchors</span> = <span class="t-funcCall">anchors</span>(<span class="t-dotName">names</span>, <span class="t-dotName">type</span>)
+<span class="t-dotName">anchors</span> = <span class="t-funcCall">anchors</span>(<span class="t-dotName">names</span>, <span class="t-dotName">templateType</span>)
 
 <span class="t-comment"># Create a list of dictionaries, one dictionary for each function
 </span><span class="t-comment"># variable in the f function dictionary.  Each dictionary contains,
 </span><span class="t-comment"># the function name, doc comment, anchor name and a short description.
-</span><span class="t-dotName">o.entries</span> = []
-<span class="t-funcCall">loop</span>(<span class="t-dotName">flatFuncList</span>, <span class="t-dotName">o.entries</span>, <span class="t-dotName">make-entry</span>, <span class="t-dotName">anchors</span>)
+</span><span class="t-dotName">state</span> = <span class="t-funcCall">dict</span>()
+<span class="t-dotName">state.anchors</span> = <span class="t-dotName">anchors</span>
+<span class="t-dotName">state.templateType</span> = <span class="t-dotName">templateType</span>
+<span class="t-dotName">o.entries</span> = []
+<span class="t-funcCall">loop</span>(<span class="t-dotName">flatFuncList</span>, <span class="t-dotName">o.entries</span>, <span class="t-dotName">make-entry</span>, <span class="t-dotName">state</span>)
 
 </pre>
 

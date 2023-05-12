@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>templates/formatMarkdown.tea</title>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
+</head>
+<body>
+<h1>templates/formatMarkdown.tea</h1>
+
+<pre>
+<span class="t-doc">## Format a statictea markdown description for html or github
+</span><span class="t-doc">## markdown.  Return a dictionary with two elements, the description
+</span><span class="t-doc">## and the first sentence.
+</span>
+<span class="t-dotName">u.html-link</span> = <span class="t-funcCall">func</span>(<span class="t-param">linkElement</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
+  <span class="t-doc">## Convert the inline link element into an html link.
+</span>  <span class="t-dotName">tag</span> = <span class="t-dotName">linkElement</span>[<span class="t-num">0</span>]
+  <span class="t-comment"># if((tag != &quot;link&quot;), warn(format(&quot;expected a link element got: {tag}&quot;)))
+</span>  <span class="t-funcCall">if</span>((<span class="t-dotName">tag</span> != <span class="t-str">&quot;link&quot;</span>), <span class="t-funcCall">return</span>(<span class="t-str">&quot;&quot;</span>))
+  <span class="t-dotName">eList</span> = <span class="t-dotName">linkElement</span>[<span class="t-num">1</span>]
+  <span class="t-dotName">linkDesc</span> = <span class="t-funcCall">html</span>(<span class="t-dotName">eList</span>[<span class="t-num">0</span>], <span class="t-str">&quot;body&quot;</span>)
+  <span class="t-dotName">url</span> = <span class="t-funcCall">html</span>(<span class="t-dotName">eList</span>[<span class="t-num">1</span>], <span class="t-str">&quot;url&quot;</span>)
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;a href=\&quot;{url}\&quot;&gt;{linkDesc}&lt;/a&gt;&quot;</span>))
+
+<span class="t-dotName">u.handle-html-inline</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">inLineElement</span>: <span class="t-type">list</span>, <span class="t-param">lines</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Format the inline md element as html and add it to lines.
+</span>  <span class="t-dotName">tag</span> = <span class="t-dotName">inLineElement</span>[<span class="t-num">0</span>]
+  <span class="t-dotName">eList</span> = <span class="t-dotName">inLineElement</span>[<span class="t-num">1</span>]
+  <span class="t-dotName">text</span> = <span class="t-funcCall">html</span>(<span class="t-dotName">eList</span>[<span class="t-num">0</span>], <span class="t-str">&quot;body&quot;</span>)
+  <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">case</span>(<span class="t-dotName">tag</span>, [ +
+    <span class="t-str">&quot;normal&quot;</span>, <span class="t-dotName">text</span>, +
+    <span class="t-str">&quot;bold&quot;</span>, <span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;b&gt;&quot;</span>, <span class="t-dotName">text</span>, <span class="t-str">&quot;&lt;/b&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>), +
+    <span class="t-str">&quot;italic&quot;</span>, <span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;i&gt;&quot;</span>, <span class="t-dotName">text</span>, <span class="t-str">&quot;&lt;/i&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>), +
+    <span class="t-str">&quot;boldItalic&quot;</span>, <span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;b&gt;&lt;i&gt;&quot;</span>, <span class="t-dotName">text</span>, <span class="t-str">&quot;&lt;/i&gt;&lt;/b&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>), +
+    <span class="t-str">&quot;link&quot;</span>, <span class="t-funcCall">u.html-link</span>(<span class="t-dotName">inLineElement</span>) ])
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-dotName">u.inline-html</span> = <span class="t-funcCall">func</span>(<span class="t-param">text</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+  <span class="t-doc">## Convert the inline text to html with bold, italic and links
+</span>  <span class="t-doc">## formatted.
+</span>  <span class="t-dotName">inlineElements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">text</span>, <span class="t-str">&quot;inline&quot;</span>)
+  <span class="t-dotName">inlineFrags</span> = []
+  <span class="t-funcCall">loop</span>(<span class="t-dotName">inlineElements</span>, <span class="t-dotName">inlineFrags</span>, <span class="t-dotName">u.handle-html-inline</span>)
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">inlineFrags</span>, <span class="t-str">&quot;&quot;</span>))
+
+<span class="t-dotName">u.handle-html-bullet</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">bullet</span>: <span class="t-type">string</span>, <span class="t-param">lines</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Make the bullet text into an html bullet and add it to lines.
+</span>  <span class="t-dotName">text</span> = <span class="t-funcCall">u.inline-html</span>(<span class="t-dotName">bullet</span>)
+  <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;li&gt;&quot;</span>, <span class="t-dotName">text</span>, <span class="t-str">&quot;&lt;/li&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>)
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-dotName">u.html-paragraph</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
+  <span class="t-doc">## Return html given a &quot;p&quot; element md list.
+</span>  <span class="t-dotName">text</span> = <span class="t-dotName">item</span>[<span class="t-num">0</span>]
+  <span class="t-dotName">inlineText</span> = <span class="t-funcCall">u.inline-html</span>(<span class="t-dotName">text</span>)
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>([<span class="t-str">&quot;&lt;p&gt;&quot;</span>, <span class="t-dotName">inlineText</span>, <span class="t-str">&quot;&lt;/p&gt;&quot;</span>], <span class="t-str">&quot;&quot;</span>))
+
+<span class="t-dotName">u.handle-html-fragment</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">fragment</span>: <span class="t-type">list</span>, <span class="t-param">frags</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Highlight the fragment for html and add it to the frags list.
+</span>  <span class="t-dotName">tag</span> = <span class="t-dotName">fragment</span>[<span class="t-num">0</span>]
+  <span class="t-dotName">str</span> = <span class="t-funcCall">html</span>(<span class="t-dotName">fragment</span>[<span class="t-num">1</span>], <span class="t-str">&quot;body&quot;</span>)
+  <span class="t-comment"># Wrap each fragment with a span element except the &quot;other&quot; element.
+</span>  <span class="t-dotName">frags</span> &amp;= <span class="t-funcCall">if</span>((<span class="t-dotName">tag</span> == <span class="t-str">&quot;other&quot;</span>), <span class="t-dotName">str</span>, +
+    <span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;span class=\&quot;t-{tag}\&quot;&gt;{str}&lt;/span&gt;&quot;</span>))
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-dotName">u.handle-plain-code</span> = <span class="t-funcCall">func</span>(<span class="t-param">codeBlock</span>: <span class="t-type">string</span>, <span class="t-param">frags</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Add the plain code block (not tea code) to the frags list.
+</span>  <span class="t-dotName">frags</span> &amp;= <span class="t-funcCall">html</span>(<span class="t-dotName">codeBlock</span>, <span class="t-str">&quot;body&quot;</span>)
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-dotName">u.html-code</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
+  <span class="t-doc">## Format the &quot;code&quot; md element list as html.
+</span>  <span class="t-dotName">lines</span> = []
+  <span class="t-dotName">teaCode</span> = <span class="t-funcCall">find</span>(<span class="t-dotName">item</span>[<span class="t-num">0</span>], <span class="t-str">&quot;statictea&quot;</span>, <span class="t-num">-1</span>)
+  <span class="t-dotName">class</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">teaCode</span> == <span class="t-num">-1</span>), <span class="t-str">&quot;plain-code&quot;</span>, <span class="t-str">&quot;tea-code&quot;</span>)
+  <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">format</span>(<span class="t-str">&quot;&lt;pre class=\&quot;{class}\&quot;&gt;\n&quot;</span>)
+
+  <span class="t-dotName">codeBlock</span> = <span class="t-dotName">item</span>[<span class="t-num">1</span>]
+  <span class="t-dotName">ret</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">class</span> == <span class="t-str">&quot;tea-code&quot;</span>), +
+    <span class="t-funcCall">loop</span>(<span class="t-funcCall">parseCode</span>(<span class="t-dotName">codeBlock</span>), <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-fragment</span>), +
+    <span class="t-funcCall">u.handle-plain-code</span>(<span class="t-dotName">codeBlock</span>, <span class="t-dotName">lines</span>))
+    
+  <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;/pre&gt;\n&quot;</span>
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
+
+<span class="t-dotName">u.html-bullets</span> = <span class="t-funcCall">func</span>(<span class="t-param">item</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
+  <span class="t-doc">## Format the &quot;bullets&quot; md element list as html.
+</span>  <span class="t-dotName">lines</span> = []
+  <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;ul&gt;\n&quot;</span>
+  <span class="t-funcCall">loop</span>(<span class="t-dotName">item</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-bullet</span>)
+  <span class="t-dotName">lines</span> &amp;= <span class="t-str">&quot;&lt;/ul&gt;\n&quot;</span>
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
+
+<span class="t-dotName">u.handle-html-element</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">element</span>: <span class="t-type">list</span>, <span class="t-param">lines</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Format the md element as html and add it to lines.
+</span>  <span class="t-dotName">l.fn</span> = <span class="t-funcCall">case</span>(<span class="t-dotName">element</span>[<span class="t-num">0</span>], [ +
+    <span class="t-str">&quot;p&quot;</span>, <span class="t-dotName">u.html-paragraph</span>, +
+    <span class="t-str">&quot;code&quot;</span>, <span class="t-dotName">u.html-code</span>, +
+    <span class="t-str">&quot;bullets&quot;</span>, <span class="t-dotName">u.html-bullets</span> +
+  ])
+  <span class="t-dotName">lines</span> &amp;= <span class="t-funcCall">l.fn</span>(<span class="t-dotName">element</span>[<span class="t-num">1</span>])
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-dotName">u.get-html-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDesc</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+  <span class="t-doc">## Parse the description markdown text and return html paragraphs,
+</span>  <span class="t-doc">## bullet lists and code blocks.
+</span>  <span class="t-dotName">elements</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">mdDesc</span>, <span class="t-str">&quot;lite&quot;</span>)
+  <span class="t-dotName">lines</span> = []
+  <span class="t-funcCall">loop</span>(<span class="t-dotName">elements</span>, <span class="t-dotName">lines</span>, <span class="t-dotName">u.handle-html-element</span>)
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">join</span>(<span class="t-dotName">lines</span>, <span class="t-str">&quot;&quot;</span>))
+
+<span class="t-dotName">u.get-name</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">entry</span>: <span class="t-type">dict</span>, <span class="t-param">newList</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Add the entry name to the list.
+</span>  <span class="t-dotName">newList</span> &amp;= <span class="t-dotName">entry.name</span>
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+
+<span class="t-dotName">u.format-md-description</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdDesc</span>: <span class="t-type">string</span>, <span class="t-param">templateType</span>: <span class="t-type">string</span>) <span class="t-type">dict</span>
+  <span class="t-doc">## Format the statictea markdown description for html or github
+</span>  <span class="t-doc">## markdown. TemplateType is either &quot;md&quot; or &quot;html&quot;. For md replace
+</span>  <span class="t-doc">## the statictea code blocks with javascript so the code is
+</span>  <span class="t-doc">## highlighted by github. Return a dictionary with two elements,
+</span>  <span class="t-doc">## description and sentence. Sentence is the first sentence of the
+</span>  <span class="t-doc">## description.
+</span>
+  <span class="t-comment"># Use the first sentence for the short description.
+</span>  <span class="t-dotName">pos</span> = <span class="t-funcCall">find</span>(<span class="t-dotName">mdDesc</span>, <span class="t-str">&quot;.&quot;</span>, <span class="t-num">-1</span>)
+  <span class="t-dotName">short</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">pos</span> == <span class="t-num">-1</span>), <span class="t-dotName">mdDesc</span>, <span class="t-funcCall">slice</span>(<span class="t-dotName">mdDesc</span>, <span class="t-num">0</span>, <span class="t-funcCall">add</span>(<span class="t-dotName">pos</span>, <span class="t-num">1</span>)))
+  <span class="t-dotName">sentence</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">short</span>, [<span class="t-str">&quot;\n&quot;</span>, <span class="t-str">&quot; &quot;</span>])
+  
+  <span class="t-comment"># Convert the markdown description to html for the html
+</span>  <span class="t-comment"># template. For md switch statictea code blocks to javascript.
+</span>  <span class="t-dotName">description</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">templateType</span> == <span class="t-str">&quot;html&quot;</span>), +
+    <span class="t-funcCall">u.get-html-description</span>(<span class="t-dotName">mdDesc</span>), +
+    <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">mdDesc</span>, [<span class="t-str">&quot;~~~\\s*statictea&quot;</span>, <span class="t-str">&quot;~~~javascript&quot;</span>]))
+
+  <span class="t-comment"># Return both the discription and the first sentence.
+</span>  <span class="t-dotName">ret</span> = <span class="t-funcCall">dict</span>()
+  <span class="t-dotName">ret.description</span> = <span class="t-dotName">description</span>
+  <span class="t-dotName">ret.sentence</span> = <span class="t-dotName">sentence</span>
+  <span class="t-funcCall">return</span>(<span class="t-dotName">ret</span>)
+
+</pre>
+
+</body>
+</html>

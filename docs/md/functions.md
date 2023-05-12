@@ -1421,7 +1421,7 @@ Examples:
 ~~~javascript
 list = list("Tea", "Water", "Tea")
 a = anchors(list, "github")
-  # ["tea", "water", "tea-1"]
+# ["tea", "water", "tea-1"]
 ~~~
 
 

@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Statictea Functions</title>
+<link rel="stylesheet" type="text/css" href="nimModule.css">
+</head>
+<body>
+
+<h1>Statictea Functions</h1>
+<h4>The built-in Statictea functions.</h4>
+<img src=../teapotlogo.svg alt="statictea teapot logo" />
+
+<p>
+Functions allow you to format variables for presentation in a
+replacement block.  They return a value that you assign to a
+variable or pass to another function.
+</p>
+
+<h3>Index</h3>
+<ul>
+<li><a href="#add">add</a> &mdash; Add two floats.</li>
+<li><a href="#add-1">add</a> &mdash; Add two integers.</li>
+<li><a href="#anchors">anchors</a> &mdash; Create anchor names from heading names.</li>
+<li><a href="#bool">bool</a> &mdash; Create an bool from a value.</li>
+<li><a href="#case">case</a> &mdash; Compare integer cases and return the matching value.</li>
+<li><a href="#case-1">case</a> &mdash; Compare string cases and return the matching value.</li>
+<li><a href="#cmp">cmp</a> &mdash; Compare two floats.</li>
+<li><a href="#cmp-1">cmp</a> &mdash; Compare two ints.</li>
+<li><a href="#cmp-2">cmp</a> &mdash; Compare two strings.</li>
+<li><a href="#cmpVersion">cmpVersion</a> &mdash; Compare two StaticTea version numbers.</li>
+<li><a href="#dict">dict</a> &mdash; Create a dictionary from a list of key, value pairs.</li>
+<li><a href="#dup">dup</a> &mdash; Duplicate a string x times.</li>
+<li><a href="#echo">echo</a> &mdash; Echo a string to standard out.</li>
+<li><a href="#exists">exists</a> &mdash; Determine whether a key exists in a dictionary.</li>
+<li><a href="#find">find</a> &mdash; Find the position of a substring in a string.</li>
+<li><a href="#float">float</a> &mdash; Create a float from an int.</li>
+<li><a href="#float-1">float</a> &mdash; Create a float from a number string.</li>
+<li><a href="#float-2">float</a> &mdash; Create a float from a number string.</li>
+<li><a href="#format">format</a> &mdash; Format a string using replacement variables similar to a replacement block.</li>
+<li><a href="#func">func</a> &mdash; Define a function.</li>
+<li><a href="#functionDetails">functionDetails</a> &mdash; Return the function details in a dictionary.</li>
+<li><a href="#get">get</a> &mdash; Get a dictionary value by its key.</li>
+<li><a href="#get-1">get</a> &mdash; Get a list value by its index.</li>
+<li><a href="#html">html</a> &mdash; Escape text for placing it in an html page.</li>
+<li><a href="#if">if</a> &mdash; If the condition is true, return the second argument, else return the third argument.</li>
+<li><a href="#int">int</a> &mdash; Create an int from a float.</li>
+<li><a href="#int-1">int</a> &mdash; Create an int from a number string.</li>
+<li><a href="#int-2">int</a> &mdash; Create an int from a number string.</li>
+<li><a href="#join">join</a> &mdash; Join a list of strings with a separator.</li>
+<li><a href="#joinPath">joinPath</a> &mdash; Join the path components with a path separator.</li>
+<li><a href="#keys">keys</a> &mdash; Create a list from the keys in a dictionary.</li>
+<li><a href="#len">len</a> &mdash; Number of elements in a dictionary.</li>
+<li><a href="#len-1">len</a> &mdash; Number of elements in a list.</li>
+<li><a href="#len-2">len</a> &mdash; Number of unicode characters in a string.</li>
+<li><a href="#list">list</a> &mdash; Create a list of variables.</li>
+<li><a href="#log">log</a> &mdash; Log a message to the log file and return the same string.</li>
+<li><a href="#loop">loop</a> &mdash; Loop over items in a list and fill in a container.</li>
+<li><a href="#lower">lower</a> &mdash; Lowercase a string.</li>
+<li><a href="#not">not</a> &mdash; Boolean not.</li>
+<li><a href="#parseCode">parseCode</a> &mdash; Parse a string of StaticTea code into fragments useful for syntax highlighting.</li>
+<li><a href="#parseMarkdown">parseMarkdown</a> &mdash; Parse a simple subset of markdown.</li>
+<li><a href="#path">path</a> &mdash; Split a file path into its component pieces.</li>
+<li><a href="#readJson">readJson</a> &mdash; Convert a JSON string to a variable.</li>
+<li><a href="#replace">replace</a> &mdash; Replace a substring specified by its position and length with another string.</li>
+<li><a href="#replaceRe">replaceRe</a> &mdash; Replace multiple parts of a string using regular expressions.</li>
+<li><a href="#return">return</a> &mdash; Return is a special function that returns the value passed in and has has side effects.</li>
+<li><a href="#slice">slice</a> &mdash; Extract a substring from a string by its position and length.</li>
+<li><a href="#sort">sort</a> &mdash; Sort a list of values of the same type.</li>
+<li><a href="#sort-1">sort</a> &mdash; Sort a list of lists.</li>
+<li><a href="#sort-2">sort</a> &mdash; Sort a list of dictionaries.</li>
+<li><a href="#startsWith">startsWith</a> &mdash; Check whether a string starts with the given prefix.</li>
+<li><a href="#string">string</a> &mdash; Convert a variable to a string.</li>
+<li><a href="#string-1">string</a> &mdash; Convert the dictionary variable to dot names.</li>
+<li><a href="#sub">sub</a> &mdash; Subtract two floats.</li>
+<li><a href="#sub-1">sub</a> &mdash; Subtract two integers.</li>
+<li><a href="#type">type</a> &mdash; Return the argument type, one of: int, float, string, list, dict, bool or func.</li>
+<li><a href="#values">values</a> &mdash; Create a list out of the values in the specified dictionary.</li>
+<li><a href="#warn">warn</a> &mdash; Return a warning message and skip the current statement.</li>
+</ul>
+
+<h3 id="add">add</h3>
+<p>
+<p>Add two floats. A warning is generated on overflow.
+
+</p><pre class="tea-code">
+<span class="t-dotName">add</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">float</span>, <span class="t-param">b</span>: <span class="t-type">float</span>) <span class="t-type">float</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">add</span>(<span class="t-num">1.5</span>, <span class="t-num">2.3</span>) <span class="t-comment"># 3.8
+</span><span class="t-funcCall">add</span>(<span class="t-num">3.2</span>, <span class="t-num">-2.2</span>) <span class="t-comment"># 1.0
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="add-1">add</h3>
+<p>
+<p>Add two integers. A warning is generated on overflow.
+
+</p><pre class="tea-code">
+<span class="t-dotName">add</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">int</span>, <span class="t-param">b</span>: <span class="t-type">int</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">add</span>(<span class="t-num">1</span>, <span class="t-num">2</span>) <span class="t-comment"># 3
+</span><span class="t-funcCall">add</span>(<span class="t-num">3</span>, <span class="t-num">-2</span>) <span class="t-comment"># 1
+</span><span class="t-funcCall">add</span>(<span class="t-num">-2</span>, <span class="t-num">-5</span>) <span class="t-comment"># -7
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="anchors">anchors</h3>
+<p>
+<p>Create anchor names from heading names. Use it for HTML class
+names or Github markdown internal links. It handles duplicate
+heading names.
+
+</p><pre class="tea-code">
+<span class="t-dotName">anchors</span> = <span class="t-funcCall">func</span>(<span class="t-param">names</span>: <span class="t-type">list</span>, <span class="t-param">type</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
+</pre>
+<p>
+type:
+
+</p><ul>
+<li><b>html</b> — HTML class names
+</li><li><b>github</b> — GitHub markdown anchor links
+
+</li></ul>
+<p>Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;Water&quot;</span>, <span class="t-str">&quot;Tea&quot;</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">anchors</span>(<span class="t-dotName">list</span>, <span class="t-str">&quot;github&quot;</span>)
+<span class="t-comment"># [&quot;tea&quot;, &quot;water&quot;, &quot;tea-1&quot;]
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="bool">bool</h3>
+<p>
+<p>Create an bool from a value.
+
+</p><pre class="tea-code">
+<span class="t-dotName">bool</span> = <span class="t-funcCall">func</span>(<span class="t-param">value</span>: V<span class="t-type">alue</span>) <span class="t-type">bool</span>
+</pre>
+<p>
+False values by variable types:
+
+</p><ul>
+<li><b>bool</b> — false
+</li><li><b>int</b> — 0
+</li><li><b>float</b> — 0.0
+</li><li><b>string</b> — when the length of the string is 0
+</li><li><b>list</b> — when the length of the list is 0
+</li><li><b>dict</b> — when the length of the dictionary is 0
+</li><li><b>func</b> — always false
+
+</li></ul>
+<p>Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">bool</span>(<span class="t-num">0</span>) <span class="t-comment"># false
+</span><span class="t-funcCall">bool</span>(<span class="t-num">0.0</span>) <span class="t-comment"># false
+</span><span class="t-funcCall">bool</span>([]) <span class="t-comment"># false
+</span><span class="t-funcCall">bool</span>(<span class="t-str">&quot;&quot;</span>) <span class="t-comment"># false
+</span><span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>()) <span class="t-comment"># false
+</span>
+<span class="t-funcCall">bool</span>(<span class="t-num">5</span>) <span class="t-comment"># true
+</span><span class="t-funcCall">bool</span>(<span class="t-num">3.3</span>) <span class="t-comment"># true
+</span><span class="t-funcCall">bool</span>([<span class="t-num">8</span>]) <span class="t-comment"># true
+</span><span class="t-funcCall">bool</span>(<span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># true
+</span><span class="t-funcCall">bool</span>(<span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">2</span>])) <span class="t-comment"># true
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="case">case</h3>
+<p>
+<p>Compare integer cases and return the matching value.  It takes a
+main integer condition, a list of case pairs and an optional
+value when none of the cases match.
+
+</p><p>The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+</p><p>When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be integers. The return values
+can be any type.
+
+</p><p>If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
+</p><pre class="tea-code">
+<span class="t-dotName">case</span> = <span class="t-funcCall">case</span>(<span class="t-dotName">condition</span>: <span class="t-dotName">int</span>, <span class="t-dotName">pairs</span>: <span class="t-dotName">list</span>, <span class="t-dotName">default</span>: <span class="t-dotName">optional</span> <span class="t-dotName">any</span>) <span class="t-dotName">any</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">cases</span> = <span class="t-funcCall">list</span>(<span class="t-num">0</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-num">1</span>, <span class="t-str">&quot;water&quot;</span>, <span class="t-num">2</span>, <span class="t-str">&quot;beer&quot;</span>)
+<span class="t-funcCall">case</span>(<span class="t-num">0</span>, <span class="t-dotName">cases</span>) <span class="t-comment"># &quot;tea&quot;
+</span><span class="t-funcCall">case</span>(<span class="t-num">1</span>, <span class="t-dotName">cases</span>) <span class="t-comment"># &quot;water&quot;
+</span><span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>) <span class="t-comment"># &quot;beer&quot;
+</span><span class="t-funcCall">case</span>(<span class="t-num">2</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;wine&quot;</span>) <span class="t-comment"># &quot;beer&quot;
+</span><span class="t-funcCall">case</span>(<span class="t-num">3</span>, <span class="t-dotName">cases</span>, <span class="t-str">&quot;wine&quot;</span>) <span class="t-comment"># &quot;wine&quot;
+</span>
+<span class="t-dotName">x</span> = <span class="t-funcCall">case</span>(<span class="t-num">1</span>, [ +
+  <span class="t-num">0</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>), +
+  <span class="t-num">1</span>, <span class="t-str">&quot;match&quot;</span>, +
+  <span class="t-num">2</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>)])
+<span class="t-comment"># x =&gt; match
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="case-1">case</h3>
+<p>
+<p>Compare string cases and return the matching value.  It takes a
+main string condition, a list of case pairs and an optional
+value when none of the cases match.
+
+</p><p>The first element of a case pair is the condition and the
+second is the return value when that condition matches the main
+condition. The function compares the conditions left to right and
+returns the first match.
+
+</p><p>When none of the cases match the main condition, the default
+value is returned if it is specified, otherwise a warning is
+generated.  The conditions must be strings. The return values
+can be any type.
+
+</p><p>If the pairs argument is a literal list, only the matching case is
+executed and the other ones are skipped.
+
+</p><pre class="tea-code">
+<span class="t-dotName">case</span> = <span class="t-funcCall">func</span>(<span class="t-param">condition</span>: <span class="t-type">string</span>, <span class="t-param">pairs</span>: <span class="t-type">list</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">pairs</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-num">15</span>, <span class="t-str">&quot;water&quot;</span>, <span class="t-num">2.3</span>, <span class="t-str">&quot;beer&quot;</span>, <span class="t-str">&quot;cold&quot;</span>)
+<span class="t-funcCall">case</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">pairs</span>) <span class="t-comment"># 15
+</span><span class="t-funcCall">case</span>(<span class="t-str">&quot;water&quot;</span>, <span class="t-dotName">pairs</span>) <span class="t-comment"># 2.3
+</span><span class="t-funcCall">case</span>(<span class="t-str">&quot;beer&quot;</span>, <span class="t-dotName">pairs</span>) <span class="t-comment"># &quot;cold&quot;
+</span><span class="t-funcCall">case</span>(<span class="t-str">&quot;bunch&quot;</span>, <span class="t-dotName">pairs</span>, <span class="t-str">&quot;other&quot;</span>) <span class="t-comment"># &quot;other&quot;
+</span>
+<span class="t-dotName">x</span> = <span class="t-funcCall">case</span>(<span class="t-str">&quot;a&quot;</span>, [ +
+  <span class="t-str">&quot;q&quot;</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>), +
+  <span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;match&quot;</span>, +
+  <span class="t-str">&quot;e&quot;</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;not hit&quot;</span>)])
+<span class="t-comment"># x =&gt; match
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="cmp">cmp</h3>
+<p>
+<p>Compare two floats. Returns -1 for less, 0 for equal and 1 for
+greater than.
+
+</p><pre class="tea-code">
+<span class="t-dotName">cmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">float</span>, <span class="t-param">b</span>: <span class="t-type">float</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">cmp</span>(<span class="t-num">7.8</span>, <span class="t-num">9.1</span>) <span class="t-comment"># -1
+</span><span class="t-funcCall">cmp</span>(<span class="t-num">8.4</span>, <span class="t-num">8.4</span>) <span class="t-comment"># 0
+</span><span class="t-funcCall">cmp</span>(<span class="t-num">9.3</span>, <span class="t-num">2.2</span>) <span class="t-comment"># 1
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="cmp-1">cmp</h3>
+<p>
+<p>Compare two ints. Returns -1 for less, 0 for equal and 1 for
+greater than.
+
+</p><pre class="tea-code">
+<span class="t-dotName">cmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">int</span>, <span class="t-param">b</span>: <span class="t-type">int</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">cmp</span>(<span class="t-num">7</span>, <span class="t-num">9</span>) <span class="t-comment"># -1
+</span><span class="t-funcCall">cmp</span>(<span class="t-num">8</span>, <span class="t-num">8</span>) <span class="t-comment"># 0
+</span><span class="t-funcCall">cmp</span>(<span class="t-num">9</span>, <span class="t-num">2</span>) <span class="t-comment"># 1
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="cmp-2">cmp</h3>
+<p>
+<p>Compare two strings. Returns -1 for less, 0 for equal and 1 for
+greater than.
+
+</p><p>You have the option to compare case insensitive. Case sensitive
+is the default.
+
+</p><pre class="tea-code">
+<span class="t-dotName">cmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">string</span>, <span class="t-param">b</span>: <span class="t-type">string</span>, <span class="t-param">insensitive</span>: <span class="t-type">optional</span> <span class="t-type">bool</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">cmp</span>(<span class="t-str">&quot;coffee&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># -1
+</span><span class="t-funcCall">cmp</span>(<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># 0
+</span><span class="t-funcCall">cmp</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># 1
+</span><span class="t-funcCall">cmp</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">true</span>) <span class="t-comment"># 1
+</span><span class="t-funcCall">cmp</span>(<span class="t-str">&quot;Tea&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-dotName">false</span>) <span class="t-comment"># 0
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="cmpVersion">cmpVersion</h3>
+<p>
+<p>Compare two StaticTea version numbers. Returns -1 for less, 0 for
+equal and 1 for greater than.
+
+</p><pre class="tea-code">
+<span class="t-dotName">cmpVersion</span> = <span class="t-funcCall">func</span>(<span class="t-param">versionA</span>: <span class="t-type">string</span>, <span class="t-param">versionB</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
+</pre>
+<p>
+StaticTea uses Semantic Versioning (<a href="https%3A%2F%2Fsemver.org%2F">https://semver.org/</a>)
+with the added restriction that each version component has one
+to three digits (no letters).
+
+</p><p>Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">cmpVersion</span>(<span class="t-str">&quot;1.2.5&quot;</span>, <span class="t-str">&quot;1.1.8&quot;</span>) <span class="t-comment"># 1
+</span><span class="t-funcCall">cmpVersion</span>(<span class="t-str">&quot;1.2.5&quot;</span>, <span class="t-str">&quot;1.3.0&quot;</span>) <span class="t-comment"># -1
+</span><span class="t-funcCall">cmpVersion</span>(<span class="t-str">&quot;1.2.5&quot;</span>, <span class="t-str">&quot;1.2.5&quot;</span>) <span class="t-comment"># 0
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="dict">dict</h3>
+<p>
+<p>Create a dictionary from a list of key, value pairs.  The keys
+must be strings and the values can be any type.
+
+</p><pre class="tea-code">
+<span class="t-dotName">dict</span> = <span class="t-funcCall">func</span>(<span class="t-param">pairs</span>: <span class="t-type">optional</span> <span class="t-type">list</span>) <span class="t-type">dict</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">dict</span>() <span class="t-comment"># {}
+</span><span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>]) <span class="t-comment"># {&quot;a&quot;: 5}
+</span><span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">33</span>, <span class="t-str">&quot;c&quot;</span>, <span class="t-num">0</span>])
+  <span class="t-comment"># {&quot;a&quot;: 5, &quot;b&quot;: 33, &quot;c&quot;: 0}
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="dup">dup</h3>
+<p>
+<p>Duplicate a string x times. The result is a new string built by
+concatenating the string to itself the specified number of times.
+The resulting string must be less than or equal to 1024 bytes.
+
+</p><pre class="tea-code">
+<span class="t-dotName">dup</span> = <span class="t-funcCall">func</span>(<span class="t-param">pattern</span>: <span class="t-type">string</span>, <span class="t-param">count</span>: <span class="t-type">int</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">dup</span>(<span class="t-str">&quot;=&quot;</span>, <span class="t-num">3</span>) <span class="t-comment"># &quot;===&quot;
+</span><span class="t-funcCall">dup</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-num">0</span>) <span class="t-comment"># &quot;&quot;
+</span><span class="t-funcCall">dup</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-num">1</span>) <span class="t-comment"># &quot;abc&quot;
+</span><span class="t-funcCall">dup</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-num">2</span>) <span class="t-comment"># &quot;abcabc&quot;
+</span><span class="t-funcCall">dup</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">3</span>) <span class="t-comment"># &quot;&quot;
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="echo">echo</h3>
+<p>
+<p>Echo a string to standard out. Return the same string. The
+function has a bare form.
+
+</p><pre class="tea-code">
+<span class="t-dotName">echo</span> = <span class="t-funcCall">func</span>(<span class="t-param">text</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">echo</span>(<span class="t-str">&quot;debugging string&quot;</span>)
+
+<span class="t-funcCall">if</span>(<span class="t-dotName">cond</span>, <span class="t-funcCall">echo</span>(<span class="t-str">&quot;debugging string&quot;</span>))
+
+<span class="t-dotName">a</span> = <span class="t-funcCall">len</span>(<span class="t-funcCall">echo</span>(<span class="t-str">&quot;len called&quot;</span>))
+ <span class="t-comment">#-&gt; 10
+</span></pre>
+<p>
+
+</p>
+</p>
+<h3 id="exists">exists</h3>
+<p>
+<p>Determine whether a key exists in a dictionary. Return true when it
+exists, else false.
+
+</p><pre class="tea-code">
+<span class="t-dotName">exists</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>, <span class="t-param">key</span>: <span class="t-type">string</span>) <span class="t-type">bool</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl&quot;</span>])
+<span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># true
+</span><span class="t-funcCall">exists</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;coffee&quot;</span>) <span class="t-comment"># false
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="find">find</h3>
+<p>
+<p>Find the position of a substring in a string.  When the substring
+is not found, return an optional default value.  A warning is
+generated when the substring is missing and you don&#x27;t specify a
+default value.
+
+</p><pre class="tea-code">
+<span class="t-dotName">find</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">substring</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+       <span class="t-num">0123456789</span> <span class="t-num">1234567</span>
+<span class="t-dotName">msg</span> = <span class="t-str">&quot;Tea time at 3:30.&quot;</span>
+<span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;Tea&quot;</span>) <span class="t-comment"># 0
+</span><span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;time&quot;</span>) <span class="t-comment"># 4
+</span><span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;me&quot;</span>) <span class="t-comment"># 6
+</span><span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;party&quot;</span>, <span class="t-num">-1</span>) <span class="t-comment"># -1
+</span><span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;party&quot;</span>, <span class="t-funcCall">len</span>(<span class="t-dotName">msg</span>)) <span class="t-comment"># 17
+</span><span class="t-funcCall">find</span>(<span class="t-dotName">msg</span>, <span class="t-str">&quot;party&quot;</span>, <span class="t-num">0</span>) <span class="t-comment"># 0
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="float">float</h3>
+<p>
+<p>Create a float from an int.
+
+</p><pre class="tea-code">
+<span class="t-dotName">float</span> = <span class="t-funcCall">func</span>(<span class="t-param">num</span>: <span class="t-type">int</span>) <span class="t-type">float</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">float</span>(<span class="t-num">2</span>) <span class="t-comment"># 2.0
+</span><span class="t-funcCall">float</span>(<span class="t-num">-33</span>) <span class="t-comment"># -33.0
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="float-1">float</h3>
+<p>
+<p>Create a float from a number string. If the string is not a
+number, return the default.
+
+</p><pre class="tea-code">
+<span class="t-dotName">float</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">float</span>(<span class="t-str">&quot;2&quot;</span>) <span class="t-comment"># 2.0
+</span><span class="t-funcCall">float</span>(<span class="t-str">&quot;notnum&quot;</span>, <span class="t-str">&quot;nan&quot;</span>) <span class="t-comment"># nan
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="float-2">float</h3>
+<p>
+<p>Create a float from a number string.
+
+</p><pre class="tea-code">
+<span class="t-dotName">float</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>) <span class="t-type">float</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">float</span>(<span class="t-str">&quot;2&quot;</span>) <span class="t-comment"># 2.0
+</span><span class="t-funcCall">float</span>(<span class="t-str">&quot;2.4&quot;</span>) <span class="t-comment"># 2.4
+</span><span class="t-funcCall">float</span>(<span class="t-str">&quot;33&quot;</span>) <span class="t-comment"># 33.0
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="format">format</h3>
+<p>
+<p>Format a string using replacement variables similar to a
+replacement block. To enter a left bracket use two in a row.
+
+</p><pre class="tea-code">
+<span class="t-dotName">format</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Example:
+
+</p><pre class="tea-code">
+<span class="t-dotName">let</span> <span class="t-dotName">first</span> = <span class="t-str">&quot;Earl&quot;</span>
+<span class="t-dotName">let</span> <span class="t-dotName">last</span> = <span class="t-str">&quot;Grey&quot;</span>
+<span class="t-dotName">str</span> = <span class="t-funcCall">format</span>(<span class="t-str">&quot;name: {first} {last}&quot;</span>)
+  <span class="t-comment"># &quot;name: Earl Grey&quot;
+</span></pre>
+<p>
+To enter a left bracket use two in a row.
+
+</p><pre class="tea-code">
+<span class="t-dotName">str</span> = <span class="t-funcCall">format</span>(<span class="t-str">&quot;use two {{ to get one&quot;</span>)
+  <span class="t-comment"># &quot;use two { to get one&quot;
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="func">func</h3>
+<p>
+<p>Define a function.
+
+</p><pre class="tea-code">
+<span class="t-dotName">func</span> = <span class="t-funcCall">func</span>(<span class="t-param">name</span>: <span class="t-type">type</span>, ...) <span class="t-type">ret</span>T<span class="t-dotName">ype</span>
+</pre>
+<p>
+Example:
+
+</p><pre class="tea-code">
+<span class="t-dotName">mycmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">numStr1</span>: <span class="t-type">string</span>, <span class="t-param">numStr2</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
+  <span class="t-doc">## Compare two number strings
+</span>  <span class="t-doc">## and return 1, 0, or -1.
+</span>  <span class="t-dotName">num1</span> = <span class="t-funcCall">int</span>(<span class="t-dotName">numStr1</span>)
+  <span class="t-dotName">num2</span> = <span class="t-funcCall">int</span>(<span class="t-dotName">numStr2</span>)
+  <span class="t-funcCall">return</span>(<span class="t-funcCall">cmp</span>(<span class="t-dotName">num1</span>, <span class="t-dotName">num2</span>))
+</pre>
+<p>
+</p>
+</p>
+<h3 id="functionDetails">functionDetails</h3>
+<p>
+<p>Return the function details in a dictionary.
+
+</p><pre class="tea-code">
+<span class="t-dotName">functionDetails</span> = <span class="t-funcCall">func</span>(<span class="t-param">funcVar</span>: <span class="t-type">func</span>) <span class="t-type">dict</span>
+</pre>
+<p>
+The following example defines a simple function then gets its
+function details.
+
+</p><pre class="tea-code">
+<span class="t-dotName">mycmp</span> = <span class="t-funcCall">func</span>(<span class="t-param">numStr1</span>: <span class="t-type">string</span>, <span class="t-param">numStr2</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
+  <span class="t-doc">## Compare two number strings and return 1, 0, or -1.
+</span>  <span class="t-funcCall">return</span>(<span class="t-funcCall">cmp</span>(<span class="t-funcCall">int</span>(<span class="t-dotName">numStr1</span>), <span class="t-funcCall">int</span>(<span class="t-dotName">numStr2</span>)))
+
+<span class="t-dotName">fd</span> = <span class="t-funcCall">functionDetails</span>(<span class="t-dotName">mycmp</span>)
+
+<span class="t-dotName">fd</span> =&gt;
+<span class="t-dotName">fd.builtIn</span> = <span class="t-dotName">false</span>
+<span class="t-dotName">fd.signature.optional</span> = <span class="t-dotName">false</span>
+<span class="t-dotName">fd.signature.name</span> = <span class="t-str">&quot;mycmp&quot;</span>
+<span class="t-dotName">fd.signature.paramNames</span> = [<span class="t-str">&quot;numStr1&quot;</span>,<span class="t-str">&quot;numStr2&quot;</span>]
+<span class="t-dotName">fd.signature.paramTypes</span> = [<span class="t-str">&quot;string&quot;</span>,<span class="t-str">&quot;string&quot;</span>]
+<span class="t-dotName">fd.signature.returnType</span> = <span class="t-str">&quot;int&quot;</span>
+<span class="t-dotName">fd.docComment</span> = <span class="t-str">&quot;  ## Compare two number strings and return 1, 0, or -1.\\n&quot;</span>
+<span class="t-dotName">fd.filename</span> = <span class="t-str">&quot;testcode.tea&quot;</span>
+<span class="t-dotName">fd.lineNum</span> = <span class="t-num">3</span>
+<span class="t-dotName">fd.numLines</span> = <span class="t-num">2</span>
+<span class="t-dotName">fd.statements</span> = [<span class="t-str">&quot;  return(cmp(int(numStr1), int(numStr2)))&quot;</span>]
+</pre>
+<p>
+</p>
+</p>
+<h3 id="get">get</h3>
+<p>
+<p>Get a dictionary value by its key.  If the key doesn&#x27;t exist, the
+default value is returned if specified, else a warning is
+generated.
+
+</p><pre class="tea-code">
+<span class="t-dotName">get</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>, <span class="t-param">key</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Note: For dictionary lookup you can use dot notation. It&#x27;s the
+same as get without the default.
+
+</p><p>Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>])
+<span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># &quot;Earl Grey&quot;
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;coffee&quot;</span>, <span class="t-str">&quot;water&quot;</span>) <span class="t-comment"># &quot;water&quot;
+</span></pre>
+<p>
+Using dot notation:
+
+</p><pre class="tea-code">
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;Earl Grey&quot;</span>])
+<span class="t-dotName">d.tea</span> =&gt; <span class="t-str">&quot;Earl Grey&quot;</span>
+</pre>
+<p>
+</p>
+</p>
+<h3 id="get-1">get</h3>
+<p>
+<p>Get a list value by its index.  If the index is invalid, the
+default value is returned when specified, else a warning is
+generated. You can use negative index values. Index -1 gets the
+last element. It is short hand for len - 1. Index -2 is len - 2,
+etc.
+
+</p><pre class="tea-code">
+<span class="t-dotName">get</span> = <span class="t-funcCall">func</span>(<span class="t-param">list</span>: <span class="t-type">list</span>, <span class="t-param">index</span>: <span class="t-type">int</span>, <span class="t-param">default</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-str">&quot;a&quot;</span>, <span class="t-num">10</span>)
+<span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">0</span>) <span class="t-comment"># 4
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">1</span>) <span class="t-comment"># &quot;a&quot;
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">2</span>) <span class="t-comment"># 10
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">3</span>, <span class="t-num">99</span>) <span class="t-comment"># 99
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-1</span>) <span class="t-comment"># 10
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-2</span>) <span class="t-comment"># &quot;a&quot;
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-3</span>) <span class="t-comment"># 4
+</span><span class="t-funcCall">get</span>(<span class="t-dotName">list</span>, <span class="t-num">-4</span>, <span class="t-num">11</span>) <span class="t-comment"># 11
+</span></pre>
+<p>
+You can also use bracket notation to access list items.
+
+</p><pre class="tea-code">
+<span class="t-dotName">a</span> = <span class="t-dotName">teas</span>[<span class="t-num">0</span>]
+</pre>
+<p>
+</p>
+</p>
+<h3 id="html">html</h3>
+<p>
+<p>Escape text for placing it in an html page.
+
+</p><pre class="tea-code">
+<span class="t-dotName">html</span> = <span class="t-funcCall">func</span>(<span class="t-param">text</span>: <span class="t-type">string</span>, <span class="t-param">place</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+places:
+
+</p><ul>
+<li><b>body</b> — in the html body
+</li><li><b>attribute</b> — in an html attribute
+</li><li><b>url</b> — url encoding (percent encoding)
+
+</li></ul>
+<pre class="tea-code">
+<span class="t-dotName">name</span> = <span class="t-funcCall">html</span>(<span class="t-str">&quot;Mad &lt;Hatter&gt;&quot;</span>, <span class="t-str">&quot;body&quot;</span>)
+  <span class="t-comment"># &quot;Mad &amp;lt;Hatter&amp;gt;&quot;
+</span>
+<span class="t-dotName">url</span> = <span class="t-funcCall">html</span>(<span class="t-str">&quot;https://github.com/flenniken/statictea&quot;</span>, <span class="t-str">&quot;url&quot;</span>)
+  <span class="t-comment"># &quot;https%3A%2F%2Fgithub.com%2Fflenniken%2Fstatictea&quot;
+</span></pre>
+<p>
+For more information about how to escape and what is safe see:
+<a href="https%3A%2F%2Fcheatsheetseries.owasp.org%2Fcheatsheets%2FCross_Site_Scripting_Prevention_Cheat_Sheet.html%23output-encoding-for-html-contexts">XSS Cheatsheets</a>
+
+</p>
+</p>
+<h3 id="if">if</h3>
+<p>
+<p>If the condition is true, return the second argument, else return
+the third argument.
+
+</p><p>The IF function is special in a couple of ways, see the IF
+Function section.
+
+</p><p>You usually use boolean infix expressions for the condition, see:
+the Boolean Expressions section.
+
+</p><pre class="tea-code">
+<span class="t-dotName">if</span> = <span class="t-funcCall">func</span>(<span class="t-param">condition</span>: <span class="t-type">bool</span>, <span class="t-param">then</span>: <span class="t-type">any</span>, <span class="t-param">else</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">a</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">true</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># tea
+</span><span class="t-dotName">b</span> = <span class="t-funcCall">if</span>(<span class="t-dotName">false</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
+</span><span class="t-dotName">v</span> = <span class="t-num">6</span>
+<span class="t-dotName">c</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">v</span> &lt; <span class="t-num">5</span>), <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;beer&quot;</span>) <span class="t-comment"># beer
+</span><span class="t-dotName">d</span> = <span class="t-funcCall">if</span>((<span class="t-dotName">v</span> &lt; <span class="t-num">5</span>), <span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># no assignment
+</span></pre>
+<p>
+You don&#x27;t have to assign the result of an if function which is
+useful when using a warn or return function for its side effects.
+The if takes two arguments when there is no assignment.
+
+</p><pre class="tea-code">
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;c is true&quot;</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">&quot;skip&quot;</span>))
+</pre>
+<p>
+</p>
+</p>
+<h3 id="int">int</h3>
+<p>
+<p>Create an int from a float. When the float value is out of range,
+a warning is generated.
+
+</p><pre class="tea-code">
+<span class="t-dotName">int</span> = <span class="t-funcCall">func</span>(<span class="t-param">num</span>: <span class="t-type">float</span>, <span class="t-param">roundOption</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Round options:
+
+</p><ul>
+<li><b>round</b> - nearest integer, the default.
+</li><li><b>floor</b> - integer below (to the left on number line)
+</li><li><b>ceiling</b> - integer above (to the right on number line)
+</li><li><b>truncate</b> - remove decimals
+
+</li></ul>
+<p>Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">int</span>(<span class="t-num">2.34</span>) <span class="t-comment"># 2
+</span><span class="t-funcCall">int</span>(<span class="t-num">2.34</span>, <span class="t-str">&quot;round&quot;</span>) <span class="t-comment"># 2
+</span><span class="t-funcCall">int</span>(<span class="t-num">-2.34</span>, <span class="t-str">&quot;round&quot;</span>) <span class="t-comment"># -2
+</span><span class="t-funcCall">int</span>(<span class="t-num">6.5</span>, <span class="t-str">&quot;round&quot;</span>) <span class="t-comment"># 7
+</span><span class="t-funcCall">int</span>(<span class="t-num">-6.5</span>, <span class="t-str">&quot;round&quot;</span>) <span class="t-comment"># -7
+</span><span class="t-funcCall">int</span>(<span class="t-num">4.57</span>, <span class="t-str">&quot;floor&quot;</span>) <span class="t-comment"># 4
+</span><span class="t-funcCall">int</span>(<span class="t-num">-4.57</span>, <span class="t-str">&quot;floor&quot;</span>) <span class="t-comment"># -5
+</span><span class="t-funcCall">int</span>(<span class="t-num">6.3</span>, <span class="t-str">&quot;ceiling&quot;</span>) <span class="t-comment"># 7
+</span><span class="t-funcCall">int</span>(<span class="t-num">-6.3</span>, <span class="t-str">&quot;ceiling&quot;</span>) <span class="t-comment"># -6
+</span><span class="t-funcCall">int</span>(<span class="t-num">6.3456</span>, <span class="t-str">&quot;truncate&quot;</span>) <span class="t-comment"># 6
+</span><span class="t-funcCall">int</span>(<span class="t-num">-6.3456</span>, <span class="t-str">&quot;truncate&quot;</span>) <span class="t-comment"># -6
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="int-1">int</h3>
+<p>
+<p>Create an int from a number string. It generates a warning when
+the number string is not an int.
+
+</p><pre class="tea-code">
+<span class="t-dotName">int</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>, <span class="t-param">roundOption</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Round options:
+
+</p><ul>
+<li><b>round</b> - nearest integer, the default
+</li><li><b>floor</b> - integer below (to the left on number line)
+</li><li><b>ceiling</b> - integer above (to the right on number line)
+</li><li><b>truncate</b> - remove decimals
+
+</li></ul>
+<p>Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;2&quot;</span>) <span class="t-comment"># 2
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;2.34&quot;</span>) <span class="t-comment"># 2
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;-2.34&quot;</span>, <span class="t-str">&quot;round&quot;</span>) <span class="t-comment"># -2
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;6.5&quot;</span>, <span class="t-str">&quot;round&quot;</span>) <span class="t-comment"># 7
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;-6.5&quot;</span>, <span class="t-str">&quot;round&quot;</span>) <span class="t-comment"># -7
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;4.57&quot;</span>, <span class="t-str">&quot;floor&quot;</span>) <span class="t-comment"># 4
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;-4.57&quot;</span>, <span class="t-str">&quot;floor&quot;</span>) <span class="t-comment"># -5
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;6.3&quot;</span>, <span class="t-str">&quot;ceiling&quot;</span>) <span class="t-comment"># 7
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;-6.3&quot;</span>, <span class="t-str">&quot;ceiling&quot;</span>) <span class="t-comment"># -6
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;6.3456&quot;</span>, <span class="t-str">&quot;truncate&quot;</span>) <span class="t-comment"># 6
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;-6.3456&quot;</span>, <span class="t-str">&quot;truncate&quot;</span>) <span class="t-comment"># -6
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="int-2">int</h3>
+<p>
+<p>Create an int from a number string. If the string is not a number,
+return the default value.
+
+</p><pre class="tea-code">
+<span class="t-dotName">int</span> = <span class="t-funcCall">func</span>(<span class="t-param">numString</span>: <span class="t-type">string</span>, <span class="t-param">roundOption</span>: <span class="t-type">string</span>, <span class="t-param">default</span>: <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Round options:
+
+</p><ul>
+<li><b>round</b> - nearest integer, the default
+</li><li><b>floor</b> - integer below (to the left on number line)
+</li><li><b>ceiling</b> - integer above (to the right on number line)
+</li><li><b>truncate</b> - remove decimals
+
+</li></ul>
+<p>Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">int</span>(<span class="t-str">&quot;2&quot;</span>, <span class="t-str">&quot;round&quot;</span>, <span class="t-str">&quot;nan&quot;</span>) <span class="t-comment"># 2
+</span><span class="t-funcCall">int</span>(<span class="t-str">&quot;notnum&quot;</span>, <span class="t-str">&quot;round&quot;</span>, <span class="t-str">&quot;nan&quot;</span>) <span class="t-comment"># nan
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="join">join</h3>
+<p>
+<p>Join a list of strings with a separator.  An optional parameter
+determines the separator, by default it is &quot;&quot;.
+
+</p><pre class="tea-code">
+<span class="t-dotName">join</span> = <span class="t-funcCall">func</span>(<span class="t-param">strs</span>: <span class="t-type">list</span>, <span class="t-param">sep</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>]) <span class="t-comment"># &quot;ab&quot;
+</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># &quot;ab&quot;
+</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>], <span class="t-str">&quot;, &quot;</span>) <span class="t-comment"># &quot;a, b&quot;
+</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># &quot;abc&quot;
+</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>], <span class="t-str">&quot;, &quot;</span>) <span class="t-comment"># &quot;a&quot;
+</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;&quot;</span>], <span class="t-str">&quot;, &quot;</span>) <span class="t-comment"># &quot;&quot;
+</span><span class="t-funcCall">join</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;c&quot;</span>], <span class="t-str">&quot;|&quot;</span>) <span class="t-comment"># &quot;a||c&quot;
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="joinPath">joinPath</h3>
+<p>
+<p>Join the path components with a path separator.
+
+</p><p>You pass a list of components to join. For the second optional
+parameter you specify the separator to use, either &quot;/&quot;, &quot;\&quot; or
+&quot;&quot;. If you specify &quot;&quot; or leave off the parameter, the current
+platform separator is used.
+
+</p><p>A warning is generated if a component contains a separator.  If a
+component is &quot;&quot;, the platform separator is used for it.
+
+</p><pre class="tea-code">
+<span class="t-dotName">joinPath</span> = <span class="t-funcCall">func</span>(<span class="t-param">components</span>: <span class="t-type">list</span>, <span class="t-param">separator</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;pot&quot;</span>]) <span class="t-comment"># tea/pot
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;hot&quot;</span>, <span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># tea/hot/
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;cool&quot;</span>]) <span class="t-comment"># /tea/cool
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;cool&quot;</span>, <span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># /tea/cool/
+</span><span class="t-funcCall">joinPath</span>([]) <span class="t-comment"># &quot;&quot;
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># /
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;abc&quot;</span>]) <span class="t-comment"># abc
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>]) <span class="t-comment"># /tea
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;&quot;</span>]) <span class="t-comment"># tea/
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;tea&quot;</span>], <span class="t-str">&quot;/&quot;</span>) <span class="t-comment"># /tea
+</span><span class="t-funcCall">joinPath</span>([<span class="t-str">&quot;net:&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;cold&quot;</span>], <span class="t-str">&quot;\\&quot;</span>) <span class="t-comment"># net:\\cold
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="keys">keys</h3>
+<p>
+<p>Create a list from the keys in a dictionary.
+
+</p><pre class="tea-code">
+<span class="t-dotName">keys</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>) <span class="t-type">list</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>, <span class="t-str">&quot;c&quot;</span>, <span class="t-num">3</span>)
+<span class="t-funcCall">keys</span>(<span class="t-dotName">d</span>) <span class="t-comment"># [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+</span><span class="t-funcCall">values</span>(<span class="t-dotName">d</span>) <span class="t-comment"># [1, 2, 3]
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="len">len</h3>
+<p>
+<p>Number of elements in a dictionary.
+
+</p><pre class="tea-code">
+<span class="t-dotName">len</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>()) <span class="t-comment"># 0
+</span><span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>])) <span class="t-comment"># 1
+</span><span class="t-funcCall">len</span>(<span class="t-funcCall">dict</span>([<span class="t-str">&quot;a&quot;</span>, <span class="t-num">4</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">3</span>])) <span class="t-comment"># 2
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="len-1">len</h3>
+<p>
+<p>Number of elements in a list.
+
+</p><pre class="tea-code">
+<span class="t-dotName">len</span> = <span class="t-funcCall">func</span>(<span class="t-param">list</span>: <span class="t-type">list</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>()) <span class="t-comment"># 0
+</span><span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>(<span class="t-num">1</span>)) <span class="t-comment"># 1
+</span><span class="t-funcCall">len</span>(<span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-num">5</span>)) <span class="t-comment"># 2
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="len-2">len</h3>
+<p>
+<p>Number of unicode characters in a string.
+
+</p><pre class="tea-code">
+<span class="t-dotName">len</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">len</span>(<span class="t-str">&quot;tea&quot;</span>) <span class="t-comment"># 3
+</span><span class="t-funcCall">len</span>(<span class="t-str">&quot;añyóng&quot;</span>) <span class="t-comment"># 6
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="list">list</h3>
+<p>
+<p>Create a list of variables. You can also create a list with brackets.
+
+</p><pre class="tea-code">
+<span class="t-dotName">list</span> = <span class="t-funcCall">func</span>(...) <span class="t-type">list</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">a</span> = <span class="t-funcCall">list</span>()
+<span class="t-dotName">a</span> = <span class="t-funcCall">list</span>(<span class="t-num">1</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">list</span>(<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>, <span class="t-str">&quot;b&quot;</span>)
+<span class="t-dotName">a</span> = []
+<span class="t-dotName">a</span> = [<span class="t-num">1</span>]
+<span class="t-dotName">a</span> = [<span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-num">3</span>]
+<span class="t-dotName">a</span> = [<span class="t-str">&quot;a&quot;</span>, <span class="t-num">5</span>, <span class="t-str">&quot;b&quot;</span>]
+</pre>
+<p>
+</p>
+</p>
+<h3 id="log">log</h3>
+<p>
+<p>Log a message to the log file and return the same string. The
+function has a bare form.  Logging needs to be turned on, see the
+Logging section.
+
+</p><pre class="tea-code">
+<span class="t-dotName">log</span> = <span class="t-funcCall">func</span>(<span class="t-param">message</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+You can log conditionally in a bare if statement:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">log</span>(<span class="t-str">&quot;log this message when c is 0&quot;</span>))
+</pre>
+<p>
+You can log unconditionally using a bare log statement:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">log</span>(<span class="t-str">&quot;always log&quot;</span>)
+</pre>
+<p>
+</p>
+</p>
+<h3 id="loop">loop</h3>
+<p>
+<p>Loop over items in a list and fill in a container. A callback
+function is called for each item in the list and it decides what
+goes in the container.
+
+</p><p>You pass a list to loop over, a container to fill in, a
+callback function, and an optional state variable. The function
+returns whether the callback stopped early or not and you can
+ignore it using a bare form.
+
+</p><pre class="tea-code">
+<span class="t-dotName">loop</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">list</span>, <span class="t-param">container</span>: <span class="t-type">any</span>, <span class="t-param">listCallback</span>: <span class="t-type">func</span>, <span class="t-param">state</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">bool</span>
+</pre>
+<p>
+The callback gets passed the index to the item, its value, the
+container and the state variable.  The callback looks at the
+information and adds to the container when appropriate. The
+callback returns true to stop iterating.
+
+</p><pre class="tea-code">
+<span class="t-dotName">listCallback</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">item</span>: <span class="t-type">any</span>, <span class="t-param">container</span>: <span class="t-type">any</span>, <span class="t-param">state</span>: <span class="t-type">optional</span> <span class="t-type">any</span>) <span class="t-type">bool</span>
+</pre>
+<p>
+The following example makes a new list [6, 8] from the list
+[2,4,6,8].  The callback is called b5.
+
+</p><pre class="tea-code">
+<span class="t-dotName">o.container</span> = []
+<span class="t-dotName">list</span> = [<span class="t-num">2</span>,<span class="t-num">4</span>,<span class="t-num">6</span>,<span class="t-num">8</span>]
+<span class="t-funcCall">loop</span>(<span class="t-dotName">list</span>, <span class="t-dotName">o.container</span>, <span class="t-dotName">b5</span>)
+<span class="t-comment"># o.container =&gt; [6, 8]
+</span></pre>
+<p>
+Below is the definition of the b5 callback function.
+
+</p><pre class="tea-code">
+<span class="t-dotName">b5</span> = <span class="t-funcCall">func</span>(<span class="t-param">ix</span>: <span class="t-type">int</span>, <span class="t-param">value</span>: <span class="t-type">int</span>, <span class="t-param">container</span>: <span class="t-type">list</span>) <span class="t-type">bool</span>
+  <span class="t-doc">## Collect values greater than 5.
+</span>  <span class="t-dotName">container</span> &amp;= <span class="t-funcCall">if</span>( (<span class="t-dotName">value</span> &gt; <span class="t-num">5</span>), <span class="t-dotName">value</span>)
+  <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+</pre>
+<p>
+</p>
+</p>
+<h3 id="lower">lower</h3>
+<p>
+<p>Lowercase a string.
+
+</p><pre class="tea-code">
+<span class="t-dotName">lower</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">lower</span>(<span class="t-str">&quot;Tea&quot;</span>) <span class="t-comment"># &quot;tea&quot;
+</span><span class="t-funcCall">lower</span>(<span class="t-str">&quot;TEA&quot;</span>) <span class="t-comment"># &quot;tea&quot;
+</span><span class="t-funcCall">lower</span>(<span class="t-str">&quot;TEĀ&quot;</span>) <span class="t-comment"># &quot;teā&quot;
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="not">not</h3>
+<p>
+<p>Boolean not.
+
+</p><pre class="tea-code">
+<span class="t-dotName">not</span> = <span class="t-funcCall">func</span>(<span class="t-param">value</span>: <span class="t-type">bool</span>) <span class="t-type">bool</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">not</span>(<span class="t-dotName">true</span>) <span class="t-comment"># false
+</span><span class="t-funcCall">not</span>(<span class="t-dotName">false</span>) <span class="t-comment"># true
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="parseCode">parseCode</h3>
+<p>
+<p>Parse a string of StaticTea code into fragments useful for
+syntax highlighting.  Return a list of tagged fragments.
+
+</p><pre class="tea-code">
+<span class="t-dotName">parseCode</span> = <span class="t-funcCall">func</span>(<span class="t-param">code</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
+</pre>
+<p>
+Tags:
+
+</p><ul>
+<li><b>other</b> — not one of the other types
+</li><li><b>dotName</b> — a dot name
+</li><li><b>funcCall</b> — a function call; a dot name followed by a left parenthesis
+</li><li><b>num</b> — a literal number
+</li><li><b>str</b> — a literal string
+</li><li><b>multiline</b> — a multiline literal string
+</li><li><b>doc</b> — a doc comment
+</li><li><b>comment</b> — a comment
+</li><li><b>param</b> — a parameter name
+</li><li><b>type</b> — int, float, string, list, dict, bool, func, any and optional
+
+</li></ul>
+<p>Example:
+
+</p><pre class="tea-code">
+<span class="t-dotName">frags</span> = <span class="t-funcCall">parseCode</span>(<span class="t-str">&quot;a = 5&quot;</span>)
+<span class="t-dotName">frags</span> =&gt; [
+  [<span class="t-str">&quot;dotName&quot;</span>, <span class="t-str">&quot;a&quot;</span>],
+  [<span class="t-str">&quot;other&quot;</span>, <span class="t-str">&quot; = &quot;</span>],
+  [<span class="t-str">&quot;num&quot;</span>, <span class="t-str">&quot;5&quot;</span>],
+]
+</pre>
+<p>
+</p>
+</p>
+<h3 id="parseMarkdown">parseMarkdown</h3>
+<p>
+<p>Parse a simple subset of markdown. This subset is used to
+document all StaticTea functions. Return a list of lists.
+
+</p><p>type:
+</p><ul>
+<li><b>lite</b> — parse paragraphs, bullets and code blocks. See list elements below.
+</li><li><b>inline</b> — parse inline attributes, bold, italics, bold+italics and links
+
+</li></ul>
+<pre class="tea-code">
+<span class="t-dotName">parseMarkdown</span> = <span class="t-funcCall">func</span>(<span class="t-param">mdText</span>: <span class="t-type">string</span>, <span class="t-param">type</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
+</pre>
+<p>
+Block list elements:
+
+</p><ul>
+<li><b>p</b> — A paragraph element is one string, possibly containing
+newlines.
+</li><li><b>code</b> — A code element is three strings. The first string is
+the code start line, for example &quot;~~~&quot; or &quot;~~~nim&quot;.  The second
+string (with newlines) contains the text of the block.  The third
+string is the ending line, for example &quot;~~~&quot;.
+</li><li><b>bullets</b> — A bullets element contains a string (with newlines)
+for each bullet point.  The leading &quot;* &quot; is not part of the
+string.
+
+</li></ul>
+<pre class="tea-code">
+<span class="t-dotName">lite</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-dotName">description</span>, <span class="t-str">&quot;lite&quot;</span>)
+<span class="t-dotName">lite</span> =&gt; [
+  [<span class="t-str">&quot;p&quot;</span>, [<span class="t-str">&quot;the paragraph which may contain newlines&quot;</span>]]
+  [<span class="t-str">&quot;code&quot;</span>, [<span class="t-str">&quot;~~~&quot;</span>, <span class="t-str">&quot;code text with newlines&quot;</span>, <span class="t-str">&quot;~~~&quot;</span>]]
+  [<span class="t-str">&quot;bullets&quot;</span>, [<span class="t-str">&quot;bullet (newlines) 1&quot;</span>, <span class="t-str">&quot;point 2&quot;</span>, <span class="t-str">&quot;3&quot;</span>, ...]
+]
+</pre>
+<p>
+Inline list elements:
+
+</p><ul>
+<li><b>normal</b> -- an inline span of unformatted text
+</li><li><b>bold</b> -- an inline span of <b>bold</b> text.
+</li><li><b>italic</b> -- an inline span of <i>italic</i> text.
+</li><li><b>boldItalic</b> -- an inline span of <b><i>bold and italic</i></b> text.
+</li><li><b>link</b> -- an inline hyperlink; two strings: description and
+link.
+
+</li></ul>
+<p>The leading and trailing stars are not part of the strings and the
+[] and () are not part of the link.
+
+</p><pre class="tea-code">
+<span class="t-dotName">inline</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-str">&quot;**bold** and hyperlink [text](link)&quot;</span>, <span class="t-str">&quot;inline&quot;</span>)
+<span class="t-dotName">inline</span> =&gt; [
+  [<span class="t-str">&quot;bold&quot;</span>, [<span class="t-str">&quot;bold&quot;</span>]]
+  [<span class="t-str">&quot;normal&quot;</span>, [<span class="t-str">&quot; and a hyperlink &quot;</span>]]
+  [<span class="t-str">&quot;link&quot;</span>, [<span class="t-str">&quot;text&quot;</span>, <span class="t-str">&quot;link&quot;</span>]]
+]
+</pre>
+<p>
+</p>
+</p>
+<h3 id="path">path</h3>
+<p>
+<p>Split a file path into its component pieces. Return a dictionary
+with the filename, basename, extension and directory.
+
+</p><p>You pass a path string and the optional path separator, forward
+slash or or backslash. When no separator, the current
+system separator is used.
+
+</p><pre class="tea-code">
+<span class="t-dotName">path</span> = <span class="t-funcCall">func</span>(<span class="t-param">filename</span>: <span class="t-type">string</span>, <span class="t-param">separator</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">dict</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">path</span>(<span class="t-str">&quot;src/functions.nim&quot;</span>) =&gt; {
+  <span class="t-str">&quot;filename&quot;</span>: <span class="t-str">&quot;functions.nim&quot;</span>,
+  <span class="t-str">&quot;basename&quot;</span>: <span class="t-str">&quot;functions&quot;</span>,
+  <span class="t-str">&quot;ext&quot;</span>: <span class="t-str">&quot;.nim&quot;</span>,
+  <span class="t-str">&quot;dir&quot;</span>: <span class="t-str">&quot;src/&quot;</span>,
+}
+
+<span class="t-funcCall">path</span>(<span class="t-str">&quot;src\\functions.nim&quot;</span>, <span class="t-str">&quot;\\&quot;</span>) =&gt; {
+  <span class="t-str">&quot;filename&quot;</span>: <span class="t-str">&quot;functions.nim&quot;</span>,
+  <span class="t-str">&quot;basename&quot;</span>: <span class="t-str">&quot;functions&quot;</span>,
+  <span class="t-str">&quot;ext&quot;</span>: <span class="t-str">&quot;.nim&quot;</span>,
+  <span class="t-str">&quot;dir&quot;</span>: <span class="t-str">&quot;src\\&quot;</span>,
+}
+</pre>
+<p>
+</p>
+</p>
+<h3 id="readJson">readJson</h3>
+<p>
+<p>Convert a JSON string to a variable.
+
+</p><pre class="tea-code">
+<span class="t-dotName">readJson</span> = <span class="t-funcCall">func</span>(<span class="t-param">json</span>: <span class="t-type">string</span>) <span class="t-type">any</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">a</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;\\&quot;</span>t<span class="t-dotName">ea</span>\\<span class="t-str">&quot;&quot;</span>) <span class="t-comment"># tea
+</span><span class="t-dotName">b</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;4.5&quot;</span>) <span class="t-comment"># 4.5
+</span><span class="t-dotName">c</span> = <span class="t-funcCall">readJson</span>(<span class="t-str">&quot;[1,2,3]&quot;</span>) <span class="t-comment"># [1, 2, 3]
+</span>
+<span class="t-dotName">json</span> = “””
+{<span class="t-str">&quot;a&quot;</span>:<span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>: <span class="t-num">2</span>}
+“””
+<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-dotName">json</span>) =&gt;
+
+{<span class="t-str">&quot;a&quot;</span>: <span class="t-num">1</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>}
+</pre>
+<p>
+</p>
+</p>
+<h3 id="replace">replace</h3>
+<p>
+<p>Replace a substring specified by its position and length with
+another string.  You can use the function to insert and append to
+a string as well.
+
+</p><pre class="tea-code">
+<span class="t-dotName">replace</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">start</span>: <span class="t-type">int</span>, <span class="t-param">length</span>: <span class="t-type">int</span>, <span class="t-param">replacement</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+</p><ul>
+<li><b>str</b> — string to operate on
+</li><li><b>start</b> — substring start index
+</li><li><b>length</b> — substring length
+</li><li><b>replacement</b> — substring replacement
+
+</li></ul>
+<p>Examples:
+
+</p><p>Replace:
+</p><pre class="tea-code">
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;Earl Grey&quot;</span>, <span class="t-num">5</span>, <span class="t-num">4</span>, <span class="t-str">&quot;of Sandwich&quot;</span>)
+  =&gt; <span class="t-str">&quot;Earl of Sandwich&quot;</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">1</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># abcd23
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">2</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># abcd3
+</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">1</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># 1abcd3
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># 1abcd
+</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">2</span>, <span class="t-num">1</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># 12abcd
+</span></pre>
+<p>Insert:
+</p><pre class="tea-code">
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># abcd123
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># 1abcd23
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">2</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># 12abcd3
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">3</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># 123abcd
+</span></pre>
+<p>Append:
+</p><pre class="tea-code">
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">3</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># 123abcd
+</span></pre>
+<p>Delete:
+</p><pre class="tea-code">
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">1</span>, <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># 23
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">2</span>, <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># 3
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">0</span>, <span class="t-num">3</span>, <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># &quot;&quot;
+</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">1</span>, <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># 13
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">1</span>, <span class="t-num">2</span>, <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># 1
+</span>
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;123&quot;</span>, <span class="t-num">2</span>, <span class="t-num">1</span>, <span class="t-str">&quot;&quot;</span>) <span class="t-comment"># 12
+</span></pre>
+<p>Edge Cases:
+</p><pre class="tea-code">
+<span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;&quot;</span>) <span class="t-comment">#
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;a&quot;</span>) <span class="t-comment"># a
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;ab&quot;</span>) <span class="t-comment"># ab
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abc&quot;</span>) <span class="t-comment"># abc
+</span><span class="t-funcCall">replace</span>(<span class="t-str">&quot;&quot;</span>, <span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-str">&quot;abcd&quot;</span>) <span class="t-comment"># abcd
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="replaceRe">replaceRe</h3>
+<p>
+<p>Replace multiple parts of a string using regular expressions.
+
+</p><p>You specify one or more pairs of regex patterns and their string
+replacements.
+
+</p><pre class="tea-code">
+<span class="t-dotName">replaceRe</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">pairs</span>: <span class="t-type">list</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">list</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;abc&quot;</span>, <span class="t-str">&quot;456&quot;</span>, <span class="t-str">&quot;def&quot;</span>, <span class="t-str">&quot;&quot;</span>)
+<span class="t-funcCall">replaceRe</span>(<span class="t-str">&quot;abcdefabc&quot;</span>, <span class="t-dotName">list</span>))
+  <span class="t-comment"># &quot;456456&quot;
+</span></pre>
+<p>
+For developing and debugging regular expressions see the
+website: (<a href="https%3A%2F%2Fregex101.com%2F">https://regex101.com/</a>).
+
+</p>
+</p>
+<h3 id="return">return</h3>
+<p>
+<p>Return is a special function that returns the value passed in and
+has has side effects.
+
+</p><pre class="tea-code">
+<span class="t-dotName">return</span> = <span class="t-funcCall">func</span>(<span class="t-param">value</span>: <span class="t-type">any</span>) <span class="t-type">any</span>
+</pre>
+<p>
+In a function, the return completes the function and returns
+the value of it.
+
+</p><pre class="tea-code">
+<span class="t-funcCall">return</span>(<span class="t-dotName">false</span>)
+</pre>
+<p>
+You can also use it with a bare IF statement to conditionally
+return a function value.
+
+</p><pre class="tea-code">
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-num">5</span>))
+</pre>
+<p>
+In a template command a return controls the replacement block
+looping by returning &quot;skip&quot; and &quot;stop&quot;.
+
+</p><pre class="tea-code">
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">&quot;stop&quot;</span>))
+<span class="t-funcCall">if</span>(<span class="t-dotName">c</span>, <span class="t-funcCall">return</span>(<span class="t-str">&quot;skip&quot;</span>))
+</pre>
+<p>
+</p><ul>
+<li><b>stop</b> – stops processing the command
+</li><li><b>skip</b> – skips this replacement block and continues with the next iteration
+
+</li></ul>
+<p>The following block command repeats 4 times but skips when
+t.row is 2.
+
+</p><pre class="plain-code">
+$$ block t.repeat = 4
+$$ : if((t.row == 2), return(&quot;skip&quot;))
+{t.row}
+$$ endblock
+</pre>
+<p>
+output:
+
+</p><pre class="plain-code">
+0
+1
+3
+</pre>
+<p>
+</p>
+</p>
+<h3 id="slice">slice</h3>
+<p>
+<p>Extract a substring from a string by its position and length. You
+pass the string, the substring&#x27;s start index and its length.  The
+length is optional. When not specified, the slice returns the
+characters from the start to the end of the string.
+
+</p><p>The start index and length are by unicode characters not bytes.
+
+</p><pre class="tea-code">
+<span class="t-dotName">slice</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">start</span>: <span class="t-type">int</span>, <span class="t-param">length</span>: <span class="t-type">optional</span> <span class="t-type">int</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">slice</span>(<span class="t-str">&quot;Earl Grey&quot;</span>, <span class="t-num">1</span>, <span class="t-num">3</span>) <span class="t-comment"># &quot;arl&quot;
+</span><span class="t-funcCall">slice</span>(<span class="t-str">&quot;Earl Grey&quot;</span>, <span class="t-num">6</span>) <span class="t-comment"># &quot;rey&quot;
+</span><span class="t-funcCall">slice</span>(<span class="t-str">&quot;añyóng&quot;</span>, <span class="t-num">0</span>, <span class="t-num">3</span>) <span class="t-comment"># &quot;añy&quot;
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="sort">sort</h3>
+<p>
+<p>Sort a list of values of the same type.
+
+</p><ul>
+<li><b>list</b> — a list of values of the same type, either int, float or string
+</li><li><b>order</b> — the sort order: &quot;ascending&quot; or &quot;descending&quot;
+</li><li><b>insensitive</b> — sort strings case insensitive. Case
+sensitive is the default.
+
+</li></ul>
+<pre class="tea-code">
+<span class="t-dotName">sort</span> = <span class="t-funcCall">func</span>(<span class="t-param">values</span>: <span class="t-type">list</span>, <span class="t-param">order</span>: <span class="t-type">string</span>, <span class="t-param">insensitive</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">list</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">ints</span> = <span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-num">3</span>, <span class="t-num">5</span>, <span class="t-num">5</span>, <span class="t-num">2</span>, <span class="t-num">4</span>)
+<span class="t-funcCall">sort</span>(<span class="t-dotName">list</span>, <span class="t-str">&quot;ascending&quot;</span>) <span class="t-comment"># [2, 3, 4, 4, 5, 5]
+</span><span class="t-funcCall">sort</span>(<span class="t-dotName">list</span>, <span class="t-str">&quot;descending&quot;</span>) <span class="t-comment"># [5, 5, 4, 4, 3, 2]
+</span>
+<span class="t-dotName">floats</span> = <span class="t-funcCall">list</span>(<span class="t-num">4.4</span>, <span class="t-num">3.1</span>, <span class="t-num">5.9</span>)
+<span class="t-funcCall">sort</span>(<span class="t-dotName">floats</span>, <span class="t-str">&quot;ascending&quot;</span>) <span class="t-comment"># [3.1, 4.4, 5.9]
+</span><span class="t-funcCall">sort</span>(<span class="t-dotName">floats</span>, <span class="t-str">&quot;descending&quot;</span>) <span class="t-comment"># [5.9, 4.4, 3.1]
+</span>
+<span class="t-dotName">strs</span> = <span class="t-funcCall">list</span>(<span class="t-str">&quot;T&quot;</span>, <span class="t-str">&quot;e&quot;</span>, <span class="t-str">&quot;a&quot;</span>)
+<span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">&quot;ascending&quot;</span>) <span class="t-comment"># [&quot;T&quot;, &quot;a&quot;, &quot;e&quot;]
+</span><span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>) <span class="t-comment"># [&quot;T&quot;, &quot;a&quot;, &quot;e&quot;]
+</span><span class="t-funcCall">sort</span>(<span class="t-dotName">strs</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;insensitive&quot;</span>) <span class="t-comment"># [&quot;a&quot;, &quot;e&quot;, &quot;T&quot;]
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="sort-1">sort</h3>
+<p>
+<p>Sort a list of lists.
+
+</p><ul>
+<li><b>lists</b> — a list of lists
+</li><li><b>order</b> — the sort order: &quot;ascending&quot; or &quot;descending&quot;
+</li><li><b>case</b> — sort strings case either case sensitive or insensitive.
+</li><li><b>index</b> — which index to compare by.  The compare index value
+must exist in each list, be the same type and be an int, float,
+or string.
+
+</li></ul>
+<pre class="tea-code">
+<span class="t-dotName">sort</span> = <span class="t-funcCall">func</span>(<span class="t-param">lists</span>: <span class="t-type">list</span>, <span class="t-param">order</span>: <span class="t-type">string</span>, <span class="t-param">case</span>: <span class="t-type">string</span>, <span class="t-param">index</span>: <span class="t-type">int</span>) <span class="t-type">list</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">l1</span> = <span class="t-funcCall">list</span>(<span class="t-num">4</span>, <span class="t-num">3</span>, <span class="t-num">1</span>)
+<span class="t-dotName">l2</span> = <span class="t-funcCall">list</span>(<span class="t-num">2</span>, <span class="t-num">3</span>, <span class="t-num">4</span>)
+<span class="t-dotName">listOfLists</span> = <span class="t-funcCall">list</span>(<span class="t-dotName">l1</span>, <span class="t-dotName">l2</span>)
+<span class="t-funcCall">sort</span>(<span class="t-dotName">listOfLists</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-num">0</span>) <span class="t-comment"># [l2, l1]
+</span><span class="t-funcCall">sort</span>(<span class="t-dotName">listOfLists</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-num">2</span>) <span class="t-comment"># [l1, l2]
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="sort-2">sort</h3>
+<p>
+<p>Sort a list of dictionaries.
+
+</p><ul>
+<li><b>dicts</b> — a list of dictionaries
+</li><li><b>order</b> — the sort order: &quot;ascending&quot; or &quot;descending&quot;
+</li><li><b>case</b> — sort strings case either sensitive or insensitive
+</li><li><b>key</b> — the compare key.  The key value must exist in
+each dictionary, be the same type and be an int, float or
+string.
+
+</li></ul>
+<pre class="tea-code">
+<span class="t-dotName">sort</span> = <span class="t-funcCall">func</span>(<span class="t-param">dicts</span>: <span class="t-type">list</span>, <span class="t-param">order</span>: <span class="t-type">string</span>, <span class="t-param">case</span>: <span class="t-type">string</span>, <span class="t-param">key</span>: <span class="t-type">string</span>) <span class="t-type">list</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">d1</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;name&quot;</span>, <span class="t-str">&quot;Earl Gray&quot;</span>, <span class="t-str">&quot;weight&quot;</span>, <span class="t-num">1.2</span>)
+<span class="t-dotName">d2</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;name&quot;</span>, <span class="t-str">&quot;Tea Pot&quot;</span>, <span class="t-str">&quot;weight&quot;</span>, <span class="t-num">3.5</span>)
+<span class="t-dotName">dicts</span> = <span class="t-funcCall">list</span>(<span class="t-dotName">d1</span>, <span class="t-dotName">d2</span>)
+<span class="t-funcCall">sort</span>(<span class="t-dotName">dicts</span>, <span class="t-str">&quot;ascending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-str">&quot;weight&quot;</span>) <span class="t-comment"># [d1, d2]
+</span><span class="t-funcCall">sort</span>(<span class="t-dotName">dicts</span>, <span class="t-str">&quot;descending&quot;</span>, <span class="t-str">&quot;sensitive&quot;</span>, <span class="t-str">&quot;name&quot;</span>) <span class="t-comment"># [d2, d1]
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="startsWith">startsWith</h3>
+<p>
+<p>Check whether a string starts with the given prefix. Return true
+when it does, else false.
+
+</p><pre class="tea-code">
+<span class="t-dotName">startsWith</span> = <span class="t-funcCall">func</span>(<span class="t-param">str</span>: <span class="t-type">string</span>, <span class="t-param">str</span>: <span class="t-type">prefix</span>) <span class="t-type">bool</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">a</span> = <span class="t-funcCall">startsWith</span>(<span class="t-str">&quot;abcdef&quot;</span>, <span class="t-str">&quot;abc&quot;</span>) <span class="t-comment"># true
+</span><span class="t-dotName">b</span> = <span class="t-funcCall">startsWith</span>(<span class="t-str">&quot;abcdef&quot;</span>, <span class="t-str">&quot;abf&quot;</span>) <span class="t-comment"># false
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="string">string</h3>
+<p>
+<p>Convert a variable to a string. You specify the variable and
+optionally the type of output you want.
+
+</p><pre class="tea-code">
+<span class="t-dotName">string</span> = <span class="t-funcCall">func</span>(<span class="t-param">var</span>: <span class="t-type">any</span>, <span class="t-param">stype</span>: <span class="t-type">optional</span> <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+The default stype is &quot;rb&quot; which is used for replacement blocks.
+
+</p><p>stype:
+
+</p><ul>
+<li><b>json</b> — returns JSON
+</li><li><b>rb</b> — replacement block (rb) returns JSON except strings are
+not quoted and special characters are not escaped.
+</li><li><b>dn</b> — dot name (dn) returns JSON except dictionary elements
+are printed one per line as &quot;key = value&quot;. See string(dotName, string).
+</li><li><b>vl</b> — vertical list (vl) returns JSON except list elements
+are printed one per line as &quot;ix: value&quot;.
+
+</li></ul>
+<p>Examples variables:
+
+</p><pre class="tea-code">
+<span class="t-dotName">str</span> = <span class="t-str">&quot;Earl Grey&quot;</span>
+<span class="t-dotName">pi</span> = <span class="t-num">3.14159</span>
+<span class="t-dotName">one</span> = <span class="t-num">1</span>
+<span class="t-dotName">a</span> = [<span class="t-str">&quot;red&quot;</span>, <span class="t-str">&quot;green&quot;</span>, <span class="t-str">&quot;blue&quot;</span>]
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>([<span class="t-str">&quot;x&quot;</span>, <span class="t-num">1</span>, <span class="t-str">&quot;y&quot;</span>, <span class="t-num">2</span>])
+<span class="t-dotName">fn</span> = <span class="t-dotName">cmp</span>[<span class="t-num">0</span>]
+<span class="t-dotName">found</span> = <span class="t-dotName">true</span>
+</pre>
+<p>
+json:
+
+</p><pre class="plain-code">
+str =&gt; &quot;Earl Grey&quot;
+pi =&gt; 3.14159
+one =&gt; 1
+a =&gt; [&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;]
+d =&gt; {&quot;x&quot;:1,&quot;y&quot;:2}
+fn =&gt; &quot;cmp&quot;
+found =&gt; true
+</pre>
+<p>
+rb:
+
+</p><p>Same as JSON except the following.
+
+</p><pre class="plain-code">
+str =&gt; Earl Grey
+fn =&gt; cmp
+</pre>
+<p>
+dn:
+
+</p><p>Note: see the other string function with the dictionary name parameter.
+
+</p><p>Same as JSON except the following:
+
+</p><pre class="plain-code">
+d =&gt;
+x = 1
+y = 2
+</pre>
+<p>
+vl:
+
+</p><p>Same as JSON except the following.
+
+</p><pre class="plain-code">
+a =&gt;
+0: &quot;red&quot;
+1: &quot;green&quot;
+2: &quot;blue&quot;
+</pre>
+<p>
+</p>
+</p>
+<h3 id="string-1">string</h3>
+<p>
+<p>Convert the dictionary variable to dot names. You specify the
+name of the dictionary and the dict variable.
+
+</p><pre class="tea-code">
+<span class="t-dotName">string</span> = <span class="t-funcCall">func</span>(<span class="t-param">d</span>: <span class="t-type">dict</span>, <span class="t-param">stype</span>: <span class="t-type">string</span>, <span class="t-param">dictName</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Example:
+
+</p><pre class="tea-code">
+<span class="t-dotName">json</span> = “””
+{<span class="t-str">&quot;x&quot;</span>:<span class="t-num">1</span>, <span class="t-str">&quot;y&quot;</span>:<span class="t-str">&quot;tea&quot;</span>, <span class="t-str">&quot;z&quot;</span>:{<span class="t-str">&quot;a&quot;</span>:<span class="t-num">8</span>}}
+“””
+<span class="t-dotName">d</span> = <span class="t-funcCall">readJson</span>(<span class="t-dotName">json</span>)
+<span class="t-dotName">a</span> = <span class="t-funcCall">string</span>(<span class="t-dotName">d</span>, <span class="t-str">&quot;dn&quot;</span>, <span class="t-str">&quot;teas&quot;</span>)
+
+<span class="t-comment"># a =&gt;
+</span><span class="t-dotName">teas.x</span> = <span class="t-num">1</span>
+<span class="t-dotName">teas.y</span> = <span class="t-str">&quot;tea&quot;</span>
+<span class="t-dotName">teas.z.a</span> = <span class="t-num">8</span>
+</pre>
+<p>
+</p>
+</p>
+<h3 id="sub">sub</h3>
+<p>
+<p>Subtract two floats. A warning is generated on overflow.
+
+</p><pre class="tea-code">
+<span class="t-dotName">sub</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">float</span>, <span class="t-param">b</span>: <span class="t-type">float</span>) <span class="t-type">float</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">sub</span>(<span class="t-num">4.5</span>, <span class="t-num">2.3</span>) <span class="t-comment"># 2.2
+</span><span class="t-funcCall">sub</span>(<span class="t-num">1.0</span>, <span class="t-num">2.2</span>) <span class="t-comment"># -1.2
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="sub-1">sub</h3>
+<p>
+<p>Subtract two integers. A warning is generated on overflow.
+
+</p><pre class="tea-code">
+<span class="t-dotName">sub</span> = <span class="t-funcCall">func</span>(<span class="t-param">a</span>: <span class="t-type">int</span>, <span class="t-param">b</span>: <span class="t-type">int</span>) <span class="t-type">int</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">sub</span>(<span class="t-num">3</span>, <span class="t-num">1</span>) <span class="t-comment"># 2
+</span><span class="t-funcCall">add</span>(<span class="t-num">3</span>, <span class="t-num">-2</span>) <span class="t-comment"># 5
+</span><span class="t-funcCall">add</span>(<span class="t-num">1</span>, <span class="t-num">5</span>) <span class="t-comment"># -4
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="type">type</h3>
+<p>
+<p>Return the argument type, one of: int, float, string, list,
+dict, bool or func.
+
+</p><pre class="tea-code">
+<span class="t-dotName">type</span> = <span class="t-funcCall">func</span>(<span class="t-param">variable</span>: <span class="t-type">any</span>) <span class="t-type">string</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">type</span>(<span class="t-num">2</span>) <span class="t-comment"># &quot;int&quot;
+</span><span class="t-funcCall">type</span>(<span class="t-num">3.14159</span>) <span class="t-comment"># &quot;float&quot;
+</span><span class="t-funcCall">type</span>(<span class="t-str">&quot;Tea&quot;</span>) <span class="t-comment"># &quot;string&quot;
+</span><span class="t-funcCall">type</span>(<span class="t-funcCall">list</span>(<span class="t-num">1</span>,<span class="t-num">2</span>)) <span class="t-comment"># &quot;list&quot;
+</span><span class="t-funcCall">type</span>(<span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-num">1</span>)) <span class="t-comment"># &quot;dict&quot;
+</span><span class="t-funcCall">type</span>(<span class="t-dotName">true</span>) <span class="t-comment"># &quot;bool&quot;
+</span><span class="t-funcCall">type</span>(<span class="t-dotName">f.cmp</span>[<span class="t-num">0</span>]) <span class="t-comment"># &quot;func&quot;
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="values">values</h3>
+<p>
+<p>Create a list out of the values in the specified dictionary.
+
+</p><pre class="tea-code">
+<span class="t-dotName">values</span> = <span class="t-funcCall">func</span>(<span class="t-param">dictionary</span>: <span class="t-type">dict</span>) <span class="t-type">list</span>
+</pre>
+<p>
+Examples:
+
+</p><pre class="tea-code">
+<span class="t-dotName">d</span> = <span class="t-funcCall">dict</span>(<span class="t-str">&quot;a&quot;</span>, <span class="t-str">&quot;apple&quot;</span>, <span class="t-str">&quot;b&quot;</span>, <span class="t-num">2</span>, <span class="t-str">&quot;c&quot;</span>, <span class="t-num">3</span>)
+<span class="t-funcCall">keys</span>(<span class="t-dotName">d</span>) <span class="t-comment"># [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+</span><span class="t-funcCall">values</span>(<span class="t-dotName">d</span>) <span class="t-comment"># [&quot;apple&quot;, 2, 3]
+</span></pre>
+<p>
+</p>
+</p>
+<h3 id="warn">warn</h3>
+<p>
+<p>Return a warning message and skip the current statement.
+You can call the warn function without an assignment.
+
+</p><pre class="tea-code">
+<span class="t-dotName">warn</span> = <span class="t-funcCall">func</span>(<span class="t-param">message</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
+</pre>
+<p>
+You can warn conditionally in a bare if statement:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">if</span>(<span class="t-dotName">cond</span>, <span class="t-funcCall">warn</span>(<span class="t-str">&quot;message is 0&quot;</span>))
+</pre>
+<p>
+You can warn unconditionally using a bare warn statement:
+
+</p><pre class="tea-code">
+<span class="t-funcCall">warn</span>(<span class="t-str">&quot;always warn&quot;</span>)
+</pre>
+<p>
+</p>
+</p>
+
+<p>⦿ Generated by the teaFunctions.html StaticTea template. ⦿</p>
+</body>
+</html>

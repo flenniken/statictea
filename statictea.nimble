@@ -736,19 +736,34 @@ proc taskDoch(namePart: string, forceRebuild = false) =
     echo fmt"file:///{getCurrentDir()}/{resultFile}"
     rmFile(jsonFile)
 
-proc taskFuncDocs() =
+proc taskFuncDocsMd() =
   ## Create the teaFunctions.md file from the f dictionary.
 
   let statictea = fmt"bin/{dirName}/statictea"
   let tFile = "templates/teaFunctions.md"
   let teaFile = "templates/teaFunctions.tea"
+  let formatFile = "templates/formatMarkdown.tea"
   let result = "docs/md/teaFunctions.md"
 
   # echo fmt"make {result}"
-  let cmd = fmt"{statictea} -t {tFile} -o {teaFile} -r {result}"
+  let cmd = fmt"{statictea} -t {tFile} -o {formatFile} -o {teaFile} -r {result}"
   exec cmd
   # echoGrip()
   echo fmt"Generated: http://localhost:6419/{result}"
+
+proc taskFuncDocsHtml() =
+  ## Create the teaFunctions.html file from the f dictionary.
+
+  let statictea = fmt"bin/{dirName}/statictea"
+  let tFile = "templates/teaFunctions.html"
+  let teaFile = "templates/teaFunctions.tea"
+  let formatFile = "templates/formatMarkdown.tea"
+  let result = "docs/html/teaFunctions.html"
+
+  # echo fmt"make {result}"
+  let cmd = fmt"{statictea} -t {tFile} -o {formatFile} -o {teaFile} -r {result}"
+  exec cmd
+  echo fmt"Generated: file:///{getCurrentDir()}/{result}"
 
 proc buildRunner() =
   let cmd = fmt"""
@@ -995,7 +1010,8 @@ proc taskDocsAll() =
   taskDochix()
   taskDocm("")
   taskDoch("")
-  taskFuncDocs()
+  taskFuncDocsMd()
+  taskFuncDocsHtml()
   taskTestfilesReadme()
   taskTea2HtmlLoop("tea2html")
   createDependencyGraph()
@@ -1047,8 +1063,11 @@ task json, "\tDisplay a source file's json doc comments; specify part of the nam
       rmFile(jsonFilename)
       break
 
-task teafuncs, "Create the function docs (docs/md/teaFunctions.md).":
-  taskFuncDocs()
+task teafuncsm, "Create the function docs (docs/md/teaFunctions.md).":
+  taskFuncDocsMd()
+
+task teafuncsh, "Create the function docs (docs/html/teaFunctions.html).":
+  taskFuncDocsHtml()
 
 task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) from (src/functions.nim).":
   # Extract the statictea function metadata from the functions.json

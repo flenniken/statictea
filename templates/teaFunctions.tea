@@ -1,16 +1,16 @@
 ## Create a list of dictionaries (o.entries), one dictionary for each
-## function in the f function dictionary.  Each dictionary contains,
-## the function name, doc comment, anchor name and a short description.
-
-## The nimble task teafuncs runs the template.
+## function in the f function dictionary.  Each dictionary entry
+## contains, function name, doc comment, anchor name and the first
+## sentence. The nimble task teafuncsh runs the template.
 
 u.add-func-var = func(ix: int, funcVar: func, newList: list) bool
-  ## Add the function variable to the list.
+  ## Add the given function variable to the list.
   newList &= funcVar
   return(false)
 
 add-vars = func(ix: int, key: string, newList: list) bool
-  ## Add all the func variables with the key name to the new list.
+  ## Add all the func variables with the given key name to the new
+  ## list.
   funcList = f[key]
   loop(funcList, newList, u.add-func-var)
   return(false)
@@ -21,25 +21,27 @@ get-name = func(ix: int, funcVar: func, newList: list) bool
   newList &= fd.signature.name
   return(false)
 
-make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
+make-entry = func(ix: int, funcVar: func, newList: list, state: dict) bool
   ## Make a dictionary of function details for the given function
-  ## variable and add it to the new list.
+  ## variable and add it to the new list. Each entry contains the name
+  ## of the function, its anchor name, its description, and the first
+  ## sentence of the description.
 
-  # Look up the function details.
-  fd = functionDetails(funcVar)
-
-  # Make a dictionary containing the function name, its doc comments
-  # and its doc comment's first sentence.
   entry = dict()
+
+  # Get the function name from the function variable.
+  fd = functionDetails(funcVar)
   entry.name = fd.signature.name
-  entry.docComment = replaceRe(fd.docComment, ["~~~statictea", "~~~javascript"])
 
-  ax = fd.docComment
-  pos = find(ax, ".", -1)
-  text = if((pos == -1), ax, slice(ax, 0, add(pos, 1)))
-  entry.sentence = replaceRe(text, ["\n", " "])
+  # Format the description for the template type, either markdown or
+  # html.
+  dest = u.format-md-description(fd.docComment, state.templateType)
+  entry.description = dest.description
+  entry.sentence = dest.sentence
 
-  entry.anchorName = anchors[ix]
+  # Get the anchor name for the function. The name is dependent on its
+  # order.
+  entry.anchorName = state.anchors[ix]
   newList &= entry
   return(false)
 
@@ -48,18 +50,21 @@ make-entry = func(ix: int, funcVar: func, newList: list, anchors: list) bool
 flatFuncList = []
 loop(keys(f), flatFuncList, add-vars)
 
-# Get the anchor type based on the template type.
+# Determine the template type from the template's extension.
 path = path(t.args.resultFilename)
-type = if((path.ext == ".md"), "github", "html")
+templateType = if((path.ext == ".md"), "github", "html")
 
 # Get a list of all the function names then make that into anchor
 # names.
 names = []
 loop(flatFuncList, names, get-name)
-anchors = anchors(names, type)
+anchors = anchors(names, templateType)
 
 # Create a list of dictionaries, one dictionary for each function
 # variable in the f function dictionary.  Each dictionary contains,
 # the function name, doc comment, anchor name and a short description.
+state = dict()
+state.anchors = anchors
+state.templateType = templateType
 o.entries = []
-loop(flatFuncList, o.entries, make-entry, anchors)
+loop(flatFuncList, o.entries, make-entry, state)

@@ -6,13 +6,13 @@ const
   dc_fun_add_fff = """
 Add two floats. A warning is generated on overflow.
 
-~~~statictea
+~~~ statictea
 add = func(a: float, b: float) float
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 add(1.5, 2.3) # 3.8
 add(3.2, -2.2) # 1.0
 ~~~
@@ -22,13 +22,13 @@ add(3.2, -2.2) # 1.0
   dc_fun_add_iii = """
 Add two integers. A warning is generated on overflow.
 
-~~~statictea
+~~~ statictea
 add = func(a: int, b: int) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 add(1, 2) # 3
 add(3, -2) # 1
 add(-2, -5) # -7
@@ -41,7 +41,7 @@ Create anchor names from heading names. Use it for HTML class
 names or Github markdown internal links. It handles duplicate
 heading names.
 
-~~~statictea
+~~~ statictea
 anchors = func(names: list, type: string) list
 ~~~
 
@@ -52,10 +52,10 @@ type:
 
 Examples:
 
-~~~statictea
+~~~ statictea
 list = list("Tea", "Water", "Tea")
 a = anchors(list, "github")
-  # ["tea", "water", "tea-1"]
+# ["tea", "water", "tea-1"]
 ~~~
 
 """
@@ -63,7 +63,7 @@ a = anchors(list, "github")
   dc_fun_bool_ab = """
 Create an bool from a value.
 
-~~~statictea
+~~~ statictea
 bool = func(value: Value) bool
 ~~~
 
@@ -79,7 +79,7 @@ False values by variable types:
 
 Examples:
 
-~~~statictea
+~~~ statictea
 bool(0) # false
 bool(0.0) # false
 bool([]) # false
@@ -113,13 +113,13 @@ can be any type.
 If the pairs argument is a literal list, only the matching case is
 executed and the other ones are skipped.
 
-~~~statictea
+~~~ statictea
 case = case(condition: int, pairs: list, default: optional any) any
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 cases = list(0, "tea", 1, "water", 2, "beer")
 case(0, cases) # "tea"
 case(1, cases) # "water"
@@ -154,13 +154,13 @@ can be any type.
 If the pairs argument is a literal list, only the matching case is
 executed and the other ones are skipped.
 
-~~~statictea
+~~~ statictea
 case = func(condition: string, pairs: list, default: optional any) any
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 pairs = list("tea", 15, "water", 2.3, "beer", "cold")
 case("tea", pairs) # 15
 case("water", pairs) # 2.3
@@ -180,13 +180,13 @@ x = case("a", [ +
 Compare two floats. Returns -1 for less, 0 for equal and 1 for
 greater than.
 
-~~~statictea
+~~~ statictea
 cmp = func(a: float, b: float) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 cmp(7.8, 9.1) # -1
 cmp(8.4, 8.4) # 0
 cmp(9.3, 2.2) # 1
@@ -198,13 +198,13 @@ cmp(9.3, 2.2) # 1
 Compare two ints. Returns -1 for less, 0 for equal and 1 for
 greater than.
 
-~~~statictea
+~~~ statictea
 cmp = func(a: int, b: int) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 cmp(7, 9) # -1
 cmp(8, 8) # 0
 cmp(9, 2) # 1
@@ -219,13 +219,13 @@ greater than.
 You have the option to compare case insensitive. Case sensitive
 is the default.
 
-~~~statictea
+~~~ statictea
 cmp = func(a: string, b: string, insensitive: optional bool) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 cmp("coffee", "tea") # -1
 cmp("tea", "tea") # 0
 cmp("Tea", "tea") # 1
@@ -261,13 +261,13 @@ cmpVersion("1.2.5", "1.2.5") # 0
 Create a dictionary from a list of key, value pairs.  The keys
 must be strings and the values can be any type.
 
-~~~statictea
+~~~ statictea
 dict = func(pairs: optional list) dict
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 dict() # {}
 dict(["a", 5]) # {"a": 5}
 dict(["a", 5, "b", 33, "c", 0])
@@ -281,13 +281,13 @@ Duplicate a string x times. The result is a new string built by
 concatenating the string to itself the specified number of times.
 The resulting string must be less than or equal to 1024 bytes.
 
-~~~statictea
+~~~ statictea
 dup = func(pattern: string, count: int) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 dup("=", 3) # "==="
 dup("abc", 0) # ""
 dup("abc", 1) # "abc"
@@ -301,13 +301,13 @@ dup("", 3) # ""
 Echo a string to standard out. Return the same string. The
 function has a bare form.
 
-~~~statictea
+~~~ statictea
 echo = func(text: string) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 echo("debugging string")
 
 if(cond, echo("debugging string"))
@@ -323,13 +323,13 @@ a = len(echo("len called"))
 Determine whether a key exists in a dictionary. Return true when it
 exists, else false.
 
-~~~statictea
+~~~ statictea
 exists = func(dictionary: dict, key: string) bool
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 d = dict(["tea", "Earl"])
 exists(d, "tea") # true
 exists(d, "coffee") # false
@@ -343,13 +343,13 @@ is not found, return an optional default value.  A warning is
 generated when the substring is missing and you don't specify a
 default value.
 
-~~~statictea
+~~~ statictea
 find = func(str: string, substring: string, default: optional any) any
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
        0123456789 1234567
 msg = "Tea time at 3:30."
 find(msg, "Tea") # 0
@@ -365,13 +365,13 @@ find(msg, "party", 0) # 0
   dc_fun_float_if = """
 Create a float from an int.
 
-~~~statictea
+~~~ statictea
 float = func(num: int) float
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 float(2) # 2.0
 float(-33) # -33.0
 ~~~
@@ -382,13 +382,13 @@ float(-33) # -33.0
 Create a float from a number string. If the string is not a
 number, return the default.
 
-~~~statictea
+~~~ statictea
 float = func(numString: string, default: optional any) any
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 float("2") # 2.0
 float("notnum", "nan") # nan
 ~~~
@@ -398,13 +398,13 @@ float("notnum", "nan") # nan
   dc_fun_float_sf = """
 Create a float from a number string.
 
-~~~statictea
+~~~ statictea
 float = func(numString: string) float
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 float("2") # 2.0
 float("2.4") # 2.4
 float("33") # 33.0
@@ -416,13 +416,13 @@ float("33") # 33.0
 Format a string using replacement variables similar to a
 replacement block. To enter a left bracket use two in a row.
 
-~~~statictea
+~~~ statictea
 format = func(str: string) string
 ~~~
 
 Example:
 
-~~~statictea
+~~~ statictea
 let first = "Earl"
 let last = "Grey"
 str = format("name: {first} {last}")
@@ -431,7 +431,7 @@ str = format("name: {first} {last}")
 
 To enter a left bracket use two in a row.
 
-~~~statictea
+~~~ statictea
 str = format("use two {{ to get one")
   # "use two { to get one"
 ~~~
@@ -441,13 +441,13 @@ str = format("use two {{ to get one")
   dc_fun_func_sp = """
 Define a function.
 
-~~~statictea
+~~~ statictea
 func = func(name: type, ...) retType
 ~~~
 
 Example:
 
-~~~statictea
+~~~ statictea
 mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings
   ## and return 1, 0, or -1.
@@ -461,14 +461,14 @@ mycmp = func(numStr1: string, numStr2: string) int
   dc_fun_functionDetails_pd = """
 Return the function details in a dictionary.
 
-~~~statictea
+~~~ statictea
 functionDetails = func(funcVar: func) dict
 ~~~
 
 The following example defines a simple function then gets its
 function details.
 
-~~~statictea
+~~~ statictea
 mycmp = func(numStr1: string, numStr2: string) int
   ## Compare two number strings and return 1, 0, or -1.
   return(cmp(int(numStr1), int(numStr2)))
@@ -496,7 +496,7 @@ Get a dictionary value by its key.  If the key doesn't exist, the
 default value is returned if specified, else a warning is
 generated.
 
-~~~statictea
+~~~ statictea
 get = func(dictionary: dict, key: string, default: optional any) any
 ~~~
 
@@ -505,7 +505,7 @@ same as get without the default.
 
 Examples:
 
-~~~statictea
+~~~ statictea
 d = dict(["tea", "Earl Grey"])
 get(d, "tea") # "Earl Grey"
 get(d, "coffee", "water") # "water"
@@ -513,7 +513,7 @@ get(d, "coffee", "water") # "water"
 
 Using dot notation:
 
-~~~statictea
+~~~ statictea
 d = dict(["tea", "Earl Grey"])
 d.tea => "Earl Grey"
 ~~~
@@ -527,13 +527,13 @@ generated. You can use negative index values. Index -1 gets the
 last element. It is short hand for len - 1. Index -2 is len - 2,
 etc.
 
-~~~statictea
+~~~ statictea
 get = func(list: list, index: int, default: optional any) any
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 list = list(4, "a", 10)
 get(list, 0) # 4
 get(list, 1) # "a"
@@ -547,7 +547,7 @@ get(list, -4, 11) # 11
 
 You can also use bracket notation to access list items.
 
-~~~statictea
+~~~ statictea
 a = teas[0]
 ~~~
 
@@ -556,7 +556,7 @@ a = teas[0]
   dc_fun_html_sss = """
 Escape text for placing it in an html page.
 
-~~~statictea
+~~~ statictea
 html = func(text: string, place: string) string
 ~~~
 
@@ -566,7 +566,7 @@ places:
 * **attribute** — in an html attribute
 * **url** — url encoding (percent encoding)
 
-~~~statictea
+~~~ statictea
 name = html("Mad <Hatter>", "body")
   # "Mad &lt;Hatter&gt;"
 
@@ -589,13 +589,13 @@ Function section.
 You usually use boolean infix expressions for the condition, see:
 the Boolean Expressions section.
 
-~~~statictea
+~~~ statictea
 if = func(condition: bool, then: any, else: optional any) any
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 a = if(true, "tea", "beer") # tea
 b = if(false, "tea", "beer") # beer
 v = 6
@@ -607,7 +607,7 @@ You don't have to assign the result of an if function which is
 useful when using a warn or return function for its side effects.
 The if takes two arguments when there is no assignment.
 
-~~~statictea
+~~~ statictea
 if(c, warn("c is true"))
 if(c, return("skip"))
 ~~~
@@ -618,7 +618,7 @@ if(c, return("skip"))
 Create an int from a float. When the float value is out of range,
 a warning is generated.
 
-~~~statictea
+~~~ statictea
 int = func(num: float, roundOption: optional string) int
 ~~~
 
@@ -631,7 +631,7 @@ Round options:
 
 Examples:
 
-~~~statictea
+~~~ statictea
 int(2.34) # 2
 int(2.34, "round") # 2
 int(-2.34, "round") # -2
@@ -651,7 +651,7 @@ int(-6.3456, "truncate") # -6
 Create an int from a number string. It generates a warning when
 the number string is not an int.
 
-~~~statictea
+~~~ statictea
 int = func(numString: string, roundOption: optional string) int
 ~~~
 
@@ -664,7 +664,7 @@ Round options:
 
 Examples:
 
-~~~statictea
+~~~ statictea
 int("2") # 2
 int("2.34") # 2
 int("-2.34", "round") # -2
@@ -684,7 +684,7 @@ int("-6.3456", "truncate") # -6
 Create an int from a number string. If the string is not a number,
 return the default value.
 
-~~~statictea
+~~~ statictea
 int = func(numString: string, roundOption: string, default: any) any
 ~~~
 
@@ -697,7 +697,7 @@ Round options:
 
 Examples:
 
-~~~statictea
+~~~ statictea
 int("2", "round", "nan") # 2
 int("notnum", "round", "nan") # nan
 ~~~
@@ -708,13 +708,13 @@ int("notnum", "round", "nan") # nan
 Join a list of strings with a separator.  An optional parameter
 determines the separator, by default it is "".
 
-~~~statictea
+~~~ statictea
 join = func(strs: list, sep: optional string) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 join(["a", "b"]) # "ab"
 join(["a", "b"], "") # "ab"
 join(["a", "b"], ", ") # "a, b"
@@ -737,13 +737,13 @@ platform separator is used.
 A warning is generated if a component contains a separator.  If a
 component is "", the platform separator is used for it.
 
-~~~statictea
+~~~ statictea
 joinPath = func(components: list, separator: optional string) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 joinPath(["tea", "pot"]) # tea/pot
 joinPath(["tea", "hot", ""]) # tea/hot/
 joinPath(["", "tea", "cool"]) # /tea/cool
@@ -762,13 +762,13 @@ joinPath(["net:", "", "", "cold"], "\\") # net:\\cold
   dc_fun_keys_dl = """
 Create a list from the keys in a dictionary.
 
-~~~statictea
+~~~ statictea
 keys = func(dictionary: dict) list
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 d = dict("a", 1, "b", 2, "c", 3)
 keys(d) # ["a", "b", "c"]
 values(d) # [1, 2, 3]
@@ -779,13 +779,13 @@ values(d) # [1, 2, 3]
   dc_fun_len_di = """
 Number of elements in a dictionary.
 
-~~~statictea
+~~~ statictea
 len = func(dictionary: dict) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 len(dict()) # 0
 len(dict(["a", 4])) # 1
 len(dict(["a", 4, "b", 3])) # 2
@@ -796,13 +796,13 @@ len(dict(["a", 4, "b", 3])) # 2
   dc_fun_len_li = """
 Number of elements in a list.
 
-~~~statictea
+~~~ statictea
 len = func(list: list) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 len(list()) # 0
 len(list(1)) # 1
 len(list(4, 5)) # 2
@@ -813,13 +813,13 @@ len(list(4, 5)) # 2
   dc_fun_len_si = """
 Number of unicode characters in a string.
 
-~~~statictea
+~~~ statictea
 len = func(str: string) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 len("tea") # 3
 len("añyóng") # 6
 ~~~
@@ -829,13 +829,13 @@ len("añyóng") # 6
   dc_fun_list_al = """
 Create a list of variables. You can also create a list with brackets.
 
-~~~statictea
+~~~ statictea
 list = func(...) list
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 a = list()
 a = list(1)
 a = list(1, 2, 3)
@@ -853,19 +853,19 @@ Log a message to the log file and return the same string. The
 function has a bare form.  Logging needs to be turned on, see the
 Logging section.
 
-~~~statictea
+~~~ statictea
 log = func(message: string) string
 ~~~
 
 You can log conditionally in a bare if statement:
 
-~~~statictea
+~~~ statictea
 if(c, log("log this message when c is 0"))
 ~~~
 
 You can log unconditionally using a bare log statement:
 
-~~~statictea
+~~~ statictea
 log("always log")
 ~~~
 
@@ -881,7 +881,7 @@ callback function, and an optional state variable. The function
 returns whether the callback stopped early or not and you can
 ignore it using a bare form.
 
-~~~statictea
+~~~ statictea
 loop = func(a: list, container: any, listCallback: func, state: optional any) bool
 ~~~
 
@@ -890,14 +890,14 @@ container and the state variable.  The callback looks at the
 information and adds to the container when appropriate. The
 callback returns true to stop iterating.
 
-~~~statictea
+~~~ statictea
 listCallback = func(ix: int, item: any, container: any, state: optional any) bool
 ~~~
 
 The following example makes a new list [6, 8] from the list
 [2,4,6,8].  The callback is called b5.
 
-~~~statictea
+~~~ statictea
 o.container = []
 list = [2,4,6,8]
 loop(list, o.container, b5)
@@ -906,7 +906,7 @@ loop(list, o.container, b5)
 
 Below is the definition of the b5 callback function.
 
-~~~statictea
+~~~ statictea
 b5 = func(ix: int, value: int, container: list) bool
   ## Collect values greater than 5.
   container &= if( (value > 5), value)
@@ -918,13 +918,13 @@ b5 = func(ix: int, value: int, container: list) bool
   dc_fun_lower_ss = """
 Lowercase a string.
 
-~~~statictea
+~~~ statictea
 lower = func(str: string) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 lower("Tea") # "tea"
 lower("TEA") # "tea"
 lower("TEĀ") # "teā"
@@ -935,13 +935,13 @@ lower("TEĀ") # "teā"
   dc_fun_not_bb = """
 Boolean not.
 
-~~~statictea
+~~~ statictea
 not = func(value: bool) bool
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 not(true) # false
 not(false) # true
 ~~~
@@ -952,7 +952,7 @@ not(false) # true
 Parse a string of StaticTea code into fragments useful for
 syntax highlighting.  Return a list of tagged fragments.
 
-~~~statictea
+~~~ statictea
 parseCode = func(code: string) list
 ~~~
 
@@ -971,7 +971,7 @@ Tags:
 
 Example:
 
-~~~statictea
+~~~ statictea
 frags = parseCode("a = 5")
 frags => [
   ["dotName", "a"],
@@ -990,7 +990,7 @@ type:
 * **lite** — parse paragraphs, bullets and code blocks. See list elements below.
 * **inline** — parse inline attributes, bold, italics, bold+italics and links
 
-~~~statictea
+~~~ statictea
 parseMarkdown = func(mdText: string, type: string) list
 ~~~
 
@@ -1006,7 +1006,7 @@ string is the ending line, for example "~~~".
 for each bullet point.  The leading "* " is not part of the
 string.
 
-~~~statictea
+~~~ statictea
 lite = parseMarkdown(description, "lite")
 lite => [
   ["p", ["the paragraph which may contain newlines"]]
@@ -1046,13 +1046,13 @@ You pass a path string and the optional path separator, forward
 slash or or backslash. When no separator, the current
 system separator is used.
 
-~~~statictea
+~~~ statictea
 path = func(filename: string, separator: optional string) dict
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 path("src/functions.nim") => {
   "filename": "functions.nim",
   "basename": "functions",
@@ -1073,13 +1073,13 @@ path("src\\functions.nim", "\\") => {
   dc_fun_readJson_sa = """
 Convert a JSON string to a variable.
 
-~~~statictea
+~~~ statictea
 readJson = func(json: string) any
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 a = readJson("\\"tea\\"") # tea
 b = readJson("4.5") # 4.5
 c = readJson("[1,2,3]") # [1, 2, 3]
@@ -1099,7 +1099,7 @@ Replace a substring specified by its position and length with
 another string.  You can use the function to insert and append to
 a string as well.
 
-~~~statictea
+~~~ statictea
 replace = func(str: string, start: int, length: int, replacement: string) string
 ~~~
 
@@ -1111,7 +1111,7 @@ replace = func(str: string, start: int, length: int, replacement: string) string
 Examples:
 
 Replace:
-~~~statictea
+~~~ statictea
 replace("Earl Grey", 5, 4, "of Sandwich")
   => "Earl of Sandwich"
 replace("123", 0, 1, "abcd") # abcd23
@@ -1123,18 +1123,18 @@ replace("123", 1, 2, "abcd") # 1abcd
 replace("123", 2, 1, "abcd") # 12abcd
 ~~~
 Insert:
-~~~statictea
+~~~ statictea
 replace("123", 0, 0, "abcd") # abcd123
 replace("123", 1, 0, "abcd") # 1abcd23
 replace("123", 2, 0, "abcd") # 12abcd3
 replace("123", 3, 0, "abcd") # 123abcd
 ~~~
 Append:
-~~~statictea
+~~~ statictea
 replace("123", 3, 0, "abcd") # 123abcd
 ~~~
 Delete:
-~~~statictea
+~~~ statictea
 replace("123", 0, 1, "") # 23
 replace("123", 0, 2, "") # 3
 replace("123", 0, 3, "") # ""
@@ -1145,7 +1145,7 @@ replace("123", 1, 2, "") # 1
 replace("123", 2, 1, "") # 12
 ~~~
 Edge Cases:
-~~~statictea
+~~~ statictea
 replace("", 0, 0, "") #
 replace("", 0, 0, "a") # a
 replace("", 0, 0, "ab") # ab
@@ -1161,13 +1161,13 @@ Replace multiple parts of a string using regular expressions.
 You specify one or more pairs of regex patterns and their string
 replacements.
 
-~~~statictea
+~~~ statictea
 replaceRe = func(str: string, pairs: list) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 list = list("abc", "456", "def", "")
 replaceRe("abcdefabc", list))
   # "456456"
@@ -1182,28 +1182,28 @@ website: ([https://regex101.com/](https://regex101.com/)).
 Return is a special function that returns the value passed in and
 has has side effects.
 
-~~~statictea
+~~~ statictea
 return = func(value: any) any
 ~~~
 
 In a function, the return completes the function and returns
 the value of it.
 
-~~~statictea
+~~~ statictea
 return(false)
 ~~~
 
 You can also use it with a bare IF statement to conditionally
 return a function value.
 
-~~~statictea
+~~~ statictea
 if(c, return(5))
 ~~~
 
 In a template command a return controls the replacement block
 looping by returning "skip" and "stop".
 
-~~~statictea
+~~~ statictea
 if(c, return("stop"))
 if(c, return("skip"))
 ~~~
@@ -1239,13 +1239,13 @@ characters from the start to the end of the string.
 
 The start index and length are by unicode characters not bytes.
 
-~~~statictea
+~~~ statictea
 slice = func(str: string, start: int, length: optional int) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 slice("Earl Grey", 1, 3) # "arl"
 slice("Earl Grey", 6) # "rey"
 slice("añyóng", 0, 3) # "añy"
@@ -1261,13 +1261,13 @@ Sort a list of values of the same type.
 * **insensitive** — sort strings case insensitive. Case
 sensitive is the default.
 
-~~~statictea
+~~~ statictea
 sort = func(values: list, order: string, insensitive: optional string) list
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 ints = list(4, 3, 5, 5, 2, 4)
 sort(list, "ascending") # [2, 3, 4, 4, 5, 5]
 sort(list, "descending") # [5, 5, 4, 4, 3, 2]
@@ -1294,13 +1294,13 @@ Sort a list of lists.
 must exist in each list, be the same type and be an int, float,
 or string.
 
-~~~statictea
+~~~ statictea
 sort = func(lists: list, order: string, case: string, index: int) list
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 l1 = list(4, 3, 1)
 l2 = list(2, 3, 4)
 listOfLists = list(l1, l2)
@@ -1320,13 +1320,13 @@ Sort a list of dictionaries.
 each dictionary, be the same type and be an int, float or
 string.
 
-~~~statictea
+~~~ statictea
 sort = func(dicts: list, order: string, case: string, key: string) list
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 d1 = dict("name", "Earl Gray", "weight", 1.2)
 d2 = dict("name", "Tea Pot", "weight", 3.5)
 dicts = list(d1, d2)
@@ -1340,13 +1340,13 @@ sort(dicts, "descending", "sensitive", "name") # [d2, d1]
 Check whether a string starts with the given prefix. Return true
 when it does, else false.
 
-~~~statictea
+~~~ statictea
 startsWith = func(str: string, str: prefix) bool
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 a = startsWith("abcdef", "abc") # true
 b = startsWith("abcdef", "abf") # false
 ~~~
@@ -1357,7 +1357,7 @@ b = startsWith("abcdef", "abf") # false
 Convert a variable to a string. You specify the variable and
 optionally the type of output you want.
 
-~~~statictea
+~~~ statictea
 string = func(var: any, stype: optional string) string
 ~~~
 
@@ -1375,7 +1375,7 @@ are printed one per line as "ix: value".
 
 Examples variables:
 
-~~~statictea
+~~~ statictea
 str = "Earl Grey"
 pi = 3.14159
 one = 1
@@ -1435,13 +1435,13 @@ a =>
 Convert the dictionary variable to dot names. You specify the
 name of the dictionary and the dict variable.
 
-~~~statictea
+~~~ statictea
 string = func(d: dict, stype: string, dictName: string) string
 ~~~
 
 Example:
 
-~~~statictea
+~~~ statictea
 json = “””
 {"x":1, "y":"tea", "z":{"a":8}}
 “””
@@ -1459,13 +1459,13 @@ teas.z.a = 8
   dc_fun_sub_fff = """
 Subtract two floats. A warning is generated on overflow.
 
-~~~statictea
+~~~ statictea
 sub = func(a: float, b: float) float
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 sub(4.5, 2.3) # 2.2
 sub(1.0, 2.2) # -1.2
 ~~~
@@ -1475,13 +1475,13 @@ sub(1.0, 2.2) # -1.2
   dc_fun_sub_iii = """
 Subtract two integers. A warning is generated on overflow.
 
-~~~statictea
+~~~ statictea
 sub = func(a: int, b: int) int
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 sub(3, 1) # 2
 add(3, -2) # 5
 add(1, 5) # -4
@@ -1493,13 +1493,13 @@ add(1, 5) # -4
 Return the argument type, one of: int, float, string, list,
 dict, bool or func.
 
-~~~statictea
+~~~ statictea
 type = func(variable: any) string
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 type(2) # "int"
 type(3.14159) # "float"
 type("Tea") # "string"
@@ -1514,13 +1514,13 @@ type(f.cmp[0]) # "func"
   dc_fun_values_dl = """
 Create a list out of the values in the specified dictionary.
 
-~~~statictea
+~~~ statictea
 values = func(dictionary: dict) list
 ~~~
 
 Examples:
 
-~~~statictea
+~~~ statictea
 d = dict("a", "apple", "b", 2, "c", 3)
 keys(d) # ["a", "b", "c"]
 values(d) # ["apple", 2, 3]
@@ -1532,19 +1532,19 @@ values(d) # ["apple", 2, 3]
 Return a warning message and skip the current statement.
 You can call the warn function without an assignment.
 
-~~~statictea
+~~~ statictea
 warn = func(message: string) string
 ~~~
 
 You can warn conditionally in a bare if statement:
 
-~~~statictea
+~~~ statictea
 if(cond, warn("message is 0"))
 ~~~
 
 You can warn unconditionally using a bare warn statement:
 
-~~~statictea
+~~~ statictea
 warn("always warn")
 ~~~
 
