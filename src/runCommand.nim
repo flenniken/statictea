@@ -50,7 +50,7 @@ type
     ## * spLog — log function
     ## * spReturn — return function
     ## * spFunc — func function
-    ## * spListLoop — list with callback function
+    ## * spLoop — list with callback function
     ## * spCase — case function
     ## * spEcho — echo function
     spNotSpecial = "not-special",
@@ -59,7 +59,7 @@ type
     spLog = "log",
     spReturn = "return",
     spFunc = "func",
-    spListLoop = "loop",
+    spLoop = "loop",
     spCase = "case",
     spEcho = "echo",
 
@@ -1064,7 +1064,7 @@ func getSpecialFunction(funcVar: Value): SpecialFunction =
   of "func":
     result = spFunc
   of "loop":
-    result = spListLoop
+    result = spLoop
   of "case":
     result = spCase
   of "echo":
@@ -1452,7 +1452,7 @@ proc getFunctionValuePosSi*(
   var sideEffect: SideEffect
   let specialFunction = getSpecialFunction(funcVar)
   case specialFunction:
-  of spNotSpecial, spIf, spListLoop, spCase, spFunc, spReturn, spWarn:
+  of spNotSpecial, spIf, spLoop, spCase, spFunc, spReturn, spWarn:
     sideEffect = seNone
   of spEcho:
     sideEffect = seNone
@@ -2184,7 +2184,7 @@ proc getValuePosSiWorker(env: var Env, sourceFilename: string, statement: Statem
         # Handle the special IF function.
         return ifFunction(env, specialFunction, sourceFilename, statement,
           rightName.pos, variables, topLevel)
-      of spListLoop:
+      of spLoop:
         # Handle the special loop function.
         return loop(env, specialFunction, sourceFilename, statement,
           rightName.pos, variables)
@@ -2271,7 +2271,7 @@ proc runBareFunction*(env: var Env, sourceFilename: string, statement: Statement
     result = bareIf(env, specialFunction, sourceFilename, statement, runningPos, variables)
   of spReturn:
     result = bareReturn(env, sourceFilename, statement, runningPos, variables)
-  of spListLoop:
+  of spLoop:
     result = loop(env, specialFunction, sourceFilename, statement, runningPos, variables)
   of spNotSpecial, spFunc, spCase:
     # Missing left hand side and operator, e.g. a = len(b) not len(b).

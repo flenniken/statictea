@@ -1860,7 +1860,7 @@ func fun_joinPath_loss*(variables: Variables, arguments: seq[Value]): FunResult 
   ## Join the path components with a path separator.
   ##
   ## You pass a list of components to join. For the second optional
-  ## parameter you specify the separator to use, either "/", "\" or
+  ## parameter you specify the separator to use, either "/", "\\" or
   ## "". If you specify "" or leave off the parameter, the current
   ## platform separator is used.
   ##
@@ -1956,8 +1956,8 @@ func fun_warn_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Log a message to the log file and return the same string. The
-  ## function has a bare form.  Logging needs to be turned on, see the
-  ## Logging section.
+  ## function has a bare form.  Nothing is logged unless logging is
+  ## turned on, see the Logging section.
   ##
   ## ~~~ statictea
   ## log = func(message: string) string
@@ -1981,7 +1981,7 @@ func fun_log_ss*(variables: Variables, arguments: seq[Value]): FunResult =
 
 func fun_return_aa*(variables: Variables, arguments: seq[Value]): FunResult =
   ## Return is a special function that returns the value passed in and
-  ## has has side effects.
+  ## has side effects.
   ##
   ## ~~~ statictea
   ## return = func(value: any) any
@@ -2058,7 +2058,8 @@ func fun_string_aoss*(variables: Variables, arguments: seq[Value]): FunResult =
   ## * **rb** — replacement block (rb) returns JSON except strings are
   ## not quoted and special characters are not escaped.
   ## * **dn** — dot name (dn) returns JSON except dictionary elements
-  ## are printed one per line as "key = value". See string(dotName, string).
+  ## are printed one per line as "key = value". See the string
+  ## function with three parameters.
   ## * **vl** — vertical list (vl) returns JSON except list elements
   ## are printed one per line as "ix: value".
   ##
@@ -2380,9 +2381,9 @@ func fun_parseMarkdown_ssl*(variables: Variables, arguments: seq[Value]): FunRes
   ## [] and () are not part of the link.
   ##
   ## ~~~ statictea
-  ## inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
+  ## inline = parseMarkdown("**tea** and hyperlink [text](link)", "inline")
   ## inline => [
-  ##   ["bold", ["bold"]]
+  ##   ["bold", ["tea"]]
   ##   ["normal", [" and a hyperlink "]]
   ##   ["link", ["text", "link"]]
   ## ]

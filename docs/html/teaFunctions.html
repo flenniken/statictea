@@ -64,7 +64,7 @@ variable or pass to another function.
 <li><a href="#readJson">readJson</a> &mdash; Convert a JSON string to a variable.</li>
 <li><a href="#replace">replace</a> &mdash; Replace a substring specified by its position and length with another string.</li>
 <li><a href="#replaceRe">replaceRe</a> &mdash; Replace multiple parts of a string using regular expressions.</li>
-<li><a href="#return">return</a> &mdash; Return is a special function that returns the value passed in and has has side effects.</li>
+<li><a href="#return">return</a> &mdash; Return is a special function that returns the value passed in and has side effects.</li>
 <li><a href="#slice">slice</a> &mdash; Extract a substring from a string by its position and length.</li>
 <li><a href="#sort">sort</a> &mdash; Sort a list of values of the same type.</li>
 <li><a href="#sort-1">sort</a> &mdash; Sort a list of lists.</li>
@@ -848,7 +848,7 @@ Examples:
 <p>Join the path components with a path separator.
 
 </p><p>You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either &quot;/&quot;, &quot;\&quot; or
+parameter you specify the separator to use, either &quot;/&quot;, &quot;\\&quot; or
 &quot;&quot;. If you specify &quot;&quot; or leave off the parameter, the current
 platform separator is used.
 
@@ -974,8 +974,8 @@ Examples:
 <h3 id="log">log</h3>
 <p>
 <p>Log a message to the log file and return the same string. The
-function has a bare form.  Logging needs to be turned on, see the
-Logging section.
+function has a bare form.  Nothing is logged unless logging is
+turned on, see the Logging section.
 
 </p><pre class="tea-code">
 <span class="t-dotName">log</span> = <span class="t-funcCall">func</span>(<span class="t-param">message</span>: <span class="t-type">string</span>) <span class="t-type">string</span>
@@ -1165,9 +1165,9 @@ link.
 [] and () are not part of the link.
 
 </p><pre class="tea-code">
-<span class="t-dotName">inline</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-str">&quot;**bold** and hyperlink [text](link)&quot;</span>, <span class="t-str">&quot;inline&quot;</span>)
+<span class="t-dotName">inline</span> = <span class="t-funcCall">parseMarkdown</span>(<span class="t-str">&quot;**tea** and hyperlink [text](link)&quot;</span>, <span class="t-str">&quot;inline&quot;</span>)
 <span class="t-dotName">inline</span> =&gt; [
-  [<span class="t-str">&quot;bold&quot;</span>, [<span class="t-str">&quot;bold&quot;</span>]]
+  [<span class="t-str">&quot;bold&quot;</span>, [<span class="t-str">&quot;tea&quot;</span>]]
   [<span class="t-str">&quot;normal&quot;</span>, [<span class="t-str">&quot; and a hyperlink &quot;</span>]]
   [<span class="t-str">&quot;link&quot;</span>, [<span class="t-str">&quot;text&quot;</span>, <span class="t-str">&quot;link&quot;</span>]]
 ]
@@ -1324,7 +1324,7 @@ website: (<a href="https%3A%2F%2Fregex101.com%2F">https://regex101.com/</a>).
 <h3 id="return">return</h3>
 <p>
 <p>Return is a special function that returns the value passed in and
-has has side effects.
+has side effects.
 
 </p><pre class="tea-code">
 <span class="t-dotName">return</span> = <span class="t-funcCall">func</span>(<span class="t-param">value</span>: <span class="t-type">any</span>) <span class="t-type">any</span>
@@ -1528,7 +1528,8 @@ The default stype is &quot;rb&quot; which is used for replacement blocks.
 </li><li><b>rb</b> — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
 </li><li><b>dn</b> — dot name (dn) returns JSON except dictionary elements
-are printed one per line as &quot;key = value&quot;. See string(dotName, string).
+are printed one per line as &quot;key = value&quot;. See the string
+function with three parameters.
 </li><li><b>vl</b> — vertical list (vl) returns JSON except list elements
 are printed one per line as &quot;ix: value&quot;.
 

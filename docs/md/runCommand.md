@@ -116,7 +116,7 @@ The special functions.
 * spLog — log function
 * spReturn — return function
 * spFunc — func function
-* spListLoop — list with callback function
+* spLoop — list with callback function
 * spCase — case function
 * spEcho — echo function
 
@@ -124,7 +124,7 @@ The special functions.
 ~~~nim
 SpecialFunction {.pure.} = enum
   spNotSpecial = "not-special", spIf = "if", spWarn = "warn", spLog = "log",
-  spReturn = "return", spFunc = "func", spListLoop = "loop", spCase = "case",
+  spReturn = "return", spFunc = "func", spLoop = "loop", spCase = "case",
   spEcho = "echo"
 ~~~
 

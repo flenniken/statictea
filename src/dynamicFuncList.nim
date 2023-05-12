@@ -730,7 +730,7 @@ join(["a", "", "c"], "|") # "a||c"
 Join the path components with a path separator.
 
 You pass a list of components to join. For the second optional
-parameter you specify the separator to use, either "/", "\" or
+parameter you specify the separator to use, either "/", "\\" or
 "". If you specify "" or leave off the parameter, the current
 platform separator is used.
 
@@ -850,8 +850,8 @@ a = ["a", 5, "b"]
 
   dc_fun_log_ss = """
 Log a message to the log file and return the same string. The
-function has a bare form.  Logging needs to be turned on, see the
-Logging section.
+function has a bare form.  Nothing is logged unless logging is
+turned on, see the Logging section.
 
 ~~~ statictea
 log = func(message: string) string
@@ -1028,9 +1028,9 @@ The leading and trailing stars are not part of the strings and the
 [] and () are not part of the link.
 
 ~~~ statictea
-inline = parseMarkdown("**bold** and hyperlink [text](link)", "inline")
+inline = parseMarkdown("**tea** and hyperlink [text](link)", "inline")
 inline => [
-  ["bold", ["bold"]]
+  ["bold", ["tea"]]
   ["normal", [" and a hyperlink "]]
   ["link", ["text", "link"]]
 ]
@@ -1180,7 +1180,7 @@ website: ([https://regex101.com/](https://regex101.com/)).
 
   dc_fun_return_aa = """
 Return is a special function that returns the value passed in and
-has has side effects.
+has side effects.
 
 ~~~ statictea
 return = func(value: any) any
@@ -1369,7 +1369,8 @@ stype:
 * **rb** — replacement block (rb) returns JSON except strings are
 not quoted and special characters are not escaped.
 * **dn** — dot name (dn) returns JSON except dictionary elements
-are printed one per line as "key = value". See string(dotName, string).
+are printed one per line as "key = value". See the string
+function with three parameters.
 * **vl** — vertical list (vl) returns JSON except list elements
 are printed one per line as "ix: value".
 
@@ -1603,7 +1604,7 @@ warn("always warn")
     info("fun_sort_lssil", dc_fun_sort_lssil, 27),
     info("fun_sort_lsssl", dc_fun_sort_lsssl, 27),
     info("fun_startsWith_ssb", dc_fun_startsWith_ssb, 20),
-    info("fun_string_aoss", dc_fun_string_aoss, 106),
+    info("fun_string_aoss", dc_fun_string_aoss, 107),
     info("fun_string_dsss", dc_fun_string_dsss, 32),
     info("fun_sub_fff", dc_fun_sub_fff, 25),
     info("fun_sub_iii", dc_fun_sub_iii, 24),
@@ -1631,18 +1632,18 @@ warn("always warn")
     780,
     1182,
     1142,
-    2532,
+    2533,
     658,
     1069,
     824,
     867,
     841,
-    2183,
-    2215,
-    2236,
+    2184,
+    2216,
+    2237,
     480,
     432,
-    2492,
+    2493,
     521,
     894,
     930,
@@ -1657,11 +1658,11 @@ warn("always warn")
     1957,
     1239,
     1511,
-    2291,
-    2416,
-    2337,
+    2292,
+    2417,
+    2338,
     1456,
-    2309,
+    2310,
     1287,
     1397,
     1982,
@@ -1669,9 +1670,9 @@ warn("always warn")
     1677,
     1709,
     1736,
-    2271,
+    2272,
     2045,
-    2151,
+    2152,
     633,
     609,
     1801,

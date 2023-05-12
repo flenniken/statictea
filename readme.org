@@ -1894,7 +1894,7 @@ count = len(str)
 You can define your own functions in code files.
 
 User defined functions are important for sharing common code, as
-conditional code blocks, looping (loop) and as callbacks for
+conditional code blocks, and as loop function callbacks for
 building lists and dictionaries.
 
 In the following example we define a function called u.mycmp and
@@ -2887,7 +2887,7 @@ nimble release
 - [[#user-functions][User Functions]]
 - [[#run-statictea][Run StaticTea]]
 - [[#how-to][How To]]
-- [[#miscellaneous][Miscellaneous (+15)]]
+- [[#miscellaneous][Miscellaneous (+14)]]
 - [[docs/md/teaFunctions.md][Functions]]
 
 * Tea Info                                                            :notoc:
