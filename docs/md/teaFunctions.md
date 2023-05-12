@@ -13,7 +13,7 @@ variable or pass to another function.
 * [add](#add) &mdash; Add two floats.
 * [add](#add-1) &mdash; Add two integers.
 * [anchors](#anchors) &mdash; Create anchor names from heading names.
-* [bool](#bool) &mdash; Create an bool from a value.
+* [bool](#bool) &mdash; Create a bool from a value.
 * [case](#case) &mdash; Compare integer cases and return the matching value.
 * [case](#case-1) &mdash; Compare string cases and return the matching value.
 * [cmp](#cmp) &mdash; Compare two floats.
@@ -131,10 +131,10 @@ a = anchors(list, "github")
 
 # bool
 
-Create an bool from a value.
+Create a bool from a value.
 
 ~~~javascript
-bool = func(value: Value) bool
+bool = func(value: any) bool
 ~~~
 
 False values by variable types:

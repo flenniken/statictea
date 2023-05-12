@@ -44,7 +44,7 @@ StaticTea language functions start with "fun_", for example, the
 * [fun_int_sosi](#fun_int_sosi) &mdash; Create an int from a number string.
 * [fun_int_ssaa](#fun_int_ssaa) &mdash; Create an int from a number string.
 * [boolConditions](#boolconditions) &mdash; Convert the value to a boolean.
-* [fun_bool_ab](#fun_bool_ab) &mdash; Create an bool from a value.
+* [fun_bool_ab](#fun_bool_ab) &mdash; Create a bool from a value.
 * [fun_find_ssoaa](#fun_find_ssoaa) &mdash; Find the position of a substring in a string.
 * [fun_slice_siois](#fun_slice_siois) &mdash; Extract a substring from a string by its position and length.
 * [fun_dup_sis](#fun_dup_sis) &mdash; Duplicate a string x times.
@@ -878,10 +878,10 @@ func boolConditions(cond: Value): bool
 
 # fun_bool_ab
 
-Create an bool from a value.
+Create a bool from a value.
 
 ~~~javascript
-bool = func(value: Value) bool
+bool = func(value: any) bool
 ~~~
 
 False values by variable types:

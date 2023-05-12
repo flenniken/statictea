@@ -54,7 +54,7 @@ Nim source code: <a href="../../src/functions.nim">functions.nim</a>
 <li> <a href="#fun_int_sosi">fun_int_sosi</a> &mdash; Create an int from a number string.</li>
 <li> <a href="#fun_int_ssaa">fun_int_ssaa</a> &mdash; Create an int from a number string.</li>
 <li> <a href="#boolConditions">boolConditions</a> &mdash; Convert the value to a boolean.</li>
-<li> <a href="#fun_bool_ab">fun_bool_ab</a> &mdash; Create an bool from a value.</li>
+<li> <a href="#fun_bool_ab">fun_bool_ab</a> &mdash; Create a bool from a value.</li>
 <li> <a href="#fun_find_ssoaa">fun_find_ssoaa</a> &mdash; Find the position of a substring in a string.</li>
 <li> <a href="#fun_slice_siois">fun_slice_siois</a> &mdash; Extract a substring from a string by its position and length.</li>
 <li> <a href="#fun_dup_sis">fun_dup_sis</a> &mdash; Duplicate a string x times.</li>
@@ -895,10 +895,10 @@ func boolConditions(cond: Value): bool
 
 <h3 id="fun_bool_ab">fun_bool_ab</h3>
 
-<p>Create an bool from a value.
+<p>Create a bool from a value.
 
 </p><pre class="tea-code">
-<span class="t-dotName">bool</span> = <span class="t-funcCall">func</span>(<span class="t-param">value</span>: V<span class="t-type">alue</span>) <span class="t-type">bool</span>
+<span class="t-dotName">bool</span> = <span class="t-funcCall">func</span>(<span class="t-param">value</span>: <span class="t-type">any</span>) <span class="t-type">bool</span>
 </pre>
 <p>
 False values by variable types:

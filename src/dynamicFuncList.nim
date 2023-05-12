@@ -61,10 +61,10 @@ a = anchors(list, "github")
 """
 
   dc_fun_bool_ab = """
-Create an bool from a value.
+Create a bool from a value.
 
 ~~~ statictea
-bool = func(value: Value) bool
+bool = func(value: any) bool
 ~~~
 
 False values by variable types:

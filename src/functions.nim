@@ -1030,10 +1030,10 @@ func boolConditions*(cond: Value): bool =
      result = false
 
 func fun_bool_ab*(variables: Variables, arguments: seq[Value]): FunResult =
-  ## Create an bool from a value.
+  ## Create a bool from a value.
   ##
   ## ~~~ statictea
-  ## bool = func(value: Value) bool
+  ## bool = func(value: any) bool
   ## ~~~
   ##
   ## False values by variable types:

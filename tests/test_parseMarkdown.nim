@@ -716,6 +716,24 @@ other: )␊
 """ % tripleQuotes
     check testHighlightCode(code, expected)
 
+  test "highlightCode bool signature":
+    let code = """
+bool = func(value: any) bool
+""" % tripleQuotes
+    let expected = """
+dotName: bool
+other: ␠=␠
+funcCall: func
+other: (
+param: value
+other: :␠
+type: any
+other: )␠
+type: bool
+other: ␊
+""" % tripleQuotes
+    check testHighlightCode(code, expected)
+
   test "highlightCode drink me":
     let code = "drink = $1\nme\n$1" % "\""
     let expected = """
