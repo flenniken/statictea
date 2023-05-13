@@ -8,31 +8,6 @@ import std/algorithm
 include src/version
 include src/dot
 
-proc runCmd(cmd: string, showOutput = false) =
-  ## Run the command and if it fails, generate an expection and print
-  ## out debugging info.
-
-  let (stdouterr, rc) = gorgeEx(cmd)
-  if rc != 0:
-    echo "\n\n"
-    echo "------"
-    echo fmt"The following command failed with return code {rc}:"
-    echo ""
-    echo cmd
-    echo ""
-    echo stdouterr
-    echo "------"
-    echo ""
-    raise newException(OSError, "the command failed")
-  if showOutput:
-    echo showOutput
-
-proc get_last_argument(): string =
-  ## Get the last argument specified on the command line. It is the
-  ## nimble task name when no extra args are given.
-  let count = system.paramCount()+1
-  return system.paramStr(count-1)
-
 proc getDirName(): string =
   ## Return a directory name corresponding to the given nim hostOS
   ## name.  The name is good for storing host specific files, for
@@ -61,9 +36,34 @@ bin           = @[fmt"bin/{dirName}/statictea"]
 
 requires "nim >= 1.4.2"
 
+proc runCmd(cmd: string, showOutput = false) =
+  ## Run the command and if it fails, generate an expection and print
+  ## out debugging info.
+
+  let (stdouterr, rc) = gorgeEx(cmd)
+  if rc != 0:
+    echo "\n\n"
+    echo "------"
+    echo fmt"The following command failed with return code {rc}:"
+    echo ""
+    echo cmd
+    echo ""
+    echo stdouterr
+    echo "------"
+    echo ""
+    raise newException(OSError, "the command failed")
+  if showOutput:
+    echo showOutput
+
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.
 # https://nim-lang.org/0.11.3/nimscript.html
+
+proc get_last_argument(): string =
+  ## Get the last argument specified on the command line. It is the
+  ## nimble task name when no extra args are given.
+  let count = system.paramCount()+1
+  return system.paramStr(count-1)
 
 proc exit() =
   exec "exit 1"
