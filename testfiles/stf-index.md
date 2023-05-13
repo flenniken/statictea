@@ -4,6 +4,7 @@ Stf (single test file) tests found in the testfiles folder.
 
 * [block-readme](../testfiles/block-readme.stf.md) &mdash; Test the readme block example.
 * [bool-expr](../testfiles/bool-expr.stf.md) &mdash; Test boolean expressions.
+* [case-basics](../testfiles/case-basics.stf.md) &mdash; Test the case function.
 * [cmdline-no-templates](../testfiles/cmdline-no-templates.stf.md) &mdash; Test with no templates on the command line.
 * [cmdline-two-templates](../testfiles/cmdline-two-templates.stf.md) &mdash; Test with two templates on the command line.
 * [cmp-basics](../testfiles/cmp-basics.stf.md) &mdash; Test the cmp functions.
@@ -15,6 +16,7 @@ Stf (single test file) tests found in the testfiles folder.
 * [continue-basics](../testfiles/continue-basics.stf.md) &mdash; The continue line readme example.
 * [dict-basics](../testfiles/dict-basics.stf.md) &mdash; Test the dictionary type.
 * [dup-json](../testfiles/dup-json.stf.md) &mdash; Test duplicate json variables.
+* [echo-basics](../testfiles/echo-basics.stf.md) &mdash; Test the echo function.
 * [endblock-readme](../testfiles/endblock-readme.stf.md) &mdash; Test the endblock readme example.
 * [endcommand-alone](../testfiles/endcommand-alone.stf.md) &mdash; Test endcommand without a block command.
 * [endline](../testfiles/endline.stf.md) &mdash; Test there are no extra lines for the readmefun case.
@@ -22,6 +24,7 @@ Stf (single test file) tests found in the testfiles folder.
 * [format-basic](../testfiles/format-basic.stf.md) &mdash; Test the format function.
 * [format-warnings](../testfiles/format-warnings.stf.md) &mdash; Test the format function's warning messages.
 * [func-basics](../testfiles/func-basics.stf.md) &mdash; Test the func type.
+* [func-list](../testfiles/func-list.stf.md) &mdash; Test calling a list of user functions.
 * [func-warnings](../testfiles/func-warnings.stf.md) &mdash; Test the function warnings.
 * [get-dict](../testfiles/get-dict.stf.md) &mdash; Test the get function with dictionaries.
 * [get-list](../testfiles/get-list.stf.md) &mdash; Test getting items from a list.

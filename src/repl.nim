@@ -381,10 +381,11 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
 
   of pf_cmd:
     # print function, f, f.cmp, f.cmp[0]
-    if haveDotName and variableName.dotName == "f":
+    # print function, u, u.cmp, u.cmp[0]
+    if haveDotName and (variableName.dotName == "f" or variableName.dotName == "u"):
       # echo "terminal width = " & $width
       var list: seq[string]
-      for key, value in variables["f"].dictv.dict.pairs():
+      for key, value in variables[variableName.dotName].dictv.dict.pairs():
         list.add(key)
       env.writeOut(listInColumns(list, getMaxWidth()))
     elif value.kind == vkList:
@@ -398,7 +399,7 @@ proc handleReplLine*(env: var Env, variables: var Variables, line: string): bool
     elif value.kind == vkFunc:
       echoDocComment(value)
     else:
-      # Specify f or a function variable.
+      # Specify u, f or a function variable.
       errorAndColumn(env, wSpecifyF, line, runningPos)
 
   of q_cmd, h_cmd, v_cmd, not_cmd:

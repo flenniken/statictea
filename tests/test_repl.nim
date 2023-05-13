@@ -259,7 +259,7 @@ The variable is not a function variable.
     let eErr = """
 pf t
    ^
-Specify f or a function variable.
+Specify u, f or a function variable.
 """
     check testHandleReplLine("pf t", eErr = eErr)
 
