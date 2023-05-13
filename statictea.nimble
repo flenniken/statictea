@@ -189,15 +189,30 @@ proc get_test_module_cmd(filename: string, release = false, force = false): stri
     fb = ""
 
   result = fmt"""
-nim c --verbosity:0 --hint[Performance]:off --hint[XCannotRaiseY]:off \
-  --hint[Name]:off {rel} {fb} -r -p:src \
-  -d:test --out:bin/{dirName}/{binName} tests/{filename}"""
+nim c \
+--verbosity:0 \
+--hint[Performance]:off \
+--hint[XCannotRaiseY]:off \
+--hint[Name]:off \
+{rel} \
+{fb} \
+-r \
+-p:src \
+-d:test \
+--out:bin/{dirName}/{binName} \
+tests/{filename}"""
 
 proc buildRelease() =
   ## Build the release version of statictea.
   let cmd = fmt"""
-nim c --hint[Performance]:off --hint[Conf]:off --hint[Name]:off --hint[Link]:off \
-  -d:release --out:bin/{dirName}/ src/statictea"""
+nim c \
+--hint[Performance]:off \
+--hint[Conf]:off \
+--hint[Name]:off \
+--hint[Link]:off \
+-d:release \
+--out:bin/{dirName}/ \
+src/statictea"""
 
   let exeName = fmt"bin/{dirName}/statictea"
   echo fmt"Build: {exeName}"
@@ -767,10 +782,13 @@ proc taskFuncDocsHtml() =
 
 proc buildRunner() =
   let cmd = fmt"""
-nim c --hint[Performance]:off \
-  --hint[Conf]:off --hint[Link]: off \
-  -d:release \
-  --out:bin/{dirName}/ src/runner"""
+nim c \
+--hint[Performance]:off \
+--hint[Conf]:off \
+--hint[Link]: off \
+-d:release \
+--out:bin/{dirName}/ \
+src/runner"""
 
   let exeName = fmt"bin/{dirName}/runner"
   echo fmt"Build runner: {exeName}"
@@ -855,18 +873,28 @@ proc sameBytes(a: string, b: string): bool =
 proc buildCmdLine() =
   # Build the cmdline exe.
   let cmd = fmt"""
-nim c --hint[Performance]:off \
-  --hint[Conf]:off --hint[Link]: off -d:release \
-  --out:bin/{dirName}/ src/cmdline"""
+nim c \
+--hint[Performance]:off \
+--hint[Conf]:off \
+--hint[Link]: off \
+-d:release \
+--out:bin/{dirName}/ \
+src/cmdline"""
+
   echo fmt"Build bin/{dirName}/cmdline"
   runCmd(cmd)
 
 proc buildJsonDocRaw() =
   # Build the jsondocraw exe.
   let cmd = fmt"""
-nim c --hint[Performance]:off \
-  --hint[Conf]:off --hint[Link]: off -d:release \
-  --out:bin/{dirName}/ src/jsondocraw"""
+nim c \
+--hint[Performance]:off \
+--hint[Conf]:off \
+--hint[Link]: off \
+-d:release \
+--out:bin/{dirName}/ \
+src/jsondocraw"""
+
   echo fmt"Build bin/{dirName}/jsondocraw"
   runCmd(cmd)
 
