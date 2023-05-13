@@ -1,8 +1,8 @@
 stf file, version 0.1.0
 
-# Stf Template
+# Func List
 
-This stf file is used as a template by the newstf nimble task.
+Test calling a list of user functions.
 
 ### File cmd.sh command
 
@@ -18,6 +18,10 @@ $statictea \
 ### File tmpl.txt
 
 ~~~
+$$ nextline
+$$ : msg = o.myfunc("world")
+$$ : num = o.myfunc(2)
+{msg} {num}
 ~~~
 
 ### File server.json
@@ -29,11 +33,22 @@ $statictea \
 ### File shared.tea
 
 ~~~
+hello = func(msg: string) string
+  ## Format hello message.
+  str = format("hello {msg}")
+  return(str)
+
+double = func(num: int) int
+  ## Return twice the number passed in.
+  return(add(num, num))
+
+o.myfunc = [hello, double]
 ~~~
 
 ### File result.expected
 
 ~~~
+hello world 4
 ~~~
 
 ### File stdout.expected

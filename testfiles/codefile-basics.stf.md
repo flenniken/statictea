@@ -9,6 +9,7 @@ Test using a code file.
 ~~~
 $statictea \
   -o codefile.tea \
+  -o codefile2.tea \
   -t tmpl.txt \
   -r result >stdout 2>stderr
 ~~~
@@ -34,7 +35,7 @@ $$ endblock
 
 ### File codefile.tea
 
-~~~ nim
+~~~
 # codefile.tea
 
 o.a = 5
@@ -48,6 +49,17 @@ Green
 White"""
 o.xLen = len(o.x)
 o.sum = add(o.a, int(o.b))
+~~~
+
+### File codefile2.tea
+
+~~~
+# You can stop in a code file but not skip or other values.
+return(1)
+return("skip")
+echo("after skip")
+return("stop")
+echo("after stop")
 ~~~
 
 ### File result.expected
@@ -69,11 +81,18 @@ o.sum = 8
 ### File stdout.expected
 
 ~~~
+after skip
 ~~~
 
 ### File stderr.expected
 
 ~~~
+codefile2.tea(2): w177: Expected 'skip' or 'stop' for the return function value.
+statement: return(1)
+           ^
+codefile2.tea(3): w187: Use '...return("stop")...' in a code file.
+statement: return("skip")
+           ^
 tmpl.txt(12): w182: You can only change code variables (o dictionary) in code files.
 statement: o.hello = "not allowed"
            ^
