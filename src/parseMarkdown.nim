@@ -252,11 +252,12 @@ func `$`*(elements: seq[BlockElement]): string =
     result.add($element)
 
 func `$`*(element: InlineElement): string =
-  ## Return a string representation of an InlineElement.
-  ## ~~~
-  ## **text** => " bold text"
-  ## [desc](http) => " link desc http"
-  ## ~~~
+  ##
+  #$ Return a string representation of an InlineElement.
+  #$ ~~~
+  #$ **text** => " bold text"
+  #$ [desc](http) => " link desc http"
+  #$ ~~~
   result.add(" $1" % $element.tag)
   for ix, line in element.content:
     result.add(" $1" % line)
@@ -498,12 +499,13 @@ func countStars*(text: string, pos: Natural): Natural =
     inc(vpos)
 
 func parseLink*(text: string, start: Natural): Option[LinkItem] =
-  ## Parse the link at the given start position.
   ##
-  ## ~~~
-  ## [description](link)
-  ## ^                  ^
-  ## ~~~
+  #$ Parse the link at the given start position.
+  #$
+  #$ ~~~
+  #$ [description](link)
+  #$ ^                  ^
+  #$ ~~~
   let matchesO = matchMarkdownLink(text, start)
   if isSome(matchesO):
     let (desc, link, length) = matchesO.get2GroupsLen()

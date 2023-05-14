@@ -268,13 +268,14 @@ func getRightType*(statement: Statement, start: Natural): RightType =
     result = rtNothing
 
 proc getParameterNameOr*(text: string, startPos: Natural): ParameterNameOr =
-  ## Get a parameter name from the statement and skip trailing
-  ## whitespace. Start points at a name.
   ##
-  ## ~~~statictea
-  ## a = func(var-name : int) dict
-  ##          ^        ^
-  ## ~~~
+  #$ Get a parameter name from the statement and skip trailing
+  #$ whitespace. Start points at a name.
+  #$
+  #$ ~~~statictea
+  #$ a = func(var-name : int) dict
+  #$          ^        ^
+  #$ ~~~
   assert(startPos >= 0, "startPos is less than 0")
 
   if startPos >= text.len:
@@ -354,16 +355,17 @@ proc getParameterNameOr*(text: string, startPos: Natural): ParameterNameOr =
   result = newParameterNameOr(parameterName, currentPos)
 
 proc getDotNameOr*(text: string, startPos: Natural): DotNameOr =
-  ## Get a dot name from the statement. Start points at a name.
   ##
-  ## ~~~statictea
-  ## a = var-name( 1 )
-  ##     ^         ^
-  ## a = abc # comment
-  ##     ^   ^
-  ## a = o.def.bbb # comment
-  ##     ^         ^
-  ## ~~~
+  #$ Get a dot name from the statement. Start points at a name.
+  #$
+  #$ ~~~statictea
+  #$ a = var-name( 1 )
+  #$     ^         ^
+  #$ a = abc # comment
+  #$     ^   ^
+  #$ a = o.def.bbb # comment
+  #$     ^         ^
+  #$ ~~~
   assert(startPos >= 0, "startPos is less than 0")
 
   if startPos >= text.len:
@@ -851,15 +853,16 @@ proc matchTabSpace2*(line: string, start: Natural = 0): Option[Matches] =
   result = matchPattern(line, pattern, start, 0)
 
 func getString*(str: string, start: Natural): ValuePosSiOr =
-  ## Return a literal string value and position after it. The start
-  ## parameter is the index of the first quote in the statement and
-  ## the return position is after the optional trailing white space
-  ## following the last quote.
   ##
-  ## ~~~statictea
-  ## var = "hello" # asdf
-  ##       ^       ^
-  ## ~~~
+  #$ Return a literal string value and position after it. The start
+  #$ parameter is the index of the first quote in the statement and
+  #$ the return position is after the optional trailing white space
+  #$ following the last quote.
+  #$
+  #$ ~~~statictea
+  #$ var = "hello" # asdf
+  #$       ^       ^
+  #$ ~~~
 
   # Parse the json string and remove escaping.
   result = parseJsonStr(str, start+1)
@@ -885,17 +888,18 @@ func getNumber*(statement: Statement, start: Natural): ValuePosSiOr =
   result = parseNumber(statement.text, start)
 
 func skipArgument*(statement: Statement, startPos: Natural): PosOr =
-  ## Skip past the argument.  startPos points at the first character
-  ## of a function argument.  Return the first non-whitespace
-  ## character after the argument or a message when there is a
-  ## problem.
-  ## ~~~statictea
-  ## a = fn( 1 )
-  ##         ^ ^
-  ##           ^^
-  ## a = fn( 1 , 2 )
-  ##         ^ ^
-  ## ~~~
+  ##
+  #$ Skip past the argument.  startPos points at the first character
+  #$ of a function argument.  Return the first non-whitespace
+  #$ character after the argument or a message when there is a
+  #$ problem.
+  #$ ~~~statictea
+  #$ a = fn( 1 )
+  #$         ^ ^
+  #$           ^^
+  #$ a = fn( 1 , 2 )
+  #$         ^ ^
+  #$ ~~~
 
   let text = statement.text
   assert(startPos < text.len, "startPos is greater than the text len")
@@ -1111,19 +1115,20 @@ proc ifFunction*(
     variables: Variables,
     topLevel = false,
   ): ValuePosSiOr =
-  ## Return the "if" function's value and position after. It
-  ## conditionally runs one of its arguments and skips the
-  ## other. Start points at the first argument of the function. The
-  ## position includes the trailing whitespace after the ending ).
   ##
-  ## This handles the three parameter form with an assignment.
-  ##
-  ## ~~~statictea
-  ## a = if(cond, then, else)
-  ##        ^                ^
-  ## a = if(cond, then)
-  ##        ^          ^
-  ## ~~~
+  #$ Return the "if" function's value and position after. It
+  #$ conditionally runs one of its arguments and skips the
+  #$ other. Start points at the first argument of the function. The
+  #$ position includes the trailing whitespace after the ending ).
+  #$
+  #$ This handles the three parameter form with an assignment.
+  #$
+  #$ ~~~statictea
+  #$ a = if(cond, then, else)
+  #$        ^                ^
+  #$ a = if(cond, then)
+  #$        ^          ^
+  #$ ~~~
 
   # Get the condition's value.
   let vlcOr = getValuePosSi(env, sourceFilename, statement, start, variables)
@@ -1214,15 +1219,16 @@ proc bareIf*(
     start: Natural,
     variables: Variables,
   ): ValuePosSiOr =
-  ## Handle the bare IF. Return the resulting value and the
-  ## position in the statement after the if.
   ##
-  ## ~~~statictea
-  ## if(cond, return("stop"))
-  ##    ^                    ^
-  ## if(c, warn("c is true"))
-  ##    ^                    ^
-  ## ~~~
+  #$ Handle the bare IF. Return the resulting value and the
+  #$ position in the statement after the if.
+  #$
+  #$ ~~~statictea
+  #$ if(cond, return("stop"))
+  #$    ^                    ^
+  #$ if(c, warn("c is true"))
+  #$    ^                    ^
+  #$ ~~~
   var runningPos = start
 
   # Get the condition's value.
@@ -1316,15 +1322,16 @@ proc getArguments*(
     arguments: var seq[Value],
     argumentStarts: var seq[Natural],
   ): ValuePosSiOr =
-  ## Get the function arguments and the position of each. If an
-  ## argument has a side effect, the return value and pos and side
-  ## effect is returned, else a 0 value and seNone is returned.
-  ## ~~~statictea
-  ## newList = loop(list, callback, state)  # comment
-  ##                    ^                       ^
-  ## newList = loop(return(3), callback, state)  # comment
-  ##                           ^ ^
-  ## ~~~
+  ##
+  #$ Get the function arguments and the position of each. If an
+  #$ argument has a side effect, the return value and pos and side
+  #$ effect is returned, else a 0 value and seNone is returned.
+  #$ ~~~statictea
+  #$ newList = loop(list, callback, state)  # comment
+  #$                    ^                       ^
+  #$ newList = loop(return(3), callback, state)  # comment
+  #$                           ^ ^
+  #$ ~~~
 
   var runningPos = start
 
@@ -1386,25 +1393,26 @@ proc getFunctionValuePosSi*(
     listCase = false,
     topLevel = false,
 ): ValuePosSiOr =
-  ## Return the function's value and the position after it. Start
-  ## points at the first argument of the function. The position
-  ## includes the trailing whitespace after the ending ). The
-  ## functionName is the name of the function to call. The functionPos
-  ## is the start position of the function.
   ##
-  ## The listCase parameter true means brackets are used for
-  ## the list function. A true topLevel parameter means the item
-  ## pointed to by start is the first item after the equal sign (not
-  ## an argument).
-  ##
-  ## ~~~statictea
-  ## a = get(b, 2, c) # condition
-  ##     ^ functionPos
-  ##         ^ start  ^ end
-  ##
-  ## a = get(b, len("hi"), c)
-  ##                ^    ^
-  ## ~~~
+  #$ Return the function's value and the position after it. Start
+  #$ points at the first argument of the function. The position
+  #$ includes the trailing whitespace after the ending ). The
+  #$ functionName is the name of the function to call. The functionPos
+  #$ is the start position of the function.
+  #$
+  #$ The listCase parameter true means brackets are used for
+  #$ the list function. A true topLevel parameter means the item
+  #$ pointed to by start is the first item after the equal sign (not
+  #$ an argument).
+  #$
+  #$ ~~~statictea
+  #$ a = get(b, 2, c) # condition
+  #$     ^ functionPos
+  #$         ^ start  ^ end
+  #$
+  #$ a = get(b, len("hi"), c)
+  #$                ^    ^
+  #$ ~~~
 
   # Get all the function arguments.
   var runningPos = start
@@ -1518,15 +1526,16 @@ proc getValueOrNestedCond(env: var Env, sourceFilename: string,
 
 proc getCondition*(env: var Env, sourceFilename: string, statement: Statement, start: Natural,
     variables: Variables): ValuePosSiOr =
-  ## Return the bool value of the condition expression and the
-  ## position after it.  The start index points at the ( left
-  ## parentheses. The position includes the trailing whitespace after
-  ## the ending ).
   ##
-  ## ~~~statictea
-  ## a = (5 < 3) # condition
-  ##     ^       ^
-  ## ~~~
+  #$ Return the bool value of the condition expression and the
+  #$ position after it.  The start index points at the ( left
+  #$ parentheses. The position includes the trailing whitespace after
+  #$ the ending ).
+  #$
+  #$ ~~~statictea
+  #$ a = (5 < 3) # condition
+  #$     ^       ^
+  #$ ~~~
   when showPos:
     showDebugPos(statement, start, "^ s condition")
 
@@ -1653,15 +1662,16 @@ proc getCondition*(env: var Env, sourceFilename: string, statement: Statement, s
 
 proc getBracketedVarValue*(env: var Env, sourceFilename: string, statement: Statement,
     start: Natural, container: Value, variables: Variables): ValuePosSiOr =
-  ## Return the value of the bracketed variable and the position after
-  ## the trailing whitespace.. Start points at the the first argument.
   ##
-  ## ~~~statictea
-  ## a = list[ 4 ]
-  ##           ^  ^
-  ## a = dict[ "abc" ]
-  ##           ^      ^
-  ## ~~~
+  #$ Return the value of the bracketed variable and the position after
+  #$ the trailing whitespace.. Start points at the the first argument.
+  #$
+  #$ ~~~statictea
+  #$ a = list[ 4 ]
+  #$           ^  ^
+  #$ a = dict[ "abc" ]
+  #$           ^      ^
+  #$ ~~~
   when showPos:
     showDebugPos(statement, start, "^ s bracketed")
   var runningPos = start
@@ -1782,20 +1792,21 @@ proc loop*(
     start: Natural,
     variables: Variables,
   ): ValuePosSiOr =
-  ## Make a new list from an existing list. The callback function is
-  ## called for each item in the list and determines what goes in the
-  ## new list.  See funList_lpoal in functions.nim for more
-  ## information.
   ##
-  ## Return the loop value and the ending position.  Start
-  ## points at the first parameter of the function. The position
-  ## includes the trailing whitespace after the ending right
-  ## parentheses.
-  ##
-  ## ~~~statictea
-  ## stopped = loop(list, new, callback, state)
-  ##                    ^                          ^
-  ## ~~~
+  #$ Make a new list from an existing list. The callback function is
+  #$ called for each item in the list and determines what goes in the
+  #$ new list.  See funList_lpoal in functions.nim for more
+  #$ information.
+  #$
+  #$ Return the loop value and the ending position.  Start
+  #$ points at the first parameter of the function. The position
+  #$ includes the trailing whitespace after the ending right
+  #$ parentheses.
+  #$
+  #$ ~~~statictea
+  #$ stopped = loop(list, new, callback, state)
+  #$                    ^                          ^
+  #$ ~~~
   # Get all the function arguments.
   var runningPos = start
   var arguments: seq[Value]
@@ -2020,26 +2031,27 @@ proc caseFunction*(
     start: Natural,
     variables: Variables,
   ): ValuePosSiOr =
-  ## Return the case function's value and position after. It
-  ## conditionally runs one of its arguments and skips the
-  ## others. Start points at the first argument of the function. The
-  ## position includes the trailing whitespace after the ending
-  ## parentheses.
   ##
-  ## ~~~statictea
-  ## a = case(cond, [1, len("1"), 2, len("abc")], default) # comment
-  ##          ^                                            ^
-  ##
-  ## a = case(cond, list(1, len("1"), 2, len("abc")), default) # comment
-  ##          ^                                                ^
-  ##
-  ## pairs = [1, len("1"), 2, len("abc")]
-  ## a = case(cond, pairs, default) # comment
-  ##          ^                     ^
-  ##
-  ## a = case(cond, listMaker(), default) # comment
-  ##          ^                           ^
-  ## ~~~
+  #$ Return the case function's value and position after. It
+  #$ conditionally runs one of its arguments and skips the
+  #$ others. Start points at the first argument of the function. The
+  #$ position includes the trailing whitespace after the ending
+  #$ parentheses.
+  #$
+  #$ ~~~statictea
+  #$ a = case(cond, [1, len("1"), 2, len("abc")], default) # comment
+  #$          ^                                            ^
+  #$
+  #$ a = case(cond, list(1, len("1"), 2, len("abc")), default) # comment
+  #$          ^                                                ^
+  #$
+  #$ pairs = [1, len("1"), 2, len("abc")]
+  #$ a = case(cond, pairs, default) # comment
+  #$          ^                     ^
+  #$
+  #$ a = case(cond, listMaker(), default) # comment
+  #$          ^                           ^
+  #$ ~~~
   var runningPos = start
 
   # Get the main condition's value.
@@ -2211,23 +2223,24 @@ proc getValuePosSiWorker(env: var Env, sourceFilename: string, statement: Statem
 
 proc getValuePosSi*(env: var Env, sourceFilename: string, statement: Statement,
   start: Natural, variables: Variables, topLevel = false): ValuePosSiOr =
-  ## Return the value and position of the item that the start
-  ## parameter points at which is a string, number, variable, list, or
-  ## condition.  The position returned includes the trailing
-  ## whitespace after the item. The ending position is pointing at the
-  ## end of the statement, or at the first non-whitespace character
-  ## after the argument. A true topLevel parameter means the item
-  ## pointed to by start is the first item after the equal sign (not
-  ## an argument).
   ##
-  ## ~~~statictea
-  ## a = "tea" # string
-  ##     ^     ^
-  ## a = cmp(b, c) # calling variable
-  ##     ^         ^
-  ## a = if( bool(len(b)), d, e) # if
-  ##         ^             ^
-  ## ~~~
+  #$ Return the value and position of the item that the start
+  #$ parameter points at which is a string, number, variable, list, or
+  #$ condition.  The position returned includes the trailing
+  #$ whitespace after the item. The ending position is pointing at the
+  #$ end of the statement, or at the first non-whitespace character
+  #$ after the argument. A true topLevel parameter means the item
+  #$ pointed to by start is the first item after the equal sign (not
+  #$ an argument).
+  #$
+  #$ ~~~statictea
+  #$ a = "tea" # string
+  #$     ^     ^
+  #$ a = cmp(b, c) # calling variable
+  #$     ^         ^
+  #$ a = if( bool(len(b)), d, e) # if
+  #$         ^             ^
+  #$ ~~~
 
   when showPos:
     showDebugPos(statement, start, "^ s")
@@ -2244,15 +2257,16 @@ proc getValuePosSi*(env: var Env, sourceFilename: string, statement: Statement,
 
 proc runBareFunction*(env: var Env, sourceFilename: string, statement: Statement,
     start: Natural, variables: Variables, leftName: DotName): ValuePosSiOr =
-  ## Handle bare function: if, return, warn, log and loop. A
-  ## bare function does not assign a variable.
   ##
-  ## ~~~statictea
-  ## if( true, warn("tea time")) # test
-  ## ^                           ^
-  ## return(5)
-  ## ^        ^
-  ## ~~~
+  #$ Handle bare function: if, return, warn, log and loop. A
+  #$ bare function does not assign a variable.
+  #$
+  #$ ~~~statictea
+  #$ if( true, warn("tea time")) # test
+  #$ ^                           ^
+  #$ return(5)
+  #$ ^        ^
+  #$ ~~~
   let runningPos = leftName.pos
 
   # Get the function variable.
@@ -2283,17 +2297,18 @@ proc runBareFunction*(env: var Env, sourceFilename: string, statement: Statement
 
 proc getBracketDotName*(env: var Env, statement: Statement, start: Natural,
     variables: Variables, leftName: DotName): ValuePosSiOr =
-  ## Convert var[key] to a dot name.
   ##
-  ## ~~~statictea
-  ## key = "hello"
-  ## name[key] = 20
-  ## ^         ^
-  ## => name.hello, pos
-  ##
-  ## name["hello"] = 20
-  ## ^             ^
-  ## ~~~
+  #$ Convert var[key] to a dot name.
+  #$
+  #$ ~~~statictea
+  #$ key = "hello"
+  #$ name[key] = 20
+  #$ ^         ^
+  #$ => name.hello, pos
+  #$
+  #$ name["hello"] = 20
+  #$ ^             ^
+  #$ ~~~
 
   # Get the index name.
   var runningPos = leftName.pos
@@ -2539,13 +2554,14 @@ proc runStatementAssignVar*(env: var Env, sourceFilename: string, statement: Sta
     result = lcAdd
 
 proc parseSignature*(dotName: string, signature: string, start: Natural): SignatureOr =
-  ## Parse the signature and return the list of parameters or a
-  ## message. Start points at the first parameter.
   ##
-  ## ~~~statictea
-  ## cmp = func(numStr1: string, numStr2: string) int
-  ##            ^
-  ## ~~~
+  #$ Parse the signature and return the list of parameters or a
+  #$ message. Start points at the first parameter.
+  #$
+  #$ ~~~statictea
+  #$ cmp = func(numStr1: string, numStr2: string) int
+  #$            ^
+  #$ ~~~
   var runningPos = start
 
   var optional = false

@@ -22,7 +22,7 @@ StaticTea nim source code documentation.
 * [parseNumber.nim](parseNumber.md) &mdash; Parse an int or float number string.
 * [processTemplate.nim](processTemplate.md) &mdash; Process the template.
 * [readjson.nim](readjson.md) &mdash; Read json content.
-* [regexes.nim](regexes.md) &mdash; Perl regular expression matching.
+* [regexes.nim](regexes.md) &mdash;  Perl regular expression matching.
 * [repl.nim](repl.md) &mdash; Run commands at a prompt.
 * [replacement.nim](replacement.md) &mdash; Handle the replacement block lines.
 * [runCommand.nim](runCommand.md) &mdash; Run a command and fill in the variables dictionaries.

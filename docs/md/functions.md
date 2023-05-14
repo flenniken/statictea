@@ -2083,7 +2083,6 @@ a = len(echo("len called"))
 ~~~
 
 
-
 ~~~nim
 func fun_echo_ss(variables: Variables; arguments: seq[Value]): FunResult {.
     raises: [KeyError], tags: [].}
@@ -2100,11 +2099,10 @@ functionsDict = newTable(32)
 
 # BuiltInInfo
 
-The built-in function information.
-
-* **funcName** — the function name in the nim file, e.g.: fun_add_ii
-* **docComment** — the function documentation
-* **numLines** — the number of function code lines
+The built-in function information.<ul class="simple"><li><strong>funcName</strong> — the function name in the nim file, e.g.: fun_add_ii</li>
+<li><strong>docComment</strong> — the function documentation</li>
+<li><strong>numLines</strong> — the number of function code lines</li>
+</ul>
 
 
 ~~~nim
@@ -2117,7 +2115,6 @@ BuiltInInfo = object
 # newBuiltInInfo
 
 Return a BuiltInInfo object.
-
 
 ~~~nim
 func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo

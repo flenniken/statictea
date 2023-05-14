@@ -216,19 +216,20 @@ type
     seIf2False = "if2False",
 
   ValuePosSi* = object
-    ## A value and the position after the value in the statement along
-    ## with the side effect, if any. The position includes the trailing
-    ## whitespace.  For the example statement below, the value 567
-    ## starts at index 6 and ends at position 10.
     ##
-    ## Example:
-    ##
-    ## ~~~
-    ## 0123456789 123456789
-    ## var = 567 # test
-    ##       ^ start
-    ##           ^ end position
-    ## ~~~
+    #$ A value and the position after the value in the statement along
+    #$ with the side effect, if any. The position includes the trailing
+    #$ whitespace.  For the example statement below, the value 567
+    #$ starts at index 6 and ends at position 10.
+    #$
+    #$ Example:
+    #$
+    #$ ~~~
+    #$ 0123456789 123456789
+    #$ var = 567 # test
+    #$       ^ start
+    #$           ^ end position
+    #$ ~~~
     value*: Value
     pos*: Natural
     sideEffect*: SideEffect
@@ -317,15 +318,16 @@ proc newValue*(value: Value): Value =
   result = value
 
 proc newValue*[T](list: openArray[T], mutable = Mutable.immutable): Value =
-  ## Create a new list value from an array of items of the same kind.
   ##
-  ## Examples:
-  ##
-  ## ~~~nim
-  ## let listValue = newValue([1, 2, 3])
-  ## let listValue = newValue(["a", "b", "c"])
-  ## let listValue = newValue([newValue(1), newValue("b")])
-  ## ~~~
+  #$ Create a new list value from an array of items of the same kind.
+  #$
+  #$ Examples:
+  #$
+  #$ ~~~nim
+  #$ let listValue = newValue([1, 2, 3])
+  #$ let listValue = newValue(["a", "b", "c"])
+  #$ let listValue = newValue([newValue(1), newValue("b")])
+  #$ ~~~
   var valueList: seq[Value]
   for num in list:
     valueList.add(newValue(num))
@@ -333,16 +335,17 @@ proc newValue*[T](list: openArray[T], mutable = Mutable.immutable): Value =
   result = Value(kind: vkList, listv: listv)
 
 proc newValue*[T](dictPairs: openArray[(string, T)], mutable = Mutable.immutable): Value =
-  ## Create a new dict value from an array of pairs where the pairs
-  ## are the same type which may be Value type.
   ##
-  ## Examples:
-  ##
-  ## ~~~nim
-  ##  let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
-  ##  let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
-  ##  let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
-  ## ~~~
+  #$ Create a new dict value from an array of pairs where the pairs
+  #$ are the same type which may be Value type.
+  #$
+  #$ Examples:
+  #$
+  #$ ~~~nim
+  #$  let dictValue = newValue([("a", 1), ("b", 2), ("c", 3)])
+  #$  let dictValue = newValue([("a", 1.1), ("b", 2.2), ("c", 3.3)])
+  #$  let dictValue = newValue([("a", newValue(1.1)), ("b", newValue("a"))])
+  #$ ~~~
   var varsDict = newVarsDict()
   for tup in dictPairs:
     let (a, b) = tup
@@ -781,19 +784,20 @@ proc shortName*(index: Natural): string =
     result &= $num
 
 func newSignatureO*(functionName: string, signatureCode: string): Option[Signature] =
-  ## Return a new signature for the function name and signature code.
-  ## The parameter names come from the shortName function for letters
-  ## a through z in order. The last letter in the code is the
-  ## function's return type.
   ##
-  ## Example:
-  ##
-  ## ~~~nim
-  ## var signatureO = newSignatureO("myname", "ifss")
-  ## echo $signatureO.get()
-  ##
-  ## # => myname(a: int, b: float, c: string) string
-  ## ~~~
+  #$ Return a new signature for the function name and signature code.
+  #$ The parameter names come from the shortName function for letters
+  #$ a through z in order. The last letter in the code is the
+  #$ function's return type.
+  #$
+  #$ Example:
+  #$
+  #$ ~~~nim
+  #$ var signatureO = newSignatureO("myname", "ifss")
+  #$ echo $signatureO.get()
+  #$
+  #$ # => myname(a: int, b: float, c: string) string
+  #$ ~~~
 
   var params: seq[Param]
   var nameIx = 0

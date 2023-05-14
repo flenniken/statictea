@@ -37,7 +37,7 @@ bin           = @[fmt"bin/{dirName}/statictea"]
 requires "nim >= 1.4.2"
 
 proc runCmd(cmd: string, showOutput = false) =
-  ## Run the command and if it fails, generate an expection and print
+  ## Run the command and if it fails, generate an exception and print
   ## out debugging info.
 
   let (stdouterr, rc) = gorgeEx(cmd)
@@ -53,7 +53,7 @@ proc runCmd(cmd: string, showOutput = false) =
     echo ""
     raise newException(OSError, "the command failed")
   if showOutput:
-    echo showOutput
+    echo stdouterr
 
 # The nimscript module is imported by default. It contains functions
 # you can call in your nimble file.
@@ -229,31 +229,16 @@ proc readModuleDescription(filename: string): string =
   var foundDescription = false
   var lines = newSeq[string]()
   for line in text.splitLines():
-    if line.startsWith("##") and line.len > 2:
-      lines.add(line[2 .. line.len - 1])
+    if line.startsWith("## ") or line.startsWith("#$ "):
+      lines.add(line[3 .. line.len - 1])
       foundDescription = true
     elif foundDescription:
       break
 
-  # Determine the minimum number of spaces used with the doc comment.
-  var minSpaces = 1024
-  for line in lines:
-    for ix in 0 .. line.len - 1:
-      if line[ix] != ' ':
-        if ix < minSpaces:
-          minSpaces = ix
-        break
+  result = lines.join("\n")
 
-  # Trim off the minimum leading spaces.
-  var trimmedLines = newSeq[string]()
-  for line in lines:
-    # trimmedLines.add($minSpaces & ":" & line)
-    trimmedLines.add(line[minSpaces .. ^1])
-
-  result = trimmedLines.join("\n")
-
-proc readModuleDescriptionMd(filename: string): string =
-  ## Return the module doc comment at the top of the file for markdown
+proc readModuleDescStf(filename: string): string =
+  ## Return the module doc comment at the top of the file for stf
   ## files.
   let text = slurp(filename)
 
@@ -327,7 +312,7 @@ proc testfilesIndexJson(): string =
   # Extract the source module descriptions from all the files.
   var descriptions = newSeq[string]()
   for filename in filenames:
-    descriptions.add(readModuleDescriptionMd(filename))
+    descriptions.add(readModuleDescStf(filename))
 
   result = fileIndexJson(filenames, descriptions)
 
@@ -595,15 +580,16 @@ proc taskDocmix() =
   var teaFile = "templates/nimModuleIndex.tea"
   var jsonFile = "docs/index.json"
 
-  # echo "Create the index json file."
   var json = sourceIndexJson()
   writeFile(jsonFile, json)
+  echo fmt"Generated: {jsonFile}"
 
   # Process the index template and create the index.md file.
   var cmd = fmt"bin/{dirName}/statictea -s {jsonFile} -t {templateFile} -o {teaFile} -r {resultFile}"
+  # echo cmd
   exec cmd
 
-  rmFile(jsonFile)
+  # rmFile(jsonFile)
   echo fmt"Generated: http://localhost:6419/{resultFile}"
 
 proc taskDochix() =
@@ -970,9 +956,8 @@ proc runUnitTests(name = "") =
       if filename == "testall.nim":
         continue
       let cmd = get_test_module_cmd(filename)
-      echo ""
-      echo cmd
       exec cmd
+      echo cmd
 
 proc makeJsonDoc(filename: string): string =
   # Create the json doc file for the given nim source file. Return the
@@ -1116,10 +1101,11 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
   echo "make JSON file from functions.nim"
   let jsonName = makeJsonDoc("functions.nim")
 
-  # Build the dynamicFuncList.nim file.
-  rmFile(result)
+  # Build the dynamicFuncList.nim file from the json file and template.
+  # rmFile(result)
   echo fmt"make {result}"
   let cmd = fmt"{statictea} -s {jsonName} -t {tFile} -o {teaFile} -r {result}"
+  echo cmd
   runCmd(cmd)
 
   rmFile(jsonName)

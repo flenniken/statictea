@@ -35,7 +35,7 @@
 </span>
   <span class="t-comment"># Add entries that are functions that begin with &quot;fun_&quot;, skip the
 </span>  <span class="t-comment"># others.
-</span>  <span class="t-funcCall">if</span>((<span class="t-dotName">entry.type</span> != <span class="t-str">&quot;skFunc&quot;</span>), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
+</span>  <span class="t-funcCall">if</span>((<span class="t-dotName">entry.type</span> != <span class="t-str">&quot;skFunc&quot;</span> <span class="t-dotName">and</span> <span class="t-dotName">entry.type</span> != <span class="t-str">&quot;skProc&quot;</span>), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
   <span class="t-funcCall">if</span>(<span class="t-funcCall">not</span>(<span class="t-funcCall">startsWith</span>(<span class="t-dotName">entry.name</span>, <span class="t-str">&quot;fun_&quot;</span>)), <span class="t-funcCall">return</span>(<span class="t-dotName">false</span>))
 
   <span class="t-dotName">newEntry</span> = <span class="t-funcCall">dict</span>()
@@ -58,6 +58,8 @@
 <span class="t-dotName">state.starts</span> = <span class="t-dotName">starts</span>
 <span class="t-dotName">entries</span> = []
 <span class="t-funcCall">loop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">get-entry</span>, <span class="t-dotName">state</span>)
+
+<span class="t-funcCall">if</span>((<span class="t-funcCall">len</span>(<span class="t-dotName">o.entries</span>) == <span class="t-num">0</span>), <span class="t-funcCall">warn</span>(<span class="t-str">&quot;no entries&quot;</span>))
 
 <span class="t-comment"># Sort the entries by function name. Use insensitive compare so
 </span><span class="t-comment"># function cmp_ comes before cmpV.

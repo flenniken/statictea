@@ -4,7 +4,6 @@ import std/strutils
 import std/unicode
 import unicodes
 import opresult
-import opresult
 import messages
 import vartypes
 import sharedtestcode
@@ -30,7 +29,7 @@ proc testSlice(str: string, start: int, length: int, eString: string): bool =
   let test = """slice("$1", $2, $3)""" % [str, $start, $length]
   let eFunResult = newFunResult(newValue(eString))
   result = gotExpected($funResult, $eFunResult, test)
-  
+
   # if funResult.kind == frWarning:
   #   echo "Expected value got warning: " & $funResult
   #   return false

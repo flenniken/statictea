@@ -1,44 +1,45 @@
-## Perl regular expression matching.
-##
-## Examples:
-##
-## Match a string with "abc" in it:
-##
-## ~~~nim
-## let line = "123abc456"
-## let pattern = ".*abc"
-## let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
-##
-## check matchesO.isSome == true
-## check matchesO.get().length == 6
-## ~~~
-##
-## Match a file and line number like: filename(234):
-##
-## ~~~ nim
-## let line = "template.html(87)"
-## let pattern = r"^(.*)\(([0-9]+)\):$"
-## let matchesO = matchPattern(line, pattern, start = 0, groups = 2)
-##
-## check matchesO.isSome == true
-## let (filename, lineNum, length) = matchesO.get2GroupsLen()
-## check filename == "template.html"
-## check lineNum == "87"
-## check length == 14
-## ~~~
-##
-## Replace the patterns in the string with their replacements:
-##
-## ~~~ nim
-## var replacements: seq[Replacement]
-## replacements.add(newReplacement("abc", "456"))
-## replacements.add(newReplacement("def", ""))
-##
-## let resultStringO = replaceMany("abcdefabc", replacements)
-##
-## check resultStringO.isSome
-## check resultStringO.get() == "456456"
-## ~~~
+## 
+#$ Perl regular expression matching.
+#$
+#$ Examples:
+#$
+#$ Match a string with "abc" in it:
+#$
+#$ ~~~nim
+#$ let line = "123abc456"
+#$ let pattern = ".*abc"
+#$ let matchesO = matchPattern(line, pattern, start=0, numGroups=0)
+#$
+#$ check matchesO.isSome == true
+#$ check matchesO.get().length == 6
+#$ ~~~
+#$
+#$ Match a file and line number like: filename(234):
+#$
+#$ ~~~ nim
+#$ let line = "template.html(87)"
+#$ let pattern = r"^(.*)\(([0-9]+)\):$"
+#$ let matchesO = matchPattern(line, pattern, start = 0, groups = 2)
+#$
+#$ check matchesO.isSome == true
+#$ let (filename, lineNum, length) = matchesO.get2GroupsLen()
+#$ check filename == "template.html"
+#$ check lineNum == "87"
+#$ check length == 14
+#$ ~~~
+#$
+#$ Replace the patterns in the string with their replacements:
+#$
+#$ ~~~ nim
+#$ var replacements: seq[Replacement]
+#$ replacements.add(newReplacement("abc", "456"))
+#$ replacements.add(newReplacement("def", ""))
+#$
+#$ let resultStringO = replaceMany("abcdefabc", replacements)
+#$
+#$ check resultStringO.isSome
+#$ check resultStringO.get() == "456456"
+#$ ~~~
 
 # The notice below is there because this module includes the re module.
 #[

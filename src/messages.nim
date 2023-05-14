@@ -123,21 +123,23 @@ func getWarning*(warning: MessageId, p1 = ""): string =
 
 func getWarningLine*(filename: string, lineNum: int,
     warning: MessageId, p1 = ""): string =
-  ## Return a formatted warning line. For example:
   ##
-  ## ~~~
-  ## filename(line): wId: message.
-  ## ~~~
+  #$ Return a formatted warning line. For example:
+  #$
+  #$ ~~~
+  #$ filename(line): wId: message.
+  #$ ~~~
   let warningCode = $ord(warning)
   result = "$1($2): w$3: $4" % [filename, $lineNum, warningCode, getWarning(warning, p1)]
 
 func getWarningLine*(filename: string, lineNum: int,
     warningData: WarningData): string =
-  ## Return a formatted warning line. For example:
   ##
-  ## ~~~
-  ## filename(line): wId: message.
-  ## ~~~
+  #$ Return a formatted warning line. For example:
+  #$
+  #$ ~~~
+  #$ filename(line): wId: message.
+  #$ ~~~
   return getWarningLine(filename, lineNum, warningData)
 
 func newWarningData*(messageId: MessageId, p1 = "", pos = 0): WarningData =
@@ -146,12 +148,13 @@ func newWarningData*(messageId: MessageId, p1 = "", pos = 0): WarningData =
   result = WarningData(messageId: messageId, p1: p1, pos: pos)
 
 func `$`*(warningData: WarningData): string =
-  ## Return a string representation of WarningData.
   ##
-  ## ~~~nim
-  ## let warning = newWarningData(wUnknownArg, "p1", 5)
-  ## check $warning == "wUnknownArg(p1):5"
-  ## ~~~
+  #$ Return a string representation of WarningData.
+  #$
+  #$ ~~~nim
+  #$ let warning = newWarningData(wUnknownArg, "p1", 5)
+  #$ check $warning == "wUnknownArg(p1):5"
+  #$ ~~~
   result = """$1 p1="$2" pos=$3""" % [$warningData.messageId,
     warningData.p1, $warningData.pos]
 

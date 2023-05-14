@@ -28,16 +28,14 @@ args.destJsonFile = 'src/readjson.nim'"""
     let expected = "The option 'testme' requires an argument."
     check gotExpected(got, expected)
 
-  test "readOneDesc one":
+  test "readOneDesc 1":
     let sourceCode = """
 ## Parse the command line.
 import std/os
 import std/tables
 import std/strutils
 """
-    let expected = """
-Parse the command line.
-"""
+    let expected = "Parse the command line.\n"
     let srcLines = splitNewLines(sourceCode)
     let got = readOneDesc(srcLines, 1, 4)
     check gotExpected(got, expected)
@@ -50,6 +48,17 @@ Parse the command line.
     let expected = """
 line one
 line two
+"""
+    let srcLines = splitNewLines(sourceCode)
+    let got = readOneDesc(srcLines, 1, 3)
+    check gotExpected(got, expected)
+
+  test "readOneDesc 2.5":
+    let sourceCode = """
+  ## line one
+  ##"""
+    let expected = """
+line one
 """
     let srcLines = splitNewLines(sourceCode)
     let got = readOneDesc(srcLines, 1, 3)
@@ -74,34 +83,51 @@ line three
     let sourceCode = """
   ##   line one
   ##line two
-  ##  line three
+  ## line three
 """
     let expected = """
-   line one
-line two
-  line three
+  line one
+ine two
+line three
 """
     let srcLines = splitNewLines(sourceCode)
     let got = readOneDesc(srcLines, 1, 4)
     check gotExpected(got, expected)
 
-  test "readOneDesc other":
+  test "readOneDesc 5":
     let sourceCode = """
-proc asdf(b: string): int =
+proc asdf(): =
   ## a nim doc comment
-  #$ alternate comment
+  #$ plus more comment
   #$ line two
-  a = 5
+  echo("tea")
 """
     let expected = """
-alternate comment
+a nim doc comment
+plus more comment
 line two
 """
     let srcLines = splitNewLines(sourceCode)
     let got = readOneDesc(srcLines, 1, 6)
     check gotExpected(got, expected)
 
-  test "readOneDesc 0":
+  test "readOneDesc 5.5":
+    let sourceCode = """
+proc asdf(): =
+  ##
+  #$ plus more comment
+  #$ line two
+  echo("tea")
+"""
+    let expected = """
+plus more comment
+line two
+"""
+    let srcLines = splitNewLines(sourceCode)
+    let got = readOneDesc(srcLines, 1, 6)
+    check gotExpected(got, expected)
+
+  test "readOneDesc 6":
     let sourceCode = """
   ## line one
   ##
@@ -225,10 +251,11 @@ An option without arguments will have an empty list.
       echo linesSideBySide(got, expected)
       fail
 
-  test "removePresentation":
+  test "cmdlineRawTest":
+    let resultJson = "cmdlineRawTest.json"
     var cmlArgs: CmlArgs
     cmlArgs["srcFilename"] = @["src/cmdline.nim"]
-    cmlArgs["destJsonFile"] = @["docs/cmdline.json"]
+    cmlArgs["destJsonFile"] = @[resultJson]
     let args = newArgs(cmlArgs)
 
     check fileExists(args.srcFilename)
@@ -237,6 +264,6 @@ An option without arguments will have an empty list.
     removePresentation(args)
 
     check fileExists(args.srcFilename)
-    check fileExists(args.destJsonFile)
+    check fileExists(resultJson)
 
-    discard tryRemoveFile(args.destJsonFile)
+    discard tryRemoveFile(resultJson)

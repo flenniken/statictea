@@ -1,16 +1,16 @@
 ## Read lines from a stream without exceeding the maximum line
-## length. The returned lines contain the line ending, either crlf or
-## lf.
-##
-## Example:
-##
-## ~~~ nim
-## let lbO = newLineBuffer(stream)
-## check lbO.isSome == true
-## var lb = lbO.get()
-## while line = lb.readLine():
-##   processLine(line)
-## ~~~
+#$ length. The returned lines contain the line ending, either crlf or
+#$ lf.
+#$
+#$ Example:
+#$
+#$ ~~~ nim
+#$ let lbO = newLineBuffer(stream)
+#$ check lbO.isSome == true
+#$ var lb = lbO.get()
+#$ while line = lb.readLine():
+#$   processLine(line)
+#$ ~~~
 
 import std/streams
 import std/options

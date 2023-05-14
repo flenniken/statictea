@@ -8,9 +8,7 @@
 <body>
 <h1>jsondocraw.nim</h1>
 
-<p>Generate json data from a nim source file. It&#x27;s like nim&#x27;s jsondoc
-command except no html presentation information is in the
-descriptions. The descriptions match the source.
+<p>Generate json data from a nim source file.
 </p>
 
 Nim source code: <a href="../../src/jsondocraw.nim">jsondocraw.nim</a>
@@ -18,28 +16,47 @@ Nim source code: <a href="../../src/jsondocraw.nim">jsondocraw.nim</a>
 <h1>Index</h1>
 
 <ul>
-<li>const:  <a href="#helpText">helpText</a> &mdash; alternate doc comment used instead of the first line.</li>
+<li>const:  <a href="#helpText">helpText</a> &mdash; alternate doc comment when needed </li>
 <li>type:  <a href="#Args">Args</a> &mdash; Args holds the arguments specified on the command line.</li>
 <li> <a href="#newArgs">newArgs</a> &mdash; Create an Args object from a CmlArgs.</li>
 <li> <a href="#getMessage">getMessage</a> &mdash; Return a message from a message id and problem argument.</li>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of an Args object.</li>
 <li> <a href="#readOneDesc">readOneDesc</a> &mdash; Return the doc comment found in the given range of line numbers.</li>
-<li> <a href="#readDescriptions">readDescriptions</a> &mdash; Read all the descriptions in the text specified by the line numbers.</li>
+<li> <a href="#readDescriptions">readDescriptions</a> &mdash; Read all the descriptions in the file specified by the starting line numbers.</li>
 <li> <a href="#removePresentation">removePresentation</a> &mdash; Create a json file without presentation formatting in the descriptions.</li>
 </ul>
 
 <h3 id="helpText">helpText</h3>
 
-<p>alternate doc comment used instead
-of the first line.
+<p>alternate doc comment
+when needed
 </p>
 
 <pre class="nim-code">
-helpText = """
-Create a json file like nim's jsondoc command except the descriptions
-do not contain any html presentation information.  This command runs
-nim jsondoc command then post processes the data to patch the
-descriptions.
+helpText = """Create a json file like Nim's jsondoc command except the descriptions
+match the source. This command runs Nim's jsondoc command then post
+processes the data to patch the descriptions.
+
+The jsondocraw command exists because Nim’s jsondoc command assumes
+the doc comment is formatted as reStructuredText (RST) and it converts
+the RST to HTML for the JSON description.
+
+The jsondocraw command reads the description's line number in the JSON
+file then reads the source file to extract the raw doc comment.
+
+When you use markdown or some other format for your doc comments, you
+are likely to specify something that causes the RST parser to fail and
+no JSON is produced. When this happens you can specify an alternate doc
+comment prefix as a workaround, "#$ " instead of "## ".
+
+The leading ## is required for nim's jsondoc to record it in the
+json.
+
+proc sample*() =
+  ##
+  #$ alternate doc comment
+  #$ when needed
+  echo "tea"
 
 Usage:
   jsondocraw [-h] [-v] srcFilename destFilename
@@ -49,16 +66,6 @@ Usage:
 
   srcFilename — nim source filename
   destFilename — filename of the json file to create
-
-If nim's jsondoc command crashes, replace the problem characters and
-try again. You can also use an alternate document comment #$ as a
-workaround. For example:
-
-proc myRoutine(a: int): string =
-  ## required simple line
-  #$ alternate doc comment used instead
-  #$ of the first line.
-  result = $a
 """
 </pre>
 
@@ -115,7 +122,7 @@ func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 <h3 id="readOneDesc">readOneDesc</h3>
 
 <p>Return the doc comment found in the given range of line
-numbers. Look for #$ first then, if not found, look for ##.
+numbers. The srcLines contain the line endings.
 </p>
 
 <pre class="nim-code">
@@ -125,8 +132,8 @@ proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
 
 <h3 id="readDescriptions">readDescriptions</h3>
 
-<p>Read all the descriptions in the text specified by the line
-numbers. Return a dictionary mapping the line number to its
+<p>Read all the descriptions in the file specified by the starting
+line numbers. Return a dictionary mapping the line number to its
 description.
 </p>
 

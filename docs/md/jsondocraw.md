@@ -1,34 +1,51 @@
 # jsondocraw.nim
 
-Generate json data from a nim source file. It's like nim's jsondoc
-command except no html presentation information is in the
-descriptions. The descriptions match the source.
+Generate json data from a nim source file.
 
 
 * [jsondocraw.nim](../../src/jsondocraw.nim) &mdash; Nim source code.
 # Index
 
-* const: [helpText](#helptext) &mdash; alternate doc comment used instead of the first line.
+* const: [helpText](#helptext) &mdash; alternate doc comment when needed 
 * type: [Args](#args) &mdash; Args holds the arguments specified on the command line.
 * [newArgs](#newargs) &mdash; Create an Args object from a CmlArgs.
 * [getMessage](#getmessage) &mdash; Return a message from a message id and problem argument.
 * [`$`](#) &mdash; Return a string representation of an Args object.
 * [readOneDesc](#readonedesc) &mdash; Return the doc comment found in the given range of line numbers.
-* [readDescriptions](#readdescriptions) &mdash; Read all the descriptions in the text specified by the line numbers.
+* [readDescriptions](#readdescriptions) &mdash; Read all the descriptions in the file specified by the starting line numbers.
 * [removePresentation](#removepresentation) &mdash; Create a json file without presentation formatting in the descriptions.
 
 # helpText
 
-alternate doc comment used instead
-of the first line.
+alternate doc comment
+when needed
 
 
 ~~~nim
-helpText = """
-Create a json file like nim's jsondoc command except the descriptions
-do not contain any html presentation information.  This command runs
-nim jsondoc command then post processes the data to patch the
-descriptions.
+helpText = """Create a json file like Nim's jsondoc command except the descriptions
+match the source. This command runs Nim's jsondoc command then post
+processes the data to patch the descriptions.
+
+The jsondocraw command exists because Nim’s jsondoc command assumes
+the doc comment is formatted as reStructuredText (RST) and it converts
+the RST to HTML for the JSON description.
+
+The jsondocraw command reads the description's line number in the JSON
+file then reads the source file to extract the raw doc comment.
+
+When you use markdown or some other format for your doc comments, you
+are likely to specify something that causes the RST parser to fail and
+no JSON is produced. When this happens you can specify an alternate doc
+comment prefix as a workaround, "#$ " instead of "## ".
+
+The leading ## is required for nim's jsondoc to record it in the
+json.
+
+proc sample*() =
+  ##
+  #$ alternate doc comment
+  #$ when needed
+  echo "tea"
 
 Usage:
   jsondocraw [-h] [-v] srcFilename destFilename
@@ -38,16 +55,6 @@ Usage:
 
   srcFilename — nim source filename
   destFilename — filename of the json file to create
-
-If nim's jsondoc command crashes, replace the problem characters and
-try again. You can also use an alternate document comment #$ as a
-workaround. For example:
-
-proc myRoutine(a: int): string =
-  ## required simple line
-  #$ alternate doc comment used instead
-  #$ of the first line.
-  result = $a
 """
 ~~~
 
@@ -102,7 +109,7 @@ func `$`(args: Args): string {.raises: [ValueError], tags: [].}
 # readOneDesc
 
 Return the doc comment found in the given range of line
-numbers. Look for #$ first then, if not found, look for ##.
+numbers. The srcLines contain the line endings.
 
 
 ~~~nim
@@ -112,8 +119,8 @@ proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
 
 # readDescriptions
 
-Read all the descriptions in the text specified by the line
-numbers. Return a dictionary mapping the line number to its
+Read all the descriptions in the file specified by the starting
+line numbers. Return a dictionary mapping the line number to its
 description.
 
 

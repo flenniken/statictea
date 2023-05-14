@@ -4,10 +4,31 @@
 # the statictea template templates/dynamicFuncList.nim and the nimble
 # task dyfuncs.
 
+type
+  BuiltInInfo* = object
+    ## The built-in function information.
+    ##
+    ## * **funcName** — the function name in the nim file, e.g.: fun_add_ii
+    ## * **docComment** — the function documentation
+    ## * **numLines** — the number of function code lines
+    funcName*: string
+    docComment*: string
+    numLines*: Natural
+
+func newBuiltInInfo*(
+    funcName: string,
+    docComment: string,
+    numLines: Natural
+  ): BuiltInInfo =
+  ## Return a BuiltInInfo object.
+  result = BuiltInInfo(funcName: funcName, docComment: docComment,
+    numLines: numLines)
+
 const
 #$ # Define all the doc comments. Use prefix dc_ followed by the
 #$ # function name.
-#$ block t.repeat = len(o.entries)
+#$ block
+#$ : t.repeat = len(o.entries)
 #$ : entry = o.entries[t.row]
   dc_{entry.funcName} = """
 {entry.docComment}

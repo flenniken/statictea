@@ -2124,8 +2124,7 @@ Examples:
 <span class="t-dotName">a</span> = <span class="t-funcCall">len</span>(<span class="t-funcCall">echo</span>(<span class="t-str">&quot;len called&quot;</span>))
  <span class="t-comment">#-&gt; 10
 </span></pre>
-<p>
-</p>
+
 
 <pre class="nim-code">
 func fun_echo_ss(variables: Variables; arguments: seq[Value]): FunResult {.
@@ -2143,14 +2142,11 @@ functionsDict = newTable(32)
 
 <h3 id="BuiltInInfo">BuiltInInfo</h3>
 
-<p>The built-in function information.
-
-</p><ul>
-<li><b>funcName</b> — the function name in the nim file, e.g.: fun_add_ii
-</li><li><b>docComment</b> — the function documentation
-</li><li><b>numLines</b> — the number of function code lines
-</li></ul>
-
+<p>The built-in function information.&lt;ul class=&quot;simple&quot;&gt;&lt;li&gt;&lt;strong&gt;funcName&lt;/strong&gt; — the function name in the nim file, e.g.: fun_add_ii&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;docComment&lt;/strong&gt; — the function documentation&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;numLines&lt;/strong&gt; — the number of function code lines&lt;/li&gt;
+&lt;/ul&gt;
+</p>
 
 <pre class="nim-code">
 BuiltInInfo = object
@@ -2161,8 +2157,7 @@ BuiltInInfo = object
 
 <h3 id="newBuiltInInfo">newBuiltInInfo</h3>
 
-<p>Return a BuiltInInfo object.
-</p>
+<p>Return a BuiltInInfo object.</p>
 
 <pre class="nim-code">
 func newBuiltInInfo(funcName: string; docComment: string; numLines: Natural): BuiltInInfo

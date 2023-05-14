@@ -15,7 +15,6 @@ import messages
 import version
 import opresult
 import sharedtestcode
-import runCommand
 import readjson
 import comparelines
 import unicodes

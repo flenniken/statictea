@@ -397,7 +397,6 @@ a = len(echo("len called"))
 
 
 
-
 # exists
 
 Determine whether a key exists in a dictionary. Return true when it

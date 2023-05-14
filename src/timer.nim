@@ -1,12 +1,13 @@
-## Time how long it takes something to run.
 ##
-## Usage:
-##
-## ~~~nim
-## timer = newTimer()
-## # run something
-## echo timer.seconds()
-## ~~~
+#$ Time how long it takes something to run.
+#$
+#$ Usage:
+#$
+#$ ~~~nim
+#$ timer = newTimer()
+#$ # run something
+#$ echo timer.seconds()
+#$ ~~~
 
 import std/times
 import std/math
