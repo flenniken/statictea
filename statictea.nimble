@@ -8,32 +8,36 @@ import std/algorithm
 include src/version
 include src/dot
 
-proc getDirName(): string =
+proc getHostDirName(): string =
   ## Return a directory name corresponding to the given nim hostOS
   ## name.  The name is good for storing host specific files, for
   ## example in the bin and env folders.  Current possible host
   ## values: "windows", "macosx", "linux", "netbsd", "freebsd",
   ## "openbsd", "solaris", "aix", "haiku", "standalone".
 
-  let host = hostOS
-  if host == "macosx":
+  case hostOS
+  of "macosx":
     result = "mac"
-  elif host == "linux":
+  of "linux":
     result = "linux"
-  # elif host == "windows":
+  # of "windows":
   #   result = "win"
   else:
     assert false, "add a new platform"
 
-let dirName = getDirName()
+let hostDirName = getHostDirName()
 
 version       = staticteaVersion
 author        = "Steve Flenniken"
 description   = "A template processor and language."
 license       = "MIT"
 srcDir        = "src"
-bin           = @[fmt"bin/{dirName}/statictea"]
+bin           = @[fmt"bin/{hostDirName}/statictea"]
 
+# The debian docker image is running 1.4.2 (apt-get install nim) and
+# choosenim isn't supported yet. I don't know an easy way to upgrade
+# it. Staying on 1.4.2 so the two platforms are running the same
+# version.
 requires "nim >= 1.4.2"
 
 proc runCmd(cmd: string, showOutput = false) =
@@ -166,7 +170,7 @@ proc get_test_module_cmd(filename: string, release = false, force = false): stri
     The commands are run from the statictea folder.  The nim non-test source code
     is in the src folder which is specified by -p:src so the imports can be found.
 
-  --out:bin/{dirName}/test_testfile.bin
+  --out:bin/{hostDirName}/test_testfile.bin
 
     The compiled test files go in the bin folder and their extension there is "bin".
 
@@ -199,7 +203,7 @@ nim c \
 -r \
 -p:src \
 -d:test \
---out:bin/{dirName}/{binName} \
+--out:bin/{hostDirName}/{binName} \
 tests/{filename}"""
 
 proc buildRelease() =
@@ -211,14 +215,14 @@ nim c \
 --hint[Name]:off \
 --hint[Link]:off \
 -d:release \
---out:bin/{dirName}/ \
+--out:bin/{hostDirName}/ \
 src/statictea"""
 
-  let exeName = fmt"bin/{dirName}/statictea"
+  let exeName = fmt"bin/{hostDirName}/statictea"
   echo fmt"Build: {exeName}"
   runCmd(cmd)
   echo fmt"Strip: {exeName}"
-  runCmd(fmt"strip bin/{dirName}/statictea")
+  runCmd(fmt"strip bin/{hostDirName}/statictea")
 
 proc readModuleDescription(filename: string): string =
   ## Return the module doc comment at the top of the file.
@@ -585,7 +589,7 @@ proc taskDocmix() =
   echo fmt"Generated: {jsonFile}"
 
   # Process the index template and create the index.md file.
-  var cmd = fmt"bin/{dirName}/statictea -s {jsonFile} -t {templateFile} -o {teaFile} -r {resultFile}"
+  var cmd = fmt"bin/{hostDirName}/statictea -s {jsonFile} -t {templateFile} -o {teaFile} -r {resultFile}"
   # echo cmd
   exec cmd
 
@@ -605,7 +609,7 @@ proc taskDochix() =
   writeFile(jsonFile, json)
 
   # Process the index template and create the index.md file.
-  var cmd = fmt"bin/{dirName}/statictea -s {jsonFile} -t {templateFile} -o {teaFile} -r {resultFile}"
+  var cmd = fmt"bin/{hostDirName}/statictea -s {jsonFile} -t {templateFile} -o {teaFile} -r {resultFile}"
   exec cmd
 
   rmFile(jsonFile)
@@ -623,7 +627,7 @@ proc taskTestfilesReadme() =
   # Create the stf index file in the testfiles folder.
   let templateName = "templates/stf-index.md"
   let resultFilename = "testfiles/stf-index.md"
-  let cmd = fmt"bin/{dirName}/statictea -s {jsonFilename} -t {templateName} -r {resultFilename}"
+  let cmd = fmt"bin/{hostDirName}/statictea -s {jsonFilename} -t {templateName} -r {resultFilename}"
   exec cmd
 
   echo fmt"Generated: http://localhost:6419/{resultFilename}"
@@ -680,12 +684,12 @@ proc taskDocm(namePart: string, forceRebuild = false) =
     let jsonFile = fmt"docs/{name}.json"
 
     # Create json doc comments from the source file.
-    var cmd = fmt"bin/{dirName}/jsondocraw {srcFile} {jsonFile}"
+    var cmd = fmt"bin/{hostDirName}/jsondocraw {srcFile} {jsonFile}"
     # echo cmd
     exec cmd
 
     # Create the markdown file.
-    let statictea = fmt"bin/{dirName}/statictea"
+    let statictea = fmt"bin/{hostDirName}/statictea"
     let templateFile = "templates/nimModule.md"
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
@@ -721,13 +725,13 @@ proc taskDoch(namePart: string, forceRebuild = false) =
     let jsonFile = fmt"docs/{name}.json"
 
     # Create json doc comments from the source file.
-    var cmd = fmt"bin/{dirName}/jsondocraw {srcFile} {jsonFile}"
+    var cmd = fmt"bin/{hostDirName}/jsondocraw {srcFile} {jsonFile}"
 
     # echo cmd
     exec cmd
 
     # Create the html file.
-    let statictea = fmt"bin/{dirName}/statictea"
+    let statictea = fmt"bin/{hostDirName}/statictea"
     let templateFile = "templates/nimModule2.html"
     let teaFile = "templates/nimModule.tea"
     cmd = fmt"{statictea} -t {templateFile} -o {teaFile} -s {jsonFile} -r {resultFile}"
@@ -740,7 +744,7 @@ proc taskDoch(namePart: string, forceRebuild = false) =
 proc taskFuncDocsMd() =
   ## Create the teaFunctions.md file from the f dictionary.
 
-  let statictea = fmt"bin/{dirName}/statictea"
+  let statictea = fmt"bin/{hostDirName}/statictea"
   let tFile = "templates/teaFunctions.md"
   let teaFile = "templates/teaFunctions.tea"
   let formatFile = "templates/formatMarkdown.tea"
@@ -755,7 +759,7 @@ proc taskFuncDocsMd() =
 proc taskFuncDocsHtml() =
   ## Create the teaFunctions.html file from the f dictionary.
 
-  let statictea = fmt"bin/{dirName}/statictea"
+  let statictea = fmt"bin/{hostDirName}/statictea"
   let tFile = "templates/teaFunctions.html"
   let teaFile = "templates/teaFunctions.tea"
   let formatFile = "templates/formatMarkdown.tea"
@@ -773,10 +777,10 @@ nim c \
 --hint[Conf]:off \
 --hint[Link]: off \
 -d:release \
---out:bin/{dirName}/ \
+--out:bin/{hostDirName}/ \
 src/runner"""
 
-  let exeName = fmt"bin/{dirName}/runner"
+  let exeName = fmt"bin/{hostDirName}/runner"
   echo fmt"Build runner: {exeName}"
   runCmd(cmd)
 
@@ -786,7 +790,7 @@ src/runner"""
 proc runRunnerFolder() =
   ## Run the stf files in the testfiles folder.
 
-  let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
+  let cmd = fmt"export statictea='../../bin/{hostDirName}/statictea'; bin/{hostDirName}/runner -d=testfiles"
   # echo cmd
   runCmd(cmd, showOutput = true)
 
@@ -801,7 +805,7 @@ proc get_stf_filenames(): seq[string] =
 proc runAllStf() =
   ## Run all the stf tests in the testfiles directory.
   # Run the whole directory using the -d option.
-  let cmd = fmt"export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -d=testfiles"
+  let cmd = fmt"export statictea='../../bin/{hostDirName}/statictea'; bin/{hostDirName}/runner -d=testfiles"
   exec cmd
 
 proc runRunStf() =
@@ -823,7 +827,7 @@ proc runRunStf() =
       # Run a stf file.
       foundTest = true
       let cmd = fmt"""
-export statictea='../../bin/{dirName}/statictea'; bin/{dirName}/runner -f=testfiles/{filename}"""
+export statictea='../../bin/{hostDirName}/statictea'; bin/{hostDirName}/runner -f=testfiles/{filename}"""
       echo "Running: " & filename
       let (result, _) = gorgeEx(cmd)
       lastCmd = cmd
@@ -864,10 +868,10 @@ nim c \
 --hint[Conf]:off \
 --hint[Link]: off \
 -d:release \
---out:bin/{dirName}/ \
+--out:bin/{hostDirName}/ \
 src/cmdline"""
 
-  echo fmt"Build bin/{dirName}/cmdline"
+  echo fmt"Build bin/{hostDirName}/cmdline"
   runCmd(cmd)
 
 proc buildJsonDocRaw() =
@@ -878,10 +882,10 @@ nim c \
 --hint[Conf]:off \
 --hint[Link]: off \
 -d:release \
---out:bin/{dirName}/ \
+--out:bin/{hostDirName}/ \
 src/jsondocraw"""
 
-  echo fmt"Build bin/{dirName}/jsondocraw"
+  echo fmt"Build bin/{hostDirName}/jsondocraw"
   runCmd(cmd)
 
 proc checkUtf8DecoderEcho() =
@@ -963,7 +967,7 @@ proc makeJsonDoc(filename: string): string =
   # Create the json doc file for the given nim source file. Return the
   # name of the json file.
   let jsonFilename = joinPath("docs", changeFileExt(filename, "json"))
-  var cmd = fmt"bin/{dirName}/jsondocraw src/{filename} {jsonFilename}"
+  var cmd = fmt"bin/{hostDirName}/jsondocraw src/{filename} {jsonFilename}"
   # echo cmd
   runCmd(cmd)
   result = jsonFilename
@@ -976,7 +980,7 @@ proc taskTea2Html(teaBasename: string) =
     echo fmt"{filename} doesn't exist"
     return
 
-  let statictea = fmt"bin/{dirName}/statictea"
+  let statictea = fmt"bin/{hostDirName}/statictea"
   let server = "docs/file.json"
   let templateFile = "templates/tea2html.html"
   let teaFile = "templates/tea2html.tea"
@@ -1091,7 +1095,7 @@ task dyfuncs, "\tCreate the built-in function details (src/dynamicFuncList.nim) 
   # echo fmt"Build statictea release version"
   # buildRelease()
 
-  let statictea = fmt"bin/{dirName}/statictea"
+  let statictea = fmt"bin/{hostDirName}/statictea"
   let tFile = "templates/dynamicFuncList.nim"
   let teaFile = "templates/dynamicFuncList.tea"
   let result = "src/dynamicFuncList.nim"
@@ -1121,7 +1125,7 @@ task dotsys, "\tCreate system modules dependency graph (docs/staticteadep2.svg).
   createDependencyGraph2()
 
 task tt, "\tCompile and run t.nim.":
-  let cmd = fmt"nim c -r --outdir:bin/{dirName}/tests/ src/t.nim"
+  let cmd = fmt"nim c -r --outdir:bin/{hostDirName}/tests/ src/t.nim"
   echo cmd
   exec cmd
 
@@ -1168,10 +1172,10 @@ task newstf, "\tCreate new stf test skeleton, specify a name no ext.":
         exec cmd
 
 task runhelp, "\tShow the runner help text with glow.":
-  exec fmt"bin/{dirName}/runner -h | glow -"
+  exec fmt"bin/{hostDirName}/runner -h | glow -"
 
 task helpme, "\tShow the statictea help text.":
-  exec fmt"bin/{dirName}/statictea -h | less"
+  exec fmt"bin/{hostDirName}/statictea -h | less"
 
 task cmdline, "\tBuild cmdline test app (bin/x/cmdline).":
   buildCmdLine()
@@ -1269,7 +1273,7 @@ task dlist, "\tList the docker image and container.":
 
 task clean, "\tRemove all the binaries so everything gets built next time.":
   # Remove all the bin and some doc files.
-  let dirs = @[fmt"bin/{dirName}", "docs/html", "docs/md"]
+  let dirs = @[fmt"bin/{hostDirName}", "docs/html", "docs/md"]
   for dir in dirs:
     let list = listFiles(dir)
     for filename in list:
