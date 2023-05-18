@@ -175,7 +175,7 @@ proc createFolder*(folder: string): string =
   ## created return a message telling why, else return "".
   try:
     createDir(folder)
-  except:
+  except CatchableError:
     result = getCurrentExceptionMsg()
 
 proc deleteFolder*(folder: string): string =
@@ -183,7 +183,7 @@ proc deleteFolder*(folder: string): string =
   ## deleted return a message telling why, else return "".
   try:
     removeDir(folder)
-  except:
+  except CatchableError:
     result = getCurrentExceptionMsg()
 
 when not defined(test):
@@ -822,7 +822,7 @@ when not defined(test):
         return 1
       let args = argsOp.value
       result = processRunArgs(args)
-    except:
+    except CatchableError:
       echo "Unexpected exception: $1" % [getCurrentExceptionMsg()]
       # The stack trace is only available in the debug builds.
       when not defined(release):

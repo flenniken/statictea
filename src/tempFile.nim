@@ -56,7 +56,7 @@ proc openTempFile*(): Option[TempFile] =
   var file: File
   try:
     file = open(filename, fmReadWrite)
-  except:
+  except CatchableError:
     return
   result = some(TempFile(file: file, filename: filename))
 

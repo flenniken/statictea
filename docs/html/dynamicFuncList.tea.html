@@ -59,7 +59,7 @@
 <span class="t-dotName">entries</span> = []
 <span class="t-funcCall">loop</span>(<span class="t-dotName">s.entries</span>, <span class="t-dotName">entries</span>, <span class="t-dotName">get-entry</span>, <span class="t-dotName">state</span>)
 
-<span class="t-funcCall">if</span>((<span class="t-funcCall">len</span>(<span class="t-dotName">o.entries</span>) == <span class="t-num">0</span>), <span class="t-funcCall">warn</span>(<span class="t-str">&quot;no entries&quot;</span>))
+<span class="t-funcCall">if</span>((<span class="t-funcCall">len</span>(<span class="t-dotName">entries</span>) == <span class="t-num">0</span>), <span class="t-funcCall">warn</span>(<span class="t-str">&quot;no entries&quot;</span>))
 
 <span class="t-comment"># Sort the entries by function name. Use insensitive compare so
 </span><span class="t-comment"># function cmp_ comes before cmpV.

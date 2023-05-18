@@ -590,7 +590,7 @@ func fun_add_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   let b = map["b"].intv
   try:
     result = newFunResult(newValue(a + b))
-  except:
+  except OverflowDefect:
     # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
@@ -614,7 +614,7 @@ func fun_add_fff*(variables: Variables, arguments: seq[Value]): FunResult =
   let b = map["b"].floatv
   try:
     result = newFunResult(newValue(a + b))
-  except:
+  except FloatOverflowDefect:
     # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
@@ -639,7 +639,7 @@ func fun_sub_iii*(variables: Variables, arguments: seq[Value]): FunResult =
   let b = map["b"].intv
   try:
     result = newFunResult(newValue(a - b))
-  except:
+  except OverflowDefect:
     # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
@@ -663,7 +663,7 @@ func fun_sub_fff*(variables: Variables, arguments: seq[Value]): FunResult =
   let b = map["b"].floatv
   try:
     result = newFunResult(newValue(a - b))
-  except:
+  except OverflowDefect:
     # Overflow or underflow.
     result = newFunResultWarn(wOverflow)
 
@@ -1417,7 +1417,7 @@ func replaceReMap(map: VarsDict): FunResult =
   var resultStringO: Option[string]
   try:
     resultStringO = replaceMany(str, replacements)
-  except:
+  except CatchableError:
     # You cannot get the msg because it has side effects.
     # debugEcho getCurrentExceptionMsg()
     discard

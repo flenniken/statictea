@@ -56,7 +56,7 @@ proc main*(env: var Env, argv: seq[string]) =
 
   try:
     processArgs(env, args)
-  except:
+  except CatchableError:
     let msg = getCurrentExceptionMsg()
     log(msg)
     # Unexpected exception: '$1'.

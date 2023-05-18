@@ -36,7 +36,7 @@ proc readFileContent(filename: string): OpResultStr[string] =
   try:
     let content = readFile(filename)
     result = opValueStr[string](content)
-  except:
+  except CatchableError:
     result = opMessageStr[string](getCurrentExceptionMsg())
 
 proc linesSideBySide*(gotContent: string, expectedContent: string, spacesToo=false): string =

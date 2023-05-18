@@ -185,7 +185,7 @@ func compilePattern*(pattern: string): Option[CompiledPattern] =
   try:
     let regex = re(pattern)
     result = some(regex)
-  except:
+  except CatchableError:
     result = none(CompiledPattern)
 
 func matchPattern*(str: string, pattern: string,

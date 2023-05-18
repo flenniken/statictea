@@ -1943,7 +1943,7 @@ Examples:
 
 <pre class="nim-code">
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
+    raises: [KeyError, Exception], tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="fun_parseMarkdown_ssl">fun_parseMarkdown_ssl</h3>

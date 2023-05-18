@@ -82,7 +82,7 @@ func readJsonStream*(stream: Stream, mutable = Mutable.immutable): ValueOr =
   try:
     {.cast(noSideEffect).}:
       rootNode = parseJson(stream, "")
-  except:
+  except CatchableError:
     # Unable to parse the JSON.
     return newValueOr(wJsonParseError)
   result = jsonToValue(rootNode, mutable = mutable)

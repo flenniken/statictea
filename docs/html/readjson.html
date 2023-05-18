@@ -53,7 +53,7 @@ lists and dictionaries are mutable.
 
 <pre class="nim-code">
 func readJsonStream(stream: Stream; mutable = Mutable.immutable): ValueOr {.
-    raises: [], tags: [ReadIOEffect, WriteIOEffect].}
+    raises: [Exception], tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="readJsonString">readJsonString</h3>
@@ -65,7 +65,7 @@ lists and dictionaries are mutable.
 
 <pre class="nim-code">
 func readJsonString(content: string; mutable = Mutable.immutable): ValueOr {.
-    raises: [], tags: [ReadIOEffect, WriteIOEffect].}
+    raises: [Exception], tags: [ReadIOEffect, WriteIOEffect].}
 </pre>
 
 <h3 id="readJsonFile">readJsonFile</h3>

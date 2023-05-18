@@ -34,7 +34,8 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @[fmt"bin/{hostDirName}/statictea"]
 
-requires "nim >= 1.4.2"
+let nimVersion = "1.4.2"
+requires fmt"nim >= {nimVersion}"
 
 proc runCmd(cmd: string, showOutput = false) =
   ## Run the command and if it fails, generate an exception and print
@@ -188,12 +189,18 @@ proc get_test_module_cmd(filename: string, release = false, force = false): stri
   else:
     fb = ""
 
+  # The BareExcept is turned off because nim's unittest.nim(552, 5) generates it.
+  var bareExcept = ""
+  if nimVersion != "1.4.2":
+    bareExcept = "--warning[BareExcept]:off"
+
   result = fmt"""
 nim c \
 --verbosity:0 \
 --hint[Performance]:off \
 --hint[XCannotRaiseY]:off \
 --hint[Name]:off \
+{bareExcept} \
 {rel} \
 {fb} \
 -r \
@@ -957,7 +964,7 @@ proc runUnitTests(name = "") =
         continue
       let cmd = get_test_module_cmd(filename)
       exec cmd
-      echo cmd
+      # echo cmd
 
 proc makeJsonDoc(filename: string): string =
   # Create the json doc file for the given nim source file. Return the

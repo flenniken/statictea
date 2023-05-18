@@ -15,9 +15,9 @@ Run statictea.
 
 ~~~nim
 proc main(env: var Env; argv: seq[string]) {.raises: [KeyError, OSError,
-    ValueError, IOError, ValueError, IOError, OSError], tags: [ReadDirEffect,
-    WriteIOEffect, TimeEffect, RootEffect, ReadIOEffect, ReadEnvEffect,
-    WriteDirEffect].}
+    ValueError, IOError, Exception, ValueError, IOError, OSError], tags: [
+    ReadDirEffect, WriteIOEffect, TimeEffect, RootEffect, ReadIOEffect,
+    ReadEnvEffect, WriteDirEffect].}
 ~~~
 
 

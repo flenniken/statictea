@@ -48,7 +48,7 @@ state.starts = starts
 entries = []
 loop(s.entries, entries, get-entry, state)
 
-if((len(o.entries) == 0), warn("no entries"))
+if((len(entries) == 0), warn("no entries"))
 
 # Sort the entries by function name. Use insensitive compare so
 # function cmp_ comes before cmpV.

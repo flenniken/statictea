@@ -1910,7 +1910,7 @@ d = readJson(json) =>
 
 ~~~nim
 func fun_readJson_sa(variables: Variables; arguments: seq[Value]): FunResult {.
-    raises: [KeyError], tags: [ReadIOEffect, WriteIOEffect].}
+    raises: [KeyError, Exception], tags: [ReadIOEffect, WriteIOEffect].}
 ~~~
 
 # fun_parseMarkdown_ssl

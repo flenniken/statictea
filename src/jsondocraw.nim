@@ -271,7 +271,7 @@ when isMainModule:
       result = run(args)
     except JsonDocRawError as ex:
       echo ex.msg
-    except:
+    except CatchableError:
       let msg = getCurrentExceptionMsg()
       echo fmt"Unexpected exception: '{msg}'."
 
