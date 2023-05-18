@@ -34,10 +34,6 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @[fmt"bin/{hostDirName}/statictea"]
 
-# The debian docker image is running 1.4.2 (apt-get install nim) and
-# choosenim isn't supported yet. I don't know an easy way to upgrade
-# it. Staying on 1.4.2 so the two platforms are running the same
-# version.
 requires "nim >= 1.4.2"
 
 proc runCmd(cmd: string, showOutput = false) =
@@ -1205,9 +1201,20 @@ proc getContainerState(): string =
     result = "no container"
 
 task drun, "\tRun a statictea debian docker build environment":
+
+  # Verify we are running in the statictea root folder by looking for
+  # the nimble file.
+  let dir = getCurrentDir()
+  let nimbleFile = joinPath(dir, "statictea.nimble")
+  if not fileExists(nimbleFile):
+    echo fmt"Current dir: {dir}"
+    echo "Run from the statictea root folder."
+    return
+
   if existsEnv("statictea_env"):
     echo "Run on the host not in the docker container."
     return
+
   if doesImageExist():
     echo fmt"The {staticteaImage} exists."
   else:
@@ -1234,22 +1241,26 @@ task drun, "\tRun a statictea debian docker build environment":
     exec runCmd
   else:
     echo fmt"The {staticteaContainer} does not exist, creating it..."
-    let dir = getCurrentDir()
-    let staticteaFolder = joinPath(dir, "code", "statictea")
-    if not fileExists(staticteaFolder):
-      echo fmt"Missing dir: {staticteaFolder}"
-    else:
-      let shared_option = fmt"-v {staticteaFolder}:/home/teamaster/statictea"
-      let createCmd = fmt"docker run --name={staticteaContainer} -it {shared_option} {staticteaImage}"
-      exec createCmd
+    let shared_option = fmt"-v {dir}:/home/teamaster/statictea"
+    let createCmd = fmt"docker run --name={staticteaContainer} -it {shared_option} {staticteaImage}"
+    exec createCmd
 
 task ddelete, "\tDelete the statictea docker image and container.":
   if existsEnv("statictea_env"):
     echo "Run on the host not in the docker container."
     return
-  let cmd = fmt"docker rm {staticteaContainer}; docker image rm {staticteaImage}"
-  # echo cmd
-  runCmd(cmd, showOutput = true)
+
+  let state = getContainerState()
+  if state == "running":
+    echo "The container is running, exit it and try again."
+    return
+  elif state == "exited":
+    let cmd = fmt"docker rm {staticteaContainer}"
+    runCmd(cmd, showOutput = true)
+
+  if doesImageExist():
+    let cmd = fmt"docker image rm {staticteaImage}"
+    runCmd(cmd, showOutput = true)
 
 task dlist, "\tList the docker image and container.":
   if existsEnv("statictea_env"):
