@@ -1781,6 +1781,9 @@ o.x = a + 6
 
 You can use the loop function to loop over a list and build lists
 and dictionaries. It’s the looping method you use in code files.
+You can loop over a dictionary using the keys function. You can
+pass variables to the callback with the state variable.
+
 
 Processing continues after a warning except for a problem reading
 a multi-line string or a problem with line continuation which
