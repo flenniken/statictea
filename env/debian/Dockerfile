@@ -5,10 +5,10 @@ MAINTAINER Steve Flenniken
 ENV statictea_env=debian
 
 # Install base apps.
-RUN apt update && apt -qy install less man sudo tree curl wget
+RUN apt update && apt -qy install less man sudo tree curl wget nano git
 
-# Install the c language and the nim language version 1.4.2.
-RUN apt -qy install libssl-dev build-essential clang nim
+# Install the c language.
+RUN apt -qy install libssl-dev build-essential clang
 
 # Install glow for viewing markdown at the command line.
 # https://github.com/charmbracelet/glow
@@ -63,16 +63,14 @@ WORKDIR /home/teamaster
 # version for arm64. The x86 version will run using emulation, however
 # nimble is very slow.  You can build from source by cloning the git
 # repo, checking out a version tag and running a build script.  This
-# docker file supports all three ways of getting nim.
+# docker file supports the build from source method.
 
-# Get the prebuild nim version 1.6.12 for x86 machines and install it
-# in the home folder.
-ADD --chown=teamaster:teamaster --chmod=440 \
-  https://nim-lang.org/download/nim-1.6.12-linux_x64.tar.xz /home/teamaster
-RUN tar -xf nim-1.6.12-linux_x64.tar.xz
-
-# Get nim source for manually building a nim version.
+# Get nim source for manually building a nim version. Note: You need
+# to manually run build_all.sh to build nim.
 RUN git clone https://github.com/nim-lang/Nim.git
+RUN cd Nim \
+  && git checkout v1.6.12 \
+  && git switch -c v1.6.12
 
 # Install bashrc for the prompt and some aliases.
 COPY --chown=teamaster:teamaster bashrc .bashrc

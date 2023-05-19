@@ -2791,7 +2791,8 @@ Steps:
 
 1. download code
 2. start docker environment
-3. build
+3. build nim (one time)
+4. build statictea
 
 *Download Code*
 
@@ -2812,15 +2813,36 @@ the env.
 
 #+BEGIN_SRC
 nimble drun
+nimble drun
 #+END_SRC
 
-*Build*
+*Build Nim*
+
+You build nim from source in the environment using the
+build_all.sh script. This step is needed the first time you run
+the container, or after you delete it.
+
+#+BEGIN_SRC
+cd ~/Nim
+./build_all.sh
+nim -v
+
+Nim Compiler Version 1.6.12 [Linux: arm64]
+Compiled at 2023-05-19
+Copyright (c) 2006-2023 by Andreas Rumpf
+
+git hash: 1aa9273640c0c51486cf3a7b67282fe58f360e91
+active boot switches: -d:release
+#+END_SRC
+
+*Build StaticTea*
 
 You build the statictea executable in the environment using the
 nimble *release* command.  It runs all the tests and builds the exe
 and docs.
 
 #+BEGIN_SRC
+cd ~/statictea
 nimble release
 #+END_SRC
 

@@ -34,8 +34,7 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @[fmt"bin/{hostDirName}/statictea"]
 
-let nimVersion = "1.6.12"
-requires fmt"nim >= {nimVersion}"
+requires fmt"nim >= 1.6.12"
 
 proc runCmd(cmd: string, showOutput = false) =
   ## Run the command and if it fails, generate an exception and print
@@ -189,10 +188,8 @@ proc get_test_module_cmd(filename: string, release = false, force = false): stri
   else:
     fb = ""
 
-  # The BareExcept is turned off because nim's unittest.nim(552, 5) generates it.
-  var bareExcept = ""
-  if nimVersion != "1.4.2":
-    bareExcept = "--warning[BareExcept]:off"
+  # The BareExcept is turned off because nim's unittest.nim(552, 5)
+  # generates it in version 1.6.12.
 
   result = fmt"""
 nim c \
@@ -200,7 +197,7 @@ nim c \
 --hint[Performance]:off \
 --hint[XCannotRaiseY]:off \
 --hint[Name]:off \
-{bareExcept} \
+--warning[BareExcept]:off \
 {rel} \
 {fb} \
 -r \

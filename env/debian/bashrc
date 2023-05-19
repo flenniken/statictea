@@ -12,17 +12,6 @@ alias ls='ls --color=auto'
 alias ll='ls -l'
 alias n='nimble'
 
-# This docker container supports three versions of nim. To use the
-# standard 1.4.2 package, comment out the following path
-# modifications.
-
-# Use prebuild 1.6.12 x86 version.
-# export PATH=/home/teamaster/nim-1.6.12/bin:$PATH export
-
-# Use manually built version.
-# * cd ~/Nim
-# * git checkout v1.6.12
-# * ./build_all.sh
-# * nim -v
+# Use the manually built version of nim.
 export PATH=/home/teamaster/Nim/bin:$PATH
 
