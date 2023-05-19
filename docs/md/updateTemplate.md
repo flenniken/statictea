@@ -46,7 +46,7 @@ Update the template.
 
 ~~~nim
 proc updateTemplateTop(env: var Env; args: Args) {.raises: [ValueError, IOError,
-    OSError, Exception, KeyError, Exception, IOError, ValueError, OSError], tags: [
+    OSError, Exception, KeyError, Exception, ValueError, IOError, OSError], tags: [
     ReadEnvEffect, ReadIOEffect, ReadDirEffect, WriteIOEffect, TimeEffect,
     RootEffect, WriteDirEffect].}
 ~~~

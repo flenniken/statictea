@@ -34,7 +34,7 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @[fmt"bin/{hostDirName}/statictea"]
 
-let nimVersion = "1.4.2"
+let nimVersion = "1.6.12"
 requires fmt"nim >= {nimVersion}"
 
 proc runCmd(cmd: string, showOutput = false) =
@@ -1234,8 +1234,7 @@ task drun, "\tRun a statictea debian docker build environment":
 
     echo ""
     echo "If no errors, run drun again to run the container."
-    quit(1)
-    exit()
+    return
 
   let state = getContainerState()
   if state == "running":

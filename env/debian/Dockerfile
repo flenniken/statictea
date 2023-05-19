@@ -7,8 +7,7 @@ ENV statictea_env=debian
 # Install base apps.
 RUN apt update && apt -qy install less man sudo tree curl wget
 
-# Install the c language and the nim language.
-# https://nim-lang.org/
+# Install the c language and the nim language version 1.4.2.
 RUN apt -qy install libssl-dev build-essential clang nim
 
 # Install glow for viewing markdown at the command line.
@@ -58,16 +57,22 @@ RUN mkdir -p /etc/sudoers.d \
 USER teamaster
 WORKDIR /home/teamaster
 
-# Choosenim install isn't supported for linux_arm64 yet.
-# You could probably get the latest nim version as a tar file and build it.
-# # Install choosenim and the latest version of nim.
-# RUN curl -sSfLo init.sh https://nim-lang.org/choosenim/init.sh \
-#   && sed -i 's/need_tty=yes/need_tty=no/' init.sh \
-#   && bash init.sh \
-#   && rm init.sh
-# Use the bashrc file instead of this:
-# && export PATH=/home/teamaster/.nimble/bin:$PATH \
-# && echo "export PATH=$PATH" >> .bashrc
+# The debian package manager installs nim version 1.4.2.  To get a
+# newer version you can download prebuilt binaries or build from
+# source.  The prebuilt binaries are built for x86 machines and no
+# version for arm64. The x86 version will run using emulation, however
+# nimble is very slow.  You can build from source by cloning the git
+# repo, checking out a version tag and running a build script.  This
+# docker file supports all three ways of getting nim.
+
+# Get the prebuild nim version 1.6.12 for x86 machines and install it
+# in the home folder.
+ADD --chown=teamaster:teamaster --chmod=440 \
+  https://nim-lang.org/download/nim-1.6.12-linux_x64.tar.xz /home/teamaster
+RUN tar -xf nim-1.6.12-linux_x64.tar.xz
+
+# Get nim source for manually building a nim version.
+RUN git clone https://github.com/nim-lang/Nim.git
 
 # Install bashrc for the prompt and some aliases.
 COPY --chown=teamaster:teamaster bashrc .bashrc
