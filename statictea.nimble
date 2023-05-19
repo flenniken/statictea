@@ -19,7 +19,8 @@ proc getHostDirName(): string =
   of "macosx":
     result = "mac"
   of "linux":
-    result = "linux"
+    # Use debian to match the env/debian folder name.
+    result = "debian"
   # of "windows":
   #   result = "win"
   else:
