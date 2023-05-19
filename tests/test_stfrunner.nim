@@ -3,7 +3,7 @@ import std/os
 import std/strutils
 import std/strformat
 import opresult
-import runner
+import stfrunner
 import tables
 import comparelines
 
@@ -202,7 +202,7 @@ proc testParseExpectedLine(line: string, eExpectedLine: ExpectedLine): bool =
     return false
   result = true
 
-suite "runner.nim":
+suite "stfrunner.nim":
 
   test "isRunFileLine":
     check isRunFileLine("### File ")

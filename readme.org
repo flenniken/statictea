@@ -2100,7 +2100,7 @@ template.
 - [[#docs-and-templates][Docs and Templates]]
 - [[#html-formatted-json][HTML Formatted Json]]
 - [[#nimble-tasks][Nimble Tasks]]
-- [[#stf-runner][Stf Runner]]
+- [[#stfrunner][StfRunner]]
 - [[#repl-environment][REPL Environment]]
 - [[#docker-development][Docker Development]]
 - [[#mac-development][Mac Development]]
@@ -2622,12 +2622,12 @@ Nimble Tasks:
 - *tt*:  Compile and run t.nim.
 - *tree*:  Show the project directory tree.
 - *args*:  Show command line arguments.
-- *br*:  Build the stf test runner (bin/x/runner).
+- *br*:  Build the stf test stfrunner (bin/x/stfrunner).
 - *rt*:  Run one or more stf tests in testfiles; specify part of the name.
 - *stfix*:  Create stf test files index (testfiles/stf-index.md).
 - *stfjson*:  Display stf test files index JSON.
 - *newstf*:  Create new stf test skeleton, specify a name no ext.
-- *runhelp*:  Show the runner help text with glow.
+- *runhelp*:  Show the stfrunner help text with glow.
 - *helpme*:  Show the statictea help text.
 - *cmdline*:  Build cmdline test app (bin/x/cmdline).
 - *jsondoc*:  Build jsondocraw app (bin/x/jsondocraw).
@@ -2641,15 +2641,15 @@ Nimble Tasks:
 
 [[#contents][茶]]
 
-** Stf Runner
+** StfRunner
 :PROPERTIES:
-   :CUSTOM_ID: stf-runner
+   :CUSTOM_ID: stfrunner
    :END:
 
 The Single Test File (stf) runner is a standalone program in this
 project used for testing command line applications.
 
-A stf file defines the test which the runner executes to
+A stf file defines the test which the stfrunner executes to
 determine whether the test passed. The stf file contains
 instructions for creating files, running files and comparing
 files.
@@ -2657,7 +2657,7 @@ files.
 The stf files are designed to look good in markdown readers.  The
 testfiles folder contains [[testfiles/stf-index.md][StaticTea Stf Files]].
 
-See the runner help message for more information about stf
+See the stfrunner help message for more information about stf
 files. The nimble *runhelp* task shows the stf help with glow.
 
 [[#contents][茶]]

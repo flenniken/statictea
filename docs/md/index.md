@@ -26,10 +26,10 @@ StaticTea nim source code documentation.
 * [repl.nim](repl.md) &mdash; Run commands at a prompt.
 * [replacement.nim](replacement.md) &mdash; Handle the replacement block lines.
 * [runCommand.nim](runCommand.md) &mdash; Run a command and fill in the variables dictionaries.
-* [runner.nim](runner.md) &mdash; A standalone command to run Single Test File (stf) files.
 * [signatures.nim](signatures.md) &mdash; Statictea function signatures and parameter checking.
 * [startingvars.nim](startingvars.md) &mdash; Get the starting variables.
 * [statictea.nim](statictea.md) &mdash; StaticTea; A template processor and language.
+* [stfrunner.nim](stfrunner.md) &mdash; A standalone command to run Single Test File (stf) files.
 * [tempFile.nim](tempFile.md) &mdash; Create a temporary file.
 * [timer.nim](timer.md) &mdash; Time how long it takes something to run.
 * [unicodes.nim](unicodes.md) &mdash; Functions that deal with Unicode.

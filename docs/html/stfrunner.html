@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>runner.nim</title>
+<title>stfrunner.nim</title>
 <link rel="stylesheet" type="text/css" href="nimModule.css">
 </head>
 <body>
-<h1>runner.nim</h1>
+<h1>stfrunner.nim</h1>
 
 <p>A standalone command to run Single Test File (stf) files.
 
@@ -22,7 +22,7 @@ files, or run the nimble task &quot;runhelp&quot; to show the help text with
 glow.
 </p>
 
-Nim source code: <a href="../../src/runner.nim">runner.nim</a>
+Nim source code: <a href="../../src/stfrunner.nim">stfrunner.nim</a>
 
 <h1>Index</h1>
 
@@ -52,7 +52,7 @@ Nim source code: <a href="../../src/runner.nim">runner.nim</a>
 <li> <a href="#writeErr">writeErr</a> &mdash; Write a message to stderr.</li>
 <li> <a href="#createFolder">createFolder</a> &mdash; Create a folder with the given name.</li>
 <li> <a href="#deleteFolder">deleteFolder</a> &mdash; Delete a folder with the given name.</li>
-<li>const:  <a href="#runnerHelp">runnerHelp</a> &mdash; Help for stf runner </li>
+<li>const:  <a href="#runnerHelp">runnerHelp</a> &mdash; Help for stfrunner </li>
 <li> <a href="#parseRunCommandLine">parseRunCommandLine</a> &mdash; Parse the command line arguments.</li>
 <li> <a href="#isRunFileLine">isRunFileLine</a> &mdash; Return true when the line is a file line.</li>
 <li> <a href="#isExpectedLine">isExpectedLine</a> &mdash; Return true when the line is an expected line.</li>
@@ -331,12 +331,12 @@ proc deleteFolder(folder: string): string {.raises: [],
 
 <h3 id="runnerHelp">runnerHelp</h3>
 
-<p>Help for stf runner
+<p>Help for stfrunner
 </p>
 
 <pre class="nim-code">
 runnerHelp = """# Stf Runner
-## Help for stf runner
+## Help for stfrunner
 
 Run a single test file (stf) or run all stf files in a folder.
 
@@ -348,7 +348,7 @@ the .stf or .stf.md extention.
 
 ## Usage
 
-runner [-h] [-v] [-l] [-f=filename] [-d=directory]
+stfrunner [-h] [-v] [-l] [-f=filename] [-d=directory]
 
 * -h --help          Show this help message.
 * -v --version       Show the version number.

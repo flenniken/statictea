@@ -778,19 +778,20 @@ nim c \
 --hint[Link]: off \
 -d:release \
 --out:bin/{hostDirName}/ \
-src/runner"""
+src/stfrunner"""
 
-  let exeName = fmt"bin/{hostDirName}/runner"
-  echo fmt"Build runner: {exeName}"
+  let exeName = fmt"bin/{hostDirName}/stfrunner"
+  echo fmt"Build stfrunner: {exeName}"
   runCmd(cmd)
 
-  echo fmt"Strip runner: {exeName}"
+  echo fmt"Strip stfrunner: {exeName}"
   runCmd(fmt"strip {exeName}")
 
 proc runRunnerFolder() =
   ## Run the stf files in the testfiles folder.
 
-  let cmd = fmt"export statictea='../../bin/{hostDirName}/statictea'; bin/{hostDirName}/runner -d=testfiles"
+  let cmd = fmt"""export statictea='../../bin/{hostDirName}/statictea'; \
+bin/{hostDirName}/stfrunner -d=testfiles"""
   # echo cmd
   runCmd(cmd, showOutput = true)
 
@@ -805,7 +806,8 @@ proc get_stf_filenames(): seq[string] =
 proc runAllStf() =
   ## Run all the stf tests in the testfiles directory.
   # Run the whole directory using the -d option.
-  let cmd = fmt"export statictea='../../bin/{hostDirName}/statictea'; bin/{hostDirName}/runner -d=testfiles"
+  let cmd = fmt"""export statictea='../../bin/{hostDirName}/statictea'; \
+bin/{hostDirName}/stfrunner -d=testfiles"""
   exec cmd
 
 proc runRunStf() =
@@ -827,7 +829,7 @@ proc runRunStf() =
       # Run a stf file.
       foundTest = true
       let cmd = fmt"""
-export statictea='../../bin/{hostDirName}/statictea'; bin/{hostDirName}/runner -f=testfiles/{filename}"""
+export statictea='../../bin/{hostDirName}/statictea'; bin/{hostDirName}/stfrunner -f=testfiles/{filename}"""
       echo "Running: " & filename
       let (result, _) = gorgeEx(cmd)
       lastCmd = cmd
@@ -935,7 +937,7 @@ proc otherTests() =
   # Build the statictea release exe.
   buildRelease()
 
-  # Build runner.
+  # Build stfrunner.
   buildRunner()
 
   # Build the cmdline exe.
@@ -1135,7 +1137,7 @@ task args, "\tShow command line arguments.":
   for i in 0..count-1:
     echo "$1: $2" % [$(i+1), system.paramStr(i)]
 
-task br, "\tBuild the stf test runner (bin/x/runner).":
+task br, "\tBuild the stf test stfrunner (bin/x/stfrunner).":
   buildRunner()
 
 task rt, "\tRun one or more stf tests in testfiles; specify part of the name.":
@@ -1169,8 +1171,8 @@ task newstf, "\tCreate new stf test skeleton, specify a name no ext.":
         echo cmd
         exec cmd
 
-task runhelp, "\tShow the runner help text with glow.":
-  exec fmt"bin/{hostDirName}/runner -h | glow -"
+task runhelp, "\tShow the stfrunner help text with glow.":
+  exec fmt"bin/{hostDirName}/stfrunner -h | glow -"
 
 task helpme, "\tShow the statictea help text.":
   exec fmt"bin/{hostDirName}/statictea -h | less"

@@ -1,4 +1,4 @@
-# runner.nim
+# stfrunner.nim
 
 A standalone command to run Single Test File (stf) files.
 
@@ -14,7 +14,7 @@ files, or run the nimble task "runhelp" to show the help text with
 glow.
 
 
-* [runner.nim](../../src/runner.nim) &mdash; Nim source code.
+* [stfrunner.nim](../../src/stfrunner.nim) &mdash; Nim source code.
 # Index
 
 * const: [runnerId](#runnerid) &mdash; The first line of the stf file.
@@ -42,7 +42,7 @@ glow.
 * [writeErr](#writeerr) &mdash; Write a message to stderr.
 * [createFolder](#createfolder) &mdash; Create a folder with the given name.
 * [deleteFolder](#deletefolder) &mdash; Delete a folder with the given name.
-* const: [runnerHelp](#runnerhelp) &mdash; Help for stf runner 
+* const: [runnerHelp](#runnerhelp) &mdash; Help for stfrunner 
 * [parseRunCommandLine](#parseruncommandline) &mdash; Parse the command line arguments.
 * [isRunFileLine](#isrunfileline) &mdash; Return true when the line is a file line.
 * [isExpectedLine](#isexpectedline) &mdash; Return true when the line is an expected line.
@@ -320,12 +320,12 @@ proc deleteFolder(folder: string): string {.raises: [],
 
 # runnerHelp
 
-Help for stf runner
+Help for stfrunner
 
 
 ~~~nim
 runnerHelp = """# Stf Runner
-## Help for stf runner
+## Help for stfrunner
 
 Run a single test file (stf) or run all stf files in a folder.
 
@@ -337,7 +337,7 @@ the .stf or .stf.md extention.
 
 ## Usage
 
-runner [-h] [-v] [-l] [-f=filename] [-d=directory]
+stfrunner [-h] [-v] [-l] [-f=filename] [-d=directory]
 
 * -h --help          Show this help message.
 * -v --version       Show the version number.

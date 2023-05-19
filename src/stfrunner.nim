@@ -190,7 +190,7 @@ when not defined(test):
   const
     runnerHelp* = """
 # Stf Runner
-## Help for stf runner
+## Help for stfrunner
 
 Run a single test file (stf) or run all stf files in a folder.
 
@@ -202,7 +202,7 @@ the .stf or .stf.md extention.
 
 ## Usage
 
-runner [-h] [-v] [-l] [-f=filename] [-d=directory]
+stfrunner [-h] [-v] [-l] [-f=filename] [-d=directory]
 
 * -h --help          Show this help message.
 * -v --version       Show the version number.
