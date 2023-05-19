@@ -71,7 +71,7 @@ proc exit() =
 proc get_test_filenames(): seq[string] =
   ## Return the basename of the nim files in the tests folder.
   result = @[]
-  let exclude = ["testall1.nim", "testall2.nim", "dynamicFuncList.nim"]
+  let exclude = ["dynamicFuncList.nim"]
   var list = listFiles("tests")
   for filename in list:
     let basename = lastPathPart(filename)
@@ -950,18 +950,14 @@ proc otherTests() =
   # Make sure utf8decoder is up-to-date.
   checkUtf8DecoderEcho()
 
-proc runUnitTests(name = "") =
+proc runUnitTests(name: string) =
   ## Run one or more tests.  You specify part of the test filename and
-  ## all files that match case insensitive are run. If you don't
-  ## specify a name, all are run.
+  ## all files that match case insensitive are run.
   let test_filenames = get_test_filenames()
   for filename in test_filenames:
     if name.toLower in filename.toLower:
-      if filename == "testall.nim":
-        continue
       let cmd = get_test_module_cmd(filename)
       exec cmd
-      # echo cmd
 
 proc makeJsonDoc(filename: string): string =
   # Create the json doc file for the given nim source file. Return the
@@ -1017,6 +1013,8 @@ task n, "\tShow available tasks.":
 
 task test, "\tRun one or more tests; specify part of the name.":
   let name = get_last_argument()
+  # When no name is specified the last argument is "test" and this
+  # matches all test files.
   runUnitTests(name)
 
 task other, "\tRun stf tests, build release exe and other tests.":
@@ -1038,7 +1036,7 @@ task docsall, "\tCreate all the docs.":
   taskDocsAll()
 
 task release, "\tRun tests and update docs; test, other, docsall.":
-  runUnitTests()
+  runUnitTests("test")
   otherTests()
   taskDocsAll()
 

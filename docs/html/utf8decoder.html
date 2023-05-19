@@ -35,13 +35,13 @@ proc decode(state: var uint32; codep: var uint32; sByte: char)
 <h3 id="yieldUtf8Chars">yieldUtf8Chars</h3>
 
 <p>Iterate through the string&#x27;s UTF-8 character byte sequences.
-@:For each character set ixStartSeq, ixEndSeq, and codePoint.
-@:Return true when the bytes sequence is valid else return false.
-@:
-@:You can get the current byte sequence with:
-@:str[ixStartSeq .. ixEndSeq]
-@:
-@:A UTF-8 character is a one to four byte sequence.
+For each character set ixStartSeq, ixEndSeq, and codePoint.
+Return true when the bytes sequence is valid else return false.
+
+</p><p>You can get the current byte sequence with:
+str[ixStartSeq .. ixEndSeq]
+
+</p><p>A UTF-8 character is a one to four byte sequence.
 </p>
 
 <pre class="nim-code">
