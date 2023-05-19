@@ -2506,7 +2506,7 @@ The nimble *dyfuncs* task extracts the docs and creates the nim
 source file dynamicFunctions.nim which gets complied into statictea.
 
 Since the function documentation is built in you can display it using
-the ph REPL command, see [[#repl-environment][REPL Environment]].
+the pf REPL command, see [[#repl-environment][REPL Environment]].
 
 - [[src/dynamicFuncList.nim][src/dynamicFuncList.nim]]
 - [[templates/dynamicFuncList.nim][dynamicFuncList.nim]]
@@ -2554,7 +2554,8 @@ The jsondocraw command produces a JSON file like jsondoc, except
 the descriptions match the text in the source file. Jsondocraw
 calls nim's jsondoc command then patches the descriptions.
 
-The nimble *jsondoc* command creates the jsondocraw exe.
+The nimble *jsondoc* command creates the jsondocraw exe and the
+nimble *json* command runs it on one or more files.
 
 Nim’s jsondoc command assumes the doc comment is formatted
 reStructuredText (RST). It converts the RST to HTML for the json

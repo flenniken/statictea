@@ -20,7 +20,7 @@ Stf (single test file) tests found in the testfiles folder.
 * [endblock-readme](../testfiles/endblock-readme.stf.md) &mdash; Test the endblock readme example.
 * [endcommand-alone](../testfiles/endcommand-alone.stf.md) &mdash; Test endcommand without a block command.
 * [endline](../testfiles/endline.stf.md) &mdash; Test there are no extra lines for the readmefun case.
-* [fib](../testfiles/fib.stf.md) &mdash; fig(0) = {o.
+* [fib](../testfiles/fib.stf.md) &mdash; Test recursion using the fibonacci sequence.
 * [format-basic](../testfiles/format-basic.stf.md) &mdash; Test the format function.
 * [format-warnings](../testfiles/format-warnings.stf.md) &mdash; Test the format function's warning messages.
 * [func-basics](../testfiles/func-basics.stf.md) &mdash; Test the func type.

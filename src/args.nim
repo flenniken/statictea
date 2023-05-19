@@ -33,10 +33,9 @@ type
     ## The args or a warning.
 
 proc makeUserPrepostTable*(prepostList: seq[Prepost]): PrepostTable =
-  ##
-  #$ Return the user's ordered table that maps prefixes to
-  #$ postfixes. This is used when the user specifies prefixes on the
-  #$ command line and it does not contain any defaults.
+  ## Return the user's ordered table that maps prefixes to
+  ## postfixes. This is used when the user specifies prefixes on the
+  ## command line and it does not contain any defaults.
   assert prepostList.len > 0
   result = initOrderedTable[string, string]()
   for prepost in prepostList:

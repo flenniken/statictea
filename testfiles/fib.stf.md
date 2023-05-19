@@ -2,13 +2,7 @@ stf file, version 0.1.0
 
 # Fibonacci Sequence
 
-# Test recursion using the fibonacci sequence.
-
->>> def fibonacci_of(n):
-...     if n in {0, 1}:  # Base case
-...         return n
-...     return fibonacci_of(n - 1) + fibonacci_of(n - 2)  # Recursive case
-
+Test recursion using the fibonacci sequence.
 
 ### File cmd.sh command
 
