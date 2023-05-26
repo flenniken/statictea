@@ -1776,7 +1776,7 @@ disappear when the code file finishes running.  For example the
 
 #+BEGIN_SRC nim
 a = 5
-o.x = a + 6
+o.x = add(a, 6)
 #+END_SRC
 
 You can use the loop function to loop over a list and build lists
@@ -2800,12 +2800,16 @@ Steps:
 
 *Download Code*
 
-Download the statictea source code to a folder on your system in a terminal window:
+Download the statictea source code to a folder on your system in
+a terminal window and pull the release version tag.
 
 #+BEGIN_SRC
 mkdir ~/code/statictea
 cd ~/code/statictea
 git clone git@github.com:flenniken/statictea.git .
+git tag
+git checkout v0.1.1 # variable
+git switch -c v0.1.1 # variable
 #+END_SRC
 
 *Start Docker Environment*
@@ -2872,6 +2876,9 @@ Download the statictea source code to a folder on your system:
 mkdir ~/code/statictea
 cd ~/code/statictea
 git clone git@github.com:flenniken/statictea.git .
+git tag
+git checkout v0.1.1 # variable
+git switch -c v0.1.1 # variable
 #+END_SRC
 
 *Download Nim*
