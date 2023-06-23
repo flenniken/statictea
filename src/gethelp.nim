@@ -9,7 +9,7 @@ NAME
 SYNOPSIS
 
      statictea [-h] [-v] [-x] [-u] [-s server.json] [-o codefile.tea]
-         [-t template.html] [-p "prefix[,postfix]"] [-r result.html]
+         -t template.html [-p "prefix[,postfix]"] [-r result.html]
 
 DESCRIPTION
 
@@ -52,7 +52,8 @@ DESCRIPTION
      -t filename, --template filename
 
              The template file to process. Use the name "stdin" to
-             read the template from standard input.
+             read the template from standard input. This option is
+             required.
 
      -u, --update
 
@@ -71,7 +72,7 @@ EXAMPES
      Typical usage:
 
              statictea -s server.json -o codefile.tea \
-                 -t:template.html -r home.html
+                 -t template.html -r home.html
 
      You can specify multiple server or code files.
 
