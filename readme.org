@@ -2540,7 +2540,24 @@ highlighter.
 
 The dev.html file in the root folder is a master index to the svg
 files and to all the markdown and html documents. It’s handy for
-developers with the source code for debugging the docs.
+developers with the source code for debugging the docs. Open the
+dev.html file in your browser using the file command.
+
+*Local Markdown*
+
+You can view the markdown documents locally on your machine using
+the grip server. You start the server then navigate to the
+index.md file.
+
+#+BEGIN_SRC
+# from statictea directory
+grip dev.html
+ * Running on http://localhost:6419/ (Press CTRL+C to quit)
+#+END_SRC
+
+In your browser enter the index.md file:
+
+http://localhost:6419/docs/md/index.md
 
 [[#contents][茶]]
 
@@ -2852,6 +2869,9 @@ and docs.
 #+BEGIN_SRC
 cd ~/statictea
 nimble release
+bin/debian/statictea -v
+
+0.1.2
 #+END_SRC
 
 [[#contents][茶]]

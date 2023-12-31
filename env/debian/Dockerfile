@@ -1,6 +1,6 @@
 # This builds a development environment for the statictea project.
 
-FROM debian:11
+FROM debian:12
 MAINTAINER Steve Flenniken
 ENV statictea_env=debian
 
@@ -9,6 +9,14 @@ RUN apt update && apt -qy install less man sudo tree curl wget nano git
 
 # Install the c language.
 RUN apt -qy install libssl-dev build-essential clang
+
+# Install graphviz for creating svg dependency charts.
+# https://graphviz.org/
+RUN apt install -qy graphviz
+
+# Install jq for viewing JSON at the command line.
+# https://github.com/stedolan/jq
+RUN apt -qy install jq
 
 # Install glow for viewing markdown at the command line.
 # https://github.com/charmbracelet/glow
@@ -20,30 +28,9 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] \
   | tee /etc/apt/sources.list.d/charm.list
 RUN apt update && apt install glow
 
-# Install jq for viewing JSON at the command line.
-# https://github.com/stedolan/jq
-ENV JQ_VERSION='1.5'
-RUN \
-  wget --no-check-certificate \
-    https://raw.githubusercontent.com/stedolan/jq/master/sig/jq-release.key \
-    -O /tmp/jq-release.key && \
-  wget --no-check-certificate \
-    https://raw.githubusercontent.com/stedolan/jq/master/sig/v${JQ_VERSION}/jq-linux64.asc \
-    -O /tmp/jq-linux64.asc && \
-  wget --no-check-certificate \
-    https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 \
-    -O /tmp/jq-linux64 && \
-  gpg --import /tmp/jq-release.key && \
-  gpg --verify /tmp/jq-linux64.asc /tmp/jq-linux64 && \
-  cp /tmp/jq-linux64 /usr/bin/jq && \
-  chmod +x /usr/bin/jq && \
-  rm -f /tmp/jq-release.key && \
-  rm -f /tmp/jq-linux64.asc && \
-  rm -f /tmp/jq-linux64
-
-# Install graphviz for creating svg dependency charts.
-# https://graphviz.org/
-RUN apt install -qy graphviz
+# Install the perl regular expression library to avoid "could not
+# load: libpcre.so(.3|.1|)" runtime error.
+RUN apt -qy install libpcre3 libpcre3-dev
 
 # Create user teamaster with sudo permissions and no password.
 RUN mkdir -p /etc/sudoers.d \
