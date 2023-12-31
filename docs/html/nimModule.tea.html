@@ -164,7 +164,7 @@
 
   <span class="t-comment"># Simplify the nim signatures by removing empty raises list and
 </span>  <span class="t-comment"># empty tags list. Leave the lists that contain something.
-</span>  <span class="t-dotName">junk</span> = <span class="t-str">&quot;\\s*{\\.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[]\\.}&quot;</span>
+</span>  <span class="t-dotName">junk</span> = <span class="t-str">&quot;\\s*{\\.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[],\\s*forbids:\\s*\\[]\\.}&quot;</span>
   <span class="t-dotName">newEntry.signature</span> = <span class="t-funcCall">replaceRe</span>(<span class="t-dotName">entry.code</span>, <span class="t-funcCall">list</span>(<span class="t-dotName">junk</span>, <span class="t-str">&quot;&quot;</span>, <span class="t-str">&quot;\n*\\s*$&quot;</span>, <span class="t-str">&quot;&quot;</span>))
 
   <span class="t-dotName">newEntry.anchor</span> = <span class="t-dotName">state.anchors</span>[<span class="t-dotName">ix</span>]

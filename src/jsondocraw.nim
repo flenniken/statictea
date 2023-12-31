@@ -195,6 +195,7 @@ proc removePresentation*(args: Args) =
   let tempFile = tempFileO.get()
   let origJsonFilename = tempFile.filename
   defer: discard tryRemoveFile(origJsonFilename)
+  # echo fmt"origJsonFilename: {origJsonFilename}"
 
   # Remove the destination if it exists before creating it.
   discard tryRemoveFile(args.destJsonFile)

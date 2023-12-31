@@ -61,9 +61,9 @@ StaticTea variable types.
 * [`$`](#-1) &mdash; Return a string representation of a signature.
 * [`$`](#-2) &mdash; Return a string representation of a function.
 * [jsonStringRepr](#jsonstringrepr) &mdash; Return the JSON string representation.
+* [valueToString](#valuetostring) &mdash; 
 * [dictToString](#dicttostring) &mdash; Return a string representation of a dict Value in JSON format.
 * [listToString](#listtostring) &mdash; Return a string representation of a list variable in JSON format.
-* [valueToString](#valuetostring) &mdash; Return a string representation of a variable in JSON format.
 * [valueToStringRB](#valuetostringrb) &mdash; Return the string representation of the variable for use in the replacement blocks.
 * [`$`](#-3) &mdash; Return a string representation of a Value.
 * [`$`](#-4) &mdash; Return a string representation of a VarsDict.
@@ -691,7 +691,8 @@ Return true when two variables are equal.
 
 
 ~~~nim
-proc `==`(a: Value; b: Value): bool
+proc `==`(a: Value; b: Value): bool {.noSideEffect, raises: [Exception],
+                                      tags: [RootEffect], forbids: [].}
 ~~~
 
 # newStatement
@@ -732,6 +733,15 @@ is a valid UTF-8 encoded string.
 proc jsonStringRepr(str: string): string
 ~~~
 
+# valueToString
+
+
+
+~~~nim
+func valueToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
+~~~
+
 # dictToString
 
 Return a string representation of a dict Value in JSON format.
@@ -739,7 +749,7 @@ Return a string representation of a dict Value in JSON format.
 
 ~~~nim
 func dictToString(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # listToString
@@ -749,17 +759,7 @@ Return a string representation of a list variable in JSON format.
 
 ~~~nim
 func listToString(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
-~~~
-
-# valueToString
-
-Return a string representation of a variable in JSON format.
-
-
-~~~nim
-func valueToString(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # valueToStringRB
@@ -770,7 +770,7 @@ replacement blocks.
 
 ~~~nim
 func valueToStringRB(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # `$`
@@ -779,7 +779,8 @@ Return a string representation of a Value.
 
 
 ~~~nim
-func `$`(value: Value): string {.raises: [Exception], tags: [RootEffect].}
+func `$`(value: Value): string {.raises: [Exception], tags: [RootEffect],
+                                 forbids: [].}
 ~~~
 
 # `$`
@@ -788,7 +789,8 @@ Return a string representation of a VarsDict.
 
 
 ~~~nim
-proc `$`(varsDict: VarsDict): string {.raises: [Exception], tags: [RootEffect].}
+proc `$`(varsDict: VarsDict): string {.raises: [Exception], tags: [RootEffect],
+                                       forbids: [].}
 ~~~
 
 # dotNameRep
@@ -799,7 +801,7 @@ variables tells whether the dict is the variables dictionary.
 
 ~~~nim
 func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string {.
-    raises: [ValueError, Exception], tags: [RootEffect].}
+    raises: [ValueError, Exception], tags: [RootEffect], forbids: [].}
 ~~~
 
 # verticalLines
@@ -809,7 +811,7 @@ Return a vertical lines string representation of a list.
 
 ~~~nim
 func verticalLines(value: Value): string {.raises: [Exception, ValueError],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # newValueOr
@@ -876,7 +878,8 @@ Compare two FunResult objects and return true when equal.
 
 
 ~~~nim
-func `==`(r1: FunResult; r2: FunResult): bool
+func `==`(r1: FunResult; r2: FunResult): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # `!=`
@@ -885,7 +888,8 @@ Compare two FunResult objects and return false when equal.
 
 
 ~~~nim
-proc `!=`(a: FunResult; b: FunResult): bool
+proc `!=`(a: FunResult; b: FunResult): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # `$`
@@ -895,7 +899,7 @@ Return a string representation of a FunResult object.
 
 ~~~nim
 func `$`(funResult: FunResult): string {.raises: [Exception, ValueError],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # newValuePosSi
@@ -931,7 +935,8 @@ Return true when a equals b.
 
 
 ~~~nim
-proc `==`(a: ValuePosSi; b: ValuePosSi): bool
+proc `==`(a: ValuePosSi; b: ValuePosSi): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # `==`
@@ -940,7 +945,8 @@ Return true when a equals b.
 
 
 ~~~nim
-proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # `!=`
@@ -949,7 +955,8 @@ Compare two ValuePosSi objects and return false when equal.
 
 
 ~~~nim
-proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
+proc `!=`(a: ValuePosSi; b: ValuePosSi): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # `!=`
@@ -958,7 +965,8 @@ Compare two ValuePosSiOr objects and return false when equal.
 
 
 ~~~nim
-proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 ~~~
 
 # newValuePosSiOr

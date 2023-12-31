@@ -40,11 +40,13 @@ RUN mkdir -p /etc/sudoers.d \
   && usermod -aG sudo teamaster \
   && echo 'teamaster:devenv' | chpasswd
 
+RUN chown teamaster:teamaster /home/teamaster
+
 # Switch to user teamaster for following commands.
 USER teamaster
 WORKDIR /home/teamaster
 
-# The debian package manager installs nim version 1.4.2.  To get a
+# The debian package manager installs an old nim version.  To get a
 # newer version you can download prebuilt binaries or build from
 # source.  The prebuilt binaries are built for x86 machines and no
 # version for arm64. The x86 version will run using emulation, however
@@ -56,8 +58,8 @@ WORKDIR /home/teamaster
 # to manually run build_all.sh to build nim.
 RUN git clone https://github.com/nim-lang/Nim.git
 RUN cd Nim \
-  && git checkout v1.6.12 \
-  && git switch -c v1.6.12
+  && git checkout v2.0.2 \
+  && git switch -c v2.0.2
 
 # Install bashrc for the prompt and some aliases.
 COPY --chown=teamaster:teamaster bashrc .bashrc

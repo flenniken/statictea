@@ -35,7 +35,7 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @[fmt"bin/{hostDirName}/statictea"]
 
-requires fmt"nim >= 1.6.12"
+requires fmt"nim >= 2.0.2"
 
 proc runCmd(cmd: string, showOutput = false) =
   ## Run the command and if it fails, generate an exception and print
@@ -381,6 +381,15 @@ proc createDependencyGraph() =
   ## Create a dependency dot file from statictea.nim modules showing
   ## the module import dependencies.
 
+  # The graphviz application is different between the mac and debian
+  # and they each generate a graph that looks the same but they
+  # compare different. We don't want to check in unless there is a
+  # real change. Since the debian version is much newer, use it to
+  # make the graph.
+  if hostDirName != "debian":
+    echo "Build the source dependency graph on debian."
+    return
+
   # Run "man dot" for information about the dot format
   # and formatting options.
 
@@ -498,6 +507,10 @@ proc createDependencyGraph2() =
   ## Create a dependency dot file from the StaticTea source. Show the
   ## the nim system modules on the left and the StaticTea modules on
   ## the right.
+
+  if hostDirName != "debian":
+    echo "Build the system dependency graph on debian."
+    return
 
   # Create a dot file of all the import dependencies.
   let statictea2Dot = "src/statictea.dot"

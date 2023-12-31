@@ -26,7 +26,7 @@ type
     ## StringOr holds a string or a warning.
 
   PathComponents* = object
-    ## PathComponents holds the components of the file path components.
+    ## PathComponents holds the components of the file path.
     dir: string
     filename: string
     basename: string
@@ -236,7 +236,7 @@ proc formatString*(variables: Variables, text: string): StringOr =
   result = newStringOr(newStr)
 
 type
-  AnchorNameProc = proc(name: string): string
+  AnchorNameProc = proc(name: string): string {.noSideEffect.}
 
 func anchors(names: seq[Value], anchorNameProc: AnchorNameProc): FunResult =
   ## Create a list of anchor names from the given list of

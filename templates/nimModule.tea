@@ -153,7 +153,7 @@ u.get-entry = func(ix: int, entry: dict, newList: list, state: dict) bool
 
   # Simplify the nim signatures by removing empty raises list and
   # empty tags list. Leave the lists that contain something.
-  junk = "\\s*{\\.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[]\\.}"
+  junk = "\\s*{\\.\\s*raises:\\s*\\[],\\s*tags:\\s*\\[],\\s*forbids:\\s*\\[]\\.}"
   newEntry.signature = replaceRe(entry.code, list(junk, "", "\n*\\s*$", ""))
 
   newEntry.anchor = state.anchors[ix]

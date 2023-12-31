@@ -71,9 +71,9 @@ Nim source code: <a href="../../src/vartypes.nim">vartypes.nim</a>
 <li> <a href="#a__">`$`</a> &mdash; Return a string representation of a signature.</li>
 <li> <a href="#a__-1">`$`</a> &mdash; Return a string representation of a function.</li>
 <li> <a href="#jsonStringRepr">jsonStringRepr</a> &mdash; Return the JSON string representation.</li>
+<li> <a href="#valueToString">valueToString</a> &mdash; </li>
 <li> <a href="#dictToString">dictToString</a> &mdash; Return a string representation of a dict Value in JSON format.</li>
 <li> <a href="#listToString">listToString</a> &mdash; Return a string representation of a list variable in JSON format.</li>
-<li> <a href="#valueToString">valueToString</a> &mdash; Return a string representation of a variable in JSON format.</li>
 <li> <a href="#valueToStringRB">valueToStringRB</a> &mdash; Return the string representation of the variable for use in the replacement blocks.</li>
 <li> <a href="#a__-2">`$`</a> &mdash; Return a string representation of a Value.</li>
 <li> <a href="#a__-3">`$`</a> &mdash; Return a string representation of a VarsDict.</li>
@@ -724,7 +724,8 @@ proc newEmptyDictValue(mutable = Mutable.immutable): Value
 </p>
 
 <pre class="nim-code">
-proc `==`(a: Value; b: Value): bool
+proc `==`(a: Value; b: Value): bool {.noSideEffect, raises: [Exception],
+                                      tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="newStatement">newStatement</h3>
@@ -765,6 +766,15 @@ is a valid UTF-8 encoded string.
 proc jsonStringRepr(str: string): string
 </pre>
 
+<h3 id="valueToString">valueToString</h3>
+
+
+
+<pre class="nim-code">
+func valueToString(value: Value): string {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
+</pre>
+
 <h3 id="dictToString">dictToString</h3>
 
 <p>Return a string representation of a dict Value in JSON format.
@@ -772,7 +782,7 @@ proc jsonStringRepr(str: string): string
 
 <pre class="nim-code">
 func dictToString(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="listToString">listToString</h3>
@@ -782,17 +792,7 @@ func dictToString(value: Value): string {.raises: [Exception],
 
 <pre class="nim-code">
 func listToString(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
-</pre>
-
-<h3 id="valueToString">valueToString</h3>
-
-<p>Return a string representation of a variable in JSON format.
-</p>
-
-<pre class="nim-code">
-func valueToString(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="valueToStringRB">valueToStringRB</h3>
@@ -803,7 +803,7 @@ replacement blocks.
 
 <pre class="nim-code">
 func valueToStringRB(value: Value): string {.raises: [Exception],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="a__-2">`$`</h3>
@@ -812,7 +812,8 @@ func valueToStringRB(value: Value): string {.raises: [Exception],
 </p>
 
 <pre class="nim-code">
-func `$`(value: Value): string {.raises: [Exception], tags: [RootEffect].}
+func `$`(value: Value): string {.raises: [Exception], tags: [RootEffect],
+                                 forbids: [].}
 </pre>
 
 <h3 id="a__-3">`$`</h3>
@@ -821,7 +822,8 @@ func `$`(value: Value): string {.raises: [Exception], tags: [RootEffect].}
 </p>
 
 <pre class="nim-code">
-proc `$`(varsDict: VarsDict): string {.raises: [Exception], tags: [RootEffect].}
+proc `$`(varsDict: VarsDict): string {.raises: [Exception], tags: [RootEffect],
+                                       forbids: [].}
 </pre>
 
 <h3 id="dotNameRep">dotNameRep</h3>
@@ -832,7 +834,7 @@ variables tells whether the dict is the variables dictionary.
 
 <pre class="nim-code">
 func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string {.
-    raises: [ValueError, Exception], tags: [RootEffect].}
+    raises: [ValueError, Exception], tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="verticalLines">verticalLines</h3>
@@ -842,7 +844,7 @@ func dotNameRep(dict: VarsDict; leftSide: string = ""; top = false): string {.
 
 <pre class="nim-code">
 func verticalLines(value: Value): string {.raises: [Exception, ValueError],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="newValueOr">newValueOr</h3>
@@ -909,7 +911,8 @@ func newFunResult(value: Value): FunResult
 </p>
 
 <pre class="nim-code">
-func `==`(r1: FunResult; r2: FunResult): bool
+func `==`(r1: FunResult; r2: FunResult): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="a___-2">`!=`</h3>
@@ -918,7 +921,8 @@ func `==`(r1: FunResult; r2: FunResult): bool
 </p>
 
 <pre class="nim-code">
-proc `!=`(a: FunResult; b: FunResult): bool
+proc `!=`(a: FunResult; b: FunResult): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="a__-4">`$`</h3>
@@ -928,7 +932,7 @@ proc `!=`(a: FunResult; b: FunResult): bool
 
 <pre class="nim-code">
 func `$`(funResult: FunResult): string {.raises: [Exception, ValueError],
-    tags: [RootEffect].}
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="newValuePosSi">newValuePosSi</h3>
@@ -964,7 +968,8 @@ func newValuePosSiOr(warningData: WarningData): ValuePosSiOr
 </p>
 
 <pre class="nim-code">
-proc `==`(a: ValuePosSi; b: ValuePosSi): bool
+proc `==`(a: ValuePosSi; b: ValuePosSi): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="a___-4">`==`</h3>
@@ -973,7 +978,8 @@ proc `==`(a: ValuePosSi; b: ValuePosSi): bool
 </p>
 
 <pre class="nim-code">
-proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="a___-5">`!=`</h3>
@@ -982,7 +988,8 @@ proc `==`(a: ValuePosSiOr; b: ValuePosSiOr): bool
 </p>
 
 <pre class="nim-code">
-proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
+proc `!=`(a: ValuePosSi; b: ValuePosSi): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="a___-6">`!=`</h3>
@@ -991,7 +998,8 @@ proc `!=`(a: ValuePosSi; b: ValuePosSi): bool
 </p>
 
 <pre class="nim-code">
-proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool
+proc `!=`(a: ValuePosSiOr; b: ValuePosSiOr): bool {.raises: [Exception],
+    tags: [RootEffect], forbids: [].}
 </pre>
 
 <h3 id="newValuePosSiOr-2">newValuePosSiOr</h3>

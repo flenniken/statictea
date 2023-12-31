@@ -384,7 +384,7 @@ proc newEmptyDictValue*(mutable = Mutable.immutable): Value =
   ## Create a dictionary value from a VarsDict.
   result = newValue(newVarsDict(), mutable)
 
-proc `==`*(a: Value, b: Value): bool =
+proc `==`*(a: Value, b: Value): bool {.noSideEffect.} =
   ## Return true when two variables are equal.
   if a.kind == b.kind:
     case a.kind:

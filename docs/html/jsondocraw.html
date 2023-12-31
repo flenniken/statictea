@@ -97,7 +97,7 @@ Args = object
 </p>
 
 <pre class="nim-code">
-func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [].}
+func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [], forbids: [].}
 </pre>
 
 <h3 id="getMessage">getMessage</h3>
@@ -107,7 +107,7 @@ func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [].}
 
 <pre class="nim-code">
 func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
-    raises: [ValueError], tags: [].}
+    raises: [ValueError], tags: [], forbids: [].}
 </pre>
 
 <h3 id="a__">`$`</h3>
@@ -116,7 +116,7 @@ func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
 </p>
 
 <pre class="nim-code">
-func `$`(args: Args): string {.raises: [ValueError], tags: [].}
+func `$`(args: Args): string {.raises: [ValueError], tags: [], forbids: [].}
 </pre>
 
 <h3 id="readOneDesc">readOneDesc</h3>
@@ -127,7 +127,7 @@ numbers. The srcLines contain the line endings.
 
 <pre class="nim-code">
 proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
-    raises: [RegexError], tags: [].}
+    raises: [RegexError], tags: [], forbids: [].}
 </pre>
 
 <h3 id="readDescriptions">readDescriptions</h3>
@@ -139,7 +139,7 @@ description.
 
 <pre class="nim-code">
 proc readDescriptions(text: string; lineNums: seq[int]): OrderedTable[string,
-    string] {.raises: [RegexError], tags: [].}
+    string] {.raises: [RegexError], tags: [], forbids: [].}
 </pre>
 
 <h3 id="removePresentation">removePresentation</h3>
@@ -151,9 +151,9 @@ file to create.
 
 <pre class="nim-code">
 proc removePresentation(args: Args) {.raises: [JsonDocRawError, ValueError,
-    OSError, Exception, IOError, JsonParsingError, KeyError, RegexError], tags: [
+    OSError, IOError, JsonParsingError, KeyError, RegexError], tags: [
     ReadDirEffect, ReadEnvEffect, ReadIOEffect, WriteDirEffect, ExecIOEffect,
-    RootEffect, WriteIOEffect].}
+    RootEffect, WriteIOEffect], forbids: [].}
 </pre>
 
 

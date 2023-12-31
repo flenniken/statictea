@@ -84,7 +84,7 @@ Create an Args object from a CmlArgs.
 
 
 ~~~nim
-func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [].}
+func newArgs(cmlArgs: CmlArgs): Args {.raises: [KeyError], tags: [], forbids: [].}
 ~~~
 
 # getMessage
@@ -94,7 +94,7 @@ Return a message from a message id and problem argument.
 
 ~~~nim
 func getMessage(message: CmlMessageId; problemArg: string = ""): string {.
-    raises: [ValueError], tags: [].}
+    raises: [ValueError], tags: [], forbids: [].}
 ~~~
 
 # `$`
@@ -103,7 +103,7 @@ Return a string representation of an Args object.
 
 
 ~~~nim
-func `$`(args: Args): string {.raises: [ValueError], tags: [].}
+func `$`(args: Args): string {.raises: [ValueError], tags: [], forbids: [].}
 ~~~
 
 # readOneDesc
@@ -114,7 +114,7 @@ numbers. The srcLines contain the line endings.
 
 ~~~nim
 proc readOneDesc(srcLines: seq[string]; start: int; finish: int): string {.
-    raises: [RegexError], tags: [].}
+    raises: [RegexError], tags: [], forbids: [].}
 ~~~
 
 # readDescriptions
@@ -126,7 +126,7 @@ description.
 
 ~~~nim
 proc readDescriptions(text: string; lineNums: seq[int]): OrderedTable[string,
-    string] {.raises: [RegexError], tags: [].}
+    string] {.raises: [RegexError], tags: [], forbids: [].}
 ~~~
 
 # removePresentation
@@ -138,9 +138,9 @@ file to create.
 
 ~~~nim
 proc removePresentation(args: Args) {.raises: [JsonDocRawError, ValueError,
-    OSError, Exception, IOError, JsonParsingError, KeyError, RegexError], tags: [
+    OSError, IOError, JsonParsingError, KeyError, RegexError], tags: [
     ReadDirEffect, ReadEnvEffect, ReadIOEffect, WriteDirEffect, ExecIOEffect,
-    RootEffect, WriteIOEffect].}
+    RootEffect, WriteIOEffect], forbids: [].}
 ~~~
 
 
