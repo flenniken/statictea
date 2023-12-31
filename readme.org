@@ -2871,7 +2871,7 @@ cd ~/statictea
 nimble release
 bin/debian/statictea -v
 
-0.1.2
+0.1.3
 #+END_SRC
 
 [[#contents][茶]]
