@@ -2107,6 +2107,7 @@ template.
 - [[#repl-environment][REPL Environment]]
 - [[#docker-development][Docker Development]]
 - [[#mac-development][Mac Development]]
+- [[#docs/ideas.md][Ideas]]
 
 [[#contents][茶]]
 
@@ -2965,7 +2966,7 @@ nimble release
 - [[#user-functions][User Functions]]
 - [[#run-statictea][Run StaticTea]]
 - [[#how-to][How To]]
-- [[#miscellaneous][Miscellaneous (+14)]]
+- [[#miscellaneous][Miscellaneous (+15)]]
 - [[docs/md/teaFunctions.md][Functions]]
 
 * Tea Info                                                            :notoc:
