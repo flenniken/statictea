@@ -2853,11 +2853,11 @@ cd ~/Nim
 ./build_all.sh
 nim -v
 
-Nim Compiler Version 1.6.12 [Linux: arm64]
-Compiled at 2023-05-19
-Copyright (c) 2006-2023 by Andreas Rumpf
+Nim Compiler Version 2.2.0 [Linux: arm64]
+Compiled at 2024-10-20
+Copyright (c) 2006-2024 by Andreas Rumpf
 
-git hash: 1aa9273640c0c51486cf3a7b67282fe58f360e91
+git hash: 78983f1876726a49c69d65629ab433ea1310ece1
 active boot switches: -d:release
 #+END_SRC
 
@@ -2869,7 +2869,7 @@ and docs.
 
 #+BEGIN_SRC
 cd ~/statictea
-nimble release
+n release
 bin/debian/statictea -v
 
 0.1.3
@@ -2882,6 +2882,10 @@ bin/debian/statictea -v
 :CUSTOM_ID: mac-development
 :ORDERED:  t
 :END:
+
+Note: Mac development is on pause until it is easier to install
+nim there. Currently choosenim doesn't work on an ARM Mac. The
+following instructions are for an Intel Mac.
 
 Besides the docker environment, you can develop on a mac.
 

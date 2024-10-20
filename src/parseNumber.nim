@@ -10,7 +10,7 @@ proc parseFloat*(str: string, start: Natural = 0): Option[tuple[number: float64,
   ## index. Nothing is returned when the float is out of range or the
   ## str is not a float number.  Processing stops at the first
   ## non-number character.
-  assert sizeof[BiggestFloat] == sizeof[float64]
+  assert(sizeof(BiggestFloat) == sizeof(float64))
   var number: BiggestFloat
   let length = parseBiggestFloat(str, number, start)
   if length > 0:

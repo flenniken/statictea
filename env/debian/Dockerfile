@@ -54,12 +54,19 @@ WORKDIR /home/teamaster
 # repo, checking out a version tag and running a build script.  This
 # docker file supports the build from source method.
 
-# Get nim source for manually building a nim version. Note: You need
-# to manually run build_all.sh to build nim.
+# Note: You need to manually run build_all.sh once in the container to
+# build nim.
+
+# cd ~/Nim
+# build_all.sh
+# nim -v
+
+# Get nim source for manually building nim.
 RUN git clone https://github.com/nim-lang/Nim.git
+ARG nim_version=v2.2.0
 RUN cd Nim \
-  && git checkout v2.0.2 \
-  && git switch -c v2.0.2
+  && git checkout $nim_version \
+  && git switch -c $nim_version
 
 # Install bashrc for the prompt and some aliases.
 COPY --chown=teamaster:teamaster bashrc .bashrc
@@ -67,4 +74,3 @@ COPY --chown=teamaster:teamaster bashrc .bashrc
 # Start in the statictea directory.
 WORKDIR /home/teamaster/statictea
 CMD ["/bin/bash"]
-
