@@ -111,7 +111,7 @@ statement: q asdf
     let eOut = """
 t.args = {}
 t.row = 0
-t.version = "0.1.3"
+t.version = "0.1.4"
 """
     check testHandleReplLine("pd t", false, eOut = eOut)
 

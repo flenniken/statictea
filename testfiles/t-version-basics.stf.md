@@ -61,10 +61,10 @@ t.version => {t.version}
 
 ~~~
 The current version of statictea.
-t.version => 0.1.3
+t.version => 0.1.4
 
 Try to set the version number.
-t.version => 0.1.3
+t.version => 0.1.4
 ~~~
 
 ### File stdout.expected
