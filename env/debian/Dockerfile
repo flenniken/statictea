@@ -63,7 +63,7 @@ WORKDIR /home/teamaster
 
 # Get nim source for manually building nim.
 RUN git clone https://github.com/nim-lang/Nim.git
-ARG nim_version=v2.2.0
+ARG nim_version=v2.2.4
 RUN cd Nim \
   && git checkout $nim_version \
   && git switch -c $nim_version
