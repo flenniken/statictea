@@ -16,7 +16,7 @@ ascii digits.
 
 
 ~~~nim
-staticteaVersion = "0.1.4"
+staticteaVersion = "0.1.5"
 ~~~
 
 
