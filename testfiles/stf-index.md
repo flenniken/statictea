@@ -46,6 +46,7 @@ Stf (single test file) tests found in the testfiles folder.
 * [log-path](../testfiles/log-path.stf.md) &mdash; Test the default log path is written to when you specify -l without a filename.
 * [logging-hello-world](../testfiles/logging-hello-world.stf.md) &mdash; Test logging with Hello World.
 * [logging-replacement-block](../testfiles/logging-replacement-block.stf.md) &mdash; Test logging the replacement block.
+* [loop-dict](../testfiles/loop-dict.stf.md) &mdash; Test the loop function where it loops over a list of dictionaries and creates a dictionary.
 * [lreturncode](../testfiles/lreturncode.stf.md) &mdash; Test the return code for -l -h is 0.
 * [markdownlite](../testfiles/markdownlite.stf.md) &mdash; Example using parseMarkdown.
 * [maxlines](../testfiles/maxlines.stf.md) &mdash; Test t maxLines tea variable.
